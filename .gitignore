@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+dist/
+build/
+coverage/
+*.log
+*.zip
+*.tar.gz
+*.deb
+.vscode/

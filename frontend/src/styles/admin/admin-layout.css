@@ -1,0 +1,42 @@
+.admin-layout{
+    display:flex;
+    min-height:100vh;
+    background:#f5f7fb;
+}
+
+.admin-main{
+    flex:1;
+    margin-left:270px;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.admin-content{
+    flex:1;
+    padding:30px;
+}
+
+.sidebar-overlay{
+    display:none;
+}
+
+@media(max-width:991px){
+
+.admin-main{
+    margin-left:0;
+}
+
+.admin-content{
+    padding:18px;
+}
+
+.sidebar-overlay{
+    display:block;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:998;
+}
+
+}

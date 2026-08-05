@@ -1,0 +1,596 @@
+/* ========================= */
+/* Property Gallery */
+/* ========================= */
+
+.main-property-image{
+
+  width:100%;
+
+  height:500px;
+
+  object-fit:cover;
+
+  border-radius:25px;
+
+  box-shadow:0 20px 50px rgba(0,0,0,.15);
+
+  display:block;
+
+}
+
+
+.property-thumbnails{
+
+  display:flex;
+
+  gap:12px;
+
+  margin-top:18px;
+
+  overflow-x:auto;
+
+  padding-bottom:5px;
+
+}
+
+
+.property-thumbnails::-webkit-scrollbar{
+
+  height:6px;
+
+}
+
+
+.property-thumbnails::-webkit-scrollbar-thumb{
+
+  background:#ddd;
+
+  border-radius:20px;
+
+}
+
+
+.thumbnail{
+
+  width:90px;
+
+  height:70px;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  border:3px solid transparent;
+
+  transition:.25s;
+
+  flex-shrink:0;
+
+}
+
+
+.thumbnail:hover{
+
+  transform:scale(1.05);
+
+}
+
+
+.thumbnail.active{
+
+  border-color:#111;
+
+}
+
+
+/* Mobile */
+
+@media(max-width:900px){
+
+  .main-property-image{
+
+    height:300px;
+
+  }
+
+  .thumbnail{
+
+    width:70px;
+
+    height:60px;
+
+  }
+
+}
+/* ========================= */
+/* Property Details Layout   */
+/* ========================= */
+
+.property-details{
+
+  padding:40px 0 60px;
+
+}
+
+.property-main{
+
+  display:grid;
+
+  grid-template-columns:1.6fr 1fr;
+
+  gap:35px;
+
+  align-items:start;
+
+}
+
+.property-image{
+
+  position:relative;
+
+}
+
+.wishlist-icon{
+
+  position:absolute;
+
+  top:16px;
+
+  right:16px;
+
+  width:44px;
+
+  height:44px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:50%;
+
+  border:none;
+
+  background:rgba(255,255,255,.95);
+
+  color:#333;
+
+  cursor:pointer;
+
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+  transition:.3s ease;
+
+}
+
+.wishlist-icon:hover{
+
+  color:#e63946;
+
+  transform:scale(1.08);
+
+}
+
+.wishlist-icon.active{
+
+  color:#e63946;
+
+}
+
+.property-title{
+
+  font-size:28px;
+
+  font-weight:800;
+
+  color:#111827;
+
+  margin-top:26px;
+
+}
+
+.property-location{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  color:#64748b;
+
+  font-size:15px;
+
+  margin-top:8px;
+}
+
+.property-section{
+
+  margin-top:28px;
+
+}
+
+.property-section h3{
+
+  font-size:18px;
+
+  font-weight:700;
+
+  color:#111827;
+
+  margin-bottom:12px;
+
+}
+
+.property-description{
+
+  color:#475569;
+
+  line-height:1.8;
+
+  font-size:15px;
+
+}
+
+.chip-grid{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+}
+
+.chip{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  background:#f1f5f9;
+
+  color:#334155;
+
+  font-size:13.5px;
+
+  font-weight:500;
+}
+
+.chip svg{
+
+  color:#10b981;
+
+  flex-shrink:0;
+}
+
+/* Right price panel */
+
+.property-right{
+
+  position:sticky;
+
+  top:90px;
+}
+
+.price-panel{
+
+  background:#fff;
+
+  border-radius:22px;
+
+  padding:26px;
+
+  box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+  border:1px solid #eef2f2;
+}
+
+.price-panel-amount{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:4px;
+
+  font-size:28px;
+
+  font-weight:800;
+
+  color:#111827;
+}
+
+.price-panel-amount small{
+
+  font-size:14px;
+
+  font-weight:500;
+
+  color:#94a3b8;
+
+  margin-left:4px;
+}
+
+.price-panel-deposit{
+
+  color:#64748b;
+
+  font-size:13.5px;
+
+  margin-top:6px;
+}
+
+.price-panel-badges{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+
+  margin-top:18px;
+
+  padding-top:18px;
+
+  border-top:1px solid #eef2f2;
+}
+
+.price-panel-badges span{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  font-size:13px;
+
+  color:#334155;
+
+  background:#f8fafc;
+
+  padding:7px 12px;
+
+  border-radius:10px;
+}
+
+.price-panel-badges svg{
+
+  color:#10b981;
+}
+
+.price-panel-category{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  margin-top:16px;
+
+  font-size:13.5px;
+
+  font-weight:600;
+
+  color:#10b981;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+  .property-main{
+
+    grid-template-columns:1fr;
+
+  }
+
+  .property-right{
+
+    position:static;
+
+  }
+
+  .property-title{
+
+    font-size:22px;
+
+  }
+
+}
+
+/* ========================= */
+/* Owner Info + Contact      */
+/* ========================= */
+
+.owner-block{
+
+  margin-top:20px;
+
+  padding-top:18px;
+
+  border-top:1px solid #eef2f2;
+}
+
+.owner-info{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:14px;
+}
+
+.owner-info svg{
+
+  color:#94a3b8;
+
+  flex-shrink:0;
+}
+
+.owner-name{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:5px;
+
+  font-size:14.5px;
+
+  font-weight:700;
+
+  color:#111827;
+}
+
+.verified-icon{
+
+  color:#10b981;
+}
+
+.owner-tag{
+
+  font-size:12px;
+
+  color:#10b981;
+
+  font-weight:600;
+}
+
+.owner-contact-btns{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+}
+
+.contact-btn{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:8px;
+
+  padding:12px;
+
+  border-radius:12px;
+
+  font-weight:700;
+
+  font-size:14px;
+
+  transition:.25s;
+}
+
+.call-btn{
+
+  background:#111827;
+
+  color:#fff;
+}
+
+.call-btn:hover{
+
+  background:#000;
+}
+
+.whatsapp-btn{
+
+  background:#25d366;
+
+  color:#fff;
+}
+
+.whatsapp-btn:hover{
+
+  background:#1ebc59;
+}
+
+/* ========================= */
+/* Mobile Sticky Bottom Bar  */
+/* ========================= */
+
+.mobile-sticky-bar{
+
+  display:none;
+}
+
+@media(max-width:900px){
+
+  .mobile-sticky-bar{
+
+    display:flex;
+
+    gap:10px;
+
+    position:fixed;
+
+    bottom:0;
+
+    left:0;
+
+    right:0;
+
+    padding:12px 16px;
+
+    background:#fff;
+
+    box-shadow:0 -8px 25px rgba(0,0,0,.12);
+
+    z-index:999;
+
+  }
+
+  .sticky-btn{
+
+    flex:1;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    padding:13px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    font-size:14.5px;
+  }
+
+  /* Sticky bar ke liye niche extra jagah, taaki content usse chip na jaye */
+  .property-details{
+
+    padding-bottom:90px;
+
+  }
+
+  /* Owner card ka apna button set desktop-only rahega, mobile pe sticky bar use hoga */
+  .owner-contact-btns{
+
+    display:none;
+
+  }
+
+}

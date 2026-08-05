@@ -1,0 +1,207 @@
+/* ===========================
+   CATEGORIES
+=========================== */
+
+.categories{
+    padding:16px 0 50px;
+}
+
+.categories-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+}
+
+.category-card{
+    position:relative;
+    height:190px;
+    border-radius:20px;
+    overflow:hidden;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    transition:.35s ease;
+    box-shadow:0 10px 28px rgba(0,0,0,.06);
+}
+
+.category-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 20px 40px rgba(0,0,0,.10);
+}
+
+.category-image{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:95px;
+}
+
+.category-image img{
+    width:110px;
+    max-width:100%;
+    object-fit:contain;
+    transition:.35s;
+}
+
+.category-card:hover img{
+    transform:scale(1.08);
+}
+
+.category-info h3{
+    font-size:19px;
+    font-weight:800;
+    color:#111827;
+}
+
+.category-btn{
+    position:absolute;
+    right:14px;
+    bottom:14px;
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:50%;
+    background:#fff;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,.10);
+    transition:.3s;
+}
+
+.category-btn:hover{
+    background:#111827;
+    color:#fff;
+    transform:rotate(-45deg);
+}
+
+/* ===========================
+   LAPTOP (1025px - 1200px)
+   4 columns rahenge, thode chote
+=========================== */
+
+@media (max-width:1200px) and (min-width:1025px){
+
+.categories-grid{
+gap:14px;
+}
+
+.category-card{
+height:165px;
+padding:16px;
+}
+
+.category-image{
+height:80px;
+}
+
+.category-image img{
+width:90px;
+}
+
+.category-info h3{
+font-size:17px;
+}
+
+}
+
+/* ===========================
+   TABLET (769px - 1024px)
+   4 columns, medium-compact - bade 2-column cards ki jagah
+=========================== */
+
+@media (max-width:1024px) and (min-width:769px){
+
+.categories{
+padding:10px 0 34px;
+}
+
+.categories-grid{
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+}
+
+.category-card{
+height:auto;
+border-radius:18px;
+padding:16px 8px;
+align-items:center;
+text-align:center;
+gap:10px;
+}
+
+.category-image{
+height:64px;
+}
+
+.category-image img{
+width:64px;
+}
+
+.category-info h3{
+font-size:14px;
+}
+
+.category-btn{
+display:none;
+}
+
+}
+
+/* ===========================
+   MOBILE (max 768px)
+   compact icon-badge style, unchanged
+=========================== */
+
+@media (max-width:768px){
+.categories{
+padding:2px 0 18px;
+}
+.categories-grid{
+grid-template-columns:repeat(4,1fr);
+gap:8px;
+}
+.category-card{
+height:auto;
+border-radius:16px;
+padding:12px 4px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:flex-start;
+gap:8px;
+box-shadow:none;
+}
+.category-image{
+width:72px;
+height:72px;
+border-radius:16px;
+background:rgba(255,255,255,.65);
+display:flex;
+align-items:center;
+justify-content:center;
+}
+.category-image img{
+width:56px;
+}
+.category-info h3{
+font-size:11.5px;
+font-weight:700;
+}
+.category-btn{
+display:none;
+}
+}
+
+@media (max-width:380px){
+.category-image{
+width:62px;
+height:62px;
+}
+.category-image img{
+width:48px;
+}
+.category-info h3{
+font-size:10.5px;
+}
+}

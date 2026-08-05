@@ -1,0 +1,442 @@
+/* ===========================
+   LATEST ROOMS SECTION
+=========================== */
+
+.latest-rooms{
+    padding:30px 0 70px;
+}
+
+
+
+/* HEADER */
+
+.section-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:25px;
+
+}
+
+
+.section-header h2{
+
+    font-size:28px;
+    font-weight:800;
+    color:#111827;
+
+}
+
+
+
+.view-all{
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    color:#10b981;
+
+    font-size:14px;
+    font-weight:700;
+
+    transition:.3s;
+
+    text-decoration:none;
+
+}
+
+
+
+.view-all:hover{
+
+    gap:12px;
+
+}
+
+
+
+/* ===========================
+   GRID
+=========================== */
+
+
+.rooms-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:18px;
+
+}
+
+
+
+/* ===========================
+   ROOM CARD
+=========================== */
+
+
+.room-card{
+
+    background:#ffffff;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.07);
+
+
+    transition:.35s ease;
+
+    cursor:pointer;
+
+}
+
+
+
+.room-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:
+    0 20px 45px rgba(0,0,0,.12);
+
+}
+
+
+
+/* ===========================
+   IMAGE
+=========================== */
+
+
+.room-image-wrap{
+
+    position:relative;
+
+    height:180px;
+
+    overflow:hidden;
+
+}
+
+
+
+.room-image{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    transition:.4s ease;
+
+}
+
+
+
+.room-card:hover .room-image{
+
+    transform:scale(1.08);
+
+}
+
+
+
+/* ===========================
+   WISHLIST BUTTON
+=========================== */
+
+
+.wishlist-btn{
+
+    position:absolute;
+
+    top:12px;
+
+    right:12px;
+
+
+    width:36px;
+
+    height:36px;
+
+
+    border:none;
+
+    border-radius:50%;
+
+
+    background:white;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    cursor:pointer;
+
+
+    box-shadow:
+    0 6px 18px rgba(0,0,0,.15);
+
+
+    color:#111827;
+
+
+    transition:.3s;
+
+}
+
+
+
+.wishlist-btn:hover{
+
+    color:#ef4444;
+
+    transform:scale(1.12);
+
+}
+
+
+
+
+/* ===========================
+   PRICE BADGE
+=========================== */
+
+
+.price-badge{
+
+    position:absolute;
+
+
+    left:12px;
+
+    bottom:12px;
+
+
+    background:white;
+
+
+    padding:7px 12px;
+
+
+    border-radius:12px;
+
+
+    color:#10b981;
+
+
+    font-size:14px;
+
+    font-weight:800;
+
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,.15);
+
+}
+
+
+
+.price-badge small{
+
+    color:#64748b;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    margin-left:3px;
+
+}
+
+
+
+/* ===========================
+   CONTENT
+=========================== */
+
+
+.room-info{
+
+    padding:16px;
+
+}
+
+
+
+.room-info h3{
+
+    font-size:17px;
+
+    font-weight:750;
+
+
+    color:#111827;
+
+
+    margin-bottom:10px;
+
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+}
+
+
+
+
+.room-location{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+
+    font-size:13px;
+
+
+    color:#64748b;
+
+
+}
+
+
+
+.room-location svg{
+
+    color:#10b981;
+
+}
+
+
+
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+
+@media(max-width:1200px){
+
+    .rooms-grid{
+
+        grid-template-columns:repeat(4,1fr);
+
+    }
+
+}
+
+
+
+@media(max-width:992px){
+
+    .rooms-grid{
+
+        grid-template-columns:repeat(3,1fr);
+
+    }
+
+}
+
+
+
+
+@media(max-width:576px){
+
+
+    .latest-rooms{
+
+        padding:20px 0 40px;
+
+    }
+
+
+
+    .section-header h2{
+
+        font-size:21px;
+
+    }
+
+
+
+    .rooms-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:12px;
+
+    }
+
+
+
+    .room-image-wrap{
+
+        height:120px;
+
+    }
+
+
+
+    .room-info{
+
+        padding:12px;
+
+    }
+
+
+
+    .room-info h3{
+
+        font-size:14px;
+
+    }
+
+
+
+    .room-location{
+
+        font-size:11px;
+
+    }
+
+
+
+    .price-badge{
+
+        font-size:11px;
+
+        padding:5px 8px;
+
+    }
+
+
+
+    .wishlist-btn{
+
+        width:30px;
+
+        height:30px;
+
+    }
+
+
+}
