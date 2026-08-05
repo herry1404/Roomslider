@@ -6,8 +6,9 @@ import {
   Lock,
   Eye,
   UserPlus,
-  Globe
 } from "lucide-react";
+import { FaApple, FaFacebookF } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import heroRoom from "../../assets/images/hero-room.webp";
@@ -15,7 +16,7 @@ import heroRoom from "../../assets/images/hero-room.webp";
 function Login() {
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,6 +32,23 @@ function Login() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+  };
+
+
+  const goAfterLogin = (result) => {
+
+    toast.success(result.message || "Login successful");
+
+    if (result.user?.role === "admin") {
+
+      navigate("/admin/dashboard", { replace: true });
+
+    } else {
+
+      navigate("/", { replace: true });
+
+    }
 
   };
 
@@ -71,33 +89,9 @@ function Login() {
       });
 
 
-
       if (result.success) {
 
-
-        toast.success(
-          result.message || "Login successful"
-        );
-
-
-
-        if (result.user?.role === "admin") {
-
-          navigate("/admin/dashboard", {
-            replace: true,
-          });
-
-
-        } else {
-
-
-          navigate("/", {
-            replace: true,
-          });
-
-
-        }
-
+        goAfterLogin(result);
 
       }
 
@@ -127,6 +121,39 @@ function Login() {
 
     }
 
+
+  };
+
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+
+    try {
+
+      const result = await googleLogin(credentialResponse.credential);
+
+      if (result.success) {
+
+        goAfterLogin(result);
+
+      }
+
+    } catch (error) {
+
+      console.error("❌ Google Login Error:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+        "Google login failed"
+      );
+
+    }
+
+  };
+
+
+  const handleSocialLogin = (provider) => {
+
+    toast(`${provider} Login Coming Soon 🚀`);
 
   };
 
@@ -290,35 +317,46 @@ function Login() {
 
 
 
+            <div className="social-login-row">
+
+              <div className="social-btn social-btn--google-wrapper">
+
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    toast.error("Google login failed");
+                  }}
+                  size="large"
+                  width="100%"
+                  text="continue_with"
+                />
+
+              </div>
+
+            </div>
 
 
+            <div className="social-login-row">
 
+              <button
+                type="button"
+                className="social-btn social-btn--apple"
+                onClick={() => handleSocialLogin("Apple")}
+              >
+                <FaApple size={20} />
+                <span>Apple</span>
+              </button>
 
-            <button
+              <button
+                type="button"
+                className="social-btn social-btn--facebook"
+                onClick={() => handleSocialLogin("Facebook")}
+              >
+                <FaFacebookF size={18} />
+                <span>Facebook</span>
+              </button>
 
-              type="button"
-
-              className="google-login-btn"
-
-              onClick={() => {
-
-                toast(
-                  "Google Login Coming Soon 🚀"
-                );
-
-              }}
-
-            >
-
-
-              <Globe size={20} />
-
-
-              Continue with Google
-
-
-
-            </button>
+            </div>
 
 
 
@@ -426,6 +464,5 @@ function Login() {
   );
 
 }
-
 
 export default Login;

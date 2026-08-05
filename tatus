@@ -1,0 +1,29 @@
+[33mcommit 061f87696c84e44a6176765e87ce774bdad72efd[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: herry1404 <choudharyritik711@gmail.com>
+Date:   Wed Aug 5 21:59:59 2026 +0530
+
+    first commit
+
+[33mcommit 25071957af1f403b142cf43df25160ad2ff6fdea[m
+Author: herry1404 <choudharyritik711@gmail.com>
+Date:   Wed Aug 5 15:24:52 2026 +0530
+
+    Fix backend entrypoint path
+
+[33mcommit ab9e87ffbafe76d63effb6341103decbca3ca535[m
+Author: herry1404 <choudharyritik711@gmail.com>
+Date:   Wed Aug 5 15:08:26 2026 +0530
+
+    Add vercel.json
+
+[33mcommit d3e88246e76b0c7076b05c2daebd070d7f9a6bd2[m
+Author: herry1404 <choudharyritik711@gmail.com>
+Date:   Wed Aug 5 14:42:10 2026 +0530
+
+    Remove unnecessary files
+
+[33mcommit 92b7fb6af8099760433a4a05c76ada5f0e477333[m
+Author: herry1404 <choudharyritik711@gmail.com>
+Date:   Wed Aug 5 14:40:23 2026 +0530
+
+    Initial RoomSlider commit

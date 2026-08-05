@@ -538,3 +538,116 @@ height:50px;
     border-color:#4285F4;
     transform:translateY(-2px);
 }
+/* ===========================================
+   SOCIAL LOGIN ROW (Google / Apple / Facebook)
+=========================================== */
+
+.social-login-row{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.social-btn{
+
+    flex:1;
+
+    height:52px;
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,.35);
+
+    background:#ffffff;
+
+    color:#1f2937;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+    transition:.3s;
+
+}
+
+.social-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 22px rgba(0,0,0,.18);
+
+}
+
+.social-btn--google svg{
+
+    color:#EA4335;
+
+}
+
+.social-btn--apple svg{
+
+    color:#000000;
+
+}
+
+.social-btn--facebook svg{
+
+    color:#1877F2;
+
+}
+
+@media(max-width:480px){
+
+.social-login-row{
+
+    flex-direction:column;
+
+}
+
+.social-btn{
+
+    height:50px;
+
+}
+
+}
+
+/* ===========================================
+   GOOGLE BUTTON WRAPPER (clean, no extra border)
+=========================================== */
+
+.social-btn--google-wrapper{
+
+    border:none;
+
+    background:transparent;
+
+    padding:0;
+
+    box-shadow:none;
+
+}
+
+.social-btn--google-wrapper:hover{
+
+    transform:none;
+
+    box-shadow:none;
+
+}
+
+.social-login-row + .social-login-row{
+
+    margin-top:12px;
+
+}

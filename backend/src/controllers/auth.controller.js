@@ -2,6 +2,9 @@ const User = require("../models/user.model");
 const { registerSchema, loginSchema } = require("../validators/auth.validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
 // ======================
@@ -29,8 +32,6 @@ const createToken = (user) => {
 };
 
 
-
-
 // ======================
 // REGISTER USER
 // ======================
@@ -39,349 +40,236 @@ const register = async (req, res) => {
 
   try {
 
+    const validatedData = registerSchema.parse(req.body);
 
-    const validatedData =
-      registerSchema.parse(req.body);
-
-
-
-    const existingUser =
-      await User.findOne({
-        email: validatedData.email,
-      });
-
-
-
-    if(existingUser){
-
-      return res.status(409).json({
-
-        success:false,
-
-        message:"Email already registered",
-
-      });
-
-    }
-
-
-
-
-    const hashedPassword =
-      await bcrypt.hash(
-        validatedData.password,
-        10
-      );
-
-
-
-
-
-    const user = await User.create({
-
-      name: validatedData.name,
-
+    const existingUser = await User.findOne({
       email: validatedData.email,
-
-      phone: validatedData.phone,
-
-      password: hashedPassword,
-
-      role:"user",
-
     });
 
+    if (existingUser) {
 
-
-
-
-    if(!process.env.JWT_SECRET){
-
-      throw new Error(
-        "JWT_SECRET missing in .env"
-      );
+      return res.status(409).json({
+        success: false,
+        message: "Email already registered",
+      });
 
     }
 
+    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
+    const user = await User.create({
+      name: validatedData.name,
+      email: validatedData.email,
+      phone: validatedData.phone,
+      password: hashedPassword,
+      role: "user",
+    });
 
-
-
-    const token =
-      createToken(user);
-
-
-
-
+    const token = createToken(user);
 
     return res.status(201).json({
 
-      success:true,
-
-      message:
-      "User registered successfully",
-
-
+      success: true,
+      message: "User registered successfully",
       token,
-
-
-      user:{
-
-        id:user._id,
-
-        name:user.name,
-
-        email:user.email,
-
-        phone:user.phone,
-
-        role:user.role,
-
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
       },
 
     });
 
+  } catch (error) {
 
+    console.error("REGISTER ERROR 👉", error);
 
-
-  } catch(error){
-
-
-    console.error(
-      "REGISTER ERROR 👉",
-      error
-    );
-
-
-
-    if(error.name==="ZodError"){
-
+    if (error.name === "ZodError") {
 
       return res.status(400).json({
-
-        success:false,
-
-        message:
-        error.issues[0]?.message ||
-        "Invalid input",
-
-        errors:error.issues,
-
+        success: false,
+        message: error.issues[0]?.message || "Invalid input",
+        errors: error.issues,
       });
 
     }
 
-
-
-
     return res.status(500).json({
-
-      success:false,
-
-      message:error.message,
-
+      success: false,
+      message: error.message,
     });
-
 
   }
 
 };
-
-
-
-
-
-
-
 
 
 // ======================
 // LOGIN USER
 // ======================
 
-const login = async (req,res)=>{
+const login = async (req, res) => {
 
+  try {
 
-  try{
+    const validatedData = loginSchema.parse(req.body);
 
+    const user = await User.findOne({
+      email: validatedData.email,
+    });
 
-    const validatedData =
-      loginSchema.parse(req.body);
-
-
-
-
-    const user =
-      await User.findOne({
-        email:validatedData.email,
-      });
-
-
-
-
-
-    if(!user){
-
+    if (!user) {
 
       return res.status(404).json({
-
-        success:false,
-
-        message:"User not found",
-
+        success: false,
+        message: "User not found",
       });
-
 
     }
 
+    const isPasswordMatch = await bcrypt.compare(
+      validatedData.password,
+      user.password
+    );
 
-
-
-
-    const isPasswordMatch =
-      await bcrypt.compare(
-
-        validatedData.password,
-
-        user.password
-
-      );
-
-
-
-
-
-    if(!isPasswordMatch){
-
+    if (!isPasswordMatch) {
 
       return res.status(401).json({
-
-        success:false,
-
-        message:"Invalid password",
-
+        success: false,
+        message: "Invalid password",
       });
 
-
     }
 
-
-
-
-
-    if(!process.env.JWT_SECRET){
-
-      throw new Error(
-        "JWT_SECRET missing in .env"
-      );
-
-    }
-
-
-
-
-
-    const token =
-      createToken(user);
-
-
-
-
-
-
+    const token = createToken(user);
 
     return res.status(200).json({
 
-      success:true,
-
-      message:
-      "Login successful",
-
-
+      success: true,
+      message: "Login successful",
       token,
-
-
-
-      user:{
-
-        id:user._id,
-
-        name:user.name,
-
-        email:user.email,
-
-        phone:user.phone,
-
-        role:user.role,
-
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
       },
-
 
     });
 
+  } catch (error) {
 
+    console.error("LOGIN ERROR 👉", error);
 
-
-
-  }catch(error){
-
-
-    console.error(
-      "LOGIN ERROR 👉",
-      error
-    );
-
-
-
-
-
-    if(error.name==="ZodError"){
-
+    if (error.name === "ZodError") {
 
       return res.status(400).json({
-
-        success:false,
-
-        message:
-        error.issues[0]?.message ||
-        "Invalid input",
-
-        errors:error.issues,
-
+        success: false,
+        message: error.issues[0]?.message || "Invalid input",
+        errors: error.issues,
       });
 
     }
 
-
-
-
-
-
     return res.status(500).json({
-
-      success:false,
-
-      message:error.message,
-
+      success: false,
+      message: error.message,
     });
 
-
-
   }
-
 
 };
 
 
+// ======================
+// GOOGLE LOGIN
+// ======================
 
+const googleLogin = async (req, res) => {
 
+  try {
 
+    const { credential } = req.body;
+
+    if (!credential) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Google credential missing",
+      });
+
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name } = payload;
+
+    let user = await User.findOne({
+      $or: [{ googleId }, { email }],
+    });
+
+    if (user) {
+
+      if (!user.googleId) {
+
+        user.googleId = googleId;
+        user.authProvider = "google";
+        await user.save();
+
+      }
+
+    } else {
+
+      user = await User.create({
+        name: name || email.split("@")[0],
+        email,
+        googleId,
+        authProvider: "google",
+        role: "user",
+      });
+
+    }
+
+    const token = createToken(user);
+
+    return res.status(200).json({
+
+      success: true,
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      },
+
+    });
+
+  } catch (error) {
+
+    console.error("GOOGLE LOGIN ERROR 👉", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Google login failed",
+    });
+
+  }
+
+};
 
 
 module.exports = {
-
   register,
-
   login,
-
+  googleLogin,
 };

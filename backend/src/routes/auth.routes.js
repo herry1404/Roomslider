@@ -3,7 +3,8 @@ const router = express.Router();
 
 const {
   register,
-  login
+  login,
+  googleLogin
 } = require("../controllers/auth.controller");
 
 
@@ -13,6 +14,10 @@ router.post("/register", register);
 
 // Login Route
 router.post("/login", login);
+
+
+// Google Login Route
+router.post("/google", googleLogin);
 
 
 module.exports = router;

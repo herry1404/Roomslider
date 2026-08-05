@@ -21,9 +21,21 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    password: {
+        password: {
       type: String,
-      required: true,
+      required: function(){ return !this.googleId; },
+    },
+
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
 
     // USER / ADMIN CONTROL
