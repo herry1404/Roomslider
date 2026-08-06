@@ -27,6 +27,7 @@ import EditRoom from "./pages/Admin/EditRoom";
 import ManageRooms from "./pages/Admin/ManageRooms";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import ManageOwners from "./pages/Admin/ManageOwners";
+import OwnerDetail from "./pages/Admin/OwnerDetail";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -64,6 +65,7 @@ function App() {
       <Route path="/admin/rooms/edit/:id" element={<AdminRoute><EditRoom /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
       <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
+      <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
 
       <Route

@@ -9,12 +9,12 @@ function Home() {
       <Hero />
       <Categories />
 
+      <LatestRooms />
+
       <section className="container" style={{ padding: "40px 0" }}>
         <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>
         <MapExplorer />
       </section>
-
-      <LatestRooms />
     </>
   );
 }

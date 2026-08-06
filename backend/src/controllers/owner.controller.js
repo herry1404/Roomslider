@@ -20,20 +20,21 @@ const createOwnerToken = (owner) => {
 // ===============================
 const createOwner = async (req, res) => {
   try {
-    const { name, email, propertyName } = req.body;
+    const { name, email, password, propertyName } = req.body;
 
     const existing = await Owner.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "Owner with this email already exists" });
     }
 
-    // Auto-generate a secure temporary password
-    const generatedPassword = crypto.randomBytes(6).toString("hex");
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
 
     const owner = await Owner.create({
       name,
       email,
-      password: generatedPassword,
+      password,
       propertyName,
     });
 
@@ -45,7 +46,6 @@ const createOwner = async (req, res) => {
         email: owner.email,
         propertyName: owner.propertyName,
       },
-      temporaryPassword: generatedPassword,
     });
   } catch (error) {
     console.error(error);

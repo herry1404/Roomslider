@@ -25,6 +25,12 @@
   gap: var(--space-6);
 }
 
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Logo */
 
 .logo {
@@ -315,4 +321,50 @@
   font-size: 12px;
   color: #6b7280;
   word-break: break-word;
+}
+/* ===== Search Button (near profile icon) ===== */
+.navbar-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+}
+
+.navbar-search-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.navbar-search-form {
+  display: flex;
+  align-items: center;
+  animation: searchExpand 0.2s ease;
+}
+
+.navbar-search-form input {
+  border: 1px solid #e5e7eb;
+  border-radius: 100px;
+  padding: 9px 16px;
+  font-size: 14px;
+  outline: none;
+  width: 220px;
+  margin-right: 8px;
+}
+
+.navbar-search-form input:focus {
+  border-color: #2563eb;
+}
+
+@keyframes searchExpand {
+  from { width: 0; opacity: 0; }
+  to { width: 220px; opacity: 1; }
 }

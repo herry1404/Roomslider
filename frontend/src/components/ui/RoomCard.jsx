@@ -13,6 +13,7 @@ function RoomCard({ room, onWishlistChange }) {
   const { user } = useAuth();
   const [wishlisted, setWishlisted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [burst, setBurst] = useState(false);
 
   const categoryPathMap = {
     Room: "rooms",
@@ -46,6 +47,10 @@ function RoomCard({ room, onWishlistChange }) {
         await api.post(`/wishlist/${room._id}`);
         setWishlisted(true);
         toast.success("Wishlist mein add ho gaya ❤️");
+
+        // trigger sparkle burst animation
+        setBurst(true);
+        setTimeout(() => setBurst(false), 700);
       }
 
       if (onWishlistChange) onWishlistChange();
@@ -68,13 +73,24 @@ function RoomCard({ room, onWishlistChange }) {
         />
 
         <button
-          className={wishlisted ? "wishlist-icon active" : "wishlist-icon"}
+          className={`wishlist-icon ${wishlisted ? "active" : ""} ${burst ? "burst" : ""}`}
           type="button"
           title="Add to wishlist"
           onClick={handleWishlist}
           disabled={loading}
         >
           <Heart size={20} fill={wishlisted ? "currentColor" : "none"} />
+
+          {burst && (
+            <span className="sparkle-wrap" aria-hidden="true">
+              <span className="sparkle s1"></span>
+              <span className="sparkle s2"></span>
+              <span className="sparkle s3"></span>
+              <span className="sparkle s4"></span>
+              <span className="sparkle s5"></span>
+              <span className="sparkle s6"></span>
+            </span>
+          )}
         </button>
 
         <span className="room-category">{room.category}</span>
