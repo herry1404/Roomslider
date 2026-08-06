@@ -477,7 +477,7 @@ const vacateTenant = async (req, res) => {
       .find((entry) => !entry.endDate);
 
     if (openEntry) {
-      openEntry.endDate = req.body.moveOutDate
+      openEntry.endDate = req.body?.moveOutDate
         ? new Date(req.body.moveOutDate)
         : new Date();
     }
