@@ -10,10 +10,8 @@ import {
 } from "lucide-react";
 
 import { toast } from "react-hot-toast";
-import { GoogleLogin } from "@react-oauth/google";
 
 import api from "../../api/axios";
-import { useAuth } from "../../context/AuthContext";
 
 import heroRoom from "../../assets/images/hero-room.webp";
 
@@ -21,8 +19,6 @@ import heroRoom from "../../assets/images/hero-room.webp";
 function Register() {
 
   const navigate = useNavigate();
-
-  const { googleLogin } = useAuth();
 
 
   const [formData, setFormData] = useState({
@@ -66,6 +62,11 @@ function Register() {
 
     // Frontend Validation
 
+import { toast } from "react-hot-toast";
+
+import api from "../../api/axios";
+
+import heroRoom from "../../assets/images/hero-room.webp";
     if(!name.trim()){
       toast.error("Name is required");
       return;
@@ -139,35 +140,6 @@ function Register() {
 
     }
 
-
-  };
-
-
-
-  const handleGoogleSuccess = async (credentialResponse) => {
-
-    try {
-
-      const result = await googleLogin(credentialResponse.credential);
-
-      if (result.success) {
-
-        toast.success(result.message || "Account created successfully");
-
-        navigate("/", { replace: true });
-
-      }
-
-    } catch (error) {
-
-      console.error("❌ Google Signup Error:", error);
-
-      toast.error(
-        error.response?.data?.message ||
-        "Google signup failed"
-      );
-
-    }
 
   };
 
@@ -306,36 +278,6 @@ function Register() {
 
 
             </form>
-
-
-
-            <div className="login-divider">
-
-              <span>
-                OR
-              </span>
-
-            </div>
-
-
-
-            <div className="social-login-row">
-
-              <div className="social-btn social-btn--google-wrapper">
-
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => {
-                    toast.error("Google signup failed");
-                  }}
-                  size="large"
-                  width="100%"
-                  text="signup_with"
-                />
-
-              </div>
-
-            </div>
 
 
 

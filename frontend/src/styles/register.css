@@ -364,3 +364,16 @@ height:50px;
 }
 
 }
+/* ==========================================
+   SOCIAL LOGIN (GOOGLE)
+========================================== */
+
+.social-login-row{
+    margin-bottom:18px;
+}
+
+.social-btn--google-wrapper{
+    width:100%;
+    display:flex;
+    justify-content:center;
+}
