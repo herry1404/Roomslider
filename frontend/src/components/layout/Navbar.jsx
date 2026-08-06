@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 import Container from "../ui/Container";
 import Logo from "../ui/Logo";
@@ -39,8 +39,50 @@ function Navbar() {
     if (searchValue.trim()) {
       navigate(`/rooms?search=${encodeURIComponent(searchValue.trim())}`);
       setSearchOpen(false);
+      setSearchValue("");
     }
   };
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  const SearchPill = () => (
+    <form
+      className={`navbar-search-pill ${searchOpen ? "open" : ""}`}
+      onSubmit={handleSearchSubmit}
+    >
+      <button
+        type={searchOpen ? "submit" : "button"}
+        className="navbar-search-icon-btn"
+        aria-label="Search"
+        onClick={() => {
+          if (!searchOpen) setSearchOpen(true);
+        }}
+      >
+        <Search size={20} />
+      </button>
+
+      <input
+        type="text"
+        placeholder="Search rooms, PG, area..."
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+      />
+
+      {searchOpen && (
+        <button
+          type="button"
+          className="navbar-search-close-btn"
+          aria-label="Close search"
+          onClick={closeSearch}
+        >
+          <X size={18} />
+        </button>
+      )}
+    </form>
+  );
 
   return (
     <header className="navbar">
@@ -67,40 +109,12 @@ function Navbar() {
           </nav>
 
           <div className="navbar-actions">
-            {searchOpen && (
-              <form className="navbar-search-form" onSubmit={handleSearchSubmit}>
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search rooms, PG, area..."
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onBlur={() => !searchValue && setSearchOpen(false)}
-                />
-              </form>
-            )}
-
-            <button
-              type="button"
-              className="navbar-search-btn"
-              aria-label="Search"
-              onClick={() => setSearchOpen((prev) => !prev)}
-            >
-              <Search size={20} />
-            </button>
-
+            <SearchPill />
             <ProfileMenu />
           </div>
 
           <div className="navbar-mobile-actions">
-            <button
-              type="button"
-              className="navbar-search-btn"
-              aria-label="Search"
-              onClick={() => navigate("/rooms")}
-            >
-              <Search size={20} />
-            </button>
+            <SearchPill />
             <ProfileMenu />
           </div>
         </div>

@@ -72,6 +72,8 @@
 
 .wishlist-icon {
 
+  overflow: visible;
+
   position:absolute;
 
   top:16px;
@@ -97,17 +99,16 @@
   border:none;
 
 
-  background:rgba(255,255,255,0.95);
+  background: transparent;
 
 
-  color:#333;
+  color: #fff;
 
 
   cursor:pointer;
 
 
-  box-shadow:
-  0 5px 15px rgba(0,0,0,0.15);
+  box-shadow: none;
 
 
   transition:0.3s ease;
@@ -125,11 +126,8 @@
 }
 
 .wishlist-icon.active {
-
-  color:#e63946;
-
-  background:#fff;
-
+  color: #e63946;
+  background: transparent;
 }
 
 
@@ -360,11 +358,6 @@
 
 }
 /* ===== Wishlist Sparkle Burst ===== */
-.wishlist-icon {
-  position: relative;
-  overflow: visible;
-}
-
 .wishlist-icon.burst {
   animation: heartPop 0.4s ease;
 }

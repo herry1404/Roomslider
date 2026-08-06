@@ -100,7 +100,7 @@ function ProfileMenu() {
             {user.role !== "owner" && (
               <NavLink to="/owner/login" className="profile-item" onClick={closeMenu}>
                 <Building2 size={16} />
-                Become an Owner
+                Owner Login
               </NavLink>
             )}
 
@@ -134,7 +134,7 @@ function ProfileMenu() {
 
             <NavLink to="/owner/login" className="profile-item" onClick={closeMenu}>
               <Building2 size={16} />
-              Become an Owner
+              Owner Login
             </NavLink>
           </>
         )}
