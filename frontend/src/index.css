@@ -215,3 +215,24 @@ body.dark {
   background: var(--color-background);
   color: var(--color-text);
 }
+
+/* =========================
+   DARK MODE TOKENS
+========================= */
+
+[data-theme="dark"]{
+  --color-primary:#10B981;
+  --color-primary-hover:#34D399;
+
+  --color-background:#0F172A;
+  --color-surface:#1E293B;
+
+  --color-text:#F1F5F9;
+  --color-text-light:#94A3B8;
+
+  --color-border:#334155;
+
+  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
+  --shadow-md:0 8px 24px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 40px rgba(0,0,0,.5);
+}

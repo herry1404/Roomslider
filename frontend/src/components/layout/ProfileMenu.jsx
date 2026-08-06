@@ -12,11 +12,24 @@ import {
   Settings as SettingsIcon,
   Building2,
   LayoutDashboard,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 function ProfileMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      darkMode ? "dark" : "light"
+    );
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
   const menuRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -94,6 +107,15 @@ function ProfileMenu() {
               <SettingsIcon size={16} />
               Settings
             </NavLink>
+
+            <button
+              type="button"
+              className="profile-item"
+              onClick={() => setDarkMode((prev) => !prev)}
+            >
+              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </button>
 
             <div className="profile-divider" />
 
