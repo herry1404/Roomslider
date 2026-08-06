@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
   MapPin,
   IndianRupee,
@@ -32,6 +32,7 @@ function PropertyDetails() {
   const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
     fetchRoom();
   }, [id]);
 
