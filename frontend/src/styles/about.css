@@ -33,7 +33,7 @@
 /* Sections */
 
 .about-section {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 20px;
   padding: 45px;
   margin-bottom: 40px;
@@ -108,7 +108,7 @@
 .about-card p {
   font-size: 15px;
   line-height: 1.7;
-  color: #666;
+  color: var(--color-text-light);
 }
 
 /* Quote */

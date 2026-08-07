@@ -129,7 +129,7 @@
 
 .btn-outline {
   border: 1px solid var(--color-border);
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-text);
 }
 
@@ -163,7 +163,7 @@
   justify-content: center;
   border: 1px solid var(--color-border);
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
   transition: var(--transition-fast);
@@ -322,7 +322,7 @@
   margin-top: 4px;
   margin-bottom: 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-text-light);
   word-break: break-word;
 }
 /* ===== Search Button (near profile icon) ===== */
@@ -332,7 +332,7 @@
   height: 40px;
   border-radius: 100px;
   border: 1px solid #e5e7eb;
-  background: #fff;
+  background: var(--color-surface);
   overflow: hidden;
   width: 40px;
   transition: width 0.28s ease, border-color 0.2s ease;
@@ -353,7 +353,7 @@
   flex-shrink: 0;
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--color-text);
   cursor: pointer;
 }
 
@@ -376,6 +376,6 @@
   flex-shrink: 0;
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: var(--color-text-light);
   cursor: pointer;
 }

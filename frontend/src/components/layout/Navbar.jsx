@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Search, X } from "lucide-react";
+import { Search, X, Sun, Moon } from "lucide-react";
 
 import Container from "../ui/Container";
 import Logo from "../ui/Logo";
@@ -23,6 +23,15 @@ function Navbar() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
+
+  useEffect(() => {
+    // Dark mode temporarily disabled - forcing light theme
+    document.documentElement.setAttribute("data-theme", "light");
+  }, []);
 
   const links = user
     ? [
@@ -84,6 +93,18 @@ function Navbar() {
     </form>
   );
 
+  const ThemeToggle = () => (
+    <button
+      type="button"
+      className="navbar-theme-btn"
+      aria-label="Toggle dark mode"
+      title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      onClick={() => setDarkMode((prev) => !prev)}
+    >
+      {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+    </button>
+  );
+
   return (
     <header className="navbar">
       <Container>
@@ -110,11 +131,13 @@ function Navbar() {
 
           <div className="navbar-actions">
             <SearchPill />
+            {/* <ThemeToggle /> - temporarily hidden, will revisit dark mode later */}
             <ProfileMenu />
           </div>
 
           <div className="navbar-mobile-actions">
             <SearchPill />
+            {/* <ThemeToggle /> */}
             <ProfileMenu />
           </div>
         </div>

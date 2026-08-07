@@ -38,7 +38,7 @@
 }
 
 .dashboard-card {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eef2f7;
   border-radius: 20px;
   padding: 28px;
@@ -68,7 +68,7 @@
 =========================== */
 
 .dashboard-section {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eef2f7;
   border-radius: 20px;
   padding: 28px;

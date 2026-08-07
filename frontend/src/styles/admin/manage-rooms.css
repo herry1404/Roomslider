@@ -46,7 +46,7 @@
 /* Search */
 
 .search-box{
-    background:#fff;
+    background: var(--color-surface);
     display:flex;
     align-items:center;
     gap:10px;
@@ -75,7 +75,7 @@
 /* Card */
 
 .admin-room-card{
-    background:#fff;
+    background: var(--color-surface);
     border-radius:20px;
     overflow:hidden;
     box-shadow:0 10px 30px rgba(0,0,0,.08);

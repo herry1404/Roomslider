@@ -82,7 +82,7 @@
 
 .room-card{
 
-    background:#ffffff;
+    background: var(--color-surface);
 
     border-radius:20px;
 
@@ -252,7 +252,7 @@
 
 .price-badge small{
 
-    color:#64748b;
+    color: var(--color-text-light);
 
     font-size:11px;
 
@@ -313,7 +313,7 @@
     font-size:13px;
 
 
-    color:#64748b;
+    color: var(--color-text-light);
 
 
 }

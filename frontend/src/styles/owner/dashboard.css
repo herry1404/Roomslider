@@ -58,7 +58,7 @@
 }
 
 .owner-btn-secondary {
-  background: #fff;
+  background: var(--color-surface);
   color: #475569;
   border: 1px solid #e2e8f0;
 }
@@ -80,7 +80,7 @@
 }
 
 .owner-stat-card {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eef2f7;
   border-radius: 18px;
   padding: 24px;
@@ -112,7 +112,7 @@
 =========================== */
 
 .owner-rooms-section {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eef2f7;
   border-radius: 20px;
   padding: 28px;
@@ -142,7 +142,7 @@
   border-radius: 16px;
   overflow: hidden;
   transition: 0.2s ease;
-  background: #fff;
+  background: var(--color-surface);
 }
 
 .owner-room-card:hover {
@@ -327,7 +327,7 @@
 }
 
 .owner-detail-card {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eef2f7;
   border-radius: 18px;
   padding: 24px;

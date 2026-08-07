@@ -139,7 +139,7 @@ SEARCH
 
 .search-box svg{
 
-    color:#94a3b8;
+    color: var(--color-text-light);
     flex-shrink:0;
 
 }

@@ -125,7 +125,7 @@
 
 .input-box svg{
 
-    color:#64748b;
+    color: var(--color-text-light);
 
 }
 
@@ -147,7 +147,7 @@
 
 .input-box input::placeholder{
 
-    color:#94a3b8;
+    color: var(--color-text-light);
 
 }
 
@@ -238,7 +238,7 @@
 
     border-radius:14px;
 
-    background:#ffffff;
+    background: var(--color-surface);
 
     color:#111827;
 
@@ -526,7 +526,7 @@ height:50px;
     gap:12px;
     border:1px solid #ddd;
     border-radius:12px;
-    background:#fff;
+    background: var(--color-surface);
     cursor:pointer;
     font-size:15px;
     font-weight:600;
@@ -560,7 +560,7 @@ height:50px;
 
     border:1px solid rgba(255,255,255,.35);
 
-    background:#ffffff;
+    background: var(--color-surface);
 
     color:#1f2937;
 

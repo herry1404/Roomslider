@@ -1,5 +1,5 @@
 .admin-header{
-    background:#fff;
+    background: var(--color-surface);
     padding:20px 28px;
     display:flex;
     justify-content:space-between;

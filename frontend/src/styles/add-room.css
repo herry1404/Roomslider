@@ -11,7 +11,7 @@
 .add-room-card{
     max-width:1100px;
     margin:auto;
-    background:#fff;
+    background: var(--color-surface);
     border-radius:20px;
     padding:35px;
     box-shadow:0 15px 40px rgba(0,0,0,.08);
@@ -74,7 +74,7 @@ textarea{
     outline:none;
 
     transition:.25s;
-    background:#fff;
+    background: var(--color-surface);
 
 }
 
@@ -212,7 +212,7 @@ textarea{
 
     transition:.25s;
 
-    background:#fff;
+    background: var(--color-surface);
 
 }
 
