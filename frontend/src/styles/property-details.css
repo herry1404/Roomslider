@@ -2,6 +2,122 @@
 /* Property Gallery */
 /* ========================= */
 
+.main-image-wrapper{
+
+  position:relative;
+
+  overflow:hidden;
+
+  border-radius:25px;
+
+}
+
+
+.image-nav-btn{
+
+  position:absolute;
+
+  top:50%;
+
+  transform:translateY(-50%);
+
+  width:42px;
+
+  height:42px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:50%;
+
+  border:none;
+
+  background:rgba(255,255,255,.9);
+
+  color:#111;
+
+  cursor:pointer;
+
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+
+  transition:.25s;
+
+  z-index:2;
+
+}
+
+
+.image-nav-btn:hover{
+
+  background:#fff;
+
+  transform:translateY(-50%) scale(1.08);
+
+}
+
+
+.image-nav-prev{
+
+  left:14px;
+
+}
+
+
+.image-nav-next{
+
+  right:14px;
+
+}
+
+
+.image-dots{
+
+  position:absolute;
+
+  bottom:14px;
+
+  left:50%;
+
+  transform:translateX(-50%);
+
+  display:flex;
+
+  gap:6px;
+
+  z-index:2;
+
+}
+
+
+.image-dot{
+
+  width:7px;
+
+  height:7px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.6);
+
+  transition:.25s;
+
+}
+
+
+.image-dot.active{
+
+  width:20px;
+
+  border-radius:6px;
+
+  background:#fff;
+
+}
+
+
 .main-property-image{
 
   width:100%;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import {
   MapPin,
@@ -13,6 +13,8 @@ import {
   MessageCircle,
   BadgeCheck,
   UserCircle2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -30,7 +32,8 @@ function PropertyDetails() {
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
-  const [selectedImage, setSelectedImage] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartX = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -42,10 +45,7 @@ function PropertyDetails() {
       const { data } = await api.get(`/rooms/${id}`);
 
       setRoom(data.room);
-
-      if (data.room.images?.length) {
-        setSelectedImage(data.room.images[0]);
-      }
+      setCurrentIndex(0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -92,6 +92,39 @@ function PropertyDetails() {
     );
   }
 
+  const images = room.images || [];
+  const selectedImage = images[currentIndex] || "";
+
+  const goPrev = () => {
+    setCurrentIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  const goNext = () => {
+    setCurrentIndex((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+
+    if (diff > 50) {
+      goNext();
+    } else if (diff < -50) {
+      goPrev();
+    }
+
+    touchStartX.current = null;
+  };
+
   const callLink = room.contact
     ? `tel:${room.contact}`
     : null;
@@ -109,11 +142,54 @@ function PropertyDetails() {
 
           <div className="property-image">
 
-            <img
-              src={selectedImage}
-              alt={room.title}
-              className="main-property-image"
-            />
+            <div
+              className="main-image-wrapper"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+
+              <img
+                src={selectedImage}
+                alt={room.title}
+                className="main-property-image"
+              />
+
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="image-nav-btn image-nav-prev"
+                    aria-label="Previous image"
+                    onClick={goPrev}
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="image-nav-btn image-nav-next"
+                    aria-label="Next image"
+                    onClick={goNext}
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+
+                  <div className="image-dots">
+                    {images.map((_, index) => (
+                      <span
+                        key={index}
+                        className={
+                          index === currentIndex
+                            ? "image-dot active"
+                            : "image-dot"
+                        }
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+            </div>
 
             <button
               className={
@@ -135,19 +211,19 @@ function PropertyDetails() {
 
             <div className="property-thumbnails">
 
-              {room.images?.map((img, index) => (
+              {images.map((img, index) => (
 
                 <img
                   key={index}
                   src={img}
                   alt=""
                   className={
-                    selectedImage === img
+                    index === currentIndex
                       ? "thumbnail active"
                       : "thumbnail"
                   }
                   onClick={() =>
-                    setSelectedImage(img)
+                    setCurrentIndex(index)
                   }
                 />
 
