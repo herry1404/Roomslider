@@ -152,6 +152,7 @@ function PropertyDetails() {
                 src={selectedImage}
                 alt={room.title}
                 className="main-property-image"
+                draggable={false}
               />
 
               {images.length > 1 && (

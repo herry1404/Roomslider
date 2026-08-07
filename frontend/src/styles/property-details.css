@@ -13,6 +13,17 @@
 }
 
 
+.main-property-image{
+
+  touch-action:pan-y;
+
+  -webkit-user-drag:none;
+
+  user-select:none;
+
+}
+
+
 .image-nav-btn{
 
   position:absolute;
@@ -216,6 +227,17 @@
     width:70px;
 
     height:60px;
+
+  }
+
+}
+
+
+@media(max-width:900px){
+
+  .image-nav-btn{
+
+    display:none;
 
   }
 
