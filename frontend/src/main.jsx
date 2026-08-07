@@ -5,6 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
 import "./index.css";
@@ -26,10 +27,12 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <HelmetProvider>
           <AuthProvider>
-            <ThemeProvider>
+            <WishlistProvider>
+              <ThemeProvider>
               <App />
               <Toaster position="top-center" />
             </ThemeProvider>
+            </WishlistProvider>
           </AuthProvider>
         </HelmetProvider>
       </BrowserRouter>

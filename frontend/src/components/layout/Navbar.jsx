@@ -17,6 +17,44 @@ const navLinks = [
   { name: "About", path: "/about" },
 ];
 
+function SearchPill({ searchOpen, setSearchOpen, searchValue, setSearchValue, handleSearchSubmit, closeSearch }) {
+  return (
+    <form
+      className={`navbar-search-pill ${searchOpen ? "open" : ""}`}
+      onSubmit={handleSearchSubmit}
+    >
+      <button
+        type={searchOpen ? "submit" : "button"}
+        className="navbar-search-icon-btn"
+        aria-label="Search"
+        onClick={() => {
+          if (!searchOpen) setSearchOpen(true);
+        }}
+      >
+        <Search size={20} />
+      </button>
+
+      <input
+        type="text"
+        placeholder="Search rooms, PG, area..."
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+      />
+
+      {searchOpen && (
+        <button
+          type="button"
+          className="navbar-search-close-btn"
+          aria-label="Close search"
+          onClick={closeSearch}
+        >
+          <X size={18} />
+        </button>
+      )}
+    </form>
+  );
+}
+
 function Navbar() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -57,54 +95,6 @@ function Navbar() {
     setSearchValue("");
   };
 
-  const SearchPill = () => (
-    <form
-      className={`navbar-search-pill ${searchOpen ? "open" : ""}`}
-      onSubmit={handleSearchSubmit}
-    >
-      <button
-        type={searchOpen ? "submit" : "button"}
-        className="navbar-search-icon-btn"
-        aria-label="Search"
-        onClick={() => {
-          if (!searchOpen) setSearchOpen(true);
-        }}
-      >
-        <Search size={20} />
-      </button>
-
-      <input
-        type="text"
-        placeholder="Search rooms, PG, area..."
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-      />
-
-      {searchOpen && (
-        <button
-          type="button"
-          className="navbar-search-close-btn"
-          aria-label="Close search"
-          onClick={closeSearch}
-        >
-          <X size={18} />
-        </button>
-      )}
-    </form>
-  );
-
-  const ThemeToggle = () => (
-    <button
-      type="button"
-      className="navbar-theme-btn"
-      aria-label="Toggle dark mode"
-      title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      onClick={() => setDarkMode((prev) => !prev)}
-    >
-      {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-    </button>
-  );
-
   return (
     <header className="navbar">
       <Container>
@@ -130,14 +120,26 @@ function Navbar() {
           </nav>
 
           <div className="navbar-actions">
-            <SearchPill />
-            {/* <ThemeToggle /> - temporarily hidden, will revisit dark mode later */}
+            <SearchPill
+              searchOpen={searchOpen}
+              setSearchOpen={setSearchOpen}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              handleSearchSubmit={handleSearchSubmit}
+              closeSearch={closeSearch}
+            />
             <ProfileMenu />
           </div>
 
           <div className="navbar-mobile-actions">
-            <SearchPill />
-            {/* <ThemeToggle /> */}
+            <SearchPill
+              searchOpen={searchOpen}
+              setSearchOpen={setSearchOpen}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              handleSearchSubmit={handleSearchSubmit}
+              closeSearch={closeSearch}
+            />
             <ProfileMenu />
           </div>
         </div>

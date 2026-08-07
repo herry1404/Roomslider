@@ -4,6 +4,7 @@ import { Heart, MapPin, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 import api from "../../api/axios";
 
 function LatestRooms() {
@@ -25,20 +26,24 @@ function LatestRooms() {
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
+  const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
 
-  const addToWishlist = async (roomId) => {
+  const toggleWishlist = async (roomId) => {
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
+
     try {
-      if (!user) {
-        toast.error("Please login first");
-        return;
+      if (isWishlisted(roomId)) {
+        await removeFromWishlist(roomId);
+        toast.success("Removed from wishlist");
+      } else {
+        await addToWishlist(roomId);
+        toast.success("Added to wishlist ❤️");
       }
-
-      const res = await api.post(`/wishlist/${roomId}`);
-
-      toast.success(res.data.message || "Added to wishlist ❤️");
     } catch (error) {
       console.error("Wishlist Error:", error);
-
       toast.error(error.response?.data?.message || "Wishlist failed");
     }
   };
@@ -49,7 +54,7 @@ function LatestRooms() {
 
       const roomData = res.data?.rooms || [];
 
-      setRooms(roomData.slice(0, 5));
+      setRooms(roomData.slice(0, 10));
     } catch (error) {
       console.error("Latest Rooms Error:", error);
     } finally {
@@ -69,7 +74,7 @@ function LatestRooms() {
     <section className="latest-rooms">
       <div className="container">
         <div className="section-header">
-          <h2>Latest Rooms</h2>
+          <h2>Latest</h2>
 
           <Link to="/rooms" className="view-all">
             View All
@@ -78,46 +83,53 @@ function LatestRooms() {
         </div>
 
         <div className="rooms-grid">
-          {rooms.map((room) => (
-            <article
-              key={room._id}
-              className="room-card"
-              onClick={() => goToDetails(room)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="room-image-wrap">
-                <img
-                  src={room.images?.[0]}
-                  alt={room.title}
-                  className="room-image"
-                />
+          {rooms.map((room) => {
+            const wishlisted = isWishlisted(room._id);
 
-                <button
-                  className="wishlist-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToWishlist(room._id);
-                  }}
-                >
-                  <Heart size={16} />
-                </button>
+            return (
+              <article
+                key={room._id}
+                className="room-card"
+                onClick={() => goToDetails(room)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="room-image-wrap">
+                  <img
+                    src={room.images?.[0]}
+                    alt={room.title}
+                    className="room-image"
+                  />
 
-                <span className="price-badge">
-                  ₹{room.price}
-                  <small>/month</small>
-                </span>
-              </div>
+                  <button
+                    className={`wishlist-btn ${wishlisted ? "active" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(room._id);
+                    }}
+                  >
+                    <Heart
+                      size={16}
+                      fill={wishlisted ? "currentColor" : "none"}
+                    />
+                  </button>
 
-              <div className="room-info">
-                <h3>{room.title}</h3>
+                  <span className="price-badge">
+                    ₹{room.price}
+                    <small>/month</small>
+                  </span>
+                </div>
 
-                <p className="room-location">
-                  <MapPin size={14} />
-                  {room.location}
-                </p>
-              </div>
-            </article>
-          ))}
+                <div className="room-info">
+                  <h3>{room.title}</h3>
+
+                  <p className="room-location">
+                    <MapPin size={14} />
+                    {room.location}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

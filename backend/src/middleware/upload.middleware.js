@@ -22,9 +22,9 @@ const storage = new CloudinaryStorage({
     transformation: [
       {
         width: 1200,
-        height: 800,
+        height: 1200,
         crop: "limit",
-        quality: "auto",
+        quality: "auto:good",
         fetch_format: "auto",
       }
     ]

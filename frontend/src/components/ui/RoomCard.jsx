@@ -3,17 +3,20 @@ import { MapPin, IndianRupee, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/room-card.css";
 
 function RoomCard({ room, onWishlistChange }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
+
   const [loading, setLoading] = useState(false);
   const [burst, setBurst] = useState(false);
+
+  const wishlisted = isWishlisted(room._id);
 
   const categoryPathMap = {
     Room: "rooms",
@@ -40,12 +43,10 @@ function RoomCard({ room, onWishlistChange }) {
 
     try {
       if (wishlisted) {
-        await api.delete(`/wishlist/${room._id}`);
-        setWishlisted(false);
+        await removeFromWishlist(room._id);
         toast.success("Wishlist se hata diya");
       } else {
-        await api.post(`/wishlist/${room._id}`);
-        setWishlisted(true);
+        await addToWishlist(room._id);
         toast.success("Wishlist mein add ho gaya ❤️");
 
         // trigger sparkle burst animation

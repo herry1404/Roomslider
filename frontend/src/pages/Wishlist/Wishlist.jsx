@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/wishlist.css";
 
@@ -15,6 +16,7 @@ function Wishlist() {
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
+  const { removeFromWishlist } = useWishlist();
 
 
 
@@ -71,35 +73,23 @@ function Wishlist() {
 
 
 
-  const removeWishlist = async(roomId)=>{
+  const removeWishlist = async (roomId) => {
 
-    try{
+    try {
 
-
-      await api.delete(
-        `/wishlist/${roomId}`,
-        {
-          headers:{
-            Authorization:
-            `Bearer ${localStorage.getItem("token")}`
-          }
-        }
-      );
-
+      await removeFromWishlist(roomId);
 
       setWishlist(
         wishlist.filter(
-          item=>item._id !== roomId
+          item => item._id !== roomId
         )
       );
-
 
       toast.success(
         "Removed from wishlist"
       );
 
-
-    }catch{
+    } catch {
 
       toast.error(
         "Remove failed"

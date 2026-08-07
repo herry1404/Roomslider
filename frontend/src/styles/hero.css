@@ -461,3 +461,9 @@ font-size:15px;
 }
 
 }
+/* Hide duplicate hero search box on phone view - navbar search stays */
+@media (max-width: 768px) {
+  .hero-search {
+    display: none !important;
+  }
+}

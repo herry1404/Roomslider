@@ -18,6 +18,7 @@ import {
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/property-details.css";
 import RoomMap from "../../components/map/RoomMap";
@@ -28,7 +29,7 @@ function PropertyDetails() {
 
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
@@ -52,18 +53,22 @@ function PropertyDetails() {
     }
   };
 
-  const addWishlist = async () => {
+  const wishlisted = isWishlisted(id);
+
+  const toggleWishlist = async () => {
     if (!user) {
       toast.error("Please login first");
       return;
     }
 
     try {
-      await api.post(`/wishlist/${id}`);
-
-      setWishlisted(true);
-
-      toast.success("Added to Wishlist ❤️");
+      if (wishlisted) {
+        await removeFromWishlist(id);
+        toast.success("Removed from Wishlist");
+      } else {
+        await addToWishlist(id);
+        toast.success("Added to Wishlist ❤️");
+      }
     } catch (err) {
       toast.error(
         err.response?.data?.message || "Wishlist failed"
@@ -116,7 +121,7 @@ function PropertyDetails() {
                   ? "wishlist-icon active"
                   : "wishlist-icon"
               }
-              onClick={addWishlist}
+              onClick={toggleWishlist}
             >
               <Heart
                 size={24}

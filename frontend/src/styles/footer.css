@@ -379,3 +379,15 @@ font-size:.9rem;
 }
 
 }
+/* Phone view: pair Explore + Company side by side, Contact full-width below */
+@media (max-width: 576px) {
+  .footer-top {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .footer-top > div:nth-child(1) {
+    grid-column: 1 / -1;
+  }
+  .footer-top > div:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+}
