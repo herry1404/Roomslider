@@ -183,6 +183,20 @@ function OwnerRoomDetail() {
                 <span>{room.currentTenant?.phone || "—"}</span>
               </div>
               <div className="owner-detail-row">
+                <span>Rent Status</span>
+                <span className={`owner-rent-badge ${room.liveRentStatus || "pending"}`}>
+                  {room.liveRentStatus || "pending"}
+                </span>
+              </div>
+              <div className="owner-detail-row">
+                <span>Next Due Date</span>
+                <span>
+                  {room.currentTenant?.nextDueDate
+                    ? new Date(room.currentTenant.nextDueDate).toLocaleDateString("en-IN")
+                    : "—"}
+                </span>
+              </div>
+              <div className="owner-detail-row">
                 <span>Move-in Date</span>
                 <span>
                   {room.currentTenant?.moveInDate

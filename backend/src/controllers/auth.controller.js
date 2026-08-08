@@ -291,6 +291,7 @@ const getMyTenancy = async (req, res) => {
     }
 
     const Room = require("../models/room.model");
+    const { computeRentStatus } = require("./room.controller");
 
     const room = await Room.findById(user.activeRoom).populate(
       "owner",
@@ -338,7 +339,8 @@ const getMyTenancy = async (req, res) => {
       tenancy: {
         moveInDate: room.currentTenant?.moveInDate,
         advanceAmount: room.currentTenant?.advanceAmount,
-        paymentStatus: room.paymentStatus,
+        paymentStatus: computeRentStatus(room.currentTenant?.nextDueDate),
+        nextDueDate: room.currentTenant?.nextDueDate,
         payments: openEntry?.payments || [],
         totalPaid: openEntry?.totalPaid || 0,
       },

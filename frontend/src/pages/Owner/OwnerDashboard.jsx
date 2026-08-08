@@ -128,17 +128,32 @@ function OwnerDashboard() {
                       )}
                     </div>
 
-                    <span
-                      className={`owner-status-badge ${room.status || "vacant"}`}
-                    >
-                      {room.status || "vacant"}
-                    </span>
+                    <div style={{ textAlign: "right" }}>
+                      <span
+                        className={`owner-status-badge ${room.status || "vacant"}`}
+                      >
+                        {room.status || "vacant"}
+                      </span>
+                      {room.status === "occupied" && room.liveRentStatus && (
+                        <div>
+                          <span className={`owner-rent-badge ${room.liveRentStatus}`}>
+                            Rent: {room.liveRentStatus}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="owner-room-price">
                     ₹{room.price?.toLocaleString("en-IN") || 0}
                     <span> /month</span>
                   </div>
+
+                  {room.status === "occupied" && (
+                    <div className="owner-advance-tag">
+                      Advance: <strong>₹{room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}</strong>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

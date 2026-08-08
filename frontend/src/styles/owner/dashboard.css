@@ -435,3 +435,43 @@
   font-weight: 700;
   color: #16a34a;
 }
+
+/* ===========================
+   LIVE RENT STATUS BADGE
+   (paid / pending / overdue - computed live, not stale)
+=========================== */
+
+.owner-rent-badge {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  margin-top: 6px;
+}
+
+.owner-rent-badge.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.owner-rent-badge.pending {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.owner-rent-badge.overdue {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.owner-advance-tag {
+  font-size: 12.5px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.owner-advance-tag strong {
+  color: #111827;
+}

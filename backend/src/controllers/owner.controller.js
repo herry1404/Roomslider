@@ -178,9 +178,21 @@ const getMyRooms = async (req, res) => {
     const owner = await Owner.findById(req.user._id).select("-password");
     if (!owner) return res.status(404).json({ message: "Owner not found" });
 
+    const { computeRentStatus } = require("./room.controller");
+
     const rooms = await Room.find({ owner: owner._id });
 
-    res.json({ owner, rooms });
+    // Attach a live-computed rent status (paid/pending/overdue) to each
+    // occupied room, so the dashboard never shows a stale "paid" forever.
+    const roomsWithStatus = rooms.map((room) => {
+      const roomObj = room.toObject();
+      if (room.status === "occupied") {
+        roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);
+      }
+      return roomObj;
+    });
+
+    res.json({ owner, rooms: roomsWithStatus });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch dashboard data", error: error.message });
   }

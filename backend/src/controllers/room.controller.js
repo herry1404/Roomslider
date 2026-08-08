@@ -2,6 +2,36 @@ const Room = require("../models/room.model");
 const User = require("../models/user.model");
 
 // ============================
+// Compute live rent-cycle status from nextDueDate.
+// Not stored as a flat "always paid" flag - recalculated every time it's
+// read, so it naturally goes pending/overdue again once nextDueDate passes.
+// 5-day grace period before marking as "overdue".
+// ============================
+const GRACE_DAYS = 5;
+
+function computeRentStatus(nextDueDate) {
+  if (!nextDueDate) return "pending";
+
+  const due = new Date(nextDueDate);
+  const graceEnd = new Date(due);
+  graceEnd.setDate(graceEnd.getDate() + GRACE_DAYS);
+
+  const now = new Date();
+
+  if (now < due) return "paid";
+  if (now <= graceEnd) return "pending";
+  return "overdue";
+}
+
+// Adds 1 calendar month to a date, keeping the same day-of-month
+// (e.g. 15 Aug -> 15 Sep). Falls back gracefully for month-end edge cases.
+function addOneMonth(date) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + 1);
+  return d;
+}
+
+// ============================
 // Create Room (Admin or Owner)
 // ============================
 
@@ -135,9 +165,14 @@ const getSingleRoom = async (req, res) => {
       });
     }
 
+    const roomObj = room.toObject();
+    if (room.status === "occupied") {
+      roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);
+    }
+
     res.status(200).json({
       success: true,
-      room,
+      room: roomObj,
     });
   } catch (error) {
     res.status(500).json({
@@ -449,11 +484,14 @@ const assignTenant = async (req, res) => {
       });
     }
 
+    const resolvedMoveInDate = moveInDate ? new Date(moveInDate) : new Date();
+
     room.currentTenant = {
       name,
       phone: phone || tenantPhone || "",
-      moveInDate: moveInDate ? new Date(moveInDate) : new Date(),
+      moveInDate: resolvedMoveInDate,
       advanceAmount: advanceAmount ? Number(advanceAmount) : 0,
+      nextDueDate: resolvedMoveInDate,
     };
     room.currentTenantUser = tenantUser._id;
     room.status = "occupied";
@@ -607,6 +645,11 @@ const recordPayment = async (req, res) => {
     });
     openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
 
+    // Advance the rent cycle: next payment is due 1 month after whichever
+    // due date this payment is settling (falls back to today if unset).
+    const baseDate = room.currentTenant?.nextDueDate || new Date();
+    room.currentTenant.nextDueDate = addOneMonth(baseDate);
+
     room.paymentStatus = "paid";
 
     await room.save();
@@ -636,4 +679,6 @@ module.exports = {
   assignTenant,
   vacateTenant,
   recordPayment,
+  computeRentStatus,
+  addOneMonth,
 };

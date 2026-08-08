@@ -116,6 +116,9 @@ const roomSchema = new mongoose.Schema(
       phone: { type: String, default: "" },
       moveInDate: { type: Date },
       advanceAmount: { type: Number, default: 0 },
+      // The date the current/next rent cycle is due. Advances by 1 month
+      // each time a payment is recorded. Used to compute live paid/pending/overdue status.
+      nextDueDate: { type: Date },
     },
 
     // Links this room to an actual registered User account (for Tenant Portal login)
