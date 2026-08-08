@@ -22,7 +22,7 @@ function ManageRooms() {
 
   const fetchRooms = async () => {
     try {
-      const res = await api.get("/rooms");
+      const res = await api.get("/rooms?includeOccupied=true");
 
       const data = res.data.rooms || [];
 

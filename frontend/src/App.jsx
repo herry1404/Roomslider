@@ -8,6 +8,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Settings from "./pages/Settings/Settings";
 import Wishlist from "./pages/Wishlist/Wishlist";
+import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 
@@ -50,6 +51,7 @@ function App() {
       <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
       <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
       <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
+      <Route path="/my-place" element={<MainLayout><TenantDashboard /></MainLayout>} />
       <Route path="/recently-viewed" element={<MainLayout><RecentlyViewed /></MainLayout>} />
 
       <Route path="/owner/login" element={<OwnerLogin />} />

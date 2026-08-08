@@ -12,7 +12,10 @@ import {
   Settings as SettingsIcon,
   Building2,
   LayoutDashboard,
+  Home,
 } from "lucide-react";
+
+import api from "../../api/axios";
 
 function ProfileMenu() {
   const navigate = useNavigate();
@@ -20,6 +23,21 @@ function ProfileMenu() {
   const menuRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const [isTenant, setIsTenant] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role === "user") {
+      api
+        .get("/auth/my-tenancy")
+        .then((res) => {
+          setIsTenant(!!res.data.isTenant);
+        })
+        .catch(() => {
+          setIsTenant(false);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -77,6 +95,13 @@ function ProfileMenu() {
               <NavLink to="/owner/dashboard" className="profile-item" onClick={closeMenu}>
                 <LayoutDashboard size={16} />
                 Dashboard
+              </NavLink>
+            )}
+
+            {isTenant && (
+              <NavLink to="/my-place" className="profile-item" onClick={closeMenu}>
+                <Home size={16} />
+                Your Place
               </NavLink>
             )}
 

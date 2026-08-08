@@ -18,6 +18,7 @@ function OwnerRoomDetail() {
     phone: "",
     moveInDate: "",
     advanceAmount: "",
+    tenantEmail: "",
   });
 
   const [paymentForm, setPaymentForm] = useState({
@@ -52,10 +53,18 @@ function OwnerRoomDetail() {
       return;
     }
 
+    if (!tenantForm.tenantEmail && !tenantForm.phone) {
+      toast.error("Tenant's registered email or phone is required");
+      return;
+    }
+
     try {
-      await api.put(`/rooms/${id}/assign-tenant`, tenantForm);
+      await api.put(`/rooms/${id}/assign-tenant`, {
+        ...tenantForm,
+        tenantPhone: tenantForm.phone,
+      });
       toast.success("Tenant assigned successfully");
-      setTenantForm({ name: "", phone: "", moveInDate: "", advanceAmount: "" });
+      setTenantForm({ name: "", phone: "", moveInDate: "", advanceAmount: "", tenantEmail: "" });
       fetchRoom();
     } catch (error) {
       console.error("ASSIGN TENANT ERROR:", error);
@@ -200,6 +209,20 @@ function OwnerRoomDetail() {
                     }
                     placeholder="Full name"
                   />
+                </div>
+                <div className="owner-form-group">
+                  <label>Tenant's Registered Email (RoomSlider account)</label>
+                  <input
+                    type="email"
+                    value={tenantForm.tenantEmail}
+                    onChange={(e) =>
+                      setTenantForm({ ...tenantForm, tenantEmail: e.target.value })
+                    }
+                    placeholder="tenant@example.com"
+                  />
+                  <small style={{ color: "#94a3b8" }}>
+                    Tenant must already have a RoomSlider account. You can use email or phone below.
+                  </small>
                 </div>
                 <div className="owner-form-group">
                   <label>Phone Number</label>
