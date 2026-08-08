@@ -54,6 +54,14 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+    // The room this user is currently renting as a tenant (set when an
+    // owner assigns them to a room, cleared on vacate)
+    activeRoom: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+      default: null,
+    },
+
 
   },
   {

@@ -118,6 +118,13 @@ const roomSchema = new mongoose.Schema(
       advanceAmount: { type: Number, default: 0 },
     },
 
+    // Links this room to an actual registered User account (for Tenant Portal login)
+    currentTenantUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     paymentStatus: {
       type: String,
       enum: ["paid", "pending", "overdue"],

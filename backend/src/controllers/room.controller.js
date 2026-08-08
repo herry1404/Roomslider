@@ -1,4 +1,5 @@
 const Room = require("../models/room.model");
+const User = require("../models/user.model");
 
 // ============================
 // Create Room (Admin or Owner)
@@ -94,6 +95,12 @@ const getRooms = async (req, res) => {
     if (req.query.search) {
       const regex = new RegExp(req.query.search, "i");
       filter.$or = [{ title: regex }, { location: regex }, { category: regex }];
+    }
+
+    // Public users should only ever see vacant rooms. Admin panel passes
+    // ?includeOccupied=true so it can still manage occupied rooms too.
+    if (req.query.includeOccupied !== "true") {
+      filter.status = "vacant";
     }
 
     const rooms = await Room.find(filter).sort({
@@ -404,7 +411,7 @@ const assignTenant = async (req, res) => {
       });
     }
 
-    const { name, phone, moveInDate, advanceAmount } = req.body;
+    const { name, phone, moveInDate, advanceAmount, tenantEmail, tenantPhone } = req.body;
 
     if (!name) {
       return res.status(400).json({
@@ -413,12 +420,42 @@ const assignTenant = async (req, res) => {
       });
     }
 
+    if (!tenantEmail && !tenantPhone) {
+      return res.status(400).json({
+        success: false,
+        message: "Tenant email or phone number is required to link their RoomSlider account",
+      });
+    }
+
+    // Find the tenant's registered User account by email or phone
+    const orConditions = [];
+    if (tenantEmail) orConditions.push({ email: tenantEmail.trim().toLowerCase() });
+    if (tenantPhone) orConditions.push({ phone: tenantPhone.trim() });
+
+    const tenantUser = await User.findOne({ $or: orConditions });
+
+    if (!tenantUser) {
+      return res.status(404).json({
+        success: false,
+        message: "No RoomSlider account found with this email/phone. Ask the tenant to sign up first, then try again.",
+      });
+    }
+
+    // If this user is already renting another room, block until vacated
+    if (tenantUser.activeRoom && tenantUser.activeRoom.toString() !== room._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "This user is already assigned to another room. Vacate that room first.",
+      });
+    }
+
     room.currentTenant = {
       name,
-      phone: phone || "",
+      phone: phone || tenantPhone || "",
       moveInDate: moveInDate ? new Date(moveInDate) : new Date(),
       advanceAmount: advanceAmount ? Number(advanceAmount) : 0,
     };
+    room.currentTenantUser = tenantUser._id;
     room.status = "occupied";
     room.paymentStatus = "pending";
 
@@ -430,6 +467,9 @@ const assignTenant = async (req, res) => {
     });
 
     await room.save();
+
+    tenantUser.activeRoom = room._id;
+    await tenantUser.save();
 
     res.status(200).json({
       success: true,
@@ -482,12 +522,18 @@ const vacateTenant = async (req, res) => {
         : new Date();
     }
 
+    // Clear the linked tenant's activeRoom so their portal stops showing this room
+    if (room.currentTenantUser) {
+      await User.findByIdAndUpdate(room.currentTenantUser, { activeRoom: null });
+    }
+
     room.currentTenant = {
       name: "",
       phone: "",
       moveInDate: undefined,
       advanceAmount: 0,
     };
+    room.currentTenantUser = null;
     room.status = "vacant";
     room.paymentStatus = "pending";
 

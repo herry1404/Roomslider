@@ -268,8 +268,100 @@ const googleLogin = async (req, res) => {
 };
 
 
+// ======================
+// GET MY TENANCY (Tenant Portal)
+// Returns the logged-in user's currently rented room, owner contact,
+// and full payment history — or null if they aren't renting anything.
+// ======================
+
+const getMyTenancy = async (req, res) => {
+
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    if (!user.activeRoom) {
+
+      return res.status(200).json({
+        success: true,
+        isTenant: false,
+        message: "You are not currently renting any room on RoomSlider",
+      });
+
+    }
+
+    const Room = require("../models/room.model");
+
+    const room = await Room.findById(user.activeRoom).populate(
+      "owner",
+      "name email propertyName"
+    );
+
+    if (!room || room.status !== "occupied") {
+
+      // Data got out of sync somehow — clean it up rather than error out
+      user.activeRoom = null;
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        isTenant: false,
+        message: "You are not currently renting any room on RoomSlider",
+      });
+
+    }
+
+    const openEntry = [...room.occupancyHistory]
+      .reverse()
+      .find((entry) => !entry.endDate);
+
+    return res.status(200).json({
+
+      success: true,
+      isTenant: true,
+      room: {
+        id: room._id,
+        title: room.title,
+        location: room.location,
+        images: room.images,
+        category: room.category,
+        roomNumber: room.roomNumber,
+        price: room.price,
+      },
+      owner: room.owner
+        ? {
+            name: room.owner.name,
+            email: room.owner.email,
+            propertyName: room.owner.propertyName,
+          }
+        : null,
+      tenancy: {
+        moveInDate: room.currentTenant?.moveInDate,
+        advanceAmount: room.currentTenant?.advanceAmount,
+        paymentStatus: room.paymentStatus,
+        payments: openEntry?.payments || [],
+        totalPaid: openEntry?.totalPaid || 0,
+      },
+
+    });
+
+  } catch (error) {
+
+    console.error("GET MY TENANCY ERROR 👉", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+
+};
+
+
 module.exports = {
   register,
   login,
   googleLogin,
+  getMyTenancy,
 };
