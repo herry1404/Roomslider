@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Wallet, X } from "lucide-react";
 
 import api from "../../api/axios";
 
@@ -25,6 +26,8 @@ function OwnerRoomDetail() {
     amount: "",
     method: "cash",
   });
+
+  const [showPayModal, setShowPayModal] = useState(false);
 
   const fetchRoom = async () => {
     try {
@@ -99,6 +102,7 @@ function OwnerRoomDetail() {
       await api.post(`/rooms/${id}/payment`, paymentForm);
       toast.success("Payment recorded");
       setPaymentForm({ amount: "", method: "cash" });
+      setShowPayModal(false);
       fetchRoom();
     } catch (error) {
       console.error("RECORD PAYMENT ERROR:", error);
@@ -277,41 +281,6 @@ function OwnerRoomDetail() {
             </div>
           )}
 
-          {room.status === "occupied" && (
-            <div className="owner-detail-card">
-              <h3>Record a Payment</h3>
-              <form onSubmit={handleRecordPayment}>
-                <div className="owner-form-group">
-                  <label>Amount (₹)</label>
-                  <input
-                    type="number"
-                    value={paymentForm.amount}
-                    onChange={(e) =>
-                      setPaymentForm({ ...paymentForm, amount: e.target.value })
-                    }
-                    placeholder="0"
-                  />
-                </div>
-                <div className="owner-form-group">
-                  <label>Method</label>
-                  <select
-                    value={paymentForm.method}
-                    onChange={(e) =>
-                      setPaymentForm({ ...paymentForm, method: e.target.value })
-                    }
-                  >
-                    <option value="cash">Cash</option>
-                    <option value="upi">UPI</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <button type="submit" className="owner-btn owner-btn-primary">
-                  Record Payment
-                </button>
-              </form>
-            </div>
-          )}
         </div>
 
         {/* RIGHT COLUMN */}
@@ -360,6 +329,66 @@ function OwnerRoomDetail() {
           </div>
         </div>
       </div>
+
+      {room.status === "occupied" && (
+        <button
+          className="owner-float-btn"
+          onClick={() => setShowPayModal(true)}
+        >
+          <Wallet size={16} />
+          Record Payment
+        </button>
+      )}
+
+      {showPayModal && (
+        <div
+          className="owner-modal-overlay"
+          onClick={() => setShowPayModal(false)}
+        >
+          <div className="owner-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="owner-modal-header">
+              <h3>Record a Payment</h3>
+              <button
+                className="owner-modal-close"
+                onClick={() => setShowPayModal(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleRecordPayment}>
+              <div className="owner-form-group">
+                <label>Amount (₹)</label>
+                <input
+                  type="number"
+                  value={paymentForm.amount}
+                  onChange={(e) =>
+                    setPaymentForm({ ...paymentForm, amount: e.target.value })
+                  }
+                  placeholder="0"
+                />
+              </div>
+              <div className="owner-form-group">
+                <label>Method</label>
+                <select
+                  value={paymentForm.method}
+                  onChange={(e) =>
+                    setPaymentForm({ ...paymentForm, method: e.target.value })
+                  }
+                >
+                  <option value="cash">Cash</option>
+                  <option value="upi">UPI</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <button type="submit" className="owner-btn owner-btn-primary">
+                Record Payment
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

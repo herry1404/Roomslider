@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import { Home, DoorOpen, DoorClosed, Zap } from "lucide-react";
+
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
@@ -60,12 +62,14 @@ function OwnerDashboard() {
             className="owner-btn owner-btn-primary"
             onClick={() => navigate("/owner/rooms/add")}
           >
+            <Home size={16} />
             Add Room
           </button>
           <button
             className="owner-btn owner-btn-secondary"
             onClick={() => navigate("/owner/electricity")}
           >
+            <Zap size={16} />
             Update Electricity Bills
           </button>
           <button
@@ -81,18 +85,27 @@ function OwnerDashboard() {
       <div className="owner-stats-grid">
 
         <div className="owner-stat-card total">
-          <span>Total Rooms</span>
-          <h2>{totalRooms}</h2>
+          <div className="owner-stat-icon"><Home size={20} /></div>
+          <div>
+            <span>Total Rooms</span>
+            <h2>{totalRooms}</h2>
+          </div>
         </div>
 
         <div className="owner-stat-card vacant">
-          <span>Vacant</span>
-          <h2>{vacantRooms}</h2>
+          <div className="owner-stat-icon"><DoorOpen size={20} /></div>
+          <div>
+            <span>Vacant</span>
+            <h2>{vacantRooms}</h2>
+          </div>
         </div>
 
         <div className="owner-stat-card occupied">
-          <span>Occupied</span>
-          <h2>{occupiedRooms}</h2>
+          <div className="owner-stat-icon"><DoorClosed size={20} /></div>
+          <div>
+            <span>Occupied</span>
+            <h2>{occupiedRooms}</h2>
+          </div>
         </div>
 
       </div>
