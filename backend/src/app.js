@@ -11,6 +11,7 @@ const wishlistRoutes = require("./routes/wishlist.routes");
 const roomRoutes = require("./routes/room.routes");
 const adminRoutes = require("./routes/admin.routes"); // ✅ Added
 const ownerRoutes = require("./routes/owner.routes"); // ✅ Added for Owner Portal
+const electricityRoutes = require("./routes/electricity.routes");
 
 
 const {
@@ -218,6 +219,13 @@ app.use(
 app.use(
   "/api/owners",
   ownerRoutes
+);
+
+
+// ✅ ELECTRICITY BILLING ROUTES
+app.use(
+  "/api/electricity",
+  electricityRoutes
 );
 
 

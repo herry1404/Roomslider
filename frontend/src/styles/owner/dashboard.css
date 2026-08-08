@@ -475,3 +475,78 @@
 .owner-advance-tag strong {
   color: #111827;
 }
+
+/* ===========================
+   ELECTRICITY BULK UPDATE PAGE
+=========================== */
+
+.owner-electricity-rate-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.owner-electricity-rate-bar label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.owner-electricity-rate-bar input {
+  width: 100px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.owner-electricity-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.owner-electricity-table th {
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.owner-electricity-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #111827;
+}
+
+.owner-electricity-table tr:last-child td {
+  border-bottom: none;
+}
+
+.owner-electricity-table input[type="number"] {
+  width: 90px;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.owner-electricity-amount {
+  font-weight: 600;
+  color: #15803d;
+}

@@ -22,6 +22,7 @@ import OwnerLogin from "./pages/Owner/OwnerLogin";
 import OwnerDashboard from "./pages/Owner/OwnerDashboard";
 import OwnerAddRoom from "./pages/Owner/OwnerAddRoom";
 import OwnerRoomDetail from "./pages/Owner/OwnerRoomDetail";
+import OwnerElectricity from "./pages/Owner/OwnerElectricity";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AddRoom from "./pages/Admin/AddRoom";
 import EditRoom from "./pages/Admin/EditRoom";
@@ -58,6 +59,7 @@ function App() {
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />
+        <Route path="/owner/electricity" element={<OwnerRoute><OwnerElectricity /></OwnerRoute>} />
 
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/login" element={<AdminLogin />} />

@@ -64,6 +64,12 @@ function OwnerDashboard() {
           </button>
           <button
             className="owner-btn owner-btn-secondary"
+            onClick={() => navigate("/owner/electricity")}
+          >
+            Update Electricity Bills
+          </button>
+          <button
+            className="owner-btn owner-btn-secondary"
             onClick={logout}
           >
             Logout

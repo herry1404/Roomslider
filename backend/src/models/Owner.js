@@ -7,7 +7,9 @@ const ownerSchema = new mongoose.Schema({
   password: { type: String, required: true },
   propertyName: { type: String },
   totalRooms: { type: Number, default: 0 },
-  role: { type: String, default: "owner" }
+  role: { type: String, default: "owner" },
+  // Electricity rate this owner charges tenants, per unit consumed (₹/unit)
+  ratePerUnit: { type: Number, default: 0 },
 }, { timestamps: true });
 
 ownerSchema.pre('save', async function () {

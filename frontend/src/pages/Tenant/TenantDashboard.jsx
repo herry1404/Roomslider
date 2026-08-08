@@ -10,7 +10,6 @@ import "../../styles/tenant/dashboard.css";
 const SERVICES = [
   { name: "Laundry", icon: Sparkles },
   { name: "Mess / Grocery", icon: ShoppingBasket },
-  { name: "Electricity Bill", icon: Zap },
   { name: "Repairs & Maintenance", icon: Wrench },
 ];
 
@@ -20,6 +19,7 @@ function TenantDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [bill, setBill] = useState(null);
 
   const fetchTenancy = async () => {
     try {
@@ -32,6 +32,13 @@ function TenantDashboard() {
       }
 
       setData(res.data);
+
+      try {
+        const billRes = await api.get("/electricity/my-bill");
+        setBill(billRes.data.bill || null);
+      } catch (billError) {
+        console.error("ELECTRICITY BILL FETCH ERROR:", billError);
+      }
     } catch (error) {
       console.error("TENANT DASHBOARD ERROR:", error);
       toast.error(
@@ -117,6 +124,32 @@ function TenantDashboard() {
 
         {/* RIGHT COLUMN */}
         <div>
+          <div className="tenant-card">
+            <h3>Electricity Bill</h3>
+            {bill ? (
+              <>
+                <div className="tenant-row">
+                  <span>{String(bill.month).padStart(2, "0")}/{bill.year}</span>
+                  <span className={`tenant-badge ${bill.status}`}>{bill.status}</span>
+                </div>
+                <div className="tenant-row">
+                  <span>Units Consumed</span>
+                  <span>{bill.unitsConsumed}</span>
+                </div>
+                <div className="tenant-row">
+                  <span>Rate</span>
+                  <span>₹{bill.ratePerUnit} /unit</span>
+                </div>
+                <div className="tenant-row">
+                  <span>Amount</span>
+                  <span>₹{bill.amount?.toLocaleString("en-IN")}</span>
+                </div>
+              </>
+            ) : (
+              <p className="tenant-empty">No electricity bill yet for this month.</p>
+            )}
+          </div>
+
           <div className="tenant-section-title">Nearby Services</div>
           <div className="tenant-services-grid">
             {SERVICES.map((s) => (
