@@ -1,0 +1,627 @@
+/* ===========================
+   TENANT PORTAL - "YOUR PLACE"
+   Clean, minimal, calm layout
+=========================== */
+
+.tenant-page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* ---- Header strip ---- */
+
+.tenant-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tenant-header-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #f3f4f6;
+  flex-shrink: 0;
+}
+
+.tenant-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tenant-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin-bottom: 4px;
+}
+
+.tenant-header-info h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.tenant-header-location {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ---- Grid ---- */
+
+.tenant-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .tenant-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Card base ---- */
+
+.tenant-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.tenant-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+/* ---- Rent hero card ---- */
+
+.tenant-rent-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.tenant-rent-card .tenant-rent-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #15803d;
+  margin-bottom: 6px;
+}
+
+.tenant-rent-amount {
+  font-size: 34px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+
+.tenant-rent-amount span {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.tenant-pay-btn {
+  width: 100%;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: #16a34a;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.tenant-pay-btn:hover {
+  background: #15803d;
+}
+
+.tenant-pay-btn:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.tenant-pay-note {
+  text-align: center;
+  font-size: 12.5px;
+  color: #6b7280;
+  margin-top: 10px;
+}
+
+/* ---- Info rows ---- */
+
+.tenant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.tenant-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.tenant-row span:first-child {
+  color: #6b7280;
+}
+
+.tenant-row span:last-child {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ---- Status badge ---- */
+
+.tenant-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+.tenant-badge.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.tenant-badge.pending {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.tenant-badge.overdue {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ---- Payment history ---- */
+
+.tenant-payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.tenant-payment-item:last-child {
+  border-bottom: none;
+}
+
+.tenant-payment-date {
+  color: #111827;
+  font-weight: 500;
+}
+
+.tenant-payment-method {
+  color: #6b7280;
+  font-size: 12.5px;
+  text-transform: capitalize;
+}
+
+.tenant-payment-amount {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.tenant-empty {
+  color: #9ca3af;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+/* ---- Loading state ---- */
+
+.tenant-loading {
+  padding: 60px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* ===========================
+   SERVICES SECTION
+=========================== */
+
+.tenant-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 8px 0 14px;
+}
+
+.tenant-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.tenant-service-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+}
+
+.tenant-service-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0fdf4;
+  border-radius: 10px;
+  color: #16a34a;
+}
+
+.tenant-service-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.tenant-service-soon {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #a16207;
+  background: #fef9c3;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+/* ===========================
+   FLOATING PAY RENT BUTTON
+=========================== */
+
+.tenant-float-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 40;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: #16a34a;
+  color: white;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+
+.tenant-float-btn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   PAYMENT MODAL
+=========================== */
+
+.tenant-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .tenant-modal-overlay {
+    align-items: center;
+  }
+}
+
+.tenant-modal {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+}
+
+@media (min-width: 640px) {
+  .tenant-modal {
+    border-radius: 20px;
+  }
+}
+
+.tenant-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.tenant-modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.tenant-modal-close {
+  appearance: none;
+  border: none;
+  background: #f3f4f6;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.tenant-modal-rent-row {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.tenant-modal-rent-amount {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  margin: 4px 0 12px;
+}
+
+.tenant-modal-pay-btn {
+  width: 100%;
+  appearance: none;
+  border: none;
+  background: #16a34a;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tenant-modal-pay-btn:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   SERVICES SECTION
+=========================== */
+
+.tenant-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 8px 0 14px;
+}
+
+.tenant-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.tenant-service-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+}
+
+.tenant-service-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0fdf4;
+  border-radius: 10px;
+  color: #16a34a;
+}
+
+.tenant-service-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.tenant-service-soon {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #a16207;
+  background: #fef9c3;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+/* ===========================
+   FLOATING PAY RENT BUTTON
+=========================== */
+
+.tenant-float-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 40;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: #16a34a;
+  color: white;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+
+.tenant-float-btn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   PAYMENT MODAL
+=========================== */
+
+.tenant-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .tenant-modal-overlay {
+    align-items: center;
+  }
+}
+
+.tenant-modal {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+}
+
+@media (min-width: 640px) {
+  .tenant-modal {
+    border-radius: 20px;
+  }
+}
+
+.tenant-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.tenant-modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.tenant-modal-close {
+  appearance: none;
+  border: none;
+  background: #f3f4f6;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.tenant-modal-rent-row {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.tenant-modal-rent-amount {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  margin: 4px 0 12px;
+}
+
+.tenant-modal-pay-btn {
+  width: 100%;
+  appearance: none;
+  border: none;
+  background: #16a34a;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tenant-modal-pay-btn:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
