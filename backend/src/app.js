@@ -14,6 +14,7 @@ const ownerRoutes = require("./routes/owner.routes"); // ✅ Added for Owner Por
 const electricityRoutes = require("./routes/electricity.routes");
 const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 
 const {
@@ -245,6 +246,13 @@ app.use(
 app.use(
   "/api/notifications",
   notificationRoutes
+);
+
+
+// ✅ PAYMENT ROUTES
+app.use(
+  "/api/payments",
+  paymentRoutes
 );
 
 

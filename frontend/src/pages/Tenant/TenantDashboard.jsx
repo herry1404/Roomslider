@@ -58,8 +58,63 @@ function TenantDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handlePayRent = () => {
-    toast("Online rent payment is coming soon", { icon: "🛠️" });
+  const handlePayRent = async () => {
+    try {
+      const roomId = data?.room?.id;
+
+      if (!roomId) {
+        toast.error("Room not found");
+        return;
+      }
+
+      const orderRes = await api.post("/payments/create-order", {
+        roomId,
+        type: "rent",
+      });
+
+      const { orderId, amount, currency, key } = orderRes.data;
+
+      const options = {
+        key,
+        amount,
+        currency,
+        order_id: orderId,
+        name: "RoomSlider",
+        description: "Rent Payment",
+        handler: async (response) => {
+          try {
+            await api.post("/payments/verify", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              roomId,
+              type: "rent",
+            });
+
+            toast.success("Rent paid successfully!");
+            setShowPayModal(false);
+            fetchTenancy();
+          } catch (verifyError) {
+            console.error("PAYMENT VERIFY ERROR:", verifyError);
+            toast.error("Payment could not be verified. Contact support.");
+          }
+        },
+        prefill: {
+          name: data?.tenancy?.name || "",
+        },
+        theme: {
+          color: "#16a34a",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("CREATE ORDER ERROR:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to start payment"
+      );
+    }
   };
 
   const handleGiveNotice = async (e) => {
