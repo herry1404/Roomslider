@@ -159,6 +159,9 @@ const authLimiter = rateLimit({
 
   max:20,
 
+  skip: (req) => {
+    return req.body?.email === process.env.ADMIN_EMAIL;
+  },
 
   message:{
 
