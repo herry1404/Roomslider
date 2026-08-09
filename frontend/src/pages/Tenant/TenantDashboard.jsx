@@ -20,6 +20,9 @@ function TenantDashboard() {
   const [loading, setLoading] = useState(true);
   const [showPayModal, setShowPayModal] = useState(false);
   const [bill, setBill] = useState(null);
+  const [showVacateForm, setShowVacateForm] = useState(false);
+  const [vacateDate, setVacateDate] = useState("");
+  const [vacateSubmitting, setVacateSubmitting] = useState(false);
 
   const fetchTenancy = async () => {
     try {
@@ -59,6 +62,39 @@ function TenantDashboard() {
     toast("Online rent payment is coming soon", { icon: "🛠️" });
   };
 
+  const handleGiveNotice = async (e) => {
+    e.preventDefault();
+
+    if (!vacateDate) {
+      toast.error("Select a date");
+      return;
+    }
+
+    setVacateSubmitting(true);
+    try {
+      await api.post("/auth/vacate-notice", { vacateDate });
+      toast.success("Vacate notice given");
+      setShowVacateForm(false);
+      fetchTenancy();
+    } catch (error) {
+      console.error("VACATE NOTICE ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to give notice");
+    } finally {
+      setVacateSubmitting(false);
+    }
+  };
+
+  const handleCancelNotice = async () => {
+    try {
+      await api.delete("/auth/vacate-notice");
+      toast.success("Notice cancelled. You're continuing your stay.");
+      fetchTenancy();
+    } catch (error) {
+      console.error("CANCEL NOTICE ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to cancel notice");
+    }
+  };
+
   if (loading) {
     return (
       <div className="tenant-page">
@@ -73,6 +109,7 @@ function TenantDashboard() {
 
   const { room, owner, tenancy } = data;
   const payments = [...(tenancy.payments || [])].reverse();
+  const hasNotice = !!tenancy.vacateNoticeDate;
 
   return (
     <div className="tenant-page">
@@ -91,6 +128,18 @@ function TenantDashboard() {
           <div className="tenant-header-location">{room.location}</div>
         </div>
       </div>
+
+      {hasNotice && (
+        <div className="tenant-vacate-banner">
+          You've given notice to vacate on{" "}
+          <strong>{new Date(tenancy.vacateNoticeDate).toLocaleDateString("en-IN")}</strong>.
+          <div className="tenant-vacate-actions">
+            <button className="tenant-vacate-continue-btn" onClick={handleCancelNotice}>
+              I want to continue instead
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="tenant-grid">
         {/* LEFT COLUMN */}
@@ -119,6 +168,34 @@ function TenantDashboard() {
               <span>Advance Paid</span>
               <span>₹{tenancy.advanceAmount?.toLocaleString("en-IN") || 0}</span>
             </div>
+
+            {!hasNotice && (
+              <div style={{ marginTop: 16 }}>
+                {!showVacateForm ? (
+                  <button
+                    className="owner-btn owner-btn-secondary"
+                    onClick={() => setShowVacateForm(true)}
+                  >
+                    Give Vacate Notice
+                  </button>
+                ) : (
+                  <form className="tenant-vacate-form" onSubmit={handleGiveNotice}>
+                    <input
+                      type="date"
+                      value={vacateDate}
+                      onChange={(e) => setVacateDate(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="tenant-vacate-submit-btn"
+                      disabled={vacateSubmitting}
+                    >
+                      {vacateSubmitting ? "Submitting..." : "Confirm Notice"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -173,6 +173,12 @@ function OwnerDashboard() {
                       Advance: <strong>₹{room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}</strong>
                     </div>
                   )}
+
+                  {room.currentTenant?.vacateNoticeDate && (
+                    <div style={{ marginTop: 6, fontSize: 12.5, color: "#b91c1c", fontWeight: 600 }}>
+                      Notice: vacating {new Date(room.currentTenant.vacateNoticeDate).toLocaleDateString("en-IN")}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

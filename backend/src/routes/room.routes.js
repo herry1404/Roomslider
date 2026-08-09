@@ -11,6 +11,7 @@ const {
   assignTenant,
   vacateTenant,
   recordPayment,
+  resolveVacateNotice,
 } = require("../controllers/room.controller");
 
 const upload = require("../middleware/upload.middleware");
@@ -44,6 +45,9 @@ router.put("/:id/assign-tenant", protect, adminOrOwner, assignTenant);
 
 // Vacate a room (close current tenancy)
 router.put("/:id/vacate", protect, adminOrOwner, vacateTenant);
+
+// Confirm or decline a tenant's vacate notice
+router.put("/:id/resolve-vacate-notice", protect, adminOrOwner, resolveVacateNotice);
 
 // Record a payment against the current tenancy
 router.post("/:id/payment", protect, adminOrOwner, recordPayment);

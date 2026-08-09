@@ -28,6 +28,7 @@ function OwnerRoomDetail() {
   });
 
   const [showPayModal, setShowPayModal] = useState(false);
+  const [resolvingNotice, setResolvingNotice] = useState(false);
 
   const fetchRoom = async () => {
     try {
@@ -72,6 +73,22 @@ function OwnerRoomDetail() {
     } catch (error) {
       console.error("ASSIGN TENANT ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to assign tenant");
+    }
+  };
+
+  const handleResolveNotice = async (action) => {
+    setResolvingNotice(true);
+    try {
+      await api.put(`/rooms/${id}/resolve-vacate-notice`, { action });
+      toast.success(
+        action === "confirm" ? "Room marked as vacant" : "Notice declined, tenant continues"
+      );
+      fetchRoom();
+    } catch (error) {
+      console.error("RESOLVE NOTICE ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to resolve notice");
+    } finally {
+      setResolvingNotice(false);
     }
   };
 
@@ -133,6 +150,44 @@ function OwnerRoomDetail() {
       <button className="owner-detail-back" onClick={() => navigate(-1)}>
         ← Back
       </button>
+
+      {room.status === "occupied" &&
+        room.currentTenant?.vacateNoticeDate &&
+        new Date(room.currentTenant.vacateNoticeDate) <= new Date() && (
+          <div
+            style={{
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              borderRadius: 12,
+              padding: "16px 18px",
+              marginBottom: 20,
+            }}
+          >
+            <p style={{ margin: 0, marginBottom: 12, fontSize: 14, color: "#991b1b" }}>
+              This room was due to be vacated on{" "}
+              <strong>
+                {new Date(room.currentTenant.vacateNoticeDate).toLocaleDateString("en-IN")}
+              </strong>
+              . Mark it as vacant now?
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                className="owner-btn owner-btn-primary"
+                onClick={() => handleResolveNotice("confirm")}
+                disabled={resolvingNotice}
+              >
+                Yes, vacate
+              </button>
+              <button
+                className="owner-btn owner-btn-secondary"
+                onClick={() => handleResolveNotice("decline")}
+                disabled={resolvingNotice}
+              >
+                No, tenant continues
+              </button>
+            </div>
+          </div>
+        )}
 
       <div className="owner-detail-top">
         <div className="owner-detail-heading">

@@ -669,6 +669,88 @@ const recordPayment = async (req, res) => {
   }
 };
 
+// ============================
+// Confirm or decline a vacate notice once its date has arrived
+// (Owner, or Admin). action: "confirm" -> vacates the room (reuses the
+// same logic as vacateTenant). action: "decline" -> clears the notice,
+// tenant continues as normal.
+// ============================
+
+const resolveVacateNotice = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    if (
+      req.user.role === "owner" &&
+      (!room.owner || room.owner.toString() !== req.user._id.toString())
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. This is not your room.",
+      });
+    }
+
+    const { action } = req.body; // "confirm" | "decline"
+
+    if (action === "decline") {
+      room.currentTenant.vacateNoticeDate = null;
+      await room.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Vacate notice declined. Tenant continues.",
+        room,
+      });
+    }
+
+    if (action === "confirm") {
+      const openEntry = [...room.occupancyHistory]
+        .reverse()
+        .find((entry) => !entry.endDate);
+
+      if (openEntry) {
+        openEntry.endDate = new Date();
+      }
+
+      if (room.currentTenantUser) {
+        await User.findByIdAndUpdate(room.currentTenantUser, { activeRoom: null });
+      }
+
+      room.currentTenant = {
+        name: "",
+        phone: "",
+        moveInDate: undefined,
+        advanceAmount: 0,
+        nextDueDate: undefined,
+        vacateNoticeDate: null,
+      };
+      room.currentTenantUser = null;
+      room.status = "vacant";
+      room.paymentStatus = "pending";
+
+      await room.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Room vacated successfully",
+        room,
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "action must be 'confirm' or 'decline'",
+    });
+  } catch (error) {
+    console.error("RESOLVE VACATE NOTICE ERROR 👉", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createRoom,
   getRooms,
@@ -681,4 +763,5 @@ module.exports = {
   recordPayment,
   computeRentStatus,
   addOneMonth,
+  resolveVacateNotice,
 };

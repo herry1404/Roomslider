@@ -341,6 +341,7 @@ const getMyTenancy = async (req, res) => {
         advanceAmount: room.currentTenant?.advanceAmount,
         paymentStatus: computeRentStatus(room.currentTenant?.nextDueDate),
         nextDueDate: room.currentTenant?.nextDueDate,
+        vacateNoticeDate: room.currentTenant?.vacateNoticeDate,
         payments: openEntry?.payments || [],
         totalPaid: openEntry?.totalPaid || 0,
       },
@@ -361,9 +362,110 @@ const getMyTenancy = async (req, res) => {
 };
 
 
+// ======================
+// GIVE VACATE NOTICE (Tenant)
+// Tenant declares an intended move-out date. Does NOT vacate the room
+// immediately - just flags it for the owner to see and eventually confirm.
+// ======================
+
+const giveVacateNotice = async (req, res) => {
+
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    if (!user.activeRoom) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not currently renting any room",
+      });
+    }
+
+    const { vacateDate } = req.body;
+
+    if (!vacateDate) {
+      return res.status(400).json({
+        success: false,
+        message: "A vacate date is required",
+      });
+    }
+
+    const Room = require("../models/room.model");
+    const room = await Room.findById(user.activeRoom);
+
+    if (!room || room.status !== "occupied") {
+      return res.status(400).json({
+        success: false,
+        message: "No active tenancy found",
+      });
+    }
+
+    room.currentTenant.vacateNoticeDate = new Date(vacateDate);
+    await room.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Vacate notice given",
+      vacateNoticeDate: room.currentTenant.vacateNoticeDate,
+    });
+
+  } catch (error) {
+
+    console.error("GIVE VACATE NOTICE ERROR 👉", error);
+    return res.status(500).json({ success: false, message: error.message });
+
+  }
+
+};
+
+// ======================
+// CANCEL VACATE NOTICE (Tenant)
+// Tenant changes their mind and wants to continue renting.
+// ======================
+
+const cancelVacateNotice = async (req, res) => {
+
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    if (!user.activeRoom) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not currently renting any room",
+      });
+    }
+
+    const Room = require("../models/room.model");
+    const room = await Room.findById(user.activeRoom);
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    room.currentTenant.vacateNoticeDate = null;
+    await room.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Vacate notice cancelled. You're continuing your stay.",
+    });
+
+  } catch (error) {
+
+    console.error("CANCEL VACATE NOTICE ERROR 👉", error);
+    return res.status(500).json({ success: false, message: error.message });
+
+  }
+
+};
+
+
 module.exports = {
   register,
   login,
   googleLogin,
   getMyTenancy,
+  giveVacateNotice,
+  cancelVacateNotice,
 };
