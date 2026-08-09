@@ -122,6 +122,9 @@ const roomSchema = new mongoose.Schema(
       // Set when the tenant gives notice to vacate. Cleared if they cancel.
       // Once this date has passed, the owner sees a prompt to confirm vacating.
       vacateNoticeDate: { type: Date, default: null },
+      // Lease/agreement document uploaded by the owner for this tenancy
+      leaseDocumentUrl: { type: String, default: "" },
+      leaseDocumentName: { type: String, default: "" },
     },
 
     // Links this room to an actual registered User account (for Tenant Portal login)

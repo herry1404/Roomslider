@@ -751,6 +751,59 @@ const resolveVacateNotice = async (req, res) => {
   }
 };
 
+// ============================
+// Upload a lease/agreement document for the current tenancy
+// (Owner, or Admin). Requires the room to be occupied.
+// ============================
+
+const uploadLeaseDocument = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    if (
+      req.user.role === "owner" &&
+      (!room.owner || room.owner.toString() !== req.user._id.toString())
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. This is not your room.",
+      });
+    }
+
+    if (room.status !== "occupied") {
+      return res.status(400).json({
+        success: false,
+        message: "Assign a tenant before uploading a lease document",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "A document file is required",
+      });
+    }
+
+    room.currentTenant.leaseDocumentUrl = req.file.path;
+    room.currentTenant.leaseDocumentName = req.file.originalname;
+
+    await room.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Lease document uploaded",
+      room,
+    });
+  } catch (error) {
+    console.error("UPLOAD LEASE DOCUMENT ERROR 👉", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createRoom,
   getRooms,
@@ -764,4 +817,5 @@ module.exports = {
   computeRentStatus,
   addOneMonth,
   resolveVacateNotice,
+  uploadLeaseDocument,
 };

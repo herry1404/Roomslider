@@ -12,9 +12,11 @@ const {
   vacateTenant,
   recordPayment,
   resolveVacateNotice,
+  uploadLeaseDocument,
 } = require("../controllers/room.controller");
 
 const upload = require("../middleware/upload.middleware");
+const uploadDocument = require("../middleware/uploadDocument.middleware");
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly, adminOrOwner } = require("../middleware/admin.middleware");
 
@@ -48,6 +50,9 @@ router.put("/:id/vacate", protect, adminOrOwner, vacateTenant);
 
 // Confirm or decline a tenant's vacate notice
 router.put("/:id/resolve-vacate-notice", protect, adminOrOwner, resolveVacateNotice);
+
+// Upload a lease/agreement document for the current tenant
+router.put("/:id/lease-document", protect, adminOrOwner, uploadDocument.single("document"), uploadLeaseDocument);
 
 // Record a payment against the current tenancy
 router.post("/:id/payment", protect, adminOrOwner, recordPayment);

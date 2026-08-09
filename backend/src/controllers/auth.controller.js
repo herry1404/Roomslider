@@ -342,6 +342,8 @@ const getMyTenancy = async (req, res) => {
         paymentStatus: computeRentStatus(room.currentTenant?.nextDueDate),
         nextDueDate: room.currentTenant?.nextDueDate,
         vacateNoticeDate: room.currentTenant?.vacateNoticeDate,
+        leaseDocumentUrl: room.currentTenant?.leaseDocumentUrl || "",
+        leaseDocumentName: room.currentTenant?.leaseDocumentName || "",
         payments: openEntry?.payments || [],
         totalPaid: openEntry?.totalPaid || 0,
       },

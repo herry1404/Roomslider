@@ -29,6 +29,7 @@ function OwnerRoomDetail() {
 
   const [showPayModal, setShowPayModal] = useState(false);
   const [resolvingNotice, setResolvingNotice] = useState(false);
+  const [uploadingLease, setUploadingLease] = useState(false);
 
   const fetchRoom = async () => {
     try {
@@ -73,6 +74,28 @@ function OwnerRoomDetail() {
     } catch (error) {
       console.error("ASSIGN TENANT ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to assign tenant");
+    }
+  };
+
+  const handleLeaseUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("document", file);
+
+    setUploadingLease(true);
+    try {
+      await api.put(`/rooms/${id}/lease-document`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Lease document uploaded");
+      fetchRoom();
+    } catch (error) {
+      console.error("LEASE UPLOAD ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to upload document");
+    } finally {
+      setUploadingLease(false);
     }
   };
 
@@ -266,6 +289,33 @@ function OwnerRoomDetail() {
               <div className="owner-detail-row">
                 <span>Advance Paid</span>
                 <span>₹{room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}</span>
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <label
+                  htmlFor="lease-upload"
+                  className="owner-btn owner-btn-secondary"
+                  style={{ cursor: "pointer", display: "inline-flex" }}
+                >
+                  {uploadingLease
+                    ? "Uploading..."
+                    : room.currentTenant?.leaseDocumentUrl
+                    ? "Replace Lease Document"
+                    : "Upload Lease Document"}
+                </label>
+                <input
+                  id="lease-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  style={{ display: "none" }}
+                  onChange={handleLeaseUpload}
+                  disabled={uploadingLease}
+                />
+                {room.currentTenant?.leaseDocumentUrl && (
+                  <p style={{ marginTop: 8, fontSize: 13, color: "#6b7280" }}>
+                    Current file: {room.currentTenant.leaseDocumentName || "document"}
+                  </p>
+                )}
               </div>
             </div>
           ) : (

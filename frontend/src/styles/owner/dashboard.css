@@ -1061,3 +1061,109 @@
 .owner-expense-delete:hover {
   color: #dc2626;
 }
+
+/* ===========================
+   BULK REMINDERS PAGE
+=========================== */
+
+.owner-reminder-item {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.owner-reminder-info strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.owner-reminder-info div {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.owner-reminder-due {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.owner-whatsapp-btn {
+  appearance: none;
+  border: none;
+  background: #25d366;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.owner-whatsapp-btn:hover {
+  background: #1fb855;
+}
+
+/* ===========================
+   BULK REMINDERS PAGE
+=========================== */
+
+.owner-reminder-item {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.owner-reminder-info strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.owner-reminder-info div {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.owner-reminder-due {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.owner-whatsapp-btn {
+  appearance: none;
+  border: none;
+  background: #25d366;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.owner-whatsapp-btn:hover {
+  background: #1fb855;
+}

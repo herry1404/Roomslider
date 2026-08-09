@@ -169,6 +169,20 @@ function TenantDashboard() {
               <span>₹{tenancy.advanceAmount?.toLocaleString("en-IN") || 0}</span>
             </div>
 
+            {tenancy.leaseDocumentUrl && (
+              <div style={{ marginTop: 12 }}>
+                <a
+                  href={tenancy.leaseDocumentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="owner-btn owner-btn-secondary"
+                  style={{ display: "inline-flex", textDecoration: "none" }}
+                >
+                  Download Lease Document
+                </a>
+              </div>
+            )}
+
             {!hasNotice && (
               <div style={{ marginTop: 16 }}>
                 {!showVacateForm ? (
