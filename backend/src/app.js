@@ -3,7 +3,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const rateLimit = require("express-rate-limit");
 
 
 const authRoutes = require("./routes/auth.routes");
@@ -15,6 +14,8 @@ const electricityRoutes = require("./routes/electricity.routes");
 const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const paymentRoutes = require("./routes/payment.routes");
+const maintenanceRoutes = require("./routes/maintenance.routes");
+const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 
 
 const {
@@ -148,40 +149,6 @@ app.use(
 
 
 
-// =====================
-// Rate Limiter
-// =====================
-
-const authLimiter = rateLimit({
-
-  windowMs:
-    15 * 60 * 1000,
-
-
-  max:20,
-
-  skip: (req) => {
-    return req.body?.email === process.env.ADMIN_EMAIL;
-  },
-
-  message:{
-
-    success:false,
-
-    message:
-    "Bahut zyada attempts ho gaye, thodi der baad try karo.",
-
-  },
-
-
-  standardHeaders:true,
-
-
-  legacyHeaders:false,
-
-
-});
-
 
 
 
@@ -195,7 +162,6 @@ const authLimiter = rateLimit({
 
 app.use(
   "/api/auth",
-  authLimiter,
   authRoutes
 );
 
@@ -253,6 +219,18 @@ app.use(
 app.use(
   "/api/payments",
   paymentRoutes
+);
+
+// ✅ MAINTENANCE ROUTES
+app.use(
+  "/api/maintenance",
+  maintenanceRoutes
+);
+
+// ✅ LAUNDRY VENDOR ROUTES
+app.use(
+  "/api/laundry-vendors",
+  laundryVendorRoutes
 );
 
 

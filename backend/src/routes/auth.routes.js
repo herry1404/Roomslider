@@ -11,6 +11,7 @@ const {
 } = require("../controllers/auth.controller");
 
 const { protect } = require("../middleware/auth.middleware");
+const authLimiter = require("../middleware/authLimiter");
 
 
 // Register Route
@@ -18,11 +19,11 @@ router.post("/register", register);
 
 
 // Login Route
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 
 
 // Google Login Route
-router.post("/google", googleLogin);
+router.post("/google", authLimiter, googleLogin);
 
 
 // Get logged-in user's current tenancy (Tenant Portal)
