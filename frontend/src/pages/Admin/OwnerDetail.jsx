@@ -101,7 +101,12 @@ function OwnerDetail() {
         ) : (
           <div className="owner-rooms-grid">
             {rooms.map((room) => (
-              <div key={room._id} className="owner-room-card">
+              <div
+                key={room._id}
+                className="owner-room-card"
+                onClick={() => navigate(`/admin/rooms/edit/${room._id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <img
                   src={room.images?.[0] || "/placeholder-room.jpg"}
                   alt={room.title || "Room"}
@@ -120,17 +125,40 @@ function OwnerDetail() {
                       )}
                     </div>
 
-                    <span
-                      className={`owner-status-badge ${room.status || "vacant"}`}
-                    >
-                      {room.status || "vacant"}
-                    </span>
+                    <div style={{ textAlign: "right" }}>
+                      <span
+                        className={`owner-status-badge ${room.status || "vacant"}`}
+                      >
+                        {room.status || "vacant"}
+                      </span>
+                      {room.status === "occupied" && room.liveRentStatus && (
+                        <div>
+                          <span className={`owner-rent-badge ${room.liveRentStatus}`}>
+                            Rent: {room.liveRentStatus}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="owner-room-price">
                     ₹{room.price?.toLocaleString("en-IN") || 0}
                     <span> /month</span>
                   </div>
+
+                  {room.status === "occupied" && (
+                    <div style={{ marginTop: 8, fontSize: 13, color: "#374151" }}>
+                      <div>
+                        Tenant: <strong>{room.currentTenant?.name || "—"}</strong>
+                      </div>
+                      <div style={{ color: "#6b7280" }}>
+                        {room.currentTenant?.phone || "No phone on file"}
+                      </div>
+                      <div className="owner-advance-tag">
+                        Advance: <strong>₹{room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}</strong>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
