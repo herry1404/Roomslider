@@ -12,6 +12,7 @@ const roomRoutes = require("./routes/room.routes");
 const adminRoutes = require("./routes/admin.routes"); // ✅ Added
 const ownerRoutes = require("./routes/owner.routes"); // ✅ Added for Owner Portal
 const electricityRoutes = require("./routes/electricity.routes");
+const expenseRoutes = require("./routes/expense.routes");
 
 
 const {
@@ -226,6 +227,13 @@ app.use(
 app.use(
   "/api/electricity",
   electricityRoutes
+);
+
+
+// ✅ EXPENSE TRACKING ROUTES
+app.use(
+  "/api/expenses",
+  expenseRoutes
 );
 
 
