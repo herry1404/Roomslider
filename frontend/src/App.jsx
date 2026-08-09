@@ -25,12 +25,14 @@ import OwnerRoomDetail from "./pages/Owner/OwnerRoomDetail";
 import OwnerElectricity from "./pages/Owner/OwnerElectricity";
 import OwnerExpenses from "./pages/Owner/OwnerExpenses";
 import OwnerReminders from "./pages/Owner/OwnerReminders";
+import OwnerMaintenance from "./pages/Owner/OwnerMaintenance";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AddRoom from "./pages/Admin/AddRoom";
 import EditRoom from "./pages/Admin/EditRoom";
 import ManageRooms from "./pages/Admin/ManageRooms";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import ManageOwners from "./pages/Admin/ManageOwners";
+import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
 
 import AdminRoute from "./components/AdminRoute";
@@ -64,6 +66,7 @@ function App() {
         <Route path="/owner/electricity" element={<OwnerRoute><OwnerElectricity /></OwnerRoute>} />
         <Route path="/owner/expenses" element={<OwnerRoute><OwnerExpenses /></OwnerRoute>} />
         <Route path="/owner/reminders" element={<OwnerRoute><OwnerReminders /></OwnerRoute>} />
+        <Route path="/owner/maintenance" element={<OwnerRoute><OwnerMaintenance /></OwnerRoute>} />
 
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/login" element={<AdminLogin />} />
@@ -74,6 +77,7 @@ function App() {
       <Route path="/admin/rooms/:id" element={<AdminRoute><OwnerRoomDetail /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
       <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
+      <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
       <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
 

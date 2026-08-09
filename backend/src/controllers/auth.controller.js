@@ -331,6 +331,7 @@ const getMyTenancy = async (req, res) => {
       },
       owner: room.owner
         ? {
+            id: room.owner._id,
             name: room.owner.name,
             email: room.owner.email,
             propertyName: room.owner.propertyName,

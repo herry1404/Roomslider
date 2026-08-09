@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { Home, DoorOpen, DoorClosed, Zap, Wallet, Bell } from "lucide-react";
+import { Home, DoorOpen, DoorClosed, Zap, Wallet, Bell, Wrench } from "lucide-react";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -85,6 +85,13 @@ function OwnerDashboard() {
           >
             <Bell size={16} />
             Reminders
+          </button>
+          <button
+            className="owner-btn owner-btn-secondary"
+            onClick={() => navigate("/owner/maintenance")}
+          >
+            <Wrench size={16} />
+            Maintenance
           </button>
           <button
             className="owner-btn owner-btn-secondary"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { X, Wallet, Sparkles, ShoppingBasket, Zap, Wrench } from "lucide-react";
+import { X, Wallet, Sparkles, ShoppingBasket, Zap, Wrench, MessageCircle } from "lucide-react";
 
 import api from "../../api/axios";
 
@@ -23,6 +23,20 @@ function TenantDashboard() {
   const [showVacateForm, setShowVacateForm] = useState(false);
   const [vacateDate, setVacateDate] = useState("");
   const [vacateSubmitting, setVacateSubmitting] = useState(false);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [maintenanceForm, setMaintenanceForm] = useState({
+    title: "",
+    description: "",
+    category: "other",
+  });
+  const [maintenancePhoto, setMaintenancePhoto] = useState(null);
+  const [maintenanceSubmitting, setMaintenanceSubmitting] = useState(false);
+  const [myRequests, setMyRequests] = useState([]);
+  const [requestsLoaded, setRequestsLoaded] = useState(false);
+  const [showLaundryModal, setShowLaundryModal] = useState(false);
+  const [laundryVendors, setLaundryVendors] = useState({ matched: [], all: [] });
+  const [laundryLoaded, setLaundryLoaded] = useState(false);
+  const [laundryLoading, setLaundryLoading] = useState(false);
 
   const fetchTenancy = async () => {
     try {
@@ -117,6 +131,89 @@ function TenantDashboard() {
     }
   };
 
+  const openMaintenanceModal = async () => {
+    setShowMaintenanceModal(true);
+
+    if (!requestsLoaded) {
+      try {
+        const res = await api.get("/maintenance/my-requests");
+        setMyRequests(res.data.requests || []);
+        setRequestsLoaded(true);
+      } catch (error) {
+        console.error("FETCH MAINTENANCE REQUESTS ERROR:", error);
+      }
+    }
+  };
+
+  const handleMaintenanceSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!maintenanceForm.title || !maintenanceForm.description) {
+      toast.error("Title and description are required");
+      return;
+    }
+
+    try {
+      setMaintenanceSubmitting(true);
+
+      const roomId = data?.room?.id;
+      const formData = new FormData();
+      formData.append("roomId", roomId);
+      formData.append("title", maintenanceForm.title);
+      formData.append("description", maintenanceForm.description);
+      formData.append("category", maintenanceForm.category);
+      if (maintenancePhoto) {
+        formData.append("photo", maintenancePhoto);
+      }
+
+      const res = await api.post("/maintenance", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setMyRequests((prev) => [res.data.request, ...prev]);
+      setMaintenanceForm({ title: "", description: "", category: "other" });
+      setMaintenancePhoto(null);
+      toast.success("Request submitted");
+    } catch (error) {
+      console.error("CREATE MAINTENANCE REQUEST ERROR:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to submit request"
+      );
+    } finally {
+      setMaintenanceSubmitting(false);
+    }
+  };
+
+  const openLaundryModal = async () => {
+    setShowLaundryModal(true);
+
+    if (!laundryLoaded) {
+      setLaundryLoading(true);
+      try {
+        const ownerId = data?.owner?.id;
+        const res = await api.get("/laundry-vendors/my-vendor", {
+          params: { ownerId },
+        });
+        setLaundryVendors({
+          matched: res.data.matched || [],
+          all: res.data.all || [],
+        });
+        setLaundryLoaded(true);
+      } catch (error) {
+        console.error("FETCH LAUNDRY VENDORS ERROR:", error);
+      } finally {
+        setLaundryLoading(false);
+      }
+    }
+  };
+
+  const buildLaundryWhatsAppLink = (vendorName, phone) => {
+    const cleanPhone = (phone || "").replace(/\D/g, "");
+    const phoneWithCountryCode = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+    const message = `Hi ${vendorName}, I'm a tenant on RoomSlider and would like to get laundry service.`;
+    return `https://wa.me/${phoneWithCountryCode}?text=${encodeURIComponent(message)}`;
+  };
+
   const handleGiveNotice = async (e) => {
     e.preventDefault();
 
@@ -165,6 +262,7 @@ function TenantDashboard() {
   const { room, owner, tenancy } = data;
   const payments = [...(tenancy.payments || [])].reverse();
   const hasNotice = !!tenancy.vacateNoticeDate;
+  const laundryList = laundryVendors.matched.length > 0 ? laundryVendors.matched : laundryVendors.all;
 
   return (
     <div className="tenant-page">
@@ -298,15 +396,40 @@ function TenantDashboard() {
 
           <div className="tenant-section-title">Nearby Services</div>
           <div className="tenant-services-grid">
-            {SERVICES.map((s) => (
-              <div key={s.name} className="tenant-service-card">
-                <div className="tenant-service-icon">
-                  <s.icon size={20} />
+            {SERVICES.map((s) => {
+              const isMaintenance = s.name === "Repairs & Maintenance";
+              const isLaundry = s.name === "Laundry";
+              const isActive = isMaintenance || isLaundry;
+              const handleClick = isMaintenance
+                ? openMaintenanceModal
+                : isLaundry
+                ? openLaundryModal
+                : undefined;
+
+              return (
+                <div
+                  key={s.name}
+                  className="tenant-service-card"
+                  onClick={handleClick}
+                  style={isActive ? { cursor: "pointer" } : undefined}
+                >
+                  <div className="tenant-service-icon">
+                    <s.icon size={20} />
+                  </div>
+                  <div className="tenant-service-name">{s.name}</div>
+                  {isActive ? (
+                    <span
+                      className="tenant-service-soon"
+                      style={{ background: "#dcfce7", color: "#15803d" }}
+                    >
+                      {isMaintenance ? "Raise Request" : "Contact Vendor"}
+                    </span>
+                  ) : (
+                    <span className="tenant-service-soon">Coming Soon</span>
+                  )}
                 </div>
-                <div className="tenant-service-name">{s.name}</div>
-                <span className="tenant-service-soon">Coming Soon</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -366,6 +489,151 @@ function TenantDashboard() {
                   </div>
                 </div>
               ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Maintenance Request modal */}
+      {showMaintenanceModal && (
+        <div
+          className="tenant-modal-overlay"
+          onClick={() => setShowMaintenanceModal(false)}
+        >
+          <div className="tenant-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="tenant-modal-header">
+              <h3>Repairs & Maintenance</h3>
+              <button
+                className="tenant-modal-close"
+                onClick={() => setShowMaintenanceModal(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleMaintenanceSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}
+            >
+              <input
+                type="text"
+                placeholder="Issue title (e.g. Leaking tap)"
+                value={maintenanceForm.title}
+                onChange={(e) =>
+                  setMaintenanceForm({ ...maintenanceForm, title: e.target.value })
+                }
+                style={{ padding: 10, borderRadius: 8, border: "1px solid #d1d5db" }}
+              />
+              <textarea
+                placeholder="Describe the issue"
+                value={maintenanceForm.description}
+                onChange={(e) =>
+                  setMaintenanceForm({ ...maintenanceForm, description: e.target.value })
+                }
+                rows={3}
+                style={{ padding: 10, borderRadius: 8, border: "1px solid #d1d5db" }}
+              />
+              <select
+                value={maintenanceForm.category}
+                onChange={(e) =>
+                  setMaintenanceForm({ ...maintenanceForm, category: e.target.value })
+                }
+                style={{ padding: 10, borderRadius: 8, border: "1px solid #d1d5db" }}
+              >
+                <option value="electrical">Electrical</option>
+                <option value="plumbing">Plumbing</option>
+                <option value="appliance">Appliance</option>
+                <option value="structural">Structural</option>
+                <option value="other">Other</option>
+              </select>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setMaintenancePhoto(e.target.files[0])}
+              />
+              <button
+                type="submit"
+                className="tenant-modal-pay-btn"
+                disabled={maintenanceSubmitting}
+              >
+                {maintenanceSubmitting ? "Submitting..." : "Submit Request"}
+              </button>
+            </form>
+
+            <h3 style={{ marginBottom: 12 }}>Your Requests</h3>
+            {myRequests.length === 0 ? (
+              <p className="tenant-empty">No requests raised yet.</p>
+            ) : (
+              myRequests.map((r) => (
+                <div key={r._id} className="tenant-payment-item">
+                  <div>
+                    <div className="tenant-payment-date">{r.title}</div>
+                    <div className="tenant-payment-method">
+                      {new Date(r.createdAt).toLocaleDateString("en-IN")}
+                    </div>
+                  </div>
+                  <div
+                    className="tenant-payment-amount"
+                    style={{ fontSize: 12, textTransform: "capitalize" }}
+                  >
+                    {r.status.replace("_", " ")}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Laundry modal */}
+      {showLaundryModal && (
+        <div
+          className="tenant-modal-overlay"
+          onClick={() => setShowLaundryModal(false)}
+        >
+          <div className="tenant-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="tenant-modal-header">
+              <h3>Laundry</h3>
+              <button
+                className="tenant-modal-close"
+                onClick={() => setShowLaundryModal(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {laundryLoading ? (
+              <p className="tenant-empty">Loading vendors...</p>
+            ) : laundryList.length === 0 ? (
+              <p className="tenant-empty">No laundry vendors available yet.</p>
+            ) : (
+              <>
+                {laundryVendors.matched.length === 0 && (
+                  <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 10 }}>
+                    No vendor set for your building yet — here are nearby options:
+                  </p>
+                )}
+                {laundryList.map((v) => (
+                  <div key={v._id} className="tenant-payment-item">
+                    <div>
+                      <div className="tenant-payment-date">{v.vendorName}</div>
+                      <div className="tenant-payment-method">
+                        {v.area || v.owner?.name || "Nearby"}
+                      </div>
+                    </div>
+                    <a
+                      href={buildLaundryWhatsAppLink(v.vendorName, v.phone)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="owner-whatsapp-btn"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <MessageCircle size={15} />
+                      WhatsApp
+                    </a>
+                  </div>
+                ))}
+              </>
             )}
           </div>
         </div>

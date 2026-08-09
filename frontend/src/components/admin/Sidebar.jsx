@@ -8,6 +8,7 @@ import {
   LogOut,
   X,
   UserCog,
+  Shirt,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -39,6 +40,11 @@ function Sidebar({ open, closeSidebar }) {
       title: "Manage Owners",
       icon: <UserCog size={20} />,
       path: "/admin/owners",
+    },
+    {
+      title: "Laundry Vendors",
+      icon: <Shirt size={20} />,
+      path: "/admin/laundry-vendors",
     },
     {
       title: "Users",
