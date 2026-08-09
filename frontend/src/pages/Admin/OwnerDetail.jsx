@@ -104,7 +104,7 @@ function OwnerDetail() {
               <div
                 key={room._id}
                 className="owner-room-card"
-                onClick={() => navigate(`/admin/rooms/edit/${room._id}`)}
+                onClick={() => navigate(`/admin/rooms/${room._id}`)}
                 style={{ cursor: "pointer" }}
               >
                 <img

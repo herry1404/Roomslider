@@ -130,8 +130,8 @@ function OwnerRoomDetail() {
 
   return (
     <div className="owner-dashboard">
-      <button className="owner-detail-back" onClick={() => navigate("/owner/dashboard")}>
-        ← Back to Dashboard
+      <button className="owner-detail-back" onClick={() => navigate(-1)}>
+        ← Back
       </button>
 
       <div className="owner-detail-top">

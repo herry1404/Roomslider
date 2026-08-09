@@ -67,6 +67,7 @@ function App() {
       <Route path="/admin/rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />
       <Route path="/admin/rooms/add" element={<AdminRoute><AddRoom /></AdminRoute>} />
       <Route path="/admin/rooms/edit/:id" element={<AdminRoute><EditRoom /></AdminRoute>} />
+      <Route path="/admin/rooms/:id" element={<AdminRoute><OwnerRoomDetail /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
       <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
       <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
