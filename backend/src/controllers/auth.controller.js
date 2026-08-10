@@ -43,14 +43,20 @@ const register = async (req, res) => {
     const validatedData = registerSchema.parse(req.body);
 
     const existingUser = await User.findOne({
-      email: validatedData.email,
+      $or: [
+        { email: validatedData.email },
+        { phone: validatedData.phone },
+      ],
     });
 
     if (existingUser) {
 
+      const conflictField =
+        existingUser.email === validatedData.email ? "Email" : "Phone number";
+
       return res.status(409).json({
         success: false,
-        message: "Email already registered",
+        message: `${conflictField} already registered`,
       });
 
     }
@@ -117,7 +123,10 @@ const login = async (req, res) => {
     const validatedData = loginSchema.parse(req.body);
 
     const user = await User.findOne({
-      email: validatedData.email,
+      $or: [
+        { email: validatedData.identifier.toLowerCase() },
+        { phone: validatedData.identifier },
+      ],
     });
 
     if (!user) {
@@ -244,6 +253,7 @@ const googleLogin = async (req, res) => {
       success: true,
       message: "Google login successful",
       token,
+      needsPhone: !user.phone,
       user: {
         id: user._id,
         name: user.name,
@@ -464,6 +474,66 @@ const cancelVacateNotice = async (req, res) => {
 };
 
 
+// ======================
+// UPDATE PHONE (post-Google-login binding)
+// ======================
+
+const updatePhone = async (req, res) => {
+
+  try {
+
+    const { phone } = req.body;
+
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Enter a valid 10-digit phone number",
+      });
+
+    }
+
+    const existingPhone = await User.findOne({ phone });
+
+    if (existingPhone && existingPhone._id.toString() !== req.user._id.toString()) {
+
+      return res.status(409).json({
+        success: false,
+        message: "This phone number is already linked to another account",
+      });
+
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { phone },
+      { new: true }
+    );
+
+    return res.status(200).json({
+
+      success: true,
+      message: "Phone number added successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      },
+
+    });
+
+  } catch (error) {
+
+    console.error("UPDATE PHONE ERROR 👉", error);
+    return res.status(500).json({ success: false, message: error.message });
+
+  }
+
+};
+
+
 module.exports = {
   register,
   login,
@@ -471,4 +541,5 @@ module.exports = {
   getMyTenancy,
   giveVacateNotice,
   cancelVacateNotice,
+  updatePhone,
 };

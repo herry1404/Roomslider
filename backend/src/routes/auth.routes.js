@@ -7,7 +7,8 @@ const {
   googleLogin,
   getMyTenancy,
   giveVacateNotice,
-  cancelVacateNotice
+  cancelVacateNotice,
+  updatePhone
 } = require("../controllers/auth.controller");
 
 const { protect } = require("../middleware/auth.middleware");
@@ -28,6 +29,9 @@ router.post("/google", authLimiter, googleLogin);
 
 // Get logged-in user's current tenancy (Tenant Portal)
 router.get("/my-tenancy", protect, getMyTenancy);
+
+// Add/update phone number (post-Google-login binding)
+router.patch("/update-phone", protect, updatePhone);
 
 // Give / cancel a vacate notice
 router.post("/vacate-notice", protect, giveVacateNotice);

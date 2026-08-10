@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Mail,
+  User,
   Lock,
   Eye,
+  EyeOff,
   UserPlus,
 } from "lucide-react";
 import { FaApple, FaFacebookF } from "react-icons/fa";
@@ -19,10 +20,11 @@ function Login() {
   const { login, googleLogin } = useAuth();
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
 
@@ -39,6 +41,13 @@ function Login() {
   const goAfterLogin = (result) => {
 
     toast.success(result.message || "Login successful");
+
+    if (result.needsPhone) {
+
+      navigate("/complete-profile", { replace: true });
+      return;
+
+    }
 
     if (result.user?.role === "admin") {
 
@@ -58,12 +67,12 @@ function Login() {
 
     e.preventDefault();
 
-    const { email, password } = formData;
+    const { identifier, password } = formData;
 
 
-    if (!email.trim()) {
+    if (!identifier.trim()) {
 
-      toast.error("Email is required");
+      toast.error("Email or phone number is required");
       return;
 
     }
@@ -84,7 +93,7 @@ function Login() {
 
 
       const result = await login({
-        email: email.trim(),
+        identifier: identifier.trim(),
         password,
       });
 
@@ -215,22 +224,22 @@ function Login() {
               <div className="input-box">
 
 
-                <Mail size={18} />
+                <User size={18} />
 
 
                 <input
 
-                  type="email"
+                  type="text"
 
-                  name="email"
+                  name="identifier"
 
-                  placeholder="Email"
+                  placeholder="Email or Phone Number"
 
-                  value={formData.email}
+                  value={formData.identifier}
 
                   onChange={handleChange}
 
-                  autoComplete="email"
+                  autoComplete="username"
 
                 />
 
@@ -251,7 +260,7 @@ function Login() {
 
                 <input
 
-                  type="password"
+                  type={showPassword ? "text" : "password"}
 
                   name="password"
 
@@ -266,12 +275,30 @@ function Login() {
                 />
 
 
-                <Eye size={18} />
+                <span
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  style={{ cursor: "pointer" }}
+                >
+
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+
+                </span>
 
 
               </div>
 
 
+
+              <div style={{ textAlign: "right", marginTop: "-8px", marginBottom: "12px" }}>
+
+                <Link
+                  to="/forgot-password"
+                  style={{ fontSize: "13px", color: "#6b7280" }}
+                >
+                  Forgot Password?
+                </Link>
+
+              </div>
 
 
 

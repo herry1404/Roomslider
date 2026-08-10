@@ -6,6 +6,8 @@ import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import CompleteProfile from "./pages/CompleteProfile/CompleteProfile";
 import Settings from "./pages/Settings/Settings";
 import Wishlist from "./pages/Wishlist/Wishlist";
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
@@ -54,6 +56,8 @@ function App() {
       <Route path="/flats" element={<MainLayout><Flats /></MainLayout>} />
       <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
       <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+      <Route path="/complete-profile" element={<MainLayout><CompleteProfile /></MainLayout>} />
+      <Route path="/forgot-password" element={<MainLayout><ForgotPassword /></MainLayout>} />
       <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
       <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
       <Route path="/my-place" element={<MainLayout><TenantDashboard /></MainLayout>} />

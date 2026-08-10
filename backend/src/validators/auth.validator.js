@@ -16,7 +16,7 @@ const registerSchema = z.object({
   phone: z
     .string()
     .trim()
-    .optional(),
+    .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit phone number"),
 
   password: z
     .string()
@@ -25,11 +25,10 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z
+  identifier: z
     .string()
     .trim()
-    .email("Invalid email address")
-    .toLowerCase(),
+    .min(1, "Email or phone is required"),
 
   password: z
     .string()

@@ -154,7 +154,15 @@ function Register() {
 
         toast.success(result.message || "Account created successfully");
 
-        navigate("/", { replace: true });
+        if (result.needsPhone) {
+
+          navigate("/complete-profile", { replace: true });
+
+        } else {
+
+          navigate("/", { replace: true });
+
+        }
 
       }
 

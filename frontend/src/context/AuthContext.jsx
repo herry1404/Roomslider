@@ -64,6 +64,7 @@ export function AuthProvider({ children }) {
         success: true,
         message: res.data.message || "Login successful",
         user: res.data.user,
+        needsPhone: res.data.needsPhone,
       };
     } catch (error) {
       console.error("GOOGLE LOGIN API ERROR:", error);
