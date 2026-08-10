@@ -20,6 +20,7 @@ import "./styles/login.css";   // ✅ IMPORTANT
 import "./styles/register.css";
 
 import App from "./App";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")).render(
               <ThemeProvider>
               <App />
               <Toaster position="top-center" />
+              <SpeedInsights />
             </ThemeProvider>
             </WishlistProvider>
           </AuthProvider>
