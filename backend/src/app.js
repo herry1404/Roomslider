@@ -96,6 +96,15 @@ app.use(
 
       }
 
+
+      if(
+        origin.includes("roomslider.in")
+      ){
+
+        return callback(null,true);
+
+      }
+
       return callback(new Error("Not allowed by CORS"));
 
     },
