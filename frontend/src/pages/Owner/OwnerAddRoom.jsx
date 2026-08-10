@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
+import LocationPicker from "../../components/map/LocationPicker";
 
 import "../../styles/add-room.css";
 
@@ -44,6 +45,8 @@ function OwnerAddRoom() {
         nearby: [],
         roomNumberStart: "",
         roomNumberEnd: "",
+        latitude: null,
+        longitude: null,
     });
 
     const handleChange = (e) => {
@@ -119,6 +122,8 @@ function OwnerAddRoom() {
             data.append("description", formData.description);
             data.append("amenities", JSON.stringify(formData.amenities));
             data.append("nearby", JSON.stringify(formData.nearby));
+            if (formData.latitude) data.append("latitude", formData.latitude);
+            if (formData.longitude) data.append("longitude", formData.longitude);
 
             images.forEach((image) => {
                 data.append("images", image);
@@ -257,6 +262,12 @@ function OwnerAddRoom() {
                             </select>
                         </div>
                     </div>
+
+                    <LocationPicker
+                        latitude={formData.latitude}
+                        longitude={formData.longitude}
+                        onChange={(lat, lng) => setFormData((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
+                    />
 
                     <div className="form-section">
                         <h2>Room Images</h2>

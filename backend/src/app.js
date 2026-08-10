@@ -79,6 +79,15 @@ app.use(
 
 
       if(
+        origin.includes("100.115.")
+      ){
+
+        return callback(null,true);
+
+      }
+
+
+      if(
         origin.includes("ngrok")
       ){
 

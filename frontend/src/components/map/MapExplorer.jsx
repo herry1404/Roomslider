@@ -5,12 +5,24 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 import "leaflet/dist/leaflet.css";
 
-const icon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+const shadowUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
+
+const makeIcon = (color) =>
+  L.icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+    shadowUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+const categoryIcons = {
+  Room: makeIcon("blue"),
+  PG: makeIcon("green"),
+  Hostel: makeIcon("orange"),
+  Flat: makeIcon("violet"),
+};
+const defaultIcon = makeIcon("grey");
 
 const filters = [
   { key: "all", label: "All" },
@@ -28,8 +40,10 @@ function MapExplorer() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const params = filter === "all" ? {} : { category: filter };
-        const { data } = await api.get("/rooms", { params });
+        setLoading(true);
+        // Always fetch all listings; filtering by category happens client-side
+        // so we can show multiple colors together when "All" is selected.
+        const { data } = await api.get("/rooms", {});
         setRooms(data.rooms || []);
       } catch (err) {
         console.error("Map fetch error:", err);
@@ -38,9 +52,11 @@ function MapExplorer() {
       }
     };
     fetchRooms();
-  }, [filter]);
+  }, []);
 
   const withCoords = rooms.filter((r) => r.latitude && r.longitude);
+  const visibleRooms =
+    filter === "all" ? withCoords : withCoords.filter((r) => r.category === filter);
 
   return (
     <div>
@@ -71,10 +87,16 @@ function MapExplorer() {
             attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {withCoords.map((room) => (
-            <Marker key={room._id} position={[room.latitude, room.longitude]} icon={icon}>
+          {visibleRooms.map((room) => (
+            <Marker
+              key={room._id}
+              position={[room.latitude, room.longitude]}
+              icon={categoryIcons[room.category] || defaultIcon}
+            >
               <Popup>
                 <strong>{room.title}</strong>
+                <br />
+                {room.category}
                 <br />
                 ₹{room.price}/month
                 <br />
@@ -85,7 +107,7 @@ function MapExplorer() {
         </MapContainer>
       </div>
 
-      {!loading && withCoords.length === 0 && (
+      {!loading && visibleRooms.length === 0 && (
         <p style={{ marginTop: "12px", color: "var(--color-text-light)", fontSize: "14px" }}>
           No listings with map coordinates yet.
         </p>

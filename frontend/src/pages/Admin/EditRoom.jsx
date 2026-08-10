@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import LocationPicker from "../../components/map/LocationPicker";
 
 import "../../styles/add-room.css";
 
@@ -28,6 +29,8 @@ function EditRoom() {
     amenities: "",
     nearby: "",
     priority: 9999,
+    latitude: null,
+    longitude: null,
   });
 
   useEffect(() => {
@@ -55,6 +58,8 @@ function EditRoom() {
         amenities: (room.amenities || []).join(", "),
         nearby: (room.nearby || []).join(", "),
         priority: room.priority || 9999,
+        latitude: room.latitude || null,
+        longitude: room.longitude || null,
       });
     } catch (err) {
       toast.error("Failed to load room");
@@ -153,6 +158,12 @@ function EditRoom() {
           value={formData.location}
           onChange={changeHandler}
           required
+        />
+
+        <LocationPicker
+          latitude={formData.latitude}
+          longitude={formData.longitude}
+          onChange={(lat, lng) => setFormData((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
         />
 
         <textarea

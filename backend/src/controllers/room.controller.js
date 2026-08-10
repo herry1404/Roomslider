@@ -53,6 +53,8 @@ const createRoom = async (req, res) => {
       amenities,
       nearby,
       priority,
+      latitude,
+      longitude,
     } = req.body;
 
     if (!req.files || req.files.length === 0) {
@@ -84,6 +86,8 @@ const createRoom = async (req, res) => {
       amenities: parsedAmenities,
       nearby: parsedNearby,
       priority: priority ? Number(priority) : 9999,
+      latitude: latitude ? Number(latitude) : undefined,
+      longitude: longitude ? Number(longitude) : undefined,
     };
 
     // If an owner (not admin) is creating this room, auto-tag it as theirs
@@ -224,6 +228,8 @@ const updateRoom = async (req, res) => {
       amenities,
       nearby,
       priority,
+      latitude,
+      longitude,
     } = req.body;
 
     if (title !== undefined) room.title = title;
@@ -241,6 +247,8 @@ const updateRoom = async (req, res) => {
     if (amenities !== undefined) room.amenities = JSON.parse(amenities);
     if (nearby !== undefined) room.nearby = JSON.parse(nearby);
     if (priority !== undefined) room.priority = Number(priority) || 9999;
+    if (latitude !== undefined) room.latitude = Number(latitude);
+    if (longitude !== undefined) room.longitude = Number(longitude);
 
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => file.path);
