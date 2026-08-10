@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Home, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/AuthContext";
@@ -17,7 +17,7 @@ function OwnerLogin() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: "",
+    phone: "",
     password: "",
   });
 
@@ -31,8 +31,8 @@ function OwnerLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email.trim()) {
-      return toast.error("Owner email required");
+    if (!formData.phone.trim()) {
+      return toast.error("Owner mobile number required");
     }
 
     if (!formData.password.trim()) {
@@ -87,13 +87,13 @@ function OwnerLogin() {
 
             <div className="admin-input">
 
-              <Mail size={18} />
+              <Phone size={18} />
 
               <input
-                name="email"
-                type="email"
-                placeholder="Owner Email"
-                value={formData.email}
+                name="phone"
+                type="tel"
+                placeholder="Owner Mobile Number"
+                value={formData.phone}
                 onChange={handleChange}
               />
 

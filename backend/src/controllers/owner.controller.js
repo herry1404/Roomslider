@@ -9,7 +9,7 @@ const createOwnerToken = (owner) => {
     throw new Error("JWT_SECRET missing in .env");
   }
   return jwt.sign(
-    { id: owner._id, email: owner.email, role: "owner" },
+    { id: owner._id, phone: owner.phone, role: "owner" },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
@@ -20,11 +20,15 @@ const createOwnerToken = (owner) => {
 // ===============================
 const createOwner = async (req, res) => {
   try {
-    const { name, email, password, propertyName } = req.body;
+    const { name, phone, password, propertyName } = req.body;
 
-    const existing = await Owner.findOne({ email });
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({ message: "Valid 10-digit mobile number required" });
+    }
+
+    const existing = await Owner.findOne({ phone });
     if (existing) {
-      return res.status(400).json({ message: "Owner with this email already exists" });
+      return res.status(400).json({ message: "Owner with this mobile number already exists" });
     }
 
     if (!password || password.length < 6) {
@@ -33,7 +37,7 @@ const createOwner = async (req, res) => {
 
     const owner = await Owner.create({
       name,
-      email,
+      phone,
       password,
       propertyName,
     });
@@ -43,7 +47,7 @@ const createOwner = async (req, res) => {
       owner: {
         _id: owner._id,
         name: owner.name,
-        email: owner.email,
+        phone: owner.phone,
         propertyName: owner.propertyName,
       },
     });
@@ -58,13 +62,13 @@ const createOwner = async (req, res) => {
 // ===============================
 const ownerLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (!phone || !password) {
+      return res.status(400).json({ message: "Mobile number and password are required" });
     }
 
-    const owner = await Owner.findOne({ email });
+    const owner = await Owner.findOne({ phone });
     if (!owner) {
       return res.status(404).json({ message: "Owner not found" });
     }
@@ -82,7 +86,7 @@ const ownerLogin = async (req, res) => {
       user: {
         id: owner._id,
         name: owner.name,
-        email: owner.email,
+        phone: owner.phone,
         propertyName: owner.propertyName,
         role: "owner",
       },
@@ -192,8 +196,6 @@ const getMyRooms = async (req, res) => {
 
     const rooms = await Room.find({ owner: owner._id });
 
-    // Attach a live-computed rent status (paid/pending/overdue) to each
-    // occupied room, so the dashboard never shows a stale "paid" forever.
     const roomsWithStatus = rooms.map((room) => {
       const roomObj = room.toObject();
       if (room.status === "occupied") {
@@ -217,4 +219,3 @@ module.exports = {
   deleteOwner,
   getMyRooms,
 };
-

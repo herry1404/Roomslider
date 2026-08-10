@@ -59,7 +59,7 @@ function OwnerDetail() {
       <div className="owner-dashboard-top">
         <div>
           <h2>{owner.name}</h2>
-          <p>{owner.email} {owner.phone ? `• ${owner.phone}` : ""}</p>
+          <p>{owner.phone}</p>
         </div>
 
         <div className="owner-dashboard-actions">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   UserCog,
-  Mail,
+  Phone,
   Building2,
   Home,
   Trash2,
@@ -23,7 +23,7 @@ function ManageOwners() {
 
   const [form, setForm] = useState({
     name: "",
-    email: "",
+    phone: "",
     password: "",
     propertyName: "",
   });
@@ -55,7 +55,7 @@ function ManageOwners() {
       await api.post("/owners", form);
       toast.success("Owner created successfully");
       setShowAddModal(false);
-      setForm({ name: "", email: "", password: "", propertyName: "" });
+      setForm({ name: "", phone: "", password: "", propertyName: "" });
       fetchOwners();
     } catch (error) {
       toast.error(
@@ -85,7 +85,7 @@ function ManageOwners() {
     const value = search.toLowerCase();
     return (
       owner.name?.toLowerCase().includes(value) ||
-      owner.email?.toLowerCase().includes(value) ||
+      owner.phone?.toLowerCase().includes(value) ||
       owner.propertyName?.toLowerCase().includes(value)
     );
   });
@@ -138,8 +138,8 @@ function ManageOwners() {
 
               <div className="owner-details">
                 <div className="detail-row">
-                  <Mail size={16} />
-                  <p>{owner.email}</p>
+                  <Phone size={16} />
+                  <p>{owner.phone}</p>
                 </div>
               </div>
 
@@ -201,11 +201,15 @@ function ManageOwners() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
               <input
-                type="email"
-                placeholder="Email (e.g. ambe@roomslider.com)"
+                type="tel"
+                placeholder="Mobile Number (e.g. 9876543210)"
                 required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                pattern="[6-9][0-9]{9}"
+                maxLength={10}
+                value={form.phone}
+                onChange={(e) =>
+                  setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
+                }
               />
               <input
                 type="password"
