@@ -45,7 +45,7 @@ function Footer() {
 
               {/* Instagram */}
               <a
-                href="https://instagram.com/YOUR_INSTAGRAM_USERNAME"
+                href="https://instagram.com/roomslider"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-icon"
