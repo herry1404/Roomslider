@@ -133,6 +133,7 @@ function OwnerElectricity() {
         </div>
       ) : (
         <>
+          <div className="owner-electricity-table-wrapper">
           <table className="owner-electricity-table">
             <thead>
               <tr>
@@ -170,6 +171,7 @@ function OwnerElectricity() {
               })}
             </tbody>
           </table>
+          </div>
 
           <div style={{ marginTop: 20 }}>
             <button

@@ -262,6 +262,14 @@
 }
 
 @media (max-width: 460px) {
+  .owner-dashboard-actions {
+    flex-direction: column;
+  }
+
+  .owner-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
   .owner-rooms-grid {
     grid-template-columns: 1fr;
   }
@@ -506,7 +514,19 @@
   font-size: 14px;
 }
 
+.owner-electricity-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.owner-electricity-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .owner-electricity-table {
+  min-width: 500px;
+  min-width: 500px;
   width: 100%;
   border-collapse: collapse;
   background: white;
