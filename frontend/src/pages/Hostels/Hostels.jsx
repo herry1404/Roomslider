@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 
@@ -32,6 +33,13 @@ function Hostels() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Hostels in Indore | RoomSlider</title>
+        <meta name="description" content="Comfortable and affordable hostel stays in Indore. Browse verified hostel listings with RoomSlider." />
+        <link rel="canonical" href="https://roomslider.in/hostels" />
+      </Helmet>
+
     <section className="container" style={{ padding: "40px 0" }}>
       <h1>Hostels</h1>
       <p>Comfortable and affordable hostel stays.</p>
@@ -53,6 +61,7 @@ function Hostels() {
         </div>
       )}
     </section>
+    </>
   );
 }
 

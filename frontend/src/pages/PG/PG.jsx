@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 
@@ -32,6 +33,13 @@ function PG() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>PG Accommodations in Indore | RoomSlider</title>
+        <meta name="description" content="Find verified PG accommodations in Indore for students and professionals. Affordable, safe and hassle-free PG listings on RoomSlider." />
+        <link rel="canonical" href="https://roomslider.in/pg" />
+      </Helmet>
+
     <section className="container" style={{ padding: "40px 0" }}>
       <h1>PG Accommodations</h1>
       <p>Verified PGs for students and professionals.</p>
@@ -53,6 +61,7 @@ function PG() {
         </div>
       )}
     </section>
+    </>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 
@@ -32,6 +33,13 @@ function Flats() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Flats for Rent in Indore | RoomSlider</title>
+        <meta name="description" content="Browse full flats and apartments for rent in Indore. Verified listings, trusted owners, hassle-free renting with RoomSlider." />
+        <link rel="canonical" href="https://roomslider.in/flats" />
+      </Helmet>
+
     <section className="container" style={{ padding: "40px 0" }}>
       <h1>Flats</h1>
       <p>Full flats and apartments for rent.</p>
@@ -53,6 +61,7 @@ function Flats() {
         </div>
       )}
     </section>
+    </>
   );
 }
 
