@@ -13,6 +13,8 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
+import Terms from "./pages/Terms/Terms";
+import Privacy from "./pages/Privacy/Privacy";
 
 import Rooms from "./pages/Rooms/Rooms";
 import PG from "./pages/PG/PG";
@@ -62,6 +64,8 @@ function App() {
       <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
       <Route path="/my-place" element={<MainLayout><TenantDashboard /></MainLayout>} />
       <Route path="/recently-viewed" element={<MainLayout><RecentlyViewed /></MainLayout>} />
+      <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
+      <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
 
       <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />

@@ -36,6 +36,8 @@ function Register() {
 
   const [loading, setLoading] = useState(false);
 
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
 
 
   const handleChange = (e) => {
@@ -92,6 +94,12 @@ function Register() {
 
     if(password !== confirmPassword){
       toast.error("Password not matching");
+      return;
+    }
+
+
+    if(!agreedToTerms){
+      toast.error("Please agree to the Terms of Use and Privacy Policy");
       return;
     }
 
@@ -292,6 +300,29 @@ function Register() {
                 />
 
                 <Eye size={18}/>
+
+              </div>
+
+
+
+              <div className="terms-checkbox-row">
+
+                <label>
+
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  />
+
+                  <span>
+                    I agree to the{" "}
+                    <Link to="/terms" target="_blank">Terms of Use</Link>
+                    {" "}and{" "}
+                    <Link to="/privacy" target="_blank">Privacy Policy</Link>
+                  </span>
+
+                </label>
 
               </div>
 
