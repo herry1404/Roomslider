@@ -135,12 +135,20 @@ const getRooms = async (req, res) => {
     // ?includeOccupied=true so it can still manage occupied rooms too.
     if (req.query.includeOccupied !== "true") {
       filter.status = "vacant";
+    } else if (req.query.status) {
+      filter.status = req.query.status;
     }
 
-    const rooms = await Room.find(filter).sort({
-      priority: 1,
-      createdAt: -1,
-    });
+    if (req.query.owner) {
+      filter.owner = req.query.owner;
+    }
+
+    const rooms = await Room.find(filter)
+      .populate("owner", "name")
+      .sort({
+        priority: 1,
+        createdAt: -1,
+      });
 
     res.status(200).json({
       success: true,

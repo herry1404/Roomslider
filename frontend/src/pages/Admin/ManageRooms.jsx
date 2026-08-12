@@ -19,6 +19,10 @@ function ManageRooms() {
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("all");
+  const [owners, setOwners] = useState([]);
 
   const fetchRooms = async () => {
     try {
@@ -38,21 +42,38 @@ function ManageRooms() {
 
   useEffect(() => {
     fetchRooms();
+
+    api
+      .get("/owners")
+      .then((res) => setOwners(res.data || []))
+      .catch((err) => console.error("Failed to load owners:", err));
   }, []);
+
+  const uniqueCities = [...new Set(rooms.map((room) => room.location).filter(Boolean))];
 
   useEffect(() => {
     const keyword = search.toLowerCase();
 
     const filtered = rooms.filter((room) => {
-      return (
+      const matchesSearch =
         room.title?.toLowerCase().includes(keyword) ||
         room.location?.toLowerCase().includes(keyword) ||
-        room.category?.toLowerCase().includes(keyword)
-      );
+        room.category?.toLowerCase().includes(keyword);
+
+      const matchesStatus =
+        statusFilter === "all" || room.status === statusFilter;
+
+      const matchesOwner =
+        ownerFilter === "all" || room.owner?._id === ownerFilter;
+
+      const matchesCity =
+        cityFilter === "all" || room.location === cityFilter;
+
+      return matchesSearch && matchesStatus && matchesOwner && matchesCity;
     });
 
     setFilteredRooms(filtered);
-  }, [search, rooms]);
+  }, [search, rooms, statusFilter, ownerFilter, cityFilter]);
 
   const deleteRoom = async (id) => {
     const confirmDelete = window.confirm(
@@ -119,6 +140,41 @@ function ManageRooms() {
 
       </div>
 
+      <div className="filters-row">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All Status</option>
+          <option value="vacant">Vacant</option>
+          <option value="occupied">Occupied</option>
+        </select>
+
+        <select
+          value={ownerFilter}
+          onChange={(e) => setOwnerFilter(e.target.value)}
+        >
+          <option value="all">All Owners</option>
+          {owners.map((owner) => (
+            <option key={owner._id} value={owner._id}>
+              {owner.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+        >
+          <option value="all">All Cities</option>
+          {uniqueCities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {filteredRooms.length === 0 ? (
 
         <div className="no-room">
@@ -158,6 +214,14 @@ function ManageRooms() {
                 <span className="category-badge">
                   {room.category}
                 </span>
+
+                <span className={`status-badge status-${room.status}`}>
+                  {room.status}
+                </span>
+
+                <p className="owner-name">
+                  Owner: {room.owner?.name || "Unassigned"}
+                </p>
 
                 <div className="room-actions">
 
