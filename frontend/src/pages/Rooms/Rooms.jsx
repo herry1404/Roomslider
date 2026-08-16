@@ -44,7 +44,7 @@ function Rooms() {
       <Helmet>
         <title>Rooms for Rent in Indore | RoomSlider</title>
         <meta name="description" content="Browse verified rooms for rent in Indore. Compare prices, locations and amenities. Find your perfect room with RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/rooms" />
+        <link rel="canonical" href="https://www.roomslider.in/rooms" />
       </Helmet>
 
     <section className="container" style={{ padding: "40px 0" }}>

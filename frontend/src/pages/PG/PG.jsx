@@ -37,7 +37,7 @@ function PG() {
       <Helmet>
         <title>PG Accommodations in Indore | RoomSlider</title>
         <meta name="description" content="Find verified PG accommodations in Indore for students and professionals. Affordable, safe and hassle-free PG listings on RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/pg" />
+        <link rel="canonical" href="https://www.roomslider.in/pg" />
       </Helmet>
 
     <section className="container" style={{ padding: "40px 0" }}>

@@ -13,7 +13,7 @@ function Home() {
           name="description"
           content="Find verified rooms, PG, hostels and flats for rent in Indore. Trusted listings, simple search and a hassle-free renting experience with RoomSlider."
         />
-        <link rel="canonical" href="https://roomslider.in/" />
+        <link rel="canonical" href="https://www.roomslider.in/" />
       </Helmet>
 
       <Hero />

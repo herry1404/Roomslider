@@ -37,7 +37,7 @@ function Flats() {
       <Helmet>
         <title>Flats for Rent in Indore | RoomSlider</title>
         <meta name="description" content="Browse full flats and apartments for rent in Indore. Verified listings, trusted owners, hassle-free renting with RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/flats" />
+        <link rel="canonical" href="https://www.roomslider.in/flats" />
       </Helmet>
 
     <section className="container" style={{ padding: "40px 0" }}>
