@@ -151,6 +151,7 @@ const roomSchema = new mongoose.Schema(
             amount: Number,
             date: { type: Date, default: Date.now },
             method: String,
+            type: { type: String, enum: ["rent", "advance"], default: "rent" },
           },
         ],
       },

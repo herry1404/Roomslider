@@ -1018,6 +1018,63 @@
   color: #dc2626;
 }
 
+.owner-summary-card.advance h2 {
+  color: #b45309;
+}
+
+.owner-transactions-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .owner-transactions-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.owner-tx-filter {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.owner-tx-filter .owner-form-group {
+  flex: 1;
+}
+
+.owner-tx-list {
+  max-height: 480px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.owner-tx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.owner-tx-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.owner-tx-amount {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
 .owner-summary-card.profit h2 {
   color: #111827;
 }

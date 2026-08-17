@@ -19,6 +19,7 @@ function TenantDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [includeBill, setIncludeBill] = useState(false);
   const [bill, setBill] = useState(null);
   const [showVacateForm, setShowVacateForm] = useState(false);
   const [vacateDate, setVacateDate] = useState("");
@@ -81,9 +82,12 @@ function TenantDashboard() {
         return;
       }
 
+      const payBillId = includeBill && bill && bill.status === "pending" ? bill._id : undefined;
+
       const orderRes = await api.post("/payments/create-order", {
         roomId,
         type: "rent",
+        billId: payBillId,
       });
 
       const { orderId, amount, currency, key } = orderRes.data;
@@ -94,7 +98,7 @@ function TenantDashboard() {
         currency,
         order_id: orderId,
         name: "RoomSlider",
-        description: "Rent Payment",
+        description: payBillId ? "Rent + Electricity Bill Payment" : "Rent Payment",
         handler: async (response) => {
           try {
             await api.post("/payments/verify", {
@@ -103,9 +107,12 @@ function TenantDashboard() {
               razorpay_signature: response.razorpay_signature,
               roomId,
               type: "rent",
+              billId: payBillId,
             });
 
-            toast.success("Rent paid successfully!");
+            toast.success(
+              payBillId ? "Rent and electricity bill paid successfully!" : "Rent paid successfully!"
+            );
             setShowPayModal(false);
             fetchTenancy();
           } catch (verifyError) {
@@ -467,6 +474,36 @@ function TenantDashboard() {
               <div className="tenant-modal-rent-amount">
                 ₹{room.price?.toLocaleString("en-IN")}
               </div>
+
+              {bill && bill.status === "pending" && (
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    color: "#334155",
+                    margin: "10px 0",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={includeBill}
+                    onChange={(e) => setIncludeBill(e.target.checked)}
+                  />
+                  Also pay this month's electricity bill (₹{bill.amount?.toLocaleString("en-IN")})
+                </label>
+              )}
+
+              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 10 }}>
+                Total: ₹
+                {(
+                  (room.price || 0) +
+                  (includeBill && bill && bill.status === "pending" ? bill.amount || 0 : 0)
+                ).toLocaleString("en-IN")}
+              </div>
+
               <button className="tenant-modal-pay-btn" onClick={handlePayRent}>
                 Pay Now
               </button>

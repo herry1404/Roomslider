@@ -59,7 +59,39 @@ function OwnerAddRoom() {
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        setImages(files);
+
+        const checks = files.map(
+            (file) =>
+                new Promise((resolve) => {
+                    const img = new Image();
+                    const url = URL.createObjectURL(file);
+
+                    img.onload = () => {
+                        URL.revokeObjectURL(url);
+                        resolve({ file, isLandscape: img.width >= img.height });
+                    };
+
+                    img.onerror = () => {
+                        URL.revokeObjectURL(url);
+                        resolve({ file, isLandscape: false });
+                    };
+
+                    img.src = url;
+                })
+        );
+
+        Promise.all(checks).then((results) => {
+            const accepted = results.filter((r) => r.isLandscape).map((r) => r.file);
+            const rejectedCount = results.length - accepted.length;
+
+            if (rejectedCount > 0) {
+                toast.error(
+                    `${rejectedCount} image(s) skipped — only landscape (wider than tall) photos are allowed`
+                );
+            }
+
+            setImages(accepted);
+        });
     };
 
     const removeImage = (index) => {

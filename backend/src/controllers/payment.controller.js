@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const Room = require("../models/room.model");
+const ElectricityBill = require("../models/ElectricityBill");
 const { addOneMonth } = require("./room.controller");
 
 const razorpay = new Razorpay({
@@ -12,7 +13,7 @@ const razorpay = new Razorpay({
 // trusted from the client, to prevent tampering.
 const createOrder = async (req, res) => {
   try {
-    const { roomId, type } = req.body;
+    const { roomId, type, billId } = req.body;
 
     if (!roomId || type !== "rent") {
       return res.status(400).json({
@@ -30,7 +31,20 @@ const createOrder = async (req, res) => {
       });
     }
 
-    const amount = room.price;
+    let amount = room.price;
+
+    if (billId) {
+      const bill = await ElectricityBill.findById(billId);
+
+      if (!bill || bill.room.toString() !== roomId || bill.status !== "pending") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid or already-paid electricity bill",
+        });
+      }
+
+      amount += bill.amount;
+    }
 
     const order = await razorpay.orders.create({
       amount: Math.round(amount * 100), // paise
@@ -64,6 +78,7 @@ const verifyPayment = async (req, res) => {
       razorpay_signature,
       roomId,
       type,
+      billId,
     } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -118,6 +133,7 @@ const verifyPayment = async (req, res) => {
       amount: Number(amount),
       date: new Date(),
       method: "razorpay",
+      type: "rent",
     });
     openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
 
@@ -127,10 +143,23 @@ const verifyPayment = async (req, res) => {
 
     await room.save();
 
+    let bill = null;
+
+    if (billId) {
+      bill = await ElectricityBill.findById(billId);
+
+      if (bill && bill.room.toString() === roomId && bill.status !== "paid") {
+        bill.status = "paid";
+        bill.paidAt = new Date();
+        await bill.save();
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Payment verified and recorded",
       room,
+      bill,
     });
   } catch (error) {
     console.error("VERIFY PAYMENT ERROR:", error);

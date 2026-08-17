@@ -25,6 +25,7 @@ function OwnerRoomDetail() {
   const [paymentForm, setPaymentForm] = useState({
     amount: "",
     method: "cash",
+    type: "rent",
   });
 
   const [showPayModal, setShowPayModal] = useState(false);
@@ -238,10 +239,6 @@ function OwnerRoomDetail() {
             <div className="owner-detail-row">
               <span>Rent</span>
               <span>₹{room.price?.toLocaleString("en-IN")} /month</span>
-            </div>
-            <div className="owner-detail-row">
-              <span>Deposit</span>
-              <span>₹{room.deposit?.toLocaleString("en-IN") || 0}</span>
             </div>
             <div className="owner-detail-row">
               <span>Category</span>
@@ -485,6 +482,18 @@ function OwnerRoomDetail() {
                   <option value="upi">UPI</option>
                   <option value="bank_transfer">Bank Transfer</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="owner-form-group">
+                <label>Payment Type</label>
+                <select
+                  value={paymentForm.type}
+                  onChange={(e) =>
+                    setPaymentForm({ ...paymentForm, type: e.target.value })
+                  }
+                >
+                  <option value="rent">Rent</option>
+                  <option value="advance">Advance / Deposit</option>
                 </select>
               </div>
               <button type="submit" className="owner-btn owner-btn-primary">

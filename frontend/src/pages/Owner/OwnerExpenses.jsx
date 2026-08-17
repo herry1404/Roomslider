@@ -13,6 +13,15 @@ function OwnerExpenses() {
   const [loading, setLoading] = useState(true);
   const [expenses, setExpenses] = useState([]);
   const [summary, setSummary] = useState(null);
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+
+  const [transactions, setTransactions] = useState([]);
+  const [txLoading, setTxLoading] = useState(true);
+  const [txFrom, setTxFrom] = useState(startOfMonth.toISOString().slice(0, 10));
+  const [txTo, setTxTo] = useState(new Date().toISOString().slice(0, 10));
+
   const [form, setForm] = useState({
     title: "",
     category: "other",
@@ -40,6 +49,25 @@ function OwnerExpenses() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const fetchTransactions = async () => {
+    setTxLoading(true);
+    try {
+      const res = await api.get("/expenses/transactions", {
+        params: { from: txFrom, to: txTo },
+      });
+      setTransactions(res.data.transactions || []);
+    } catch (error) {
+      console.error("TRANSACTIONS FETCH ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to load transactions");
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [txFrom, txTo]);
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
@@ -103,6 +131,10 @@ function OwnerExpenses() {
             <span>Rent Collected (This Month)</span>
             <h2>₹{summary.totalIncome.toLocaleString("en-IN")}</h2>
           </div>
+          <div className="owner-summary-card advance">
+            <span>Advance / Deposit Collected (This Month)</span>
+            <h2>₹{(summary.totalAdvanceCollected || 0).toLocaleString("en-IN")}</h2>
+          </div>
           <div className="owner-summary-card expense">
             <span>Expenses (This Month)</span>
             <h2>₹{summary.totalExpenses.toLocaleString("en-IN")}</h2>
@@ -159,29 +191,93 @@ function OwnerExpenses() {
         </button>
       </form>
 
-      <div className="owner-detail-card">
-        <h3>All Expenses</h3>
-        {expenses.length === 0 ? (
-          <p style={{ color: "#94a3b8", fontSize: "14px" }}>No expenses recorded yet.</p>
-        ) : (
-          expenses.map((exp) => (
-            <div key={exp._id} className="owner-expense-list-item">
-              <div>
-                <div className="owner-expense-title">{exp.title}</div>
-                <div className="owner-expense-meta">
-                  {new Date(exp.date).toLocaleDateString("en-IN")} · {exp.category}
-                  {exp.room && ` · ${exp.room.title}`}
+      <div className="owner-transactions-layout">
+        <div className="owner-detail-card">
+          <h3>Transactions</h3>
+
+          <div className="owner-tx-filter">
+            <div className="owner-form-group">
+              <label>From</label>
+              <input
+                type="date"
+                value={txFrom}
+                onChange={(e) => setTxFrom(e.target.value)}
+              />
+            </div>
+            <div className="owner-form-group">
+              <label>To</label>
+              <input
+                type="date"
+                value={txTo}
+                onChange={(e) => setTxTo(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {txLoading ? (
+            <p style={{ color: "#94a3b8", fontSize: "14px" }}>Loading transactions...</p>
+          ) : transactions.length === 0 ? (
+            <p style={{ color: "#94a3b8", fontSize: "14px" }}>No transactions in this range.</p>
+          ) : (
+            <div className="owner-tx-list">
+              {transactions.map((tx, idx) => (
+                <div key={idx} className={`owner-tx-item owner-tx-${tx.kind}`}>
+                  <div>
+                    <div className="owner-tx-title">
+                      {tx.kind === "rent" && `Rent · ${tx.roomTitle || ""}`}
+                      {tx.kind === "advance" && `Advance / Deposit · ${tx.roomTitle || ""}`}
+                      {tx.kind === "expense" && tx.title}
+                    </div>
+                    <div className="owner-expense-meta">
+                      {new Date(tx.date).toLocaleDateString("en-IN")}
+                      {tx.method && ` · ${tx.method}`}
+                      {tx.tenantName && ` · ${tx.tenantName}`}
+                      {tx.category && ` · ${tx.category}`}
+                    </div>
+                  </div>
+                  <div
+                    className="owner-tx-amount"
+                    style={{
+                      color:
+                        tx.kind === "expense"
+                          ? "#dc2626"
+                          : tx.kind === "advance"
+                          ? "#b45309"
+                          : "#16a34a",
+                    }}
+                  >
+                    {tx.kind === "expense" ? "-" : "+"}₹{tx.amount.toLocaleString("en-IN")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="owner-detail-card">
+          <h3>All Expenses</h3>
+          {expenses.length === 0 ? (
+            <p style={{ color: "#94a3b8", fontSize: "14px" }}>No expenses recorded yet.</p>
+          ) : (
+            expenses.map((exp) => (
+              <div key={exp._id} className="owner-expense-list-item">
+                <div>
+                  <div className="owner-expense-title">{exp.title}</div>
+                  <div className="owner-expense-meta">
+                    {new Date(exp.date).toLocaleDateString("en-IN")} · {exp.category}
+                    {exp.room && ` · ${exp.room.title}`}
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <div className="owner-expense-amount">₹{exp.amount.toLocaleString("en-IN")}</div>
+                  <button className="owner-expense-delete" onClick={() => handleDelete(exp._id)}>
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <div className="owner-expense-amount">₹{exp.amount.toLocaleString("en-IN")}</div>
-                <button className="owner-expense-delete" onClick={() => handleDelete(exp._id)}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

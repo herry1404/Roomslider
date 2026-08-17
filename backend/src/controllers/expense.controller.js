@@ -117,12 +117,17 @@ const getSummary = async (req, res) => {
     const rooms = await Room.find({ owner: req.user._id });
 
     let totalIncome = 0;
+    let totalAdvanceCollected = 0;
     rooms.forEach((room) => {
       room.occupancyHistory.forEach((entry) => {
         (entry.payments || []).forEach((p) => {
           const paidDate = new Date(p.date);
           if (paidDate >= start && paidDate < end) {
-            totalIncome += p.amount;
+            if (p.type === "advance") {
+              totalAdvanceCollected += p.amount;
+            } else {
+              totalIncome += p.amount;
+            }
           }
         });
       });
@@ -141,10 +146,80 @@ const getSummary = async (req, res) => {
       year,
       totalIncome,
       totalExpenses,
+      totalAdvanceCollected,
       profit: totalIncome - totalExpenses,
     });
   } catch (error) {
     console.error("GET SUMMARY ERROR 👉", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ============================
+// Get all transactions (rent + advance payments + expenses) in a date
+// range, combined into one sorted list, for the owner's Transactions view.
+// Query params: from, to (ISO date strings). Defaults to this month.
+// ============================
+const getTransactions = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const start = req.query.from
+      ? new Date(req.query.from)
+      : new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const end = req.query.to
+      ? new Date(new Date(req.query.to).getTime() + 24 * 60 * 60 * 1000)
+      : new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const rooms = await Room.find({ owner: req.user._id });
+
+    const transactions = [];
+
+    rooms.forEach((room) => {
+      room.occupancyHistory.forEach((entry) => {
+        (entry.payments || []).forEach((p) => {
+          const paidDate = new Date(p.date);
+          if (paidDate >= start && paidDate < end) {
+            transactions.push({
+              kind: p.type === "advance" ? "advance" : "rent",
+              amount: p.amount,
+              date: p.date,
+              method: p.method,
+              roomTitle: room.title,
+              roomNumber: room.roomNumber,
+              tenantName: entry.tenantName,
+            });
+          }
+        });
+      });
+    });
+
+    const expenses = await Expense.find({
+      owner: req.user._id,
+      date: { $gte: start, $lt: end },
+    });
+
+    expenses.forEach((e) => {
+      transactions.push({
+        kind: "expense",
+        amount: e.amount,
+        date: e.date,
+        category: e.category,
+        title: e.title,
+      });
+    });
+
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.status(200).json({
+      success: true,
+      from: start,
+      to: end,
+      transactions,
+    });
+  } catch (error) {
+    console.error("GET TRANSACTIONS ERROR 👉", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -154,4 +229,5 @@ module.exports = {
   getMyExpenses,
   deleteExpense,
   getSummary,
+  getTransactions,
 };

@@ -634,7 +634,7 @@ const recordPayment = async (req, res) => {
       });
     }
 
-    const { amount, method } = req.body;
+    const { amount, method, type } = req.body;
 
     if (!amount || Number(amount) <= 0) {
       return res.status(400).json({
@@ -658,15 +658,19 @@ const recordPayment = async (req, res) => {
       amount: Number(amount),
       date: new Date(),
       method: method || "cash",
+      type: type === "advance" ? "advance" : "rent",
     });
     openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
 
-    // Advance the rent cycle: next payment is due 1 month after whichever
-    // due date this payment is settling (falls back to today if unset).
-    const baseDate = room.currentTenant?.nextDueDate || new Date();
-    room.currentTenant.nextDueDate = addOneMonth(baseDate);
+    // Only rent payments advance the rent cycle / mark this cycle paid.
+    // Advance payments are a one-time deposit and should not affect the
+    // rent due-date or payment-status tracking.
+    if (type !== "advance") {
+      const baseDate = room.currentTenant?.nextDueDate || new Date();
+      room.currentTenant.nextDueDate = addOneMonth(baseDate);
 
-    room.paymentStatus = "paid";
+      room.paymentStatus = "paid";
+    }
 
     await room.save();
 
