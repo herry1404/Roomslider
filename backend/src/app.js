@@ -16,6 +16,7 @@ const notificationRoutes = require("./routes/notification.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
+const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
 
 
 const {
@@ -249,6 +250,12 @@ app.use(
 app.use(
   "/api/laundry-vendors",
   laundryVendorRoutes
+);
+
+// ✅ HOURLY ROOMS ROUTES
+app.use(
+  "/api/hourly-rooms",
+  hourlyRoomRoutes
 );
 
 

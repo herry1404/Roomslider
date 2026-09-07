@@ -50,7 +50,7 @@ function Flats() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+            gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
             gap: "25px",
             marginTop: "30px",
           }}

@@ -17,6 +17,7 @@ import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
 
 import Rooms from "./pages/Rooms/Rooms";
+import HourlyRooms from "./pages/Rooms/HourlyRooms";
 import PG from "./pages/PG/PG";
 import Hostels from "./pages/Hostels/Hostels";
 import Flats from "./pages/Flats/Flats";
@@ -37,6 +38,7 @@ import ManageRooms from "./pages/Admin/ManageRooms";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import ManageOwners from "./pages/Admin/ManageOwners";
 import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
+import ManageHourlyRooms from "./pages/Admin/ManageHourlyRooms";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
 
 import AdminRoute from "./components/AdminRoute";
@@ -49,6 +51,7 @@ function App() {
       <Route path="/" element={<MainLayout><Home /></MainLayout>} />
       <Route path="/about" element={<MainLayout><About /></MainLayout>} />
       <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
+      <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
       <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
       <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
       <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
@@ -86,6 +89,7 @@ function App() {
       <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
       <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
       <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
+      <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
       <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
 

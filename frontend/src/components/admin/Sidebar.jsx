@@ -9,6 +9,7 @@ import {
   X,
   UserCog,
   Shirt,
+  DoorOpen,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -45,6 +46,11 @@ function Sidebar({ open, closeSidebar }) {
       title: "Laundry Vendors",
       icon: <Shirt size={20} />,
       path: "/admin/laundry-vendors",
+    },
+    {
+      title: "Hourly Rooms",
+      icon: <DoorOpen size={20} />,
+      path: "/admin/hourly-rooms",
     },
     {
       title: "Users",

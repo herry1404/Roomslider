@@ -37,8 +37,6 @@
 
   position: relative;
 
-  overflow:hidden;
-
 }
 
 
@@ -50,6 +48,8 @@
   height:240px;
 
   object-fit:cover;
+
+  border-radius: 22px 22px 0 0;
 
   transition:
   transform 0.5s ease;
