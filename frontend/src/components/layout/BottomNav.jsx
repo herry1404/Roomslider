@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Home, Clock, Heart } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
@@ -6,6 +7,24 @@ function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const goProtected = (path) => {
     if (!user) {
@@ -18,7 +37,7 @@ function BottomNav() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bottom-nav" aria-label="Bottom Navigation">
+    <nav className={`bottom-nav ${hidden ? "bottom-nav-hidden" : ""}`} aria-label="Bottom Navigation">
       <NavLink
         to="/"
         end
@@ -26,7 +45,7 @@ function BottomNav() {
           isActive ? "bottom-nav-item active" : "bottom-nav-item"
         }
       >
-        <Home size={20} />
+        <Home size={18} />
         <span>Home</span>
       </NavLink>
 
@@ -37,7 +56,7 @@ function BottomNav() {
         }
         onClick={() => goProtected("/hourly-rooms")}
       >
-        <Clock size={20} />
+        <Clock size={18} />
         <span>Hourly</span>
       </button>
 
@@ -48,7 +67,7 @@ function BottomNav() {
         }
         onClick={() => goProtected("/wishlist")}
       >
-        <Heart size={20} />
+        <Heart size={18} />
         <span>Saved</span>
       </button>
 

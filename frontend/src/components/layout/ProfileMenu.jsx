@@ -73,7 +73,7 @@ function ProfileMenu({ variant }) {
       >
         {variant === "bottom" ? (
           <>
-            <UserCircle size={20} />
+            <UserCircle size={18} />
             <span>Profile</span>
           </>
         ) : (

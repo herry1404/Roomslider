@@ -121,6 +121,14 @@ function Navbar() {
           </nav>
 
           <div className="navbar-actions">
+            <button
+              type="button"
+              className="navbar-notification-btn"
+              aria-label="Notifications"
+              onClick={handleNotificationClick}
+            >
+              <Bell size={20} />
+            </button>
             <SearchPill
               searchOpen={searchOpen}
               setSearchOpen={setSearchOpen}
@@ -133,14 +141,6 @@ function Navbar() {
           </div>
 
           <div className="navbar-mobile-actions">
-            <SearchPill
-              searchOpen={searchOpen}
-              setSearchOpen={setSearchOpen}
-              searchValue={searchValue}
-              setSearchValue={setSearchValue}
-              handleSearchSubmit={handleSearchSubmit}
-              closeSearch={closeSearch}
-            />
             <button
               type="button"
               className="navbar-notification-btn"
@@ -149,6 +149,14 @@ function Navbar() {
             >
               <Bell size={20} />
             </button>
+            <SearchPill
+              searchOpen={searchOpen}
+              setSearchOpen={setSearchOpen}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              handleSearchSubmit={handleSearchSubmit}
+              closeSearch={closeSearch}
+            />
           </div>
         </div>
       </Container>
