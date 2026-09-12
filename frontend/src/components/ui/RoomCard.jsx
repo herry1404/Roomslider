@@ -8,6 +8,17 @@ import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/room-card.css";
 
+// FIX (slow images bug): Cloudinary URLs support "on-the-fly" resizing
+// via the URL itself — no re-upload needed. Original images are stored
+// at 1600x1067, but a card thumbnail only needs ~500px wide. This
+// inserts a transformation segment (w_500,h_320,c_fill,q_auto,f_auto)
+// right after "/upload/" in the Cloudinary URL, so the browser
+// downloads a much smaller file for the card view.
+function getThumbnailUrl(url) {
+  if (!url || !url.includes("/upload/")) return url;
+  return url.replace("/upload/", "/upload/w_500,h_320,c_fill,q_auto,f_auto/");
+}
+
 function RoomCard({ room, onWishlistChange }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -62,15 +73,17 @@ function RoomCard({ room, onWishlistChange }) {
     }
   };
 
-  const firstImage = room.images?.[0];
+  const firstImage = getThumbnailUrl(room.images?.[0]);
 
   return (
     <div className="room-card" onClick={handleDetails} style={{ cursor: "pointer" }}>
       <div className="room-image-wrapper">
         <img
-          src={firstImage || "https://via.placeholder.com/400x250"}
+          src={firstImage || "https://via.placeholder.com/500x320"}
           alt={room.title}
           className="room-image"
+          loading="lazy"
+          decoding="async"
         />
 
         <button

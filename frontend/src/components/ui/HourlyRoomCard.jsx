@@ -1,16 +1,25 @@
 import { MapPin, IndianRupee, Clock } from "lucide-react";
 import "../../styles/room-card.css";
 
+// FIX (slow images bug): request a Cloudinary-resized thumbnail instead
+// of the full 1600px original — see RoomCard.jsx for the same fix.
+function getThumbnailUrl(url) {
+  if (!url || !url.includes("/upload/")) return url;
+  return url.replace("/upload/", "/upload/w_500,h_320,c_fill,q_auto,f_auto/");
+}
+
 function HourlyRoomCard({ room }) {
-  const firstImage = room.images?.[0];
+  const firstImage = getThumbnailUrl(room.images?.[0]);
 
   return (
     <div className="room-card">
       <div className="room-image-wrapper">
         <img
-          src={firstImage || "https://via.placeholder.com/400x250"}
+          src={firstImage || "https://via.placeholder.com/500x320"}
           alt={room.title}
           className="room-image"
+          loading="lazy"
+          decoding="async"
         />
         <span className="room-category">Hourly</span>
       </div>

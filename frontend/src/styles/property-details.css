@@ -264,6 +264,19 @@
 
 }
 
+/* FIX: Mobile horizontal-overflow bug.
+   Grid columns default to "min-content" width, jo unke andar ke
+   content (images, long text) ki natural size le lete hain — chahe
+   width:100% kahin bhi likha ho. Isi wajah se body 375px screen pe
+   414px chali gayi thi. min-width:0 grid item ko force karta hai ki
+   wo apne parent column ki width follow kare, content ki nahi. */
+.property-left,
+.property-right{
+
+  min-width:0;
+
+}
+
 .property-image{
 
   position:relative;
