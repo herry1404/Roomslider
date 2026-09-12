@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Search, X, Sun, Moon } from "lucide-react";
+import { Search, X, Bell } from "lucide-react";
+import toast from "react-hot-toast";
 
 import Container from "../ui/Container";
 import Logo from "../ui/Logo";
@@ -63,12 +64,7 @@ function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const [darkMode, setDarkMode] = useState(
-    () => localStorage.getItem("theme") === "dark"
-  );
-
   useEffect(() => {
-    // Dark mode temporarily disabled - forcing light theme
     document.documentElement.setAttribute("data-theme", "light");
   }, []);
 
@@ -94,6 +90,10 @@ function Navbar() {
   const closeSearch = () => {
     setSearchOpen(false);
     setSearchValue("");
+  };
+
+  const handleNotificationClick = () => {
+    toast("Coming soon", { icon: "🔔" });
   };
 
   return (
@@ -141,7 +141,14 @@ function Navbar() {
               handleSearchSubmit={handleSearchSubmit}
               closeSearch={closeSearch}
             />
-            <ProfileMenu />
+            <button
+              type="button"
+              className="navbar-notification-btn"
+              aria-label="Notifications"
+              onClick={handleNotificationClick}
+            >
+              <Bell size={20} />
+            </button>
           </div>
         </div>
       </Container>

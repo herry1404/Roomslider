@@ -17,7 +17,7 @@ import {
 
 import api from "../../api/axios";
 
-function ProfileMenu() {
+function ProfileMenu({ variant }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -65,13 +65,20 @@ function ProfileMenu() {
   };
 
   return (
-    <div className="profile-menu" ref={menuRef}>
+    <div className={variant === "bottom" ? "profile-menu bottom-profile-menu" : "profile-menu"} ref={menuRef}>
       <button
         className="profile-btn"
         aria-label="Account Menu"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <UserCircle size={26} />
+        {variant === "bottom" ? (
+          <>
+            <UserCircle size={20} />
+            <span>Profile</span>
+          </>
+        ) : (
+          <UserCircle size={26} />
+        )}
       </button>
 
       <div className={isOpen ? "profile-dropdown open" : "profile-dropdown"}>

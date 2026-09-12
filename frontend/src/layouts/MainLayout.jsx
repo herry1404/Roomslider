@@ -1,5 +1,6 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import BottomNav from "../components/layout/BottomNav";
 
 function MainLayout({ children }) {
   return (
@@ -11,6 +12,7 @@ function MainLayout({ children }) {
       </main>
 
       <Footer />
+      <BottomNav />
     </>
   );
 }
