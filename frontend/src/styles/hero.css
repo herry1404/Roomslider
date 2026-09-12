@@ -9,6 +9,18 @@
     radial-gradient(circle at bottom left,rgba(37,99,235,.08),transparent 35%),
     var(--color-background);
     overflow:hidden;
+    position:relative;
+}
+
+.hero::after{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:100px;
+    background:linear-gradient(to bottom, transparent, var(--color-background));
+    pointer-events:none;
 }
 
 .hero-wrapper{
@@ -103,6 +115,10 @@ SEARCH
 }
 
 .location-box select{
+
+    appearance:none;
+    -webkit-appearance:none;
+    line-height:normal;
 
     flex:1;
 

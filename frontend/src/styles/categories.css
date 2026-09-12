@@ -4,6 +4,7 @@
 
 .categories{
     padding:16px 0 50px;
+    background:var(--color-background);
 }
 
 .categories-grid{
