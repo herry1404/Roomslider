@@ -100,7 +100,7 @@ function Navbar() {
     <header className="navbar">
       <Container>
         <div className="navbar-content">
-          <Logo />
+          {!searchOpen && <Logo />}
 
           <nav className="navbar-nav" aria-label="Primary Navigation">
             <ul className="navbar-menu">
