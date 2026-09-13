@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
 import HourlyBanner from "../../components/home/HourlyBanner";
+import MessBanner from "../../components/home/MessBanner";
 import CategorySection from "../../components/home/CategorySection";
 import MapExplorer from "../../components/map/MapExplorer";
 import api from "../../api/axios";
@@ -46,6 +47,7 @@ function Home() {
 
       <section className="container" style={{ padding: "16px 0" }}>
         <HourlyBanner />
+        <MessBanner />
       </section>
 
       {!loading && (

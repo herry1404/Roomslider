@@ -21,6 +21,8 @@ import Privacy from "./pages/Privacy/Privacy";
 
 import Rooms from "./pages/Rooms/Rooms";
 import HourlyRooms from "./pages/Rooms/HourlyRooms";
+import MessList from "./pages/Mess/MessList";
+import MessDetail from "./pages/Mess/MessDetail";
 import PG from "./pages/PG/PG";
 import Hostels from "./pages/Hostels/Hostels";
 import Flats from "./pages/Flats/Flats";
@@ -58,6 +60,8 @@ function App() {
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
         <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
+        <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
+        <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/map" element={<MainLayout><MapView /></MainLayout>} />
         <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />

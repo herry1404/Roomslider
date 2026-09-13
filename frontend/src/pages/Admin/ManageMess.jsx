@@ -21,6 +21,15 @@ function ManageMess() {
   };
 
   const [form, setForm] = useState(emptyForm);
+  const [images, setImages] = useState([]);
+
+  const handleImageChange = (e) => {
+    setImages(Array.from(e.target.files));
+  };
+
+  const removeImage = (index) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
 
   const fetchData = async () => {
     try {
@@ -42,6 +51,7 @@ function ManageMess() {
   const openAddModal = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setImages([]);
     setShowModal(true);
   };
 
@@ -56,17 +66,41 @@ function ManageMess() {
       longitude: mess.location?.coordinates?.[0] || "",
       pricePerPerson: mess.pricePerPerson || "",
     });
+    setImages([]);
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!editingId && images.length === 0) {
+      toast.error("Please select at least one mess image");
+      return;
+    }
+
     try {
+      const data = new FormData();
+      data.append("name", form.name);
+      data.append("phone", form.phone);
+      if (form.password) data.append("password", form.password);
+      data.append("address", form.address);
+      data.append("latitude", form.latitude);
+      data.append("longitude", form.longitude);
+      data.append("pricePerPerson", form.pricePerPerson);
+
+      images.forEach((image) => {
+        data.append("images", image);
+      });
+
       if (editingId) {
-        await api.put(`/mess/${editingId}`, form);
+        await api.put(`/mess/${editingId}`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Mess updated");
       } else {
-        await api.post("/mess", form);
+        await api.post("/mess", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Mess added");
       }
       setShowModal(false);
@@ -132,8 +166,12 @@ function ManageMess() {
           {messList.map((m) => (
             <div className="owner-card" key={m._id}>
               <div className="owner-top">
-                <div className="avatar">
-                  <UtensilsCrossed size={28} />
+                <div className="avatar" style={{ overflow: "hidden" }}>
+                  {m.images && m.images[0] ? (
+                    <img src={m.images[0]} alt={m.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <UtensilsCrossed size={28} />
+                  )}
                 </div>
                 <div>
                   <h3>{m.name}</h3>
@@ -243,6 +281,49 @@ function ManageMess() {
               <button type="button" className="submit-btn" style={{ background: "var(--color-surface-2)", color: "var(--color-text)" }} onClick={useMyLocation}>
                 Use My Current Location
               </button>
+
+              <label style={{ fontWeight: 600, marginTop: 8 }}>
+                Mess Images {editingId ? "(leave empty to keep existing)" : ""}
+              </label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+
+              {images.length > 0 && (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                  {images.map((img, idx) => (
+                    <div key={idx} style={{ position: "relative" }}>
+                      <img
+                        src={URL.createObjectURL(img)}
+                        alt="preview"
+                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        style={{
+                          position: "absolute",
+                          top: -6,
+                          right: -6,
+                          background: "#dc2626",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: 18,
+                          height: 18,
+                          fontSize: 11,
+                          cursor: "pointer",
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <button type="submit" className="submit-btn">
                 {editingId ? "Update Mess" : "Add Mess"}

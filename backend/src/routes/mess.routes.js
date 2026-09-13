@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
+const upload = require("../middleware/upload.middleware");
 
 const {
   messLogin,
@@ -33,10 +34,10 @@ router.put("/me/menu", protect, updateTodayMenu);
 // ===============================
 // Admin only
 // ===============================
-router.post("/", protect, adminOnly, createMess);
+router.post("/", protect, adminOnly, upload.array("images", 5), createMess);
 router.get("/", protect, adminOnly, getAllMess);
 router.get("/:id", protect, adminOnly, getSingleMess);
-router.put("/:id", protect, adminOnly, updateMess);
+router.put("/:id", protect, adminOnly, upload.array("images", 5), updateMess);
 router.delete("/:id", protect, adminOnly, deleteMess);
 
 module.exports = router;

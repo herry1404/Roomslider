@@ -34,6 +34,8 @@ const messSchema = new mongoose.Schema(
     },
 
     pricePerPerson: { type: Number, required: true },
+    images: { type: [String], default: [] },
+    images: { type: [String], default: [] },
 
     todayMenu: {
       date: { type: String }, // "YYYY-MM-DD"
