@@ -4,7 +4,7 @@
     display:flex;
     justify-content:space-between;
     align-items:center;
-    border-bottom:1px solid #e5e7eb;
+    border-bottom:1px solid var(--color-border);
 }
 
 .header-left{
@@ -19,7 +19,7 @@
     height:46px;
     border:none;
     border-radius:12px;
-    background:#eff6ff;
+    background:rgba(16,185,129,.10);
     cursor:pointer;
 }
 
@@ -30,11 +30,11 @@
 
 .header-left p{
     margin-top:4px;
-    color:#6b7280;
+    color:var(--color-text-light);
 }
 
 .header-left span{
-    color:#2563eb;
+    color:var(--color-primary);
     font-weight:600;
 }
 
@@ -48,7 +48,7 @@
     display:flex;
     align-items:center;
     gap:10px;
-    background:#f3f4f6;
+    background:var(--color-background);
     padding:12px 16px;
     border-radius:14px;
 }
@@ -65,7 +65,7 @@
     height:46px;
     border:none;
     border-radius:50%;
-    background:#eff6ff;
+    background:rgba(16,185,129,.10);
     cursor:pointer;
 }
 
@@ -79,7 +79,7 @@
     width:46px;
     height:46px;
     border-radius:50%;
-    background:#2563eb;
+    background:var(--color-primary);
     color:#fff;
     display:flex;
     justify-content:center;
@@ -93,7 +93,7 @@
 
 .admin-profile p{
     margin:0;
-    color:#6b7280;
+    color:var(--color-text-light);
     font-size:13px;
 }
 

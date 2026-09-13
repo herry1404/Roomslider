@@ -25,7 +25,7 @@
 
     font-size:28px;
     font-weight:800;
-    color:#111827;
+    color:var(--color-text);
 
 }
 
@@ -37,7 +37,7 @@
     align-items:center;
     gap:6px;
 
-    color:#10b981;
+    color:var(--color-primary);
 
     font-size:14px;
     font-weight:700;
@@ -191,7 +191,7 @@
     0 6px 18px rgba(0,0,0,.15);
 
 
-    color:#111827;
+    color:#374151;
 
 
     transition:.3s;
@@ -202,7 +202,7 @@
 
 .wishlist-btn:hover{
 
-    color:#ef4444;
+    color:var(--color-error);
 
     transform:scale(1.12);
 
@@ -212,7 +212,7 @@
 
 .wishlist-btn.active{
 
-    color:#ef4444;
+    color:var(--color-error);
 
 }
 
@@ -243,7 +243,7 @@
     border-radius:12px;
 
 
-    color:#10b981;
+    color:var(--color-primary);
 
 
     font-size:14px;
@@ -292,7 +292,7 @@
     font-weight:750;
 
 
-    color:#111827;
+    color:var(--color-text);
 
 
     margin-bottom:10px;
@@ -330,7 +330,7 @@
 
 .room-location svg{
 
-    color:#10b981;
+    color:var(--color-primary);
 
 }
 

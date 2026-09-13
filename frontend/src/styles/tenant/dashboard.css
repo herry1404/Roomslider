@@ -18,7 +18,7 @@
   gap: 18px;
   margin-bottom: 28px;
   padding-bottom: 22px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .tenant-header-photo {
@@ -26,7 +26,7 @@
   height: 72px;
   border-radius: 14px;
   object-fit: cover;
-  background: #f3f4f6;
+  background: var(--color-surface-2);
   flex-shrink: 0;
 }
 
@@ -47,14 +47,14 @@
 .tenant-header-info h1 {
   font-size: 22px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin-bottom: 4px;
   line-height: 1.25;
 }
 
 .tenant-header-location {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 /* ---- Grid ---- */
@@ -75,8 +75,8 @@
 /* ---- Card base ---- */
 
 .tenant-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 22px;
   margin-bottom: 20px;
@@ -87,7 +87,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6b7280;
+  color: var(--color-text-light);
   margin-bottom: 16px;
 }
 
@@ -111,7 +111,7 @@
 .tenant-rent-amount {
   font-size: 34px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin-bottom: 14px;
   letter-spacing: -0.01em;
 }
@@ -119,7 +119,7 @@
 .tenant-rent-amount span {
   font-size: 16px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .tenant-pay-btn {
@@ -142,15 +142,15 @@
 }
 
 .tenant-pay-btn:disabled {
-  background: #d1d5db;
-  color: #6b7280;
+  background: var(--color-border);
+  color: var(--color-text-light);
   cursor: not-allowed;
 }
 
 .tenant-pay-note {
   text-align: center;
   font-size: 12.5px;
-  color: #6b7280;
+  color: var(--color-text-light);
   margin-top: 10px;
 }
 
@@ -161,7 +161,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
   font-size: 14px;
 }
 
@@ -171,11 +171,11 @@
 }
 
 .tenant-row span:first-child {
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .tenant-row span:last-child {
-  color: #111827;
+  color: var(--color-text);
   font-weight: 600;
   text-align: right;
 }
@@ -197,13 +197,13 @@
 }
 
 .tenant-badge.pending {
-  background: #fef9c3;
-  color: #a16207;
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
+  color: var(--color-warning);
 }
 
 .tenant-badge.overdue {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--color-error) 20%, transparent);
+  color: var(--color-error);
 }
 
 /* ---- Payment history ---- */
@@ -213,7 +213,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
   font-size: 14px;
 }
 
@@ -222,12 +222,12 @@
 }
 
 .tenant-payment-date {
-  color: #111827;
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .tenant-payment-method {
-  color: #6b7280;
+  color: var(--color-text-light);
   font-size: 12.5px;
   text-transform: capitalize;
 }
@@ -238,7 +238,7 @@
 }
 
 .tenant-empty {
-  color: #9ca3af;
+  color: var(--color-text-light);
   font-size: 14px;
   padding: 8px 0;
 }
@@ -248,7 +248,7 @@
 .tenant-loading {
   padding: 60px 20px;
   text-align: center;
-  color: #6b7280;
+  color: var(--color-text-light);
   font-size: 15px;
 }
 
@@ -259,7 +259,7 @@
 .tenant-section-title {
   font-size: 16px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin: 8px 0 14px;
 }
 
@@ -271,8 +271,8 @@
 }
 
 .tenant-service-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 18px 16px;
   text-align: center;
@@ -294,7 +294,7 @@
 .tenant-service-name {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text);
   margin-bottom: 4px;
 }
 
@@ -304,8 +304,8 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #a16207;
-  background: #fef9c3;
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
   padding: 2px 8px;
   border-radius: 999px;
   margin-top: 6px;
@@ -363,7 +363,7 @@
 }
 
 .tenant-modal {
-  background: white;
+  background: var(--color-surface);
   width: 100%;
   max-width: 480px;
   max-height: 80vh;
@@ -388,13 +388,13 @@
 .tenant-modal-header h3 {
   font-size: 17px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .tenant-modal-close {
   appearance: none;
   border: none;
-  background: #f3f4f6;
+  background: var(--color-surface-2);
   width: 30px;
   height: 30px;
   border-radius: 999px;
@@ -402,7 +402,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .tenant-modal-rent-row {
@@ -416,7 +416,7 @@
 .tenant-modal-rent-amount {
   font-size: 26px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin: 4px 0 12px;
 }
 
@@ -434,195 +434,8 @@
 }
 
 .tenant-modal-pay-btn:disabled {
-  background: #d1d5db;
-  color: #6b7280;
-  cursor: not-allowed;
-}
-
-/* ===========================
-   SERVICES SECTION
-=========================== */
-
-.tenant-section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111827;
-  margin: 8px 0 14px;
-}
-
-.tenant-services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.tenant-service-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 18px 16px;
-  text-align: center;
-  position: relative;
-}
-
-.tenant-service-icon {
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0fdf4;
-  border-radius: 10px;
-  color: #16a34a;
-}
-
-.tenant-service-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 4px;
-}
-
-.tenant-service-soon {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: #a16207;
-  background: #fef9c3;
-  padding: 2px 8px;
-  border-radius: 999px;
-  margin-top: 6px;
-}
-
-/* ===========================
-   FLOATING PAY RENT BUTTON
-=========================== */
-
-.tenant-float-btn {
-  position: fixed;
-  left: 20px;
-  bottom: 20px;
-  z-index: 40;
-  appearance: none;
-  border: none;
-  outline: none;
-  background: #16a34a;
-  color: white;
-  font-size: 13.5px;
-  font-weight: 600;
-  padding: 12px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: 0.2s ease;
-}
-
-.tenant-float-btn:hover {
-  background: #15803d;
-  transform: translateY(-2px);
-}
-
-/* ===========================
-   PAYMENT MODAL
-=========================== */
-
-.tenant-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.5);
-  z-index: 50;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-@media (min-width: 640px) {
-  .tenant-modal-overlay {
-    align-items: center;
-  }
-}
-
-.tenant-modal {
-  background: white;
-  width: 100%;
-  max-width: 480px;
-  max-height: 80vh;
-  overflow-y: auto;
-  border-radius: 20px 20px 0 0;
-  padding: 24px;
-}
-
-@media (min-width: 640px) {
-  .tenant-modal {
-    border-radius: 20px;
-  }
-}
-
-.tenant-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.tenant-modal-header h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.tenant-modal-close {
-  appearance: none;
-  border: none;
-  background: #f3f4f6;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #6b7280;
-}
-
-.tenant-modal-rent-row {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 18px;
-}
-
-.tenant-modal-rent-amount {
-  font-size: 26px;
-  font-weight: 700;
-  color: #111827;
-  margin: 4px 0 12px;
-}
-
-.tenant-modal-pay-btn {
-  width: 100%;
-  appearance: none;
-  border: none;
-  background: #16a34a;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.tenant-modal-pay-btn:disabled {
-  background: #d1d5db;
-  color: #6b7280;
+  background: var(--color-border);
+  color: var(--color-text-light);
   cursor: not-allowed;
 }
 
@@ -631,17 +444,17 @@
 =========================== */
 
 .tenant-vacate-banner {
-  background: #fef3c7;
-  border: 1px solid #fde68a;
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 40%, transparent);
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 20px;
   font-size: 13.5px;
-  color: #92400e;
+  color: var(--color-warning);
 }
 
 .tenant-vacate-banner strong {
-  color: #78350f;
+  color: var(--color-warning);
 }
 
 .tenant-vacate-actions {
@@ -665,16 +478,18 @@
 .tenant-vacate-form input[type="date"] {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
   margin-bottom: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .tenant-vacate-submit-btn {
   appearance: none;
   border: none;
-  background: #b91c1c;
+  background: var(--color-error);
   color: white;
   font-size: 13.5px;
   font-weight: 600;

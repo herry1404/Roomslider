@@ -15,6 +15,10 @@ const ownerSchema = new mongoose.Schema({
   role: { type: String, default: "owner" },
   // Electricity rate this owner charges tenants, per unit consumed (₹/unit)
   ratePerUnit: { type: Number, default: 0 },
+  // Optional social links shown on the owner's public profile page
+  instagram: { type: String, default: "" },
+  facebook: { type: String, default: "" },
+  youtube: { type: String, default: "" },
 }, { timestamps: true });
 
 ownerSchema.pre('save', async function () {

@@ -240,7 +240,7 @@
 
     background: var(--color-surface);
 
-    color:#111827;
+    color:var(--color-text);
 
     display:flex;
 
@@ -496,7 +496,7 @@ height:50px;
     display:flex;
     align-items:center;
     margin:20px 0;
-    color:#888;
+    color:var(--color-text-light);
 }
 
 .divider::before,
@@ -504,7 +504,7 @@ height:50px;
     content:"";
     flex:1;
     height:1px;
-    background:#ddd;
+    background:var(--color-border);
 }
 
 .divider span{
@@ -524,7 +524,7 @@ height:50px;
     align-items:center;
     justify-content:center;
     gap:12px;
-    border:1px solid #ddd;
+    border:1px solid var(--color-border);
     border-radius:12px;
     background: var(--color-surface);
     cursor:pointer;
@@ -534,7 +534,7 @@ height:50px;
 }
 
 .google-btn:hover{
-    background:#f8f9fa;
+    background:var(--color-background);
     border-color:#4285F4;
     transform:translateY(-2px);
 }
@@ -562,7 +562,7 @@ height:50px;
 
     background: var(--color-surface);
 
-    color:#1f2937;
+    color:var(--color-text);
 
     display:flex;
 
@@ -596,7 +596,7 @@ height:50px;
 
 .social-btn--apple svg{
 
-    color:#000000;
+    color:var(--color-text);
 
 }
 

@@ -6,6 +6,7 @@ const { adminOnly } = require("../middleware/admin.middleware");
 
 const {
   createOwner,
+  getPublicOwnerProfile,
   ownerLogin,
   getAllOwners,
   getSingleOwner,
@@ -32,6 +33,7 @@ router.get("/", protect, adminOnly, getAllOwners);
 // ===============================
 // Get Single Owner + their rooms
 // ===============================
+router.get("/public/:id", getPublicOwnerProfile);
 router.get("/me", protect, getMyRooms);
 router.get("/:id", protect, adminOnly, getSingleOwner);
 

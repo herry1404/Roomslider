@@ -210,8 +210,24 @@ const getMyRooms = async (req, res) => {
   }
 };
 
+const getPublicOwnerProfile = async (req, res) => {
+  try {
+    const owner = await Owner.findById(req.params.id).select(
+      "name propertyName instagram facebook youtube createdAt"
+    );
+    if (!owner) return res.status(404).json({ message: "Owner not found" });
+
+    const totalListings = await Room.countDocuments({ owner: owner._id, status: "vacant" });
+
+    res.json({ owner, totalListings });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch owner profile", error: error.message });
+  }
+};
+
 module.exports = {
   createOwner,
+  getPublicOwnerProfile,
   ownerLogin,
   getAllOwners,
   getSingleOwner,

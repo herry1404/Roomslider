@@ -42,6 +42,7 @@ body{
 
   --color-background:#F8FAFC;
   --color-surface:#FFFFFF;
+  --color-surface-2:#F1F5F9;
 
   --color-text:#0F172A;
   --color-text-light:#475569;
@@ -206,33 +207,32 @@ section{
 
 }
 body { transition: 0.3s; }
-body.dark {
-  --color-background: #0A0A0A;
-  --color-surface: #171717;
-  --color-text: #F1F1F1;
-  --color-text-light: #A3A3A3;
-  --color-border: #2A2A2A;
-  background: var(--color-background);
-  color: var(--color-text);
-}
 
 /* =========================
-   DARK MODE TOKENS
+   DARK THEME TOKENS
 ========================= */
 
-[data-theme="dark"]{
-  --color-primary:#10B981;
-  --color-primary-hover:#34D399;
+body.dark {
+  --color-primary:#34D399;
+  --color-primary-hover:#6EE7B7;
 
-  --color-background:#0F172A;
-  --color-surface:#1E293B;
+  --color-background:#0B0F0E;
+  --color-surface:#161A19;
+  --color-surface-2:#1E2423;
 
-  --color-text:#F1F5F9;
-  --color-text-light:#94A3B8;
+  --color-text:#F1F5F4;
+  --color-text-light:#9CA6A3;
 
-  --color-border:#334155;
+  --color-border:#2A2F2E;
 
-  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
-  --shadow-md:0 8px 24px rgba(0,0,0,.4);
-  --shadow-lg:0 20px 40px rgba(0,0,0,.5);
+  --color-success:#4ADE80;
+  --color-error:#F87171;
+  --color-warning:#FBBF24;
+
+  --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:0 8px 24px rgba(0,0,0,.5);
+  --shadow-lg:0 20px 40px rgba(0,0,0,.6);
+
+  background:var(--color-background);
+  color:var(--color-text);
 }

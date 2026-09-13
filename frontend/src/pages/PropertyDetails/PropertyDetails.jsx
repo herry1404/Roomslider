@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import {
   MapPin,
   IndianRupee,
@@ -342,7 +342,13 @@ function PropertyDetails() {
                   <div>
 
                     <p className="owner-name">
-                      {room.ownerName}
+                      {room.owner ? (
+                        <Link to={`/owners/${room.owner}`} className="owner-name-link">
+                          {room.ownerName}
+                        </Link>
+                      ) : (
+                        room.ownerName
+                      )}
 
                       <BadgeCheck
                         size={15}

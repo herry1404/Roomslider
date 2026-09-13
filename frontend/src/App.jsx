@@ -15,6 +15,7 @@ import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 import MapView from "./pages/MapView/MapView";
+import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
 
@@ -61,6 +62,7 @@ function App() {
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />
         <Route path="/flats" element={<MainLayout><Flats /></MainLayout>} />

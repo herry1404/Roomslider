@@ -4,7 +4,7 @@
 
 .manage-rooms-page{
     padding:30px;
-    background:#f8fafc;
+    background:var(--color-background);
     min-height:100vh;
 }
 
@@ -20,7 +20,7 @@
 .rooms-header h1{
     font-size:32px;
     font-weight:800;
-    color:#111827;
+    color:var(--color-text);
 }
 
 /* Add Button */
@@ -30,7 +30,7 @@
     align-items:center;
     gap:8px;
     text-decoration:none;
-    background:#10b981;
+    background:var(--color-primary);
     color:#fff;
     padding:12px 20px;
     border-radius:12px;
@@ -39,7 +39,7 @@
 }
 
 .add-room-btn:hover{
-    background:#059669;
+    background:var(--color-primary-hover);
     transform:translateY(-2px);
 }
 
@@ -53,7 +53,7 @@
     padding:14px 18px;
     border-radius:14px;
     margin-bottom:30px;
-    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    box-shadow:var(--shadow-sm);
 }
 
 .search-box input{
@@ -62,6 +62,7 @@
     outline:none;
     font-size:15px;
     background:transparent;
+    color:var(--color-text);
 }
 
 /* Grid */
@@ -78,13 +79,13 @@
     background: var(--color-surface);
     border-radius:20px;
     overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    box-shadow:var(--shadow-md);
     transition:.35s;
 }
 
 .admin-room-card:hover{
     transform:translateY(-6px);
-    box-shadow:0 18px 40px rgba(0,0,0,.12);
+    box-shadow:var(--shadow-lg);
 }
 
 /* Image */
@@ -104,14 +105,14 @@
 .room-body h3{
     font-size:22px;
     margin-bottom:12px;
-    color:#111827;
+    color:var(--color-text);
 }
 
 .room-body p{
     display:flex;
     align-items:center;
     gap:8px;
-    color:#6b7280;
+    color:var(--color-text-light);
     margin-bottom:12px;
 }
 
@@ -119,7 +120,7 @@
     display:flex;
     align-items:center;
     gap:6px;
-    color:#10b981;
+    color:var(--color-primary);
     font-size:22px;
     margin-bottom:15px;
 }
@@ -128,8 +129,8 @@
 
 .category-badge{
     display:inline-block;
-    background:#dcfce7;
-    color:#15803d;
+    background:color-mix(in srgb, var(--color-success) 20%, transparent);
+    color:var(--color-success);
     padding:7px 14px;
     border-radius:30px;
     font-size:13px;
@@ -161,21 +162,21 @@
 }
 
 .edit-btn{
-    background:#2563eb;
+    background:var(--color-primary);
     color:#fff;
 }
 
 .edit-btn:hover{
-    background:#1d4ed8;
+    background:var(--color-primary-hover);
 }
 
 .delete-btn{
-    background:#ef4444;
+    background:var(--color-error);
     color:#fff;
 }
 
 .delete-btn:hover{
-    background:#dc2626;
+    background:color-mix(in srgb, var(--color-error) 85%, black);
 }
 
 /* Responsive */
@@ -214,8 +215,8 @@
     border-radius:14px;
     font-size:14px;
     font-weight:600;
-    color:#374151;
-    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    color:var(--color-text);
+    box-shadow:var(--shadow-sm);
     cursor:pointer;
     flex:1;
     min-width:0;
@@ -233,19 +234,19 @@
 }
 
 .status-vacant{
-    background:#dbeafe;
-    color:#1d4ed8;
+    background:color-mix(in srgb, var(--color-success) 20%, transparent);
+    color:var(--color-success);
 }
 
 .status-occupied{
-    background:#fee2e2;
-    color:#dc2626;
+    background:color-mix(in srgb, var(--color-error) 20%, transparent);
+    color:var(--color-error);
 }
 
 /* Owner Name */
 
 .owner-name{
-    color:#6b7280;
+    color:var(--color-text-light);
     font-size:14px;
     margin-top:8px;
     margin-bottom:12px;
