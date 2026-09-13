@@ -1,4 +1,4 @@
-/* ===========================
+/* =========================== 
    DASHBOARD
 =========================== */
 
@@ -27,40 +27,66 @@
 }
 
 /* ===========================
-   STATS
+   STATS (chhote, compact cards)
 =========================== */
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
   margin-bottom: 35px;
 }
 
 .dashboard-card {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 20px;
-  padding: 28px;
+  border-radius: 16px;
+  padding: 18px;
   box-shadow: var(--shadow-md);
   transition: 0.3s ease;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent, var(--color-primary));
 }
 
 .dashboard-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  color: var(--accent, var(--color-primary));
+  background: color-mix(in srgb, var(--accent, var(--color-primary)) 14%, transparent);
 }
 
 .dashboard-card span {
   display: block;
   color: var(--color-text-light);
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: 12.5px;
+  margin-bottom: 6px;
 }
 
 .dashboard-card h2 {
   margin: 0;
-  font-size: 40px;
+  font-size: 26px;
   color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ===========================
@@ -120,6 +146,10 @@
   cursor: pointer;
   pointer-events: auto;
   transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .quick-actions button:hover {
@@ -139,14 +169,6 @@
 
   .dashboard-top h2 {
     font-size: 26px;
-  }
-
-  .dashboard-card {
-    padding: 22px;
-  }
-
-  .dashboard-card h2 {
-    font-size: 32px;
   }
 }
 

@@ -78,7 +78,10 @@ function Sidebar({ open, closeSidebar }) {
   return (
     <aside className={`sidebar ${open ? "show-sidebar" : ""}`}>
 
-      <div>
+      {/* FIX: menu ab scrollable hai (sidebar-scroll), Logout button
+          hamesha neeche fixed/visible rahega, chahe menu items kitne
+          bhi badh jayein future me. */}
+      <div className="sidebar-scroll">
 
         <div className="sidebar-top">
 

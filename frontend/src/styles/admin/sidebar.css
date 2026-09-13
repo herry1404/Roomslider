@@ -15,6 +15,27 @@
     transition:.35s ease;
 }
 
+/* FIX: yahi wrapper ab scroll karega jab menu items screen se
+   zyada ho jayein. min-height:0 zaroori hai warna flexbox
+   ise scroll nahi karne dega. Logout button (isse bahar) hamesha
+   neeche fixed/visible rahega. */
+.sidebar-scroll{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar{
+    width:5px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:20px;
+}
+
 .sidebar-top{
     display:flex;
     justify-content:space-between;
@@ -80,6 +101,8 @@
     font-size:15px;
     font-weight:600;
     transition:.25s;
+    flex-shrink:0;
+    margin-top:12px;
 }
 
 .logout-btn:hover{
