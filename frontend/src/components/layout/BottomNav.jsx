@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Home, Clock, Heart } from "lucide-react";
+import { Home, MapPin, Heart } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
 
 function BottomNav() {
@@ -52,12 +52,12 @@ function BottomNav() {
       <button
         type="button"
         className={
-          isActive("/hourly-rooms") ? "bottom-nav-item active" : "bottom-nav-item"
+          isActive("/map") ? "bottom-nav-item active" : "bottom-nav-item"
         }
-        onClick={() => goProtected("/hourly-rooms")}
+        onClick={() => navigate("/map")}
       >
-        <Clock size={18} />
-        <span>Hourly</span>
+        <MapPin size={18} />
+        <span>Map</span>
       </button>
 
       <button

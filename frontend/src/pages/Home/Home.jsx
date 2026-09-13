@@ -1,8 +1,8 @@
 import { Helmet } from "react-helmet-async";
 import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
+import HourlyBanner from "../../components/home/HourlyBanner";
 import LatestRooms from "../../components/home/LatestRooms";
-import MapExplorer from "../../components/map/MapExplorer";
 
 function Home() {
   return (
@@ -19,12 +19,11 @@ function Home() {
       <Hero />
       <Categories />
 
-      <LatestRooms />
-
-      <section className="container" style={{ padding: "40px 0" }}>
-        <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>
-        <MapExplorer />
+      <section className="container" style={{ padding: "16px 0" }}>
+        <HourlyBanner />
       </section>
+
+      <LatestRooms />
     </>
   );
 }
