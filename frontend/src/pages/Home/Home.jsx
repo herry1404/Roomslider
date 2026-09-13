@@ -1,10 +1,34 @@
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+
 import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
-import LatestRooms from "../../components/home/LatestRooms";
+import CategorySection from "../../components/home/CategorySection";
 import MapExplorer from "../../components/map/MapExplorer";
+import api from "../../api/axios";
 
 function Home() {
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await api.get("/rooms");
+        setRooms(res.data?.rooms || []);
+      } catch (error) {
+        console.error("Home Rooms Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  const byCategory = (category) =>
+    rooms.filter((r) => r.category === category).slice(0, 10);
+
   return (
     <>
       <Helmet>
@@ -19,7 +43,33 @@ function Home() {
       <Hero />
       <Categories />
 
-      <LatestRooms />
+      {!loading && (
+        <>
+          <CategorySection
+            title="Latest"
+            viewAllPath="/rooms"
+            rooms={rooms.slice(0, 10)}
+          />
+
+          <CategorySection
+            title="Latest PGs"
+            viewAllPath="/pg"
+            rooms={byCategory("PG")}
+          />
+
+          <CategorySection
+            title="Latest Hostels"
+            viewAllPath="/hostels"
+            rooms={byCategory("Hostel")}
+          />
+
+          <CategorySection
+            title="Latest Flats"
+            viewAllPath="/flats"
+            rooms={byCategory("Flat")}
+          />
+        </>
+      )}
 
       <section className="container" style={{ padding: "40px 0" }}>
         <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>

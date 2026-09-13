@@ -59,17 +59,43 @@
 
 
 /* ===========================
-   GRID
+   ROW (HORIZONTAL SCROLL)
 =========================== */
 
 
 .rooms-grid{
 
-    display:grid;
+    display:flex;
 
-    grid-template-columns:repeat(5,1fr);
+    overflow-x:auto;
+
+    scroll-snap-type:x mandatory;
+
+    -webkit-overflow-scrolling:touch;
 
     gap:18px;
+
+    padding-bottom:8px;
+
+    scrollbar-width:thin;
+
+}
+
+
+
+.rooms-grid::-webkit-scrollbar{
+
+    height:6px;
+
+}
+
+
+
+.rooms-grid::-webkit-scrollbar-thumb{
+
+    background:rgba(0,0,0,.15);
+
+    border-radius:10px;
 
 }
 
@@ -95,6 +121,13 @@
     transition:.35s ease;
 
     cursor:pointer;
+
+
+    flex:0 0 auto;
+
+    width:230px;
+
+    scroll-snap-align:start;
 
 }
 
@@ -344,9 +377,9 @@
 
 @media(max-width:1200px){
 
-    .rooms-grid{
+    .room-card{
 
-        grid-template-columns:repeat(4,1fr);
+        width:210px;
 
     }
 
@@ -356,9 +389,9 @@
 
 @media(max-width:992px){
 
-    .rooms-grid{
+    .room-card{
 
-        grid-template-columns:repeat(3,1fr);
+        width:190px;
 
     }
 
@@ -388,9 +421,15 @@
 
     .rooms-grid{
 
-        grid-template-columns:repeat(2,1fr);
-
         gap:12px;
+
+    }
+
+
+
+    .room-card{
+
+        width:150px;
 
     }
 
@@ -445,6 +484,4 @@
         height:30px;
 
     }
-
-
 }
