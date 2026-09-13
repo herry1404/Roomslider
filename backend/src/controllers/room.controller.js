@@ -177,6 +177,9 @@ const getSingleRoom = async (req, res) => {
       });
     }
 
+    // Fire-and-forget view counter increment (does not block or fail the response)
+    Room.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } }).catch(() => {});
+
     const roomObj = room.toObject();
     if (room.status === "occupied") {
       roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);

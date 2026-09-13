@@ -159,6 +159,12 @@ const roomSchema = new mongoose.Schema(
 
     // ---- END NEW FIELDS ----
 
+    // Total number of times this room's detail page has been opened
+    views: {
+      type: Number,
+      default: 0,
+    },
+
     // Super Admin ordering - chhota number = upar dikhega
     // Default 9999 rakha hai taaki jinke liye priority set na ho,
     // wo hamesha explicitly priority set ki hui listings ke baad aayein

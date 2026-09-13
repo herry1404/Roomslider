@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const Room = require("../models/room.model");
+const Owner = require("../models/Owner");
 
 
 // ===============================
@@ -19,6 +20,8 @@ const getDashboard = async (req, res) => {
       role: "admin",
     });
 
+    const totalOwners = await Owner.countDocuments();
+
 
     const users = await User.find({}, "wishlist");
 
@@ -33,6 +36,67 @@ const getDashboard = async (req, res) => {
     });
 
 
+    // ---- New Users This Week ----
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const newUsersThisWeek = await User.countDocuments({
+      role: "user",
+      createdAt: { $gte: oneWeekAgo },
+    });
+
+
+    // ---- Listings Growth (cumulative, last 6 months) + Total Views + Total Earnings ----
+    const rooms = await Room.find({}, "createdAt location views occupancyHistory");
+
+    const monthLabels = [];
+    const monthBuckets = [];
+    const now = new Date();
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      monthLabels.push(d.toLocaleString("en-US", { month: "short" }));
+      const cutoff = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      monthBuckets.push(cutoff);
+    }
+
+    const listingsGrowth = monthBuckets.map((cutoff, idx) => ({
+      month: monthLabels[idx],
+      total: rooms.filter((r) => new Date(r.createdAt) < cutoff).length,
+    }));
+
+
+    // ---- Demand by Locality (top 5, by listing count) ----
+    const localityCounts = {};
+
+    rooms.forEach((r) => {
+      const loc = (r.location || "Unknown").trim();
+      localityCounts[loc] = (localityCounts[loc] || 0) + 1;
+    });
+
+    const localityDemand = Object.entries(localityCounts)
+      .map(([locality, count]) => ({ locality, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+
+    // ---- Total Views (sum across all rooms) ----
+    let totalViews = 0;
+
+    rooms.forEach((r) => {
+      totalViews += r.views || 0;
+    });
+
+
+    // ---- Total Earnings (sum of totalPaid across all occupancy history entries) ----
+    let totalEarnings = 0;
+
+    rooms.forEach((r) => {
+      (r.occupancyHistory || []).forEach((entry) => {
+        totalEarnings += entry.totalPaid || 0;
+      });
+    });
+
 
     res.status(200).json({
 
@@ -42,7 +106,13 @@ const getDashboard = async (req, res) => {
         totalRooms,
         totalUsers,
         totalAdmins,
+        totalOwners,
         totalWishlist,
+        newUsersThisWeek,
+        listingsGrowth,
+        localityDemand,
+        totalViews,
+        totalEarnings,
       },
 
     });

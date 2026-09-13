@@ -10,7 +10,21 @@ import {
   BarChart3,
   ClockAlert,
   TrendingUp,
+  Eye,
+  Wallet,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import api from "../../api/axios";
 import AdminLayout from "../../components/admin/AdminLayout";
 import "../../styles/admin/dashboard.css";
 
@@ -39,14 +53,14 @@ function useCountUp(target, duration = 800) {
   return value;
 }
 
-function StatCard({ label, value, icon, accent }) {
+function StatCard({ label, value, icon, accent, prefix = "" }) {
   const count = useCountUp(value);
 
   return (
     <div className="dashboard-card" style={{ "--accent": accent }}>
       <div className="dashboard-card-icon">{icon}</div>
       <span>{label}</span>
-      <h2>{count}</h2>
+      <h2>{prefix}{count.toLocaleString("en-IN")}</h2>
     </div>
   );
 }
@@ -54,9 +68,30 @@ function StatCard({ label, value, icon, accent }) {
 function AdminDashboard() {
   const navigate = useNavigate();
 
-  // FIX: previous buttons pointed to routes that don't exist
-  // (/admin/add-room, /admin/manage-rooms, /admin/manage-users) —
-  // corrected to match the actual routes defined in App.jsx.
+  const [stats, setStats] = useState({
+    totalRooms: 0,
+    totalUsers: 0,
+    totalOwners: 0,
+    totalWishlist: 0,
+    newUsersThisWeek: 0,
+    totalViews: 0,
+    totalEarnings: 0,
+    listingsGrowth: [],
+    localityDemand: [],
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get("/admin/dashboard");
+        setStats((prev) => ({ ...prev, ...res.data.stats }));
+      } catch (error) {
+        console.error("Dashboard fetch error:", error);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const quickActions = [
     { label: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
@@ -64,8 +99,6 @@ function AdminDashboard() {
     { label: "Analytics", icon: <BarChart3 size={18} />, action: () => alert("Analytics Coming Soon") },
   ];
 
-  // NOTE: values are still hardcoded (0) — wiring these to real
-  // counts from the backend is a separate pending task.
   return (
     <AdminLayout>
       <div className="dashboard">
@@ -78,42 +111,52 @@ function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="stats-grid">
-          <StatCard
-            label="Total Rooms"
-            value={0}
-            icon={<Building2 size={18} />}
-            accent="#3b82f6"
-          />
-          <StatCard
-            label="Total Users"
-            value={0}
-            icon={<Users size={18} />}
-            accent="#22c55e"
-          />
-          <StatCard
-            label="Wishlist"
-            value={0}
-            icon={<Heart size={18} />}
-            accent="#ec4899"
-          />
-          <StatCard
-            label="Total Owners"
-            value={0}
-            icon={<UserCog size={18} />}
-            accent="#a855f7"
-          />
-          <StatCard
-            label="Pending Approvals"
-            value={0}
-            icon={<ClockAlert size={18} />}
-            accent="#f97316"
-          />
-          <StatCard
-            label="New Users This Week"
-            value={0}
-            icon={<TrendingUp size={18} />}
-            accent="#06b6d4"
-          />
+          <StatCard label="Total Rooms" value={stats.totalRooms} icon={<Building2 size={18} />} accent="#3b82f6" />
+          <StatCard label="Total Users" value={stats.totalUsers} icon={<Users size={18} />} accent="#22c55e" />
+          <StatCard label="Wishlist" value={stats.totalWishlist} icon={<Heart size={18} />} accent="#ec4899" />
+          <StatCard label="Total Owners" value={stats.totalOwners} icon={<UserCog size={18} />} accent="#a855f7" />
+          <StatCard label="Pending Approvals" value={0} icon={<ClockAlert size={18} />} accent="#f97316" />
+          <StatCard label="New Users This Week" value={stats.newUsersThisWeek} icon={<TrendingUp size={18} />} accent="#06b6d4" />
+          <StatCard label="Total Views" value={stats.totalViews} icon={<Eye size={18} />} accent="#3b82f6" />
+          <StatCard label="Total Earnings" value={stats.totalEarnings} icon={<Wallet size={18} />} accent="#22c55e" prefix="₹" />
+        </div>
+
+        {/* Listings Growth */}
+        <div className="dashboard-section">
+          <h3>Listings Growth</h3>
+          <div style={{ width: "100%", height: 220 }}>
+            <ResponsiveContainer>
+              <LineChart data={stats.listingsGrowth}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="month" stroke="var(--color-text-light)" fontSize={12} />
+                <YAxis stroke="var(--color-text-light)" fontSize={12} allowDecimals={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Demand by Locality */}
+        <div className="dashboard-section">
+          <h3>Demand by Locality</h3>
+          {stats.localityDemand.length === 0 ? (
+            <div className="activity-box">
+              <p>No listings yet to show locality demand.</p>
+            </div>
+          ) : (
+            <div style={{ width: "100%", height: Math.max(stats.localityDemand.length * 40 + 40, 160) }}>
+              <ResponsiveContainer>
+                <BarChart data={stats.localityDemand} layout="vertical" margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis type="number" stroke="var(--color-text-light)" fontSize={12} allowDecimals={false} />
+                  <YAxis type="category" dataKey="locality" stroke="var(--color-text-light)" fontSize={12} width={100} />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}

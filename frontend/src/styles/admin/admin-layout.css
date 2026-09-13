@@ -2,6 +2,28 @@
     display:flex;
     min-height:100vh;
     background:var(--color-background);
+
+    --color-primary:#3B82F6;
+    --color-primary-hover:#2563EB;
+
+    --color-background:#0B0F14;
+    --color-surface:#161B22;
+    --color-surface-2:#1E252D;
+
+    --color-text:#F1F5F9;
+    --color-text-light:#94A3B8;
+
+    --color-border:#2A323C;
+
+    --color-success:#4ADE80;
+    --color-error:#F87171;
+    --color-warning:#FBBF24;
+
+    --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+    --shadow-md:0 8px 24px rgba(0,0,0,.5);
+    --shadow-lg:0 20px 40px rgba(0,0,0,.6);
+
+    color:var(--color-text);
 }
 
 .admin-main{
