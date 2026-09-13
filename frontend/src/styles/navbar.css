@@ -11,7 +11,7 @@
   position: sticky;
   top: 0;
   z-index: var(--z-navbar);
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--color-border);
@@ -223,7 +223,7 @@
 }
 
 .profile-item-danger:hover {
-  background: rgba(239, 68, 68, 0.12);
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
   color: var(--color-error);
 }
 
@@ -439,10 +439,10 @@ html, body {
     left: 0;
     right: 0;
     height: 50px;
-    background: rgba(255, 255, 255, 0.75);
+    background: color-mix(in srgb, var(--color-surface) 85%, transparent);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid var(--color-border);
     transition: transform 0.3s ease;
     z-index: var(--z-navbar);
   }
