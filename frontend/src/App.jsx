@@ -14,6 +14,7 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
+import MapView from "./pages/MapView/MapView";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
@@ -56,6 +57,7 @@ function App() {
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
         <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
+        <Route path="/map" element={<MainLayout><MapView /></MainLayout>} />
         <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
