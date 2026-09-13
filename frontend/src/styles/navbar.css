@@ -223,8 +223,8 @@
 }
 
 .profile-item-danger:hover {
-  background: #fef2f2;
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-error);
 }
 
 .profile-divider {
@@ -323,14 +323,14 @@ html, body {
 
 .profile-user {
   padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .profile-user h4 {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .profile-user p {
@@ -347,7 +347,7 @@ html, body {
   align-items: center;
   height: 40px;
   border-radius: 100px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
   overflow: hidden;
   width: 40px;
@@ -357,7 +357,7 @@ html, body {
 
 .navbar-search-pill.open {
   width: 260px;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 .navbar-search-icon-btn {
@@ -403,7 +403,7 @@ html, body {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   background: var(--color-surface);
   color: var(--color-text);

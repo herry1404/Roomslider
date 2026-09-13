@@ -17,7 +17,7 @@
 }
 
 .owners-header p {
-  color: #6b7280;
+  color: var(--color-text-light);
   margin-top: 0.25rem;
 }
 
@@ -32,7 +32,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #f3f4f6;
+  background: var(--color-surface-2);
   padding: 0.6rem 1rem;
   border-radius: 10px;
   min-width: 250px;
@@ -43,13 +43,14 @@
   background: transparent;
   outline: none;
   width: 100%;
+  color: var(--color-text);
 }
 
 .add-owner-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 0.65rem 1.2rem;
@@ -59,7 +60,7 @@
 }
 
 .add-owner-btn:hover {
-  background: #1d4ed8;
+  background: var(--color-primary-hover);
 }
 
 .owners-grid {
@@ -69,10 +70,10 @@
 }
 
 .owner-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: 14px;
   padding: 1.4rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: transform 0.15s ease;
   position: relative;
@@ -90,8 +91,8 @@
 }
 
 .owner-top .avatar {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-surface-2);
+  color: var(--color-primary);
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -103,18 +104,19 @@
 .owner-top h3 {
   font-size: 1.05rem;
   font-weight: 600;
+  color: var(--color-text);
 }
 
 .owner-top span {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .owner-details .detail-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4b5563;
+  color: var(--color-text-light);
   font-size: 0.9rem;
   margin-bottom: 0.4rem;
 }
@@ -124,7 +126,7 @@
   justify-content: space-between;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-border);
 }
 
 .stat-box {
@@ -136,19 +138,20 @@
   display: block;
   font-size: 1.2rem;
   font-weight: 700;
+  color: var(--color-text);
 }
 
 .stat-box p {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-light);
 }
 
 .stat-box.occupied span {
-  color: #dc2626;
+  color: var(--color-error);
 }
 
 .stat-box.vacant span {
-  color: #16a34a;
+  color: var(--color-success);
 }
 
 .owner-card .delete-btn {
@@ -158,8 +161,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  background: #fef2f2;
-  color: #dc2626;
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
+  color: var(--color-error);
   border: none;
   padding: 0.5rem;
   border-radius: 8px;
@@ -168,13 +171,13 @@
 }
 
 .owner-card .delete-btn:hover {
-  background: #fee2e2;
+  background: color-mix(in srgb, var(--color-error) 20%, transparent);
 }
 
 .empty-owners {
   text-align: center;
   padding: 3rem;
-  color: #9ca3af;
+  color: var(--color-text-light);
 }
 
 .add-owner-form {
@@ -186,18 +189,20 @@
 
 .add-owner-form input {
   padding: 0.7rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   outline: none;
   font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .add-owner-form input:focus {
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 .submit-btn {
-  background: #2563eb;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 0.75rem;
@@ -208,5 +213,5 @@
 }
 
 .submit-btn:hover {
-  background: #1d4ed8;
+  background: var(--color-primary-hover);
 }

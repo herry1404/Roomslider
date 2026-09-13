@@ -15,7 +15,7 @@
 
 
 .wishlist-header p{
-    color:#64748b;
+    color:var(--color-text-light);
 }
 
 
@@ -97,7 +97,7 @@
 
     margin:10px 0;
 
-    color:#475569;
+    color:var(--color-text-light);
 
 }
 
@@ -105,7 +105,7 @@
 
 .price{
 
-    color:#10b981;
+    color:var(--color-primary);
 
     font-weight:700;
 
@@ -155,7 +155,7 @@
 
 .empty-wishlist svg{
 
-    color:#ef4444;
+    color:var(--color-error);
 
 }
 

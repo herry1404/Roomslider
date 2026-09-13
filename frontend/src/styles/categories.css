@@ -85,8 +85,8 @@
 }
 
 .category-btn:hover{
-    background:#111827;
-    color:#fff;
+    background:var(--color-text);
+    color: var(--color-surface);
     transform:rotate(-45deg);
 }
 
