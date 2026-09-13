@@ -14,24 +14,24 @@ function HourlyBanner() {
         gap: "16px",
         padding: "18px 20px",
         borderRadius: "18px",
-        background: "linear-gradient(135deg, #e8ecfb, #eef1fb)",
-        border: "1px solid #dde3fa",
+        background: "var(--color-surface-2)",
+        border: "1px solid var(--color-border)",
         cursor: "pointer",
         flexWrap: "wrap",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "14px", minWidth: 0 }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
-          <BedDouble size={30} color="#3b4ba0" />
+          <BedDouble size={30} color="var(--color-primary)" />
           <Zap
             size={16}
-            fill="#3b4ba0"
-            color="#3b4ba0"
+            fill="var(--color-primary)"
+            color="var(--color-primary)"
             style={{ position: "absolute", top: -4, right: -8 }}
           />
         </div>
         <div style={{ minWidth: 0 }}>
-          <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#111827", margin: 0 }}>
+          <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>
             Need a Room Immediately?
           </h3>
           <p style={{ fontSize: "13px", color: "var(--color-text-light)", margin: "2px 0 0" }}>
@@ -52,12 +52,13 @@ function HourlyBanner() {
           gap: "6px",
           padding: "10px 18px",
           borderRadius: "999px",
-          background: "#111827",
+          background: "var(--color-primary)",
           color: "#fff",
           fontSize: "13.5px",
           fontWeight: 700,
           whiteSpace: "nowrap",
           flexShrink: 0,
+          border: "none",
         }}
       >
         Explore Now
