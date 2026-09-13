@@ -41,6 +41,7 @@ import ManageRooms from "./pages/Admin/ManageRooms";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import ManageOwners from "./pages/Admin/ManageOwners";
 import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
+import ManageMess from "./pages/Admin/ManageMess";
 import ManageHourlyRooms from "./pages/Admin/ManageHourlyRooms";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
 
@@ -96,6 +97,7 @@ function App() {
         <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
         <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
         <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
+        <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />

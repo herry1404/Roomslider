@@ -17,6 +17,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
+const messRoutes = require("./routes/mess.routes");
 
 
 const {
@@ -210,6 +211,13 @@ app.use(
 app.use(
   "/api/owners",
   ownerRoutes
+);
+
+
+// ✅ MESS ROUTES
+app.use(
+  "/api/mess",
+  messRoutes
 );
 
 
