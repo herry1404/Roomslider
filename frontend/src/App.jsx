@@ -15,6 +15,7 @@ import TenantDashboard from "./pages/Tenant/TenantDashboard";
 import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 import MapView from "./pages/MapView/MapView";
+import Explore from "./pages/Explore/Explore";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
@@ -62,6 +63,7 @@ function App() {
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
         <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
         <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
+        <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/map" element={<MainLayout><MapView /></MainLayout>} />
         <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
