@@ -87,6 +87,7 @@ function AddRoom() {
         title: "",
 
         category: "Room",
+        gender: "Any",
 
         location: "",
 
@@ -239,6 +240,7 @@ function AddRoom() {
             data.append("deposit", formData.deposit);
             data.append("location", formData.location);
             data.append("category", formData.category);
+            data.append("gender", formData.gender);
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
             data.append("furnished", formData.furnished);
@@ -349,6 +351,18 @@ function AddRoom() {
             <option value="PG">PG</option>
             <option value="Hostel">Hostel</option>
             <option value="Flat">Flat</option>
+
+        </select>
+
+        <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+        >
+
+            <option value="Any">Any (Male + Female)</option>
+            <option value="Male">Male Only</option>
+            <option value="Female">Female Only</option>
 
         </select>
 

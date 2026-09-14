@@ -10,9 +10,9 @@ import ProfileMenu from "./ProfileMenu";
 import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
+  { name: "Hourly Rooms", path: "/hourly-rooms" },
   { name: "Home", path: "/" },
   { name: "Rooms", path: "/rooms" },
-  { name: "Hourly Rooms", path: "/hourly-rooms" },
   { name: "Mess", path: "/mess" },
   { name: "PG", path: "/pg" },
   { name: "Hostels", path: "/hostels" },

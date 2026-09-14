@@ -20,6 +20,7 @@ function EditRoom() {
     location: "",
     description: "",
     category: "Room",
+    gender: "Any",
     rooms: 1,
     bathrooms: 1,
     furnished: false,
@@ -49,6 +50,7 @@ function EditRoom() {
         location: room.location || "",
         description: room.description || "",
         category: room.category || "Room",
+        gender: room.gender || "Any",
         rooms: room.rooms || 1,
         bathrooms: room.bathrooms || 1,
         furnished: room.furnished || false,
@@ -182,6 +184,16 @@ function EditRoom() {
           <option>PG</option>
           <option>Hostel</option>
           <option>Flat</option>
+        </select>
+
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={changeHandler}
+        >
+          <option value="Any">Any (Male + Female)</option>
+          <option value="Male">Male Only</option>
+          <option value="Female">Female Only</option>
         </select>
 
         <input

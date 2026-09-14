@@ -50,6 +50,13 @@ const roomSchema = new mongoose.Schema(
       default: "Room",
     },
 
+    // Optional — for gender-specific listings (e.g. Male Hostel, Female PG)
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Any"],
+      default: "Any",
+    },
+
     rooms: {
       type: Number,
       default: 1,

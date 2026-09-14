@@ -45,11 +45,6 @@ function Home() {
       <Hero />
       <Categories />
 
-      <section className="container" style={{ padding: "16px 0" }}>
-        <HourlyBanner />
-        <MessBanner />
-      </section>
-
       {!loading && (
         <>
           <CategorySection
@@ -65,18 +60,23 @@ function Home() {
           />
 
           <CategorySection
-            title="Latest Hostels"
-            viewAllPath="/hostels"
-            rooms={byCategory("Hostel")}
-          />
-
-          <CategorySection
             title="Latest Flats"
             viewAllPath="/flats"
             rooms={byCategory("Flat")}
           />
+
+          <CategorySection
+            title="Latest Hostels"
+            viewAllPath="/hostels"
+            rooms={byCategory("Hostel")}
+          />
         </>
       )}
+
+      <section className="container" style={{ padding: "16px 0" }}>
+        <HourlyBanner />
+        <MessBanner />
+      </section>
 
       <section className="container" style={{ padding: "40px 0" }}>
         <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>

@@ -44,6 +44,7 @@ const createRoom = async (req, res) => {
       location,
       description,
       category,
+      gender,
       rooms,
       bathrooms,
       furnished,
@@ -77,6 +78,7 @@ const createRoom = async (req, res) => {
       images,
       description,
       category,
+      gender: gender || "Any",
       rooms: rooms || 1,
       bathrooms: bathrooms || 1,
       furnished: furnished === "true" || furnished === true,
@@ -230,6 +232,7 @@ const updateRoom = async (req, res) => {
       location,
       description,
       category,
+      gender,
       rooms,
       bathrooms,
       furnished,
@@ -249,6 +252,7 @@ const updateRoom = async (req, res) => {
     if (location !== undefined) room.location = location;
     if (description !== undefined) room.description = description;
     if (category !== undefined) room.category = category;
+    if (gender !== undefined) room.gender = gender;
     if (rooms !== undefined) room.rooms = rooms;
     if (bathrooms !== undefined) room.bathrooms = bathrooms;
     if (furnished !== undefined) room.furnished = furnished === "true" || furnished === true;
@@ -339,6 +343,7 @@ const createBulkRooms = async (req, res) => {
       location,
       description,
       category,
+      gender,
       rooms,
       bathrooms,
       furnished,
@@ -396,6 +401,7 @@ const createBulkRooms = async (req, res) => {
       images,
       description,
       category,
+      gender: gender || "Any",
       rooms: rooms || 1,
       bathrooms: bathrooms || 1,
       furnished: furnished === "true" || furnished === true,

@@ -107,11 +107,12 @@ function MapExplorer() {
             borderRadius: "20px",
             overflow: "hidden",
             cursor: "pointer",
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--color-border)",
           }}
         >
           <div style={{ position: "absolute", inset: 0, opacity: 0.35, pointerEvents: "none" }}>
             <MapContainer
+              className="leaflet-map-wrapper"
               center={INDORE_CENTER}
               zoom={12}
               style={{ height: "100%", width: "100%" }}
@@ -136,12 +137,13 @@ function MapExplorer() {
               alignItems: "center",
               justifyContent: "center",
               gap: "8px",
-              background: "rgba(255, 255, 255, 0.4)",
+              background: "var(--color-surface)",
+              opacity: 0.85,
               transition: "background 0.2s ease",
             }}
           >
             <MapPin size={28} color="#ef4444" className="map-pin-icon" />
-            <span style={{ fontSize: "15px", fontWeight: 600, color: "#16a34a" }}>
+            <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-primary)" }}>
               Click here for map view
             </span>
           </div>
@@ -185,17 +187,17 @@ function MapExplorer() {
               width: "32px",
               height: "32px",
               borderRadius: "50%",
-              border: "1px solid #e2e8f0",
-              background: "#ffffff",
+              border: "1px solid var(--color-border)",
+              background: "var(--color-surface)",
               cursor: "pointer",
               boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
             }}
           >
-            <X size={16} color="#334155" />
+            <X size={16} color="var(--color-text)" />
           </button>
 
           {showMap && (
-            <MapContainer center={INDORE_CENTER} zoom={12} style={{ height: "100%", width: "100%" }}>
+            <MapContainer className="leaflet-map-wrapper" center={INDORE_CENTER} zoom={12} style={{ height: "100%", width: "100%" }}>
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

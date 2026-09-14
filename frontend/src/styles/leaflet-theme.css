@@ -1,0 +1,101 @@
+/* =====================================================
+   SHARED LEAFLET MAP THEME
+   Apply className="leaflet-map-wrapper" to any map
+   container div to get: dark-mode tiles, themed zoom
+   controls, themed popups, themed attribution.
+===================================================== */
+
+/* -----------------------------------------------------
+   ZOOM CONTROLS
+----------------------------------------------------- */
+
+.leaflet-map-wrapper .leaflet-control-zoom{
+    border-radius:12px !important;
+    overflow:hidden;
+    border:1px solid var(--color-border) !important;
+    box-shadow:0 6px 18px rgba(0,0,0,.15) !important;
+}
+
+.leaflet-map-wrapper .leaflet-control-zoom a{
+    width:36px !important;
+    height:36px !important;
+    line-height:36px !important;
+    font-size:19px !important;
+    background:var(--color-surface) !important;
+    color:var(--color-text) !important;
+    border:none !important;
+}
+
+.leaflet-map-wrapper .leaflet-control-zoom a:first-child{
+    border-bottom:1px solid var(--color-border) !important;
+}
+
+.leaflet-map-wrapper .leaflet-control-zoom a:hover{
+    background:var(--color-surface-2) !important;
+    color:var(--color-primary) !important;
+}
+
+/* -----------------------------------------------------
+   POPUPS
+----------------------------------------------------- */
+
+.leaflet-map-wrapper .leaflet-popup-content-wrapper{
+    background:var(--color-surface) !important;
+    color:var(--color-text) !important;
+    border-radius:14px !important;
+    box-shadow:0 10px 30px rgba(0,0,0,.18) !important;
+}
+
+.leaflet-map-wrapper .leaflet-popup-content{
+    margin:12px 14px !important;
+    font-size:13.5px !important;
+    line-height:1.6 !important;
+}
+
+.leaflet-map-wrapper .leaflet-popup-content a{
+    color:var(--color-primary) !important;
+    font-weight:600;
+}
+
+.leaflet-map-wrapper .leaflet-popup-tip{
+    background:var(--color-surface) !important;
+}
+
+.leaflet-map-wrapper .leaflet-popup-close-button{
+    color:var(--color-text-light) !important;
+}
+
+/* -----------------------------------------------------
+   ATTRIBUTION
+----------------------------------------------------- */
+
+.leaflet-map-wrapper .leaflet-control-attribution{
+    background:var(--color-surface) !important;
+    color:var(--color-text-light) !important;
+    border-radius:8px 0 0 0;
+}
+
+.leaflet-map-wrapper .leaflet-control-attribution a{
+    color:var(--color-text-light) !important;
+}
+
+/* -----------------------------------------------------
+   DARK MODE — invert tiles so map matches theme
+----------------------------------------------------- */
+
+body.dark .leaflet-map-wrapper .leaflet-tile-pane{
+    filter:invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+
+body.dark .leaflet-map-wrapper .leaflet-marker-icon,
+body.dark .leaflet-map-wrapper .leaflet-marker-shadow{
+    filter:invert(1) hue-rotate(180deg);
+}
+
+/* Keep popups/controls looking normal (not inverted) even though tiles are inverted */
+body.dark .leaflet-map-wrapper .leaflet-popup-content-wrapper,
+body.dark .leaflet-map-wrapper .leaflet-popup-tip,
+body.dark .leaflet-map-wrapper .leaflet-control-zoom,
+body.dark .leaflet-map-wrapper .leaflet-control-attribution{
+    filter:none;
+}
