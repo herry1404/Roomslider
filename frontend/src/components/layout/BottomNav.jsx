@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Home, MapPin, Heart } from "lucide-react";
+import { Home, MapPin, Compass } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
 
 function BottomNav() {
@@ -63,12 +63,12 @@ function BottomNav() {
       <button
         type="button"
         className={
-          isActive("/wishlist") ? "bottom-nav-item active" : "bottom-nav-item"
+          isActive("/explore") ? "bottom-nav-item active" : "bottom-nav-item"
         }
-        onClick={() => goProtected("/wishlist")}
+        onClick={() => navigate("/explore")}
       >
-        <Heart size={18} />
-        <span>Saved</span>
+        <Compass size={18} />
+        <span>Explore</span>
       </button>
 
       <ProfileMenu variant="bottom" />
