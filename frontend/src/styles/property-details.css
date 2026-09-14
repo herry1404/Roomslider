@@ -135,7 +135,9 @@
 
   height:500px;
 
-  object-fit:cover;
+  object-fit:contain;
+
+  background:var(--color-surface-2);
 
   border-radius:25px;
 

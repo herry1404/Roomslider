@@ -3,7 +3,7 @@
 ===================================================== */
 
 .add-room-page{
-    background:#f5f7fb;
+    background:var(--color-background);
     min-height:100vh;
     padding:40px 20px;
 }
@@ -22,7 +22,7 @@
     margin-bottom:35px;
     font-size:32px;
     font-weight:700;
-    color:#111;
+    color:var(--color-text);
 }
 
 /* =====================================================
@@ -32,7 +32,7 @@
 .form-section{
     margin-bottom:35px;
     padding-bottom:30px;
-    border-bottom:1px solid #ececec;
+    border-bottom:1px solid var(--color-border);
 }
 
 .form-section:last-of-type{
@@ -42,7 +42,7 @@
 .form-section h2{
     font-size:20px;
     margin-bottom:20px;
-    color:#222;
+    color:var(--color-text);
 }
 
 /* =====================================================
@@ -66,7 +66,7 @@ textarea{
     width:100%;
     padding:14px 16px;
 
-    border:1px solid #ddd;
+    border:1px solid var(--color-border);
     border-radius:12px;
 
     font-size:15px;
@@ -75,6 +75,15 @@ textarea{
 
     transition:.25s;
     background: var(--color-surface);
+    color: var(--color-text);
+
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder{
+
+    color: var(--color-text-light);
 
 }
 
@@ -82,9 +91,9 @@ input:focus,
 select:focus,
 textarea:focus{
 
-    border-color:#111;
+    border-color:var(--color-primary);
 
-    box-shadow:0 0 0 4px rgba(0,0,0,.06);
+    box-shadow:0 0 0 4px rgba(16,185,129,.12);
 
 }
 
@@ -109,6 +118,8 @@ textarea{
     margin-top:20px;
 
     font-weight:600;
+
+    color:var(--color-text);
 
 }
 
@@ -141,9 +152,9 @@ textarea{
 
     overflow:hidden;
 
-    background:#fafafa;
+    background:var(--color-surface-2);
 
-    border:1px solid #ddd;
+    border:1px solid var(--color-border);
 
 }
 
@@ -204,7 +215,7 @@ textarea{
 
     padding:12px 14px;
 
-    border:1px solid #ddd;
+    border:1px solid var(--color-border);
 
     border-radius:12px;
 
@@ -214,13 +225,15 @@ textarea{
 
     background: var(--color-surface);
 
+    color: var(--color-text);
+
 }
 
 .amenities-grid label:hover{
 
-    background:#f7f7f7;
+    background:var(--color-surface-2);
 
-    border-color:#111;
+    border-color:var(--color-primary);
 
 }
 
@@ -241,7 +254,7 @@ textarea{
 
     padding:17px;
 
-    background:#111;
+    background:var(--color-primary);
 
     color:#fff;
 
@@ -261,7 +274,7 @@ textarea{
 
 .publish-btn:hover{
 
-    background:#222;
+    background:var(--color-primary-hover);
 
     transform:translateY(-2px);
 

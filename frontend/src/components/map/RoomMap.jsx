@@ -65,12 +65,12 @@ function RoomMap({ lat, lng, title }) {
             width: "100%",
             padding: "12px 16px",
             borderRadius: "12px",
-            border: "1px solid #e2e8f0",
-            background: "#f8fafc",
+            border: "1px solid var(--color-border)",
+            background: "var(--color-surface-2)",
             cursor: "pointer",
             fontSize: "14px",
             fontWeight: 500,
-            color: "#16a34a",
+            color: "var(--color-primary)",
           }}
         >
           <MapPin size={18} color="#ef4444" className="map-pin-icon" />
@@ -94,16 +94,16 @@ function RoomMap({ lat, lng, title }) {
               width: "32px",
               height: "32px",
               borderRadius: "50%",
-              border: "1px solid #e2e8f0",
-              background: "#ffffff",
+              border: "1px solid var(--color-border)",
+              background: "var(--color-surface)",
               cursor: "pointer",
               boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
             }}
           >
-            <X size={16} color="#334155" />
+            <X size={16} color="var(--color-text)" />
           </button>
           {showMap && (
-            <MapContainer center={[lat, lng]} zoom={15} style={{ height: "100%", width: "100%" }}>
+            <MapContainer className="leaflet-map-wrapper" center={[lat, lng]} zoom={15} style={{ height: "100%", width: "100%" }}>
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

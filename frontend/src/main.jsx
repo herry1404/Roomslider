@@ -9,6 +9,7 @@ import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
 import "./index.css";
+import "./styles/leaflet-theme.css";
 
 import "./styles/navbar.css";
 import "./styles/hero.css";

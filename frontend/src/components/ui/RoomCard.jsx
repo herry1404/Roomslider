@@ -108,6 +108,14 @@ function RoomCard({ room, onWishlistChange }) {
         </button>
 
         <span className="room-category">{room.category}</span>
+        {room.gender && room.gender !== "Any" && (
+          <span
+            className="room-category"
+            style={{ left: "auto", right: "12px", background: room.gender === "Male" ? "#3b82f6" : "#ec4899" }}
+          >
+            {room.gender}
+          </span>
+        )}
       </div>
 
       <div className="room-content">
