@@ -23,9 +23,11 @@ import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/property-details.css";
+import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 import RoomMap from "../../components/map/RoomMap";
 
 function PropertyDetails() {
+  const navHidden = useHideOnScroll(80);
   const { id } = useParams();
   const { user } = useAuth();
 
@@ -402,7 +404,7 @@ function PropertyDetails() {
       </div>
 
             {(callLink || whatsappLink) && (
-        <div className="mobile-sticky-bar">
+        <div className={`mobile-sticky-bar ${navHidden ? "mobile-sticky-bar-visible" : ""}`}>
 
           {callLink && (
             <a

@@ -1,38 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Home, MapPin, Compass } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
+import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
 
-  const [hidden, setHidden] = useState(false);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > lastScrollY.current && currentY > 80) {
-        setHidden(true);
-      } else {
-        setHidden(false);
-      }
-      lastScrollY.current = currentY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const goProtected = (path) => {
-    if (!user) {
-      navigate("/login");
-    } else {
-      navigate(path);
-    }
-  };
+  const hidden = useHideOnScroll(80);
 
   const isActive = (path) => location.pathname === path;
 

@@ -12,12 +12,11 @@ import { useAuth } from "../../context/AuthContext";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Rooms", path: "/rooms" },
-  { name: "Hourly Rooms", path: "/hourly-rooms" },
-  { name: "Explore", path: "/explore" },
   { name: "PG", path: "/pg" },
   { name: "Hostels", path: "/hostels" },
   { name: "Flats", path: "/flats" },
   { name: "About", path: "/about" },
+  { name: "Explore", path: "/explore" },
 ];
 
 function SearchPill({ searchOpen, setSearchOpen, searchValue, setSearchValue, handleSearchSubmit, closeSearch }) {
