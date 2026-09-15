@@ -16,6 +16,7 @@ const {
   getMessDetail,
   updateTodayMenu,
   getMyMessDashboard,
+  getTodayOrders,
 } = require("../controllers/mess.controller");
 
 // ===============================
@@ -30,6 +31,7 @@ router.get("/public/:id", getMessDetail);
 // ===============================
 router.get("/me", protect, getMyMessDashboard);
 router.put("/me/menu", protect, updateTodayMenu);
+router.get("/me/orders/today", protect, getTodayOrders);
 
 // ===============================
 // Admin only

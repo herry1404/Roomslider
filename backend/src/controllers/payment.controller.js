@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const Room = require("../models/room.model");
 const ElectricityBill = require("../models/ElectricityBill");
+const Mess = require("../models/Mess");
+const MessOrder = require("../models/MessOrder");
 const { addOneMonth } = require("./room.controller");
 
 const razorpay = new Razorpay({
@@ -170,7 +172,130 @@ const verifyPayment = async (req, res) => {
   }
 };
 
+
+// ===============================
+// Mess Thali Order — create Razorpay order
+// Amount is derived server-side from mess.pricePerPerson * thaliCount,
+// never trusted from the client.
+// ===============================
+const createMessOrder = async (req, res) => {
+  try {
+    const { messId, thaliCount } = req.body;
+    const count = Number(thaliCount) || 1;
+
+    if (!messId || count < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order request",
+      });
+    }
+
+    const mess = await Mess.findById(messId);
+
+    if (!mess || !mess.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: "Mess not found",
+      });
+    }
+
+    const amount = mess.pricePerPerson * count;
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 100), // paise
+      currency: "INR",
+      receipt: `m_${messId.slice(-8)}_${Date.now()}`.slice(0, 40),
+    });
+
+    res.status(200).json({
+      success: true,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      key: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (error) {
+    console.error("CREATE MESS ORDER ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create payment order",
+    });
+  }
+};
+
+// ===============================
+// Mess Thali Order — verify signature, then create the MessOrder record
+// ===============================
+const verifyMessOrder = async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      messId,
+      thaliCount,
+    } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing payment verification fields",
+      });
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification failed",
+      });
+    }
+
+    const mess = await Mess.findById(messId);
+
+    if (!mess) {
+      return res.status(404).json({
+        success: false,
+        message: "Mess not found",
+      });
+    }
+
+    const count = Number(thaliCount) || 1;
+    const totalAmount = mess.pricePerPerson * count;
+
+    const messOrder = await MessOrder.create({
+      mess: mess._id,
+      user: req.user._id,
+      thaliCount: count,
+      pricePerPerson: mess.pricePerPerson,
+      totalAmount,
+      paymentStatus: "paid",
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      orderStatus: "placed",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Order placed successfully",
+      order: messOrder,
+    });
+  } catch (error) {
+    console.error("VERIFY MESS ORDER ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Payment verification failed",
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   verifyPayment,
+  createMessOrder,
+  verifyMessOrder,
 };

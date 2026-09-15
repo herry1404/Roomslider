@@ -15,6 +15,7 @@ function MessOwnerDashboard() {
   const [mess, setMess] = useState(null);
   const [todayOrderCount, setTodayOrderCount] = useState(0);
   const [menuItems, setMenuItems] = useState([""]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -26,6 +27,9 @@ function MessOwnerDashboard() {
 
       const items = res.data.mess?.todayMenu?.items || [];
       setMenuItems(items.length ? items.map((i) => i.name) : [""]);
+
+      const ordersRes = await api.get("/mess/me/orders/today");
+      setOrders(ordersRes.data.orders || []);
     } catch (error) {
       console.error("MESS DASHBOARD ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to load dashboard");
@@ -152,6 +156,32 @@ function MessOwnerDashboard() {
         >
           {saving ? "Saving..." : "Save Today's Menu"}
         </button>
+      </div>
+
+      <div className="mess-orders-section">
+        <h3>Today's Orders</h3>
+
+        {orders.length === 0 ? (
+          <p className="mess-no-orders">No orders yet today.</p>
+        ) : (
+          <div className="mess-orders-list">
+            {orders.map((order) => (
+              <div className="mess-order-row" key={order._id}>
+                <div>
+                  <strong>{order.user?.name || "Unknown"}</strong>
+                  <p>{order.user?.phone}</p>
+                </div>
+                <div className="mess-order-meta">
+                  <span>{order.thaliCount} Thali(s)</span>
+                  <span>₹{order.totalAmount}</span>
+                  <span className={`mess-order-badge ${order.orderStatus}`}>
+                    {order.orderStatus}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -266,6 +266,27 @@ const getMyMessDashboard = async (req, res) => {
   }
 };
 
+// ===============================
+// Mess Owner: Get Today's Orders (subscriber/order list)
+// ===============================
+const getTodayOrders = async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const orders = await MessOrder.find({
+      mess: req.user._id,
+      createdAt: { $gte: startOfDay },
+    })
+      .populate("user", "name phone")
+      .sort({ createdAt: -1 });
+
+    res.json({ orders });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+  }
+};
+
 module.exports = {
   messLogin,
   createMess,
@@ -275,6 +296,7 @@ module.exports = {
   deleteMess,
   getNearbyMess,
   getMessDetail,
+  getTodayOrders,
   updateTodayMenu,
   getMyMessDashboard,
 };

@@ -9,6 +9,8 @@ function MessDetail() {
   const { id } = useParams();
   const [mess, setMess] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [thaliCount, setThaliCount] = useState(1);
+  const [ordering, setOrdering] = useState(false);
 
   const fetchMess = async () => {
     try {
@@ -26,8 +28,53 @@ function MessDetail() {
     fetchMess();
   }, [id]);
 
-  const handleOrder = () => {
-    toast("Ordering coming soon!");
+  const handleOrder = async () => {
+    try {
+      setOrdering(true);
+
+      const orderRes = await api.post("/payments/mess/create-order", {
+        messId: mess._id,
+        thaliCount,
+      });
+
+      const { orderId, amount, currency, key } = orderRes.data;
+
+      const options = {
+        key,
+        amount,
+        currency,
+        order_id: orderId,
+        name: "RoomSlider",
+        description: `${mess.name} - ${thaliCount} Thali(s)`,
+        handler: async (response) => {
+          try {
+            await api.post("/payments/mess/verify", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              messId: mess._id,
+              thaliCount,
+            });
+
+            toast.success("Order placed successfully!");
+          } catch (verifyError) {
+            console.error("MESS PAYMENT VERIFY ERROR:", verifyError);
+            toast.error("Payment could not be verified. Contact support.");
+          }
+        },
+        theme: {
+          color: "#16a34a",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("CREATE MESS ORDER ERROR:", error);
+      toast.error(error.response?.data?.message || "Failed to start order");
+    } finally {
+      setOrdering(false);
+    }
   };
 
   if (loading) {
@@ -137,6 +184,57 @@ function MessDetail() {
             </p>
           )}
 
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+              marginBottom: "14px",
+            }}
+          >
+            <span style={{ color: "var(--color-text)", fontWeight: 600 }}>
+              Number of Thalis
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <button
+                type="button"
+                onClick={() => setThaliCount((c) => Math.max(1, c - 1))}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "10px",
+                  border: "1px solid var(--color-border)",
+                  background: "var(--color-surface-2)",
+                  color: "var(--color-text)",
+                  fontSize: 18,
+                  cursor: "pointer",
+                }}
+              >
+                −
+              </button>
+              <span style={{ color: "var(--color-text)", minWidth: 20, textAlign: "center" }}>
+                {thaliCount}
+              </span>
+              <button
+                type="button"
+                onClick={() => setThaliCount((c) => c + 1)}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "10px",
+                  border: "1px solid var(--color-border)",
+                  background: "var(--color-surface-2)",
+                  color: "var(--color-text)",
+                  fontSize: 18,
+                  cursor: "pointer",
+                }}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
           <div style={{ display: "flex", gap: "10px" }}>
             <a
               href={`tel:${mess.phone}`}
@@ -160,6 +258,7 @@ function MessDetail() {
 
             <button
               onClick={handleOrder}
+              disabled={ordering}
               style={{
                 flex: 2,
                 padding: "14px",
@@ -169,10 +268,11 @@ function MessDetail() {
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: "15px",
-                cursor: "pointer",
+                cursor: ordering ? "not-allowed" : "pointer",
+                opacity: ordering ? 0.7 : 1,
               }}
             >
-              Order Thali
+              {ordering ? "Processing..." : `Order ${thaliCount} Thali - ₹${mess.pricePerPerson * thaliCount}`}
             </button>
           </div>
         </div>
