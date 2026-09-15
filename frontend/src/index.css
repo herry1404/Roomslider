@@ -37,6 +37,8 @@ body{
 
 :root{
 
+  color-scheme:light;
+
   --color-primary:#10B981;
   --color-primary-hover:#059669;
 
