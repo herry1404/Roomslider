@@ -37,6 +37,8 @@ import OwnerElectricity from "./pages/Owner/OwnerElectricity";
 import OwnerExpenses from "./pages/Owner/OwnerExpenses";
 import OwnerReminders from "./pages/Owner/OwnerReminders";
 import OwnerMaintenance from "./pages/Owner/OwnerMaintenance";
+import MessLogin from "./pages/Mess/MessLogin";
+import MessOwnerDashboard from "./pages/Mess/MessOwnerDashboard";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AddRoom from "./pages/Admin/AddRoom";
 import EditRoom from "./pages/Admin/EditRoom";
@@ -51,6 +53,7 @@ import OwnerDetail from "./pages/Admin/OwnerDetail";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import OwnerRoute from "./components/OwnerRoute";
+import MessRoute from "./components/MessRoute";
 
 function App() {
   return (
@@ -63,6 +66,8 @@ function App() {
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
         <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
         <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
+        <Route path="/mess/login" element={<MessLogin />} />
+        <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/map" element={<MainLayout><MapView /></MainLayout>} />
         <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />

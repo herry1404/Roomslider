@@ -13,6 +13,7 @@ import {
   Building2,
   LayoutDashboard,
   Home,
+  Utensils,
 } from "lucide-react";
 
 import api from "../../api/axios";
@@ -136,6 +137,13 @@ function ProfileMenu({ variant }) {
               </NavLink>
             )}
 
+            {user.role !== "mess" && (
+              <NavLink to="/mess/login" className="profile-item" onClick={closeMenu}>
+                <Utensils size={16} />
+                Mess Login
+              </NavLink>
+            )}
+
             <div className="profile-divider" />
 
             <button className="profile-item profile-item-danger" onClick={handleLogout}>
@@ -167,6 +175,11 @@ function ProfileMenu({ variant }) {
             <NavLink to="/owner/login" className="profile-item" onClick={closeMenu}>
               <Building2 size={16} />
               Owner Login
+            </NavLink>
+
+            <NavLink to="/mess/login" className="profile-item" onClick={closeMenu}>
+              <Utensils size={16} />
+              Mess Login
             </NavLink>
           </>
         )}

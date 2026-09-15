@@ -95,6 +95,21 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const messLogin = async (data) => {
+    try {
+      const res = await api.post("/mess/login", data);
+      saveSession(res.data.token, res.data.user);
+      return {
+        success: true,
+        message: res.data.message || "Login successful",
+        user: res.data.user,
+      };
+    } catch (error) {
+      console.error("MESS LOGIN API ERROR:", error);
+      throw error;
+    }
+  };
+
   const register = async (data) => {
     try {
       console.log("Register Data:", data);
@@ -133,6 +148,7 @@ export function AuthProvider({ children }) {
         login,
         googleLogin,
         ownerLogin,
+        messLogin,
         register,
         logout,
       }}

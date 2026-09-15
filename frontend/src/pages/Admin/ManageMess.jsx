@@ -7,6 +7,7 @@ import "../../styles/manageOwners.css";
 function ManageMess() {
   const [messList, setMessList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -79,6 +80,7 @@ function ManageMess() {
     }
 
     try {
+      setSaving(true);
       const data = new FormData();
       data.append("name", form.name);
       data.append("phone", form.phone);
@@ -108,6 +110,8 @@ function ManageMess() {
     } catch (error) {
       console.error("SAVE MESS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to save mess");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -325,8 +329,12 @@ function ManageMess() {
                 </div>
               )}
 
-              <button type="submit" className="submit-btn">
-                {editingId ? "Update Mess" : "Add Mess"}
+              <button type="submit" className="submit-btn" disabled={saving}>
+                {saving
+                  ? "Saving..."
+                  : editingId
+                  ? "Update Mess"
+                  : "Add Mess"}
               </button>
             </form>
           </div>

@@ -1,0 +1,134 @@
+.mess-dashboard {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
+}
+
+.mess-dashboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mess-dashboard-top h2 {
+  margin: 0 0 4px;
+}
+
+.mess-dashboard-top p {
+  margin: 0;
+  color: var(--color-text-muted, #888);
+}
+
+.mess-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mess-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.mess-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-surface);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+}
+
+.mess-stat-card h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.mess-stat-card p {
+  margin: 2px 0 0;
+  color: var(--color-text-muted, #888);
+  font-size: 14px;
+}
+
+.mess-menu-section {
+  background: var(--color-surface);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+}
+
+.mess-menu-section h3 {
+  margin: 0 0 16px;
+}
+
+.mess-menu-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mess-menu-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #333);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.mess-remove-btn {
+  background: transparent;
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  width: 44px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.mess-remove-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mess-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed var(--color-primary);
+  color: var(--color-primary);
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.mess-save-btn {
+  display: block;
+  width: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mess-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

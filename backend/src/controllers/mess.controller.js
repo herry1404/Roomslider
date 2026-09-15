@@ -77,12 +77,15 @@ const createMess = async (req, res) => {
       return res.status(400).json({ message: "Location (latitude, longitude) is required" });
     }
 
+    const imageUrls = req.files ? req.files.map((file) => file.path) : [];
+
     const mess = await Mess.create({
       name,
       phone,
       password,
       address,
       pricePerPerson,
+      images: imageUrls,
       location: {
         type: "Point",
         coordinates: [Number(longitude), Number(latitude)],
@@ -143,6 +146,10 @@ const updateMess = async (req, res) => {
         type: "Point",
         coordinates: [Number(longitude), Number(latitude)],
       };
+    }
+
+    if (req.files && req.files.length > 0) {
+      updateData.images = req.files.map((file) => file.path);
     }
 
     const mess = await Mess.findByIdAndUpdate(req.params.id, updateData, {

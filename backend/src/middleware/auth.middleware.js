@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Owner = require("../models/Owner");
+const Mess = require("../models/Mess");
 
 const protect = async (req, res, next) => {
   try {
@@ -14,6 +15,8 @@ const protect = async (req, res, next) => {
     let account;
     if (decoded.role === "owner") {
       account = await Owner.findById(decoded.id).select("-password");
+    } else if (decoded.role === "mess") {
+      account = await Mess.findById(decoded.id).select("-password");
     } else {
       account = await User.findById(decoded.id).select("-password");
     }
@@ -23,7 +26,8 @@ const protect = async (req, res, next) => {
     }
 
     req.user = account.toObject ? account.toObject() : account;
-    if (decoded.role === "owner") req.user.role = "owner"; // safety net
+    if (decoded.role === "owner") req.user.role = "owner";
+    if (decoded.role === "mess") req.user.role = "mess";
     next();
   } catch (error) {
     return res.status(401).json({ success: false, message: "Invalid ya expired token" });
