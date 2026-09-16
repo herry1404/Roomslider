@@ -42,6 +42,9 @@ const createOwner = async (req, res) => {
       propertyName,
     });
 
+    const { logActivity } = require("./activity.controller");
+    await logActivity("owner_added", `New owner added: ${owner.name}`, owner._id, "Owner");
+
     res.status(201).json({
       message: "Owner created successfully",
       owner: {

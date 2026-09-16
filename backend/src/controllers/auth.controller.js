@@ -71,6 +71,9 @@ const register = async (req, res) => {
       role: "user",
     });
 
+    const { logActivity } = require("./activity.controller");
+    await logActivity("user_registered", `New user registered: ${user.name}`, user._id, "User");
+
     const token = createToken(user);
 
     return res.status(201).json({

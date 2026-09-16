@@ -99,6 +99,9 @@ const createRoom = async (req, res) => {
 
     const room = await Room.create(roomData);
 
+    const { logActivity } = require("./activity.controller");
+    await logActivity("room_added", `New room added: ${room.title || room.propertyName || "Untitled"}`, room._id, "Room");
+
     res.status(201).json({
       success: true,
       message: "Room added successfully",

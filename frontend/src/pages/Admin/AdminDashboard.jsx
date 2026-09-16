@@ -27,6 +27,7 @@ import {
 import api from "../../api/axios";
 import AdminLayout from "../../components/admin/AdminLayout";
 import "../../styles/admin/dashboard.css";
+import RecentActivity from "./RecentActivity";
 
 // Small reusable hook: animates a number counting up from 0 to
 // `target` whenever `target` changes, giving stat cards a "live"
@@ -162,9 +163,7 @@ function AdminDashboard() {
         {/* Recent Activity */}
         <div className="dashboard-section">
           <h3>Recent Activity</h3>
-          <div className="activity-box">
-            <p>No recent activity found.</p>
-          </div>
+          <RecentActivity />
         </div>
 
         {/* Quick Actions */}
