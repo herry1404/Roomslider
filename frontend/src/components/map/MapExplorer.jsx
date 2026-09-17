@@ -136,9 +136,9 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           center={INDORE_CENTER}
           zoom={12}
           style={{ height: "100%", width: "100%" }}
+          attributionControl={false}
         >
           <TileLayer
-            attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {visibleRooms.map((room) => (

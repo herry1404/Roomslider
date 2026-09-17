@@ -171,6 +171,10 @@ function Footer() {
 
           <p>© {year} RoomSlider. All rights reserved.</p>
 
+          <p className="footer-map-credit">
+            Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors
+          </p>
+
           <div className="footer-bottom-links">
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms of Service</Link>
