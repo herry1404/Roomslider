@@ -5,7 +5,6 @@ import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
 import HourlyBanner from "../../components/home/HourlyBanner";
 import CategorySection from "../../components/home/CategorySection";
-import MapExplorer from "../../components/map/MapExplorer";
 import api from "../../api/axios";
 
 function Home() {
@@ -75,11 +74,6 @@ function Home() {
           />
         </>
       )}
-
-      <section className="container" style={{ padding: "40px 0" }}>
-        <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>
-        <MapExplorer />
-      </section>
     </>
   );
 }

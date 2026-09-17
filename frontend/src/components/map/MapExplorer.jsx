@@ -35,11 +35,11 @@ const filters = [
 
 const INDORE_CENTER = [22.7196, 75.8577];
 
-function MapExplorer() {
+function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen = false }) {
   const [rooms, setRooms] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(startExpanded);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -59,6 +59,118 @@ function MapExplorer() {
   const withCoords = rooms.filter((r) => r.latitude && r.longitude);
   const visibleRooms =
     filter === "all" ? withCoords : withCoords.filter((r) => r.category === filter);
+
+  if (fullscreen) {
+    return (
+      <div className="map-fullscreen-wrap">
+        <style>{`
+          .map-fullscreen-wrap {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - var(--navbar-height));
+            overflow: hidden;
+          }
+          @media (max-width: 768px) {
+            .map-fullscreen-wrap {
+              height: calc(100vh - var(--navbar-height) - 50px);
+            }
+          }
+          .map-fullscreen-filters {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 8px;
+            padding: 0 12px;
+            overflow-x: auto;
+            z-index: 1000;
+            scrollbar-width: none;
+          }
+          .map-fullscreen-filters::-webkit-scrollbar {
+            display: none;
+          }
+          .map-fullscreen-pill {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+          }
+          .map-fullscreen-empty {
+            position: absolute;
+            bottom: 16px;
+            left: 12px;
+            right: 12px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 1000;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+          }
+        `}</style>
+
+        <div className="map-fullscreen-filters">
+          {filters.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className="map-fullscreen-pill"
+              style={{
+                border: filter === f.key ? "none" : "1px solid var(--color-border)",
+                background: filter === f.key ? "var(--color-primary)" : "var(--color-surface)",
+                color: filter === f.key ? "#fff" : "var(--color-text)",
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        <MapContainer
+          className="leaflet-map-wrapper"
+          center={INDORE_CENTER}
+          zoom={12}
+          style={{ height: "100%", width: "100%" }}
+        >
+          <TileLayer
+            attribution='&copy; OpenStreetMap contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {visibleRooms.map((room) => (
+            <Marker
+              key={room._id}
+              position={[room.latitude, room.longitude]}
+              icon={categoryIcons[room.category] || defaultIcon}
+            >
+              <Popup>
+                <strong>{room.title}</strong>
+                <br />
+                {room.category}
+                <br />
+                ₹{room.price}/month
+                <br />
+                <Link to={`/rooms/${room._id}`}>View details</Link>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        {!loading && visibleRooms.length === 0 && (
+          <div
+            className="map-fullscreen-empty"
+            style={{ background: "var(--color-surface)", color: "var(--color-text-light)" }}
+          >
+            No listings with map coordinates yet.
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -173,28 +285,30 @@ function MapExplorer() {
         </div>
 
         <div style={{ position: "relative", height: "420px", borderRadius: "20px", overflow: "hidden" }}>
-          <button
-            onClick={() => setShowMap(false)}
-            className="map-close-btn"
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              zIndex: 1000,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-surface)",
-              cursor: "pointer",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
-            }}
-          >
-            <X size={16} color="var(--color-text)" />
-          </button>
+          {allowCollapse && (
+            <button
+              onClick={() => setShowMap(false)}
+              className="map-close-btn"
+              style={{
+                position: "absolute",
+                top: "8px",
+                right: "8px",
+                zIndex: 1000,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-surface)",
+                cursor: "pointer",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+              }}
+            >
+              <X size={16} color="var(--color-text)" />
+            </button>
+          )}
 
           {showMap && (
             <MapContainer className="leaflet-map-wrapper" center={INDORE_CENTER} zoom={12} style={{ height: "100%", width: "100%" }}>

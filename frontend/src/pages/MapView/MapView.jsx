@@ -8,10 +8,7 @@ function MapView() {
         <title>Explore on Map - RoomSlider</title>
       </Helmet>
 
-      <section className="container" style={{ padding: "24px 0 60px" }}>
-        <h2 style={{ marginBottom: "16px" }}>Explore on Map</h2>
-        <MapExplorer />
-      </section>
+      <MapExplorer startExpanded allowCollapse={false} fullscreen />
     </>
   );
 }
