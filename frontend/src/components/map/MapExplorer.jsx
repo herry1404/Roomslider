@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Link } from "react-router-dom";
-import { MapPin, X } from "lucide-react";
+import { MapPin, X, LocateFixed } from "lucide-react";
 import api from "../../api/axios";
+import indoreColleges from "../../data/indoreColleges";
 import "leaflet/dist/leaflet.css";
 
 const shadowUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
@@ -25,6 +26,21 @@ const categoryIcons = {
 };
 const defaultIcon = makeIcon("grey");
 
+const userLocationIcon = L.divIcon({
+  className: "user-location-marker",
+  html: '<div class="user-location-dot"></div>',
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+});
+
+const collegeIcon = L.divIcon({
+  className: "college-marker",
+  html: '<div class="college-marker-badge">🎓</div>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [0, -15],
+});
+
 const filters = [
   { key: "all", label: "All" },
   { key: "Room", label: "Rooms" },
@@ -35,11 +51,65 @@ const filters = [
 
 const INDORE_CENTER = [22.7196, 75.8577];
 
+const directionsUrl = (lat, lng) =>
+  `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+function LocateButton({ onLocate }) {
+  const map = useMap();
+  const [locating, setLocating] = useState(false);
+
+  const handleClick = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        map.flyTo([latitude, longitude], 15);
+        onLocate([latitude, longitude]);
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="map-locate-btn"
+      style={{
+        position: "absolute",
+        bottom: "16px",
+        right: "12px",
+        zIndex: 1000,
+        width: "44px",
+        height: "44px",
+        borderRadius: "50%",
+        border: "1px solid var(--color-border)",
+        background: "var(--color-surface)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+      }}
+    >
+      <LocateFixed
+        size={20}
+        color="var(--color-primary)"
+        style={locating ? { animation: "mapLocatePulse 1s ease-in-out infinite" } : undefined}
+      />
+    </button>
+  );
+}
+
 function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen = false }) {
   const [rooms, setRooms] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(startExpanded);
+  const [userPos, setUserPos] = useState(null);
+  const [showColleges, setShowColleges] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -112,6 +182,36 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
             z-index: 1000;
             box-shadow: 0 1px 6px rgba(0,0,0,0.15);
           }
+          .user-location-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4285F4;
+            border: 2px solid white;
+            box-shadow: 0 0 0 4px rgba(66,133,244,0.35);
+          }
+          .college-marker-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+          }
+          @keyframes mapLocatePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+          }
+          .map-directions-link {
+            color: var(--color-primary);
+            font-weight: 600;
+            text-decoration: none;
+          }
         `}</style>
 
         <div className="map-fullscreen-filters">
@@ -129,6 +229,17 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
               {f.label}
             </button>
           ))}
+          <button
+            onClick={() => setShowColleges((v) => !v)}
+            className="map-fullscreen-pill"
+            style={{
+              border: showColleges ? "none" : "1px solid var(--color-border)",
+              background: showColleges ? "#1e293b" : "var(--color-surface)",
+              color: showColleges ? "#fff" : "var(--color-text)",
+            }}
+          >
+            🎓 Colleges
+          </button>
         </div>
 
         <MapContainer
@@ -141,6 +252,30 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+
+          <LocateButton onLocate={setUserPos} />
+
+          {userPos && (
+            <Marker position={userPos} icon={userLocationIcon}>
+              <Popup>You are here</Popup>
+            </Marker>
+          )}
+
+          {showColleges &&
+            indoreColleges.map((college) => (
+              <Marker
+                key={college.name}
+                position={[college.latitude, college.longitude]}
+                icon={collegeIcon}
+              >
+                <Popup>
+                  <strong>{college.name}</strong>
+                  <br />
+                  {college.address}
+                </Popup>
+              </Marker>
+            ))}
+
           {visibleRooms.map((room) => (
             <Marker
               key={room._id}
@@ -155,6 +290,15 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                 ₹{room.price}/month
                 <br />
                 <Link to={`/rooms/${room._id}`}>View details</Link>
+                <br />
+                <a
+                  href={directionsUrl(room.latitude, room.longitude)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="map-directions-link"
+                >
+                  Get Directions
+                </a>
               </Popup>
             </Marker>
           ))}
