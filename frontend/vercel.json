@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "https://roomslider-api.onrender.com/sitemap.xml" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

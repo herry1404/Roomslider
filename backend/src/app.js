@@ -19,6 +19,7 @@ const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
+const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
 
 
 const {
@@ -271,6 +272,12 @@ app.use(
 app.use(
   "/api/hourly-rooms",
   hourlyRoomRoutes
+);
+
+// ✅ SITEMAP ROUTE (for SEO)
+app.use(
+  "/sitemap.xml",
+  sitemapRoutes
 );
 
 
