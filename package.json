@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0",
-    "mongodb": "^7.5.0"
+    "leaflet.markercluster": "^1.5.3",
+    "mongodb": "^7.5.0",
+    "react-leaflet-cluster": "^4.1.3"
   }
 }

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
+import MapLayout from "./layouts/MapLayout";
 import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home/Home";
@@ -69,7 +70,7 @@ function App() {
         <Route path="/mess/login" element={<MessLogin />} />
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
-        <Route path="/map" element={<MainLayout><MapView /></MainLayout>} />
+        <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
         <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
