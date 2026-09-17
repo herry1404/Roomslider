@@ -33,12 +33,20 @@ const userLocationIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
+const collegePinSvg = `
+<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17 0C7.6 0 0 7.6 0 17c0 11.5 17 27 17 27s17-15.5 17-27C34 7.6 26.4 0 17 0z" fill="#1d4ed8"/>
+  <circle cx="17" cy="17" r="11" fill="#ffffff"/>
+  <path d="M17 10l-8 3.6 8 3.6 6.5-2.9v4.3h1.3v-5l-7.8-3.6z" fill="#111827"/>
+  <path d="M11.5 15.4v3.4c0 1.5 2.5 2.7 5.5 2.7s5.5-1.2 5.5-2.7v-3.4L17 17.3l-5.5-1.9z" fill="#111827"/>
+</svg>`;
+
 const collegeIcon = L.divIcon({
   className: "college-marker",
-  html: '<div class="college-marker-badge">🎓</div>',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [0, -15],
+  html: collegePinSvg,
+  iconSize: [34, 44],
+  iconAnchor: [17, 44],
+  popupAnchor: [0, -40],
 });
 
 const filters = [
@@ -50,9 +58,6 @@ const filters = [
 ];
 
 const INDORE_CENTER = [22.7196, 75.8577];
-
-const directionsUrl = (lat, lng) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
 function LocateButton({ onLocate }) {
   const map = useMap();
@@ -190,27 +195,10 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
             border: 2px solid white;
             box-shadow: 0 0 0 4px rgba(66,133,244,0.35);
           }
-          .college-marker-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #1e293b;
-            border: 2px solid white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-          }
           @keyframes mapLocatePulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
-          }
-          .map-directions-link {
-            color: var(--color-primary);
-            font-weight: 600;
-            text-decoration: none;
           }
         `}</style>
 
@@ -290,15 +278,6 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                 ₹{room.price}/month
                 <br />
                 <Link to={`/rooms/${room._id}`}>View details</Link>
-                <br />
-                <a
-                  href={directionsUrl(room.latitude, room.longitude)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="map-directions-link"
-                >
-                  Get Directions
-                </a>
               </Popup>
             </Marker>
           ))}
