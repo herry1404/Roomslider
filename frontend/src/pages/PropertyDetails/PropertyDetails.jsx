@@ -15,6 +15,7 @@ import {
   UserCircle2,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -35,6 +36,7 @@ function PropertyDetails() {
   const [loading, setLoading] = useState(true);
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const touchStartX = useRef(null);
 
   useEffect(() => {
@@ -155,6 +157,8 @@ function PropertyDetails() {
                 alt={room.title}
                 className="main-property-image"
                 draggable={false}
+                onClick={() => setIsFullscreen(true)}
+                style={{ cursor: "zoom-in" }}
               />
 
               {images.length > 1 && (
@@ -430,6 +434,65 @@ function PropertyDetails() {
 
         </div>
       )}
+
+    {isFullscreen && (
+      <div
+        className="fullscreen-overlay"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <button
+          type="button"
+          className="fullscreen-close-btn"
+          aria-label="Close fullscreen"
+          onClick={() => setIsFullscreen(false)}
+        >
+          <X size={28} />
+        </button>
+
+        <img
+          src={selectedImage}
+          alt={room.title}
+          className="fullscreen-image"
+          draggable={false}
+        />
+
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="fullscreen-nav-btn fullscreen-nav-prev"
+              aria-label="Previous image"
+              onClick={goPrev}
+            >
+              <ChevronLeft size={32} />
+            </button>
+
+            <button
+              type="button"
+              className="fullscreen-nav-btn fullscreen-nav-next"
+              aria-label="Next image"
+              onClick={goNext}
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            <div className="fullscreen-dots">
+              {images.map((_, index) => (
+                <span
+                  key={index}
+                  className={
+                    index === currentIndex
+                      ? "image-dot active"
+                      : "image-dot"
+                  }
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    )}
 
     </section>
   );
