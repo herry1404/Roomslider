@@ -45,10 +45,6 @@ function Home() {
       <Categories />
 
       <section className="container" style={{ padding: "16px 0" }}>
-        <SavingsCalculator />
-      </section>
-
-      <section className="container" style={{ padding: "16px 0" }}>
         <HourlyBanner />
       </section>
 
@@ -79,6 +75,9 @@ function Home() {
           />
         </>
       )}
+      <section className="container" style={{ padding: "16px 0" }}>
+        <SavingsCalculator />
+      </section>
     </>
   );
 }

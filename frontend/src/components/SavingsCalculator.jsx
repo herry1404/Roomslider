@@ -16,7 +16,8 @@ export default function SavingsCalculator() {
     <>
       <style>{`
         .sc-wrapper {
-          background: #F7F7F5;
+          background: var(--color-surface-2);
+          color: var(--color-text);
           border-radius: 16px;
           padding: 24px;
           max-width: 600px;
@@ -32,7 +33,7 @@ export default function SavingsCalculator() {
         }
         .sc-subtitle {
           font-size: 14px;
-          color: #666;
+          color: var(--color-text-light);
           margin: 0 0 20px;
         }
         .sc-slider-row {
@@ -43,7 +44,7 @@ export default function SavingsCalculator() {
         }
         .sc-slider-label {
           font-size: 14px;
-          color: #666;
+          color: var(--color-text-light);
           white-space: nowrap;
         }
         .sc-slider-row input[type="range"] {
@@ -62,14 +63,14 @@ export default function SavingsCalculator() {
           margin-bottom: 16px;
         }
         .sc-card {
-          background: #fff;
-          border: 1px solid #E5E5E0;
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
           border-radius: 10px;
           padding: 14px 16px;
         }
         .sc-card-label {
           font-size: 12px;
-          color: #666;
+          color: var(--color-text-light);
           margin: 0 0 4px;
         }
         .sc-card-value {
@@ -77,10 +78,10 @@ export default function SavingsCalculator() {
           font-weight: 600;
           margin: 0;
         }
-        .sc-broker-value { color: #C0392B; }
-        .sc-rs-value { color: #1D9E75; }
+        .sc-broker-value { color: var(--color-error); }
+        .sc-rs-value { color: var(--color-primary); }
         .sc-savings-box {
-          background: #E1F5EE;
+          background: color-mix(in srgb, var(--color-primary) 15%, transparent);
           border-radius: 10px;
           padding: 14px 18px;
           display: flex;
@@ -90,26 +91,26 @@ export default function SavingsCalculator() {
         }
         .sc-savings-label {
           font-size: 14px;
-          color: #0F6E56;
+          color: var(--color-primary-hover);
         }
         .sc-savings-value {
           font-size: 20px;
           font-weight: 700;
-          color: #0F6E56;
+          color: var(--color-primary-hover);
         }
         .sc-cta {
           width: 100%;
           padding: 12px;
           font-size: 15px;
           font-weight: 600;
-          background: #1D9E75;
-          color: #fff;
+          background: var(--color-primary);
+          color: var(--color-background);
           border: none;
           border-radius: 10px;
           cursor: pointer;
         }
         .sc-cta:hover {
-          background: #0F6E56;
+          background: var(--color-primary-hover);
         }
 
         /* Laptop / desktop view — screen 768px se bada */
