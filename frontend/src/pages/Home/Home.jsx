@@ -5,6 +5,7 @@ import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
 import HourlyBanner from "../../components/home/HourlyBanner";
 import CategorySection from "../../components/home/CategorySection";
+import SavingsCalculator from "../../components/SavingsCalculator";
 import api from "../../api/axios";
 
 function Home() {
@@ -42,6 +43,10 @@ function Home() {
 
       <Hero />
       <Categories />
+
+      <section className="container" style={{ padding: "16px 0" }}>
+        <SavingsCalculator />
+      </section>
 
       <section className="container" style={{ padding: "16px 0" }}>
         <HourlyBanner />

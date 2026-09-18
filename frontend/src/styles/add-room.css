@@ -288,45 +288,193 @@ textarea{
 
     .preview-grid{
 
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(3,1fr);
 
     }
 
 }
+
+/* ---------- TABLET / PHONE ---------- */
 
 @media(max-width:768px){
 
-    .input-grid{
+    .add-room-page{
 
-        grid-template-columns:1fr;
-
-    }
-
-    .amenities-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-    }
-
-}
-
-@media(max-width:500px){
-
-    .preview-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .amenities-grid{
-
-        grid-template-columns:1fr;
+        padding:14px 10px;
 
     }
 
     .add-room-card{
 
-        padding:20px;
+        padding:18px 14px;
+
+        border-radius:16px;
+
+        box-shadow:0 6px 20px rgba(0,0,0,.06);
+
+    }
+
+    .add-room-card h1{
+
+        font-size:22px;
+
+        margin-bottom:18px;
+
+    }
+
+    .form-section{
+
+        margin-bottom:18px;
+
+        padding-bottom:16px;
+
+    }
+
+    .form-section h2{
+
+        font-size:16px;
+
+        margin-bottom:12px;
+
+    }
+
+    /* inputs 2 column -> 1 column, but tight gap */
+    .input-grid{
+
+        grid-template-columns:1fr;
+
+        gap:10px;
+
+    }
+
+    /* font 16px = iPhone zoom nahi karega input pe */
+    input,
+    select,
+    textarea{
+
+        padding:11px 12px;
+
+        font-size:16px;
+
+        border-radius:10px;
+
+    }
+
+    textarea{
+
+        min-height:90px;
+
+    }
+
+    .checkbox{
+
+        margin-top:12px;
+
+        font-size:14px;
+
+    }
+
+    .preview-grid{
+
+        grid-template-columns:repeat(3,1fr);
+
+        gap:8px;
+
+        margin-top:12px;
+
+    }
+
+    .preview-card img{
+
+        height:90px;
+
+    }
+
+    .preview-card button{
+
+        padding:6px;
+
+        font-size:12px;
+
+    }
+
+    .amenities-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:8px;
+
+    }
+
+    .amenities-grid label{
+
+        padding:8px 10px;
+
+        gap:8px;
+
+        font-size:13px;
+
+        border-radius:10px;
+
+    }
+
+    .amenities-grid input{
+
+        width:16px;
+        height:16px;
+
+        padding:0;
+
+        flex-shrink:0;
+
+    }
+
+    /* Publish button neeche chipka rahe, scroll karna na pade */
+    .publish-btn{
+
+        position:sticky;
+
+        bottom:10px;
+
+        z-index:5;
+
+        padding:14px;
+
+        font-size:16px;
+
+        border-radius:12px;
+
+        box-shadow:0 6px 18px rgba(0,0,0,.2);
+
+    }
+
+}
+
+/* ---------- SMALL PHONE ---------- */
+
+@media(max-width:500px){
+
+    .preview-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .preview-card img{
+
+        height:100px;
+
+    }
+
+    .amenities-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .add-room-card{
+
+        padding:14px 12px;
 
     }
 

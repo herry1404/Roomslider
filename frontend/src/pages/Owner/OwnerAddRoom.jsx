@@ -37,9 +37,6 @@ function OwnerAddRoom() {
         rooms: "",
         bathrooms: "",
         furnished: false,
-        ownerName: "",
-        contact: "",
-        whatsapp: "",
         description: "",
         amenities: [],
         nearby: [],
@@ -116,9 +113,6 @@ function OwnerAddRoom() {
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
             data.append("furnished", formData.furnished);
-            data.append("ownerName", formData.ownerName);
-            data.append("contact", formData.contact);
-            data.append("whatsapp", formData.whatsapp);
             data.append("description", formData.description);
             data.append("amenities", JSON.stringify(formData.amenities));
             data.append("nearby", JSON.stringify(formData.nearby));
@@ -321,36 +315,6 @@ function OwnerAddRoom() {
                             />
                             Fully Furnished
                         </label>
-                    </div>
-
-                    <div className="form-section">
-                        <h2>Owner Details</h2>
-
-                        <div className="input-grid">
-                            <input
-                                type="text"
-                                name="ownerName"
-                                placeholder="Owner Name"
-                                value={formData.ownerName}
-                                onChange={handleChange}
-                            />
-
-                            <input
-                                type="text"
-                                name="contact"
-                                placeholder="Contact Number"
-                                value={formData.contact}
-                                onChange={handleChange}
-                            />
-
-                            <input
-                                type="text"
-                                name="whatsapp"
-                                placeholder="WhatsApp Number"
-                                value={formData.whatsapp}
-                                onChange={handleChange}
-                            />
-                        </div>
                     </div>
 
                     <div className="form-section">

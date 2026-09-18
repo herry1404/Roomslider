@@ -95,6 +95,9 @@ const createRoom = async (req, res) => {
     // If an owner (not admin) is creating this room, auto-tag it as theirs
     if (req.user.role === "owner") {
       roomData.owner = req.user._id;
+      roomData.ownerName = req.user.name || roomData.ownerName;
+      roomData.contact = req.user.phone || roomData.contact;
+      roomData.whatsapp = roomData.whatsapp || req.user.phone;
     }
 
     const room = await Room.create(roomData);
@@ -418,6 +421,9 @@ const createBulkRooms = async (req, res) => {
 
     if (req.user.role === "owner") {
       baseData.owner = req.user._id;
+      baseData.ownerName = req.user.name || baseData.ownerName;
+      baseData.contact = req.user.phone || baseData.contact;
+      baseData.whatsapp = baseData.whatsapp || req.user.phone;
     }
 
     const roomDocs = [];
