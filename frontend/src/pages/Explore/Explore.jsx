@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import MessBanner from "../../components/home/MessBanner";
 import LaundryBanner from "../../components/explore/LaundryBanner";
+import ComingSoonServices from "../../components/explore/ComingSoonServices";
 
 function Explore() {
   return (
@@ -16,9 +17,7 @@ function Explore() {
         <LaundryBanner />
       </div>
 
-      <p style={{ marginTop: "24px", color: "var(--color-text-light)", fontSize: "13.5px" }}>
-        More services coming soon.
-      </p>
+      <ComingSoonServices />
     </div>
   );
 }
