@@ -72,10 +72,10 @@ function App() {
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
-        <Route path="/rooms/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/pg/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/hostels/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/flats/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
+        <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />

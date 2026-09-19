@@ -132,13 +132,15 @@ function PropertyDetails() {
     touchStartX.current = null;
   };
 
-  const callLink = room.contact
+  const callLink = room.contact && user
     ? `tel:${room.contact}`
     : null;
 
-  const whatsappLink = room.whatsapp
+  const whatsappLink = room.whatsapp && user
     ? `https://wa.me/91${room.whatsapp.replace(/\D/g, "")}`
     : null;
+
+  const guestContact = !user && (room.contact || room.whatsapp);
 
   return (
     <section className="property-details container">
@@ -383,6 +385,16 @@ function PropertyDetails() {
                 </div>
 
                 <div className="owner-contact-btns">
+                  {guestContact && (
+                    <Link
+                      to="/login"
+                      state={{ from: window.location.pathname }}
+                      className="contact-btn call-btn"
+                    >
+                      <Phone size={16} />
+                      Login to view contact
+                    </Link>
+                  )}
 
                   {callLink && (
                     <a
@@ -418,8 +430,19 @@ function PropertyDetails() {
 
       </div>
 
-            {(callLink || whatsappLink) && (
+            {(callLink || whatsappLink || guestContact) && (
         <div className={`mobile-sticky-bar ${navHidden ? "mobile-sticky-bar-visible" : ""}`}>
+
+          {guestContact && (
+            <Link
+              to="/login"
+              state={{ from: window.location.pathname }}
+              className="sticky-btn call-btn"
+            >
+              <Phone size={18} />
+              Login to view contact
+            </Link>
+          )}
 
           {callLink && (
             <a

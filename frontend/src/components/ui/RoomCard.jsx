@@ -37,14 +37,6 @@ function RoomCard({ room, onWishlistChange }) {
 
     const detailsPath = roomPath(room);
 
-    // Login required: guest ko login page pe bhejo
-    if (!user) {
-      toast.error("Login first", {
-        id: "login-first",
-      });
-      navigate("/login", { state: { from: detailsPath } });
-      return;
-    }
 
     navigate(detailsPath);
   };
