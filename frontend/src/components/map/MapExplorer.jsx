@@ -1,9 +1,9 @@
 import { roomPath } from "../../utils/roomUrl";
-import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MapPin, X, LocateFixed } from "lucide-react";
 import api from "../../api/axios";
 import indoreColleges from "../../data/indoreColleges";
@@ -84,10 +84,44 @@ const filters = [
 
 const INDORE_CENTER = [22.7196, 75.8577];
 
-const INDIA_BOUNDS = [
-  [6.0, 68.0],
-  [37.5, 97.5],
+const MP_BOUNDS = [
+  [20.9, 73.9],
+  [27.0, 82.95],
 ];
+
+const CATEGORY_COLORS = {
+  Room: "#22c55e",
+  PG: "#60a5fa",
+  Hostel: "#f59e0b",
+  Flat: "#ec4899",
+};
+
+const HOME_SVG =
+  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>';
+
+const formatPrice = (p) => {
+  const n = Number(p) || 0;
+  if (n < 1000) return `₹${n}`;
+  return `₹${String(Math.round(n / 100) / 10).replace(/\.0$/, "")}k`;
+};
+
+const priceIconCache = {};
+const getPriceIcon = (room, selected) => {
+  const label = formatPrice(room.price);
+  const color = CATEGORY_COLORS[room.category] || "#94a3b8";
+  const key = `${color}|${label}|${selected}`;
+  if (!priceIconCache[key]) {
+    priceIconCache[key] = L.divIcon({
+      className: "rs-icon",
+      html: `<div class="rs-pill${selected ? " rs-pill-sel" : ""}" style="--c:${color}">${HOME_SVG}${label}</div>`,
+      iconSize: [0, 0],
+    });
+  }
+  return priceIconCache[key];
+};
+
+const makeClusterHtml = (count) =>
+  `<div class="rs-pill rs-cluster${count >= 100 ? " rs-cluster-big" : ""}" style="--c:#22c55e">${HOME_SVG}${count}</div>`;
 
 function LocateButton({ onLocate }) {
   const map = useMap();
@@ -99,6 +133,10 @@ function LocateButton({ onLocate }) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
+        if (!L.latLngBounds(MP_BOUNDS).contains([latitude, longitude])) {
+          setLocating(false);
+          return;
+        }
         map.flyTo([latitude, longitude], 15);
         onLocate([latitude, longitude]);
         setLocating(false);
@@ -114,7 +152,7 @@ function LocateButton({ onLocate }) {
       className="map-locate-btn"
       style={{
         position: "absolute",
-        bottom: "16px",
+        bottom: "132px",
         right: "12px",
         zIndex: 1000,
         width: "44px",
@@ -146,6 +184,7 @@ function AutoLocate({ onLocate }) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
+        if (!L.latLngBounds(MP_BOUNDS).contains([latitude, longitude])) return;
         map.setView([latitude, longitude], 15);
         onLocate([latitude, longitude]);
       },
@@ -160,6 +199,62 @@ function AutoLocate({ onLocate }) {
   return null;
 }
 
+const getRoomImage = (room) => {
+  const first = Array.isArray(room.images) ? room.images[0] : room.image;
+  const url = typeof first === "string" ? first : first?.url;
+  return typeof url === "string" && url.startsWith("http") ? url : "";
+};
+
+function FlyToSelected({ room }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!room) return;
+    const zoom = Math.max(map.getZoom(), 15);
+    const pt = map.project([room.latitude, room.longitude], zoom).add([0, 35]);
+    map.flyTo(map.unproject(pt, zoom), zoom, { duration: 0.6 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?._id]);
+
+  return null;
+}
+
+function LockToBounds({ bounds }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const apply = () => {
+      map.invalidateSize();
+      map.setMinZoom(map.getBoundsZoom(bounds, true));
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(map.getContainer());
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
+
+  return null;
+}
+
+function ViewCounter({ rooms, onCount }) {
+  const map = useMap();
+
+  const update = () => {
+    const b = map.getBounds();
+    onCount(rooms.filter((r) => b.contains([r.latitude, r.longitude])).length);
+  };
+
+  useMapEvents({ moveend: update, zoomend: update });
+
+  useEffect(() => {
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms.length, rooms[0]?._id]);
+
+  return null;
+}
+
 function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen = false }) {
   const [rooms, setRooms] = useState([]);
   const [messes, setMesses] = useState([]);
@@ -169,6 +264,11 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   const [userPos, setUserPos] = useState(null);
   const [showColleges, setShowColleges] = useState(false);
   const [showMess, setShowMess] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [inViewCount, setInViewCount] = useState(0);
+  const rowRef = useRef(null);
+  const lockRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -204,6 +304,36 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   const messWithCoords = messes.filter(
     (m) => m.location?.coordinates?.length === 2
   );
+
+  const cardRooms = visibleRooms;
+  const selectedRoom = cardRooms.find((r) => r._id === selectedId) || null;
+  const CARD_STEP = 260;
+
+  const scrollToCard = (idx) => {
+    if (!rowRef.current || idx < 0) return;
+    lockRef.current = true;
+    rowRef.current.scrollTo({ left: idx * CARD_STEP, behavior: "smooth" });
+    setTimeout(() => {
+      lockRef.current = false;
+    }, 700);
+  };
+
+  const selectRoom = (id) => {
+    setSelectedId(id);
+    scrollToCard(cardRooms.findIndex((r) => r._id === id));
+  };
+
+  const handleRowScroll = (e) => {
+    if (lockRef.current || cardRooms.length === 0) return;
+    const idx = Math.round(e.currentTarget.scrollLeft / CARD_STEP);
+    const room = cardRooms[Math.max(0, Math.min(cardRooms.length - 1, idx))];
+    if (room && room._id !== selectedId) setSelectedId(room._id);
+  };
+
+  const handleCardClick = (room) => {
+    if (room._id === selectedId) navigate(roomPath(room));
+    else selectRoom(room._id);
+  };
 
   if (fullscreen) {
     return (
@@ -265,18 +395,91 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
           }
-          .marker-cluster-custom {
-            background: rgba(37, 99, 235, 0.85);
-            border-radius: 50%;
+          .rs-pill {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1.5px solid var(--c, #22c55e);
+            white-space: nowrap;
+            cursor: pointer;
+          }
+          .rs-pill svg { color: var(--c, #22c55e); flex-shrink: 0; }
+          .rs-row {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 0 calc(50% - 125px);
+            scrollbar-width: none;
+            pointer-events: none;
+          }
+          .rs-row::-webkit-scrollbar { display: none; }
+          .map-fullscreen-wrap .leaflet-top.leaflet-right { margin-top: 56px; }
+          .rs-count {
+            position: absolute;
+            left: 14px;
+            bottom: 124px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #22c55e;
+            color: #052e16;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+          }
+          .rs-card {
+            flex: 0 0 250px;
+            scroll-snap-align: center;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            cursor: pointer;
+            pointer-events: auto;
+          }
+          .rs-card { user-select: none; -webkit-user-select: none; }
+          .rs-card-sel { border: 1.5px solid #22c55e; }
+          .rs-thumb {
+            flex: 0 0 76px;
+            height: 76px;
+            border-radius: 12px;
+            background: #1e293b;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 13px;
-            border: 2px solid white;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+            color: #64748b;
           }
+          .rs-thumb img { width: 100%; height: 100%; object-fit: cover; }
+          .rs-card-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .rs-card-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+          .rs-card-price { margin-top: 8px; font-size: 14px; font-weight: 600; color: #22c55e; }
+          .rs-pill-sel { background: var(--c); color: #0b1220; border-color: #fff; z-index: 1000; }
+          .rs-pill-sel svg { color: #0b1220; }
+          body.dark .map-fullscreen-wrap .leaflet-marker-icon.rs-icon { filter: none; }
+          .rs-cluster { font-size: 13px; padding: 6px 12px; }
+          .rs-cluster-big { background: #22c55e; color: #052e16; border-color: #22c55e; }
+          .rs-cluster-big svg { color: #052e16; }
         `}</style>
 
         <div className="map-fullscreen-filters">
@@ -324,15 +527,20 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           zoom={12}
           style={{ height: "100%", width: "100%" }}
           attributionControl={false}
-          maxBounds={INDIA_BOUNDS}
+          zoomControl={false}
+          maxBounds={MP_BOUNDS}
           maxBoundsViscosity={1.0}
-          minZoom={5}
+          minZoom={6}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
+          <LockToBounds bounds={MP_BOUNDS} />
           <AutoLocate onLocate={setUserPos} />
+          <FlyToSelected room={selectedRoom} />
+          <ZoomControl position="topright" />
+          <ViewCounter rooms={visibleRooms} onCount={setInViewCount} />
           <LocateButton onLocate={setUserPos} />
 
           {userPos && (
@@ -379,9 +587,9 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
             chunkedLoading
             iconCreateFunction={(cluster) =>
               L.divIcon({
-                html: `<div class="marker-cluster-custom" style="width:38px;height:38px;">${cluster.getChildCount()}</div>`,
-                className: "",
-                iconSize: [38, 38],
+                html: makeClusterHtml(cluster.getChildCount()),
+                className: "rs-icon",
+                iconSize: [0, 0],
               })
             }
           >
@@ -389,21 +597,47 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
               <Marker
                 key={room._id}
                 position={[room.latitude, room.longitude]}
-                icon={categoryIcons[room.category] || defaultIcon}
-              >
-                <Popup>
-                  <strong>{room.title}</strong>
-                  <br />
-                  {room.category}
-                  <br />
-                  ₹{room.price}/month
-                  <br />
-                  <Link to={roomPath(room)}>View details</Link>
-                </Popup>
-              </Marker>
+                icon={getPriceIcon(room, room._id === selectedId)}
+                zIndexOffset={room._id === selectedId ? 1000 : 0}
+                eventHandlers={{ click: () => selectRoom(room._id) }}
+              />
             ))}
           </MarkerClusterGroup>
         </MapContainer>
+
+        {inViewCount > 0 && (
+          <div className="rs-count">
+            <MapPin size={13} />
+            {inViewCount} {inViewCount === 1 ? "room" : "rooms"} in this area
+          </div>
+        )}
+
+        {cardRooms.length > 0 && (
+          <div className="rs-row" ref={rowRef} onScroll={handleRowScroll}>
+            {cardRooms.map((room) => {
+              const img = getRoomImage(room);
+              return (
+                <div
+                  key={room._id}
+                  className={`rs-card${room._id === selectedId ? " rs-card-sel" : ""}`}
+                  onClick={() => handleCardClick(room)}
+                >
+                  <div className="rs-thumb">
+                    {img ? <img src={img} alt="" loading="lazy" /> : <MapPin size={22} />}
+                  </div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div className="rs-card-title">{room.title}</div>
+                    <div className="rs-card-meta">
+                      {room.category}
+                      {room.gender && room.gender !== "Any" ? ` · ${room.gender}` : ""}
+                    </div>
+                    <div className="rs-card-price">₹{room.price}/mo</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {!loading && visibleRooms.length === 0 && (
           <div
