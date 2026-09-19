@@ -8,7 +8,8 @@ const {
   getMyTenancy,
   giveVacateNotice,
   cancelVacateNotice,
-  updatePhone
+  updatePhone,
+  updatePreferences
 } = require("../controllers/auth.controller");
 
 const { protect } = require("../middleware/auth.middleware");
@@ -32,6 +33,9 @@ router.get("/my-tenancy", protect, getMyTenancy);
 
 // Add/update phone number (post-Google-login binding)
 router.patch("/update-phone", protect, updatePhone);
+
+// Add/update preferred college and area (onboarding popup)
+router.patch("/update-preferences", protect, updatePreferences);
 
 // Give / cancel a vacate notice
 router.post("/vacate-notice", protect, giveVacateNotice);

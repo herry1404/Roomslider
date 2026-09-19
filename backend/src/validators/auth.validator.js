@@ -24,6 +24,22 @@ const registerSchema = z.object({
     .max(100, "Password is too long"),
 });
 
+const preferencesSchema = z.object({
+  preferredCollege: z
+    .string()
+    .trim()
+    .min(1, "College is required")
+    .nullable()
+    .optional(),
+
+  preferredArea: z
+    .string()
+    .trim()
+    .min(1, "Area is required")
+    .nullable()
+    .optional(),
+});
+
 const loginSchema = z.object({
   identifier: z
     .string()
@@ -38,4 +54,5 @@ const loginSchema = z.object({
 module.exports = {
   registerSchema,
   loginSchema,
+  preferencesSchema,
 };

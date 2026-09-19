@@ -1,5 +1,5 @@
 const User = require("../models/user.model");
-const { registerSchema, loginSchema } = require("../validators/auth.validator");
+const { registerSchema, loginSchema, preferencesSchema } = require("../validators/auth.validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
@@ -537,6 +537,62 @@ const updatePhone = async (req, res) => {
 };
 
 
+// ======================
+// UPDATE PREFERENCES (preferred college & area, from onboarding popup)
+// ======================
+
+const updatePreferences = async (req, res) => {
+
+  try {
+
+    const validatedData = preferencesSchema.parse(req.body);
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        preferredCollege: validatedData.preferredCollege,
+        preferredArea: validatedData.preferredArea,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+
+      success: true,
+      message: "Preferences updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        preferredCollege: user.preferredCollege,
+        preferredArea: user.preferredArea,
+      },
+
+    });
+
+  } catch (error) {
+
+    console.error("UPDATE PREFERENCES ERROR 👉", error);
+
+    if (error.name === "ZodError") {
+
+      return res.status(400).json({
+        success: false,
+        message: error.issues[0]?.message || "Invalid input",
+        errors: error.issues,
+      });
+
+    }
+
+    return res.status(500).json({ success: false, message: error.message });
+
+  }
+
+};
+
+
 module.exports = {
   register,
   login,
@@ -545,4 +601,5 @@ module.exports = {
   giveVacateNotice,
   cancelVacateNotice,
   updatePhone,
+  updatePreferences,
 };

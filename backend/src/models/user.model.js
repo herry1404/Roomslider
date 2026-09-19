@@ -64,6 +64,18 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // Preferred college and area, set via onboarding popup, used to
+    // order/label rooms on the map by distance from this reference point
+    preferredCollege: {
+      type: String,
+      default: null,
+    },
+
+    preferredArea: {
+      type: String,
+      default: null,
+    },
+
 
   },
   {
