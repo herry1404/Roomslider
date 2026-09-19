@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import {
+  UtensilsCrossed,
+  Shirt,
+  ArrowRight,
   Sparkles,
   Truck,
   Sofa,
@@ -11,7 +15,7 @@ import {
   Bike,
 } from "lucide-react";
 
-const services = [
+const comingSoon = [
   { icon: Sparkles, title: "Cleaning & Housekeeping", desc: "Room and bathroom cleaning" },
   { icon: Truck, title: "Packers & Movers", desc: "Easy shifting to your new place" },
   { icon: Sofa, title: "Furniture & Appliance Rental", desc: "Bed, cooler, AC, fridge on rent" },
@@ -24,53 +28,87 @@ const services = [
   { icon: Bike, title: "Bike & Scooty Rental", desc: "Rent a bike or scooty by the day" },
 ];
 
-function ComingSoonServices() {
-  return (
-    <div style={{ marginTop: "28px" }}>
-      <h3 style={{ marginBottom: "14px" }}>More services coming soon</h3>
+const cardStyle = {
+  background: "var(--color-surface-2, #f3f4f6)",
+  border: "1px solid var(--color-border, rgba(128,128,128,0.25))",
+  borderRadius: "14px",
+  padding: "14px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "6px",
+};
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          gap: "12px",
-        }}
-      >
-        {services.map(({ icon: Icon, title, desc }) => (
-          <div
-            key={title}
-            style={{
-              background: "var(--color-surface-2, #f3f4f6)",
-              border: "1px solid var(--color-border, rgba(128,128,128,0.25))",
-              borderRadius: "14px",
-              padding: "14px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-            }}
-          >
-            <Icon size={22} color="var(--color-primary, #16a34a)" />
-            <div style={{ fontWeight: 600, fontSize: "14px", color: "var(--color-text)" }}>
-              {title}
-            </div>
-            <div style={{ fontSize: "12.5px", color: "var(--color-text-light)" }}>{desc}</div>
-            <span
-              style={{
-                alignSelf: "flex-start",
-                marginTop: "4px",
-                fontSize: "11px",
-                fontWeight: 600,
-                padding: "3px 9px",
-                borderRadius: "999px",
-                background: "var(--color-primary, #16a34a)",
-                color: "#fff",
-              }}
-            >
-              Coming Soon
-            </span>
-          </div>
-        ))}
-      </div>
+const titleStyle = { fontWeight: 600, fontSize: "14px", color: "var(--color-text)" };
+const descStyle = { fontSize: "12.5px", color: "var(--color-text-light)" };
+
+const pillStyle = {
+  alignSelf: "flex-start",
+  marginTop: "4px",
+  fontSize: "11px",
+  fontWeight: 600,
+  padding: "3px 9px",
+  borderRadius: "999px",
+  background: "var(--color-primary, #16a34a)",
+  color: "#fff",
+  border: "none",
+  display: "flex",
+  alignItems: "center",
+  gap: "4px",
+};
+
+function ComingSoonServices() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const liveServices = [
+    {
+      icon: UtensilsCrossed,
+      title: "Hungry? Order a Thali",
+      desc: "Find mess near you with today's menu & pricing",
+      button: "Explore Mess",
+      onClick: () => navigate("/mess"),
+    },
+    {
+      icon: Shirt,
+      title: "Need Laundry?",
+      desc: "Get your building's laundry vendor contact instantly",
+      button: "Explore Laundry",
+      onClick: () => navigate(user ? "/my-place" : "/login"),
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: "12px",
+      }}
+    >
+      {liveServices.map(({ icon: Icon, title, desc, button, onClick }) => (
+        <div
+          key={title}
+          onClick={onClick}
+          style={{ ...cardStyle, cursor: "pointer" }}
+        >
+          <Icon size={22} color="var(--color-primary, #16a34a)" />
+          <div style={titleStyle}>{title}</div>
+          <div style={descStyle}>{desc}</div>
+          <button type="button" style={{ ...pillStyle, cursor: "pointer" }}>
+            {button}
+            <ArrowRight size={12} />
+          </button>
+        </div>
+      ))}
+
+      {comingSoon.map(({ icon: Icon, title, desc }) => (
+        <div key={title} style={cardStyle}>
+          <Icon size={22} color="var(--color-primary, #16a34a)" />
+          <div style={titleStyle}>{title}</div>
+          <div style={descStyle}>{desc}</div>
+          <span style={pillStyle}>Coming Soon</span>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import MessBanner from "../../components/home/MessBanner";
-import LaundryBanner from "../../components/explore/LaundryBanner";
 import ComingSoonServices from "../../components/explore/ComingSoonServices";
 
 function Explore() {
@@ -11,11 +9,6 @@ function Explore() {
       </Helmet>
 
       <h2 style={{ marginBottom: "16px" }}>Explore Services</h2>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-        <MessBanner />
-        <LaundryBanner />
-      </div>
 
       <ComingSoonServices />
     </div>
