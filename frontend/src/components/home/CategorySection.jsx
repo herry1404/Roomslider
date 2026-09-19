@@ -19,7 +19,18 @@ function CategorySection({ title, viewAllPath, rooms }) {
 
   const goToDetails = (room) => {
     const base = categoryPathMap[room.category] || "rooms";
-    navigate(`/${base}/${room._id}`);
+    const detailsPath = `/${base}/${room._id}`;
+
+    // Login required: guest ko login page pe bhejo
+    if (!user) {
+      toast.error("Login first", {
+        id: "login-first",
+      });
+      navigate("/login", { state: { from: detailsPath } });
+      return;
+    }
+
+    navigate(detailsPath);
   };
 
   const toggleWishlist = async (roomId) => {

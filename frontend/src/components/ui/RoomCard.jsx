@@ -8,12 +8,7 @@ import { useWishlist } from "../../context/WishlistContext";
 
 import "../../styles/room-card.css";
 
-// FIX (slow images bug): Cloudinary URLs support "on-the-fly" resizing
-// via the URL itself — no re-upload needed. Original images are stored
-// at 1600x1067, but a card thumbnail only needs ~500px wide. This
-// inserts a transformation segment (w_500,h_320,c_fill,q_auto,f_auto)
-// right after "/upload/" in the Cloudinary URL, so the browser
-// downloads a much smaller file for the card view.
+// Cloudinary on-the-fly thumbnail (small image for cards)
 function getThumbnailUrl(url) {
   if (!url || !url.includes("/upload/")) return url;
   return url.replace("/upload/", "/upload/w_500,h_320,c_fill,q_auto,f_auto/");
@@ -36,16 +31,29 @@ function RoomCard({ room, onWishlistChange }) {
     Flat: "flats",
   };
 
-  const handleDetails = () => {
+  const handleDetails = (e) => {
+    if (e) e.stopPropagation();
+
     const base = categoryPathMap[room.category] || "rooms";
-    navigate(`/${base}/${room._id}`);
+    const detailsPath = `/${base}/${room._id}`;
+
+    // Login required: guest ko login page pe bhejo
+    if (!user) {
+      toast.error("Login first", {
+        id: "login-first",
+      });
+      navigate("/login", { state: { from: detailsPath } });
+      return;
+    }
+
+    navigate(detailsPath);
   };
 
   const handleWishlist = async (e) => {
     e.stopPropagation();
 
     if (!user) {
-      toast.error("Wishlist ke liye pehle login karo");
+      toast.error("Wishlist ke liye pehle login karo", { id: "login-first" });
       navigate("/login");
       return;
     }
