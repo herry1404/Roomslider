@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MapLayout from "./layouts/MapLayout";
 import ScrollToTop from "./components/ScrollToTop";
+import InstallPrompt from "./components/InstallPrompt";
 
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
@@ -61,6 +62,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <InstallPrompt />
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
