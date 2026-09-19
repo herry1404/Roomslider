@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   User,
   Lock,
@@ -17,6 +17,8 @@ import heroRoom from "../../assets/images/hero-room.webp";
 function Login() {
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
   const { login, googleLogin } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -55,7 +57,7 @@ function Login() {
 
     } else {
 
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
 
     }
 
