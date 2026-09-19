@@ -9,7 +9,7 @@ import api from "../../api/axios";
 function CompleteProfile() {
 
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+  const { user, setUser, promptPreferencesNow } = useAuth();
 
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,6 +45,8 @@ function CompleteProfile() {
       toast.success(res.data.message || "Phone number added");
 
       navigate("/", { replace: true });
+
+      promptPreferencesNow(updatedUser);
 
     } catch (error) {
 

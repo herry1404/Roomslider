@@ -19,6 +19,7 @@ import "./styles/footer.css";
 import "./styles/about.css";
 import "./styles/login.css";   // ✅ IMPORTANT
 import "./styles/register.css";
+import "./styles/preferences-modal.css";
 
 import App from "./App";
 import { SpeedInsights } from "@vercel/speed-insights/react";

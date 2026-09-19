@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Search, X, Bell } from "lucide-react";
+import { Search, X, Bell, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 
 import Container from "../ui/Container";
@@ -121,6 +121,14 @@ function Navbar() {
           </nav>
 
           <div className="navbar-actions">
+            <button
+              type="button"
+              className="navbar-map-btn"
+              aria-label="Explore on map"
+              onClick={() => navigate("/map")}
+            >
+              <MapPin size={20} />
+            </button>
             <button
               type="button"
               className="navbar-notification-btn"

@@ -4,6 +4,8 @@ import MainLayout from "./layouts/MainLayout";
 import MapLayout from "./layouts/MapLayout";
 import ScrollToTop from "./components/ScrollToTop";
 import InstallPrompt from "./components/InstallPrompt";
+import PreferencesModal from "./components/onboarding/PreferencesModal";
+import { useAuth } from "./context/AuthContext";
 
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
@@ -60,10 +62,16 @@ import LoginRoute from "./components/LoginRoute";
 import MessRoute from "./components/MessRoute";
 
 function App() {
+
+  const { showPreferences, dismissPreferencesPrompt } = useAuth();
+
   return (
     <>
       <ScrollToTop />
       <InstallPrompt />
+      {showPreferences && (
+        <PreferencesModal onClose={dismissPreferencesPrompt} />
+      )}
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />

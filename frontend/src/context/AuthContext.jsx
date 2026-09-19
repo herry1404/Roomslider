@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 import api from "../api/axios";
@@ -14,6 +14,39 @@ export function AuthProvider({ children }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  const [showPreferences, setShowPreferences] = useState(false);
+
+  const maybePromptPreferences = (userData) => {
+
+    if (!userData || userData.preferredCollege) return;
+
+    const promptKey = `prefsPrompted:${userData.id}`;
+
+    if (localStorage.getItem(promptKey)) return;
+
+    setShowPreferences(true);
+
+  };
+
+  const dismissPreferencesPrompt = () => {
+
+    if (user?.id) {
+      localStorage.setItem(`prefsPrompted:${user.id}`, "1");
+    }
+
+    setShowPreferences(false);
+
+  };
+
+  useEffect(() => {
+
+    if (user) {
+      maybePromptPreferences(user);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const saveSession = (token, userData) => {
     console.log("TOKEN:", token);
     console.log("USER:", userData);
@@ -25,6 +58,7 @@ export function AuthProvider({ children }) {
     if (userData) {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
+      maybePromptPreferences(userData);
     }
   };
 
@@ -58,7 +92,18 @@ export function AuthProvider({ children }) {
 
       console.log("Google Login Response:", res.data);
 
-      saveSession(res.data.token, res.data.user);
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setUser(res.data.user);
+
+        if (!res.data.needsPhone) {
+          maybePromptPreferences(res.data.user);
+        }
+      }
 
       return {
         success: true,
@@ -151,6 +196,8 @@ export function AuthProvider({ children }) {
         messLogin,
         register,
         logout,
+        showPreferences,
+        dismissPreferencesPrompt,
       }}
     >
       {children}
