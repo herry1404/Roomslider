@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
+import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 
 function PG() {
   const [rooms, setRooms] = useState([]);
@@ -27,7 +28,11 @@ function PG() {
   if (loading) {
     return (
       <div className="container" style={{ padding: "40px 0" }}>
-        <h2>Loading...</h2>
+        <div className="skeleton-grid" style={{ marginTop: "30px" }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonRoomCard key={i} />
+          ))}
+        </div>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { BadgeCheck, Home, Link2 } from "lucide-react";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
+import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
 
 function OwnerProfile() {
   const { id } = useParams();
@@ -38,8 +39,8 @@ function OwnerProfile() {
 
   if (loading) {
     return (
-      <div className="container" style={{ padding: "40px 0" }}>
-        <h2>Loading...</h2>
+      <div className="container" style={{ padding: "40px 0", maxWidth: "700px" }}>
+        <SkeletonDetailCard />
       </div>
     );
   }

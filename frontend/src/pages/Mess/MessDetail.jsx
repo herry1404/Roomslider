@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { MapPin, IndianRupee, UtensilsCrossed, Phone } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
 
 function MessDetail() {
   const { id } = useParams();
@@ -79,8 +80,8 @@ function MessDetail() {
 
   if (loading) {
     return (
-      <div className="container" style={{ padding: "40px 0" }}>
-        <h2>Loading...</h2>
+      <div className="container" style={{ padding: "40px 0", maxWidth: "700px" }}>
+        <SkeletonDetailCard />
       </div>
     );
   }

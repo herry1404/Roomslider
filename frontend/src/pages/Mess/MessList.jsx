@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { MapPin } from "lucide-react";
 import api from "../../api/axios";
 import MessCard from "../../components/ui/MessCard";
+import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 
 function MessList() {
   const [messList, setMessList] = useState([]);
@@ -48,7 +49,11 @@ function MessList() {
   if (loading) {
     return (
       <div className="container" style={{ padding: "40px 0" }}>
-        <h2>Loading...</h2>
+        <div className="skeleton-grid" style={{ marginTop: "30px" }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonRoomCard key={i} />
+          ))}
+        </div>
       </div>
     );
   }
