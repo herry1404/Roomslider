@@ -7,6 +7,7 @@ import InstallPrompt from "./components/InstallPrompt";
 
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
+import Team from "./pages/Team/Team";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
@@ -66,6 +67,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+        <Route path="/team" element={<MainLayout><Team /></MainLayout>} />
         <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
         <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
