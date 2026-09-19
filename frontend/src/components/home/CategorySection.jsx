@@ -6,13 +6,6 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 
-const categoryPathMap = {
-  Room: "rooms",
-  PG: "pg",
-  Hostel: "hostels",
-  Flat: "flats",
-};
-
 function CategorySection({ title, viewAllPath, rooms }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -21,6 +14,12 @@ function CategorySection({ title, viewAllPath, rooms }) {
   const goToDetails = (room) => {
     const detailsPath = roomPath(room);
 
+    // Login required: guest ko login page pe bhejo
+    if (!user) {
+      toast.error("Login first", { id: "login-first" });
+      navigate("/login", { state: { from: detailsPath } });
+      return;
+    }
 
     navigate(detailsPath);
   };

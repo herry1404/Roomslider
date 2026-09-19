@@ -25,18 +25,17 @@ function RoomCard({ room, onWishlistChange }) {
 
   const wishlisted = isWishlisted(room._id);
 
-  const categoryPathMap = {
-    Room: "rooms",
-    PG: "pg",
-    Hostel: "hostels",
-    Flat: "flats",
-  };
-
   const handleDetails = (e) => {
     if (e) e.stopPropagation();
 
     const detailsPath = roomPath(room);
 
+    // Login required: guest ko login page pe bhejo
+    if (!user) {
+      toast.error("Login first", { id: "login-first" });
+      navigate("/login", { state: { from: detailsPath } });
+      return;
+    }
 
     navigate(detailsPath);
   };
