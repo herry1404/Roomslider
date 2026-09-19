@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { idFromParam, roomPath } from "../../utils/roomUrl";
 import {
   MapPin,
   IndianRupee,
@@ -29,7 +31,8 @@ import RoomMap from "../../components/map/RoomMap";
 
 function PropertyDetails() {
   const navHidden = useHideOnScroll(80);
-  const { id } = useParams();
+  const { id: rawId } = useParams();
+  const id = idFromParam(rawId);
   const { user } = useAuth();
 
   const [room, setRoom] = useState(null);
@@ -139,6 +142,14 @@ function PropertyDetails() {
 
   return (
     <section className="property-details container">
+      <Helmet>
+        <title>{`${room.title}, Indore | RoomSlider`}</title>
+        <meta
+          name="description"
+          content={`${room.title} - ${room.category || "rental"} for rent in ${room.location || "Indore"}. View photos, rent, amenities and contact the owner on RoomSlider.`}
+        />
+        <link rel="canonical" href={`https://www.roomslider.in${roomPath(room)}`} />
+      </Helmet>
 
       <div className="property-main">
 

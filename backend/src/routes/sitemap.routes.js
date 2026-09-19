@@ -7,6 +7,15 @@ const Owner = require("../models/Owner");
 
 const SITE_URL = "https://www.roomslider.in";
 
+const slugify = (text = "") =>
+  text
+    .toString()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/, "");
+
 const categoryPathMap = {
   Room: "rooms",
   PG: "pg",
@@ -17,7 +26,7 @@ const categoryPathMap = {
 router.get("/", async (req, res) => {
   try {
     const [rooms, messes, owners] = await Promise.all([
-      Room.find({}, "_id category updatedAt"),
+      Room.find({}, "_id title category updatedAt"),
       Mess.find({}, "_id updatedAt"),
       Owner.find({}, "_id updatedAt"),
     ]);
@@ -40,7 +49,7 @@ router.get("/", async (req, res) => {
     const roomUrls = rooms
       .filter((r) => categoryPathMap[r.category])
       .map((r) => ({
-        loc: `/${categoryPathMap[r.category]}/${r._id}`,
+        loc: `/${categoryPathMap[r.category]}/${slugify(r.title) ? slugify(r.title) + "-" : ""}${r._id}`,
         priority: "0.8",
         changefreq: "weekly",
         lastmod: r.updatedAt,

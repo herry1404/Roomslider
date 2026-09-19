@@ -1,3 +1,4 @@
+import { roomPath } from "../../utils/roomUrl";
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -397,7 +398,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                   <br />
                   ₹{room.price}/month
                   <br />
-                  <Link to={`/rooms/${room._id}`}>View details</Link>
+                  <Link to={roomPath(room)}>View details</Link>
                 </Popup>
               </Marker>
             ))}
@@ -573,7 +574,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                     <br />
                     ₹{room.price}/month
                     <br />
-                    <Link to={`/rooms/${room._id}`}>View details</Link>
+                    <Link to={roomPath(room)}>View details</Link>
                   </Popup>
                 </Marker>
               ))}

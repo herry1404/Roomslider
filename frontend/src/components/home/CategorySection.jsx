@@ -1,3 +1,4 @@
+import { roomPath } from "../../utils/roomUrl";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, MapPin, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
@@ -18,8 +19,7 @@ function CategorySection({ title, viewAllPath, rooms }) {
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
 
   const goToDetails = (room) => {
-    const base = categoryPathMap[room.category] || "rooms";
-    navigate(`/${base}/${room._id}`);
+    navigate(roomPath(room));
   };
 
   const toggleWishlist = async (roomId) => {

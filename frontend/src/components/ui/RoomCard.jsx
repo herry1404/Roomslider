@@ -1,3 +1,4 @@
+import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
 import { MapPin, IndianRupee, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -37,8 +38,7 @@ function RoomCard({ room, onWishlistChange }) {
   };
 
   const handleDetails = () => {
-    const base = categoryPathMap[room.category] || "rooms";
-    navigate(`/${base}/${room._id}`);
+    navigate(roomPath(room));
   };
 
   const handleWishlist = async (e) => {
