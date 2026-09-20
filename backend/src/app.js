@@ -15,6 +15,7 @@ const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
+const loanRoutes = require("./routes/loan.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
 const messRoutes = require("./routes/mess.routes");
@@ -254,6 +255,12 @@ app.use(
 app.use(
   "/api/maintenance",
   maintenanceRoutes
+);
+
+// ✅ STUDENT LOAN ROUTES
+app.use(
+  "/api/loans",
+  loanRoutes
 );
 
 // ✅ LAUNDRY VENDOR ROUTES

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UtensilsCrossed,
   Shirt,
+  Banknote,
   ArrowRight,
   Sparkles,
   Truck,
@@ -14,6 +16,7 @@ import {
   BookOpen,
   Bike,
 } from "lucide-react";
+import LoanModal from "../services/LoanModal";
 
 const comingSoon = [
   { icon: Sparkles, title: "Cleaning & Housekeeping", desc: "Room and bathroom cleaning" },
@@ -59,6 +62,7 @@ const pillStyle = {
 function ComingSoonServices() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const [showLoanModal, setShowLoanModal] = useState(false);
 
   const liveServices = [
     {
@@ -75,41 +79,52 @@ function ComingSoonServices() {
       button: "Explore Laundry",
       onClick: () => navigate(user ? "/my-place" : "/login"),
     },
+    {
+      icon: Banknote,
+      title: "Need a Student Loan?",
+      desc: "Get help finding a loan for rent, deposit or fees",
+      button: "Apply Now",
+      onClick: () => (user ? setShowLoanModal(true) : navigate("/login")),
+    },
   ];
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: "12px",
-      }}
-    >
-      {liveServices.map(({ icon: Icon, title, desc, button, onClick }) => (
-        <div
-          key={title}
-          onClick={onClick}
-          style={{ ...cardStyle, cursor: "pointer" }}
-        >
-          <Icon size={22} color="var(--color-primary, #16a34a)" />
-          <div style={titleStyle}>{title}</div>
-          <div style={descStyle}>{desc}</div>
-          <button type="button" style={{ ...pillStyle, cursor: "pointer" }}>
-            {button}
-            <ArrowRight size={12} />
-          </button>
-        </div>
-      ))}
+    <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+          gap: "12px",
+        }}
+      >
+        {liveServices.map(({ icon: Icon, title, desc, button, onClick }) => (
+          <div
+            key={title}
+            onClick={onClick}
+            style={{ ...cardStyle, cursor: "pointer" }}
+          >
+            <Icon size={22} color="var(--color-primary, #16a34a)" />
+            <div style={titleStyle}>{title}</div>
+            <div style={descStyle}>{desc}</div>
+            <button type="button" style={{ ...pillStyle, cursor: "pointer" }}>
+              {button}
+              <ArrowRight size={12} />
+            </button>
+          </div>
+        ))}
 
-      {comingSoon.map(({ icon: Icon, title, desc }) => (
-        <div key={title} style={cardStyle}>
-          <Icon size={22} color="var(--color-primary, #16a34a)" />
-          <div style={titleStyle}>{title}</div>
-          <div style={descStyle}>{desc}</div>
-          <span style={pillStyle}>Coming Soon</span>
-        </div>
-      ))}
-    </div>
+        {comingSoon.map(({ icon: Icon, title, desc }) => (
+          <div key={title} style={cardStyle}>
+            <Icon size={22} color="var(--color-primary, #16a34a)" />
+            <div style={titleStyle}>{title}</div>
+            <div style={descStyle}>{desc}</div>
+            <span style={pillStyle}>Coming Soon</span>
+          </div>
+        ))}
+      </div>
+
+      {showLoanModal && <LoanModal onClose={() => setShowLoanModal(false)} />}
+    </>
   );
 }
 
