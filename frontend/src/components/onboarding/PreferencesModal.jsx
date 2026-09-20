@@ -157,12 +157,12 @@ function PreferencesModal({ onClose }) {
 
               {indoreAreas.map((area) => (
                 <button
-                  key={area}
+                  key={area.name}
                   className="pref-list-item"
                   disabled={saving}
-                  onClick={() => handleAreaSelect(area)}
+                  onClick={() => handleAreaSelect(area.name)}
                 >
-                  {area}
+                  {area.name}
                 </button>
               ))}
 
