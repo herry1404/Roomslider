@@ -1,5 +1,6 @@
 import { roomPath } from "../../utils/roomUrl";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
@@ -37,21 +38,30 @@ const userLocationIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
-const collegePinSvg = `
-<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
-  <path d="M17 0C7.6 0 0 7.6 0 17c0 11.5 17 27 17 27s17-15.5 17-27C34 7.6 26.4 0 17 0z" fill="#1d4ed8"/>
-  <circle cx="17" cy="17" r="11" fill="#ffffff"/>
-  <path d="M17 10l-8 3.6 8 3.6 6.5-2.9v4.3h1.3v-5l-7.8-3.6z" fill="#111827"/>
-  <path d="M11.5 15.4v3.4c0 1.5 2.5 2.7 5.5 2.7s5.5-1.2 5.5-2.7v-3.4L17 17.3l-5.5-1.9z" fill="#111827"/>
-</svg>`;
+const SCHOOL_SVG =
+  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9 12 5 2 9l10 4 10-4v6"/><path d="M6 10.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.4"/></svg>';
 
-const collegeIcon = L.divIcon({
-  className: "college-marker",
-  html: collegePinSvg,
-  iconSize: [34, 44],
-  iconAnchor: [17, 44],
-  popupAnchor: [0, -40],
-});
+const getShortName = (c) => {
+  if (c.short) return c.short;
+  const m = c.name.match(/\(([^)]+)\)/);
+  if (m) return m[1];
+  const first = c.name.split(",")[0].trim();
+  return first.length > 16 ? `${first.slice(0, 15)}…` : first;
+};
+
+const collegeIconCache = {};
+const getCollegeIcon = (c) => {
+  const label = getShortName(c);
+  if (!collegeIconCache[label]) {
+    collegeIconCache[label] = L.divIcon({
+      className: "rs-icon",
+      html: `<div class="rs-college">${SCHOOL_SVG}<span>${label}</span></div>`,
+      iconSize: [0, 0],
+      popupAnchor: [0, -18],
+    });
+  }
+  return collegeIconCache[label];
+};
 
 const messPinSvg = `
 <svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
@@ -199,6 +209,50 @@ function AutoLocate({ onLocate }) {
   return null;
 }
 
+const kmBetween = (a, b) => {
+  const R = 6371;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLng = toRad(b[1] - a[1]);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
+
+const orderByArea = (list, ref) => {
+  const left = [...list];
+  const out = [];
+  let cur = ref;
+  while (left.length) {
+    let bi = 0;
+    let bd = Infinity;
+    for (let i = 0; i < left.length; i++) {
+      const d = kmBetween(cur, [Number(left[i].latitude), Number(left[i].longitude)]);
+      if (d < bd) {
+        bd = d;
+        bi = i;
+      }
+    }
+    const [next] = left.splice(bi, 1);
+    out.push(next);
+    cur = [Number(next.latitude), Number(next.longitude)];
+  }
+  return out;
+};
+
+function ZoomClass({ threshold }) {
+  const map = useMap();
+  const apply = () =>
+    map.getContainer().classList.toggle("rs-zoomed-out", map.getZoom() < threshold);
+  useMapEvents({ zoomend: apply });
+  useEffect(() => {
+    apply();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
+  return null;
+}
+
 const getRoomImage = (room) => {
   const first = Array.isArray(room.images) ? room.images[0] : room.image;
   const url = typeof first === "string" ? first : first?.url;
@@ -217,6 +271,57 @@ function FlyToSelected({ room }) {
   }, [room?._id]);
 
   return null;
+}
+
+function SelectedRoomCard({ room, onView }) {
+  const map = useMap();
+  const [pos, setPos] = useState(null);
+
+  useEffect(() => {
+    if (!room) {
+      setPos(null);
+      return;
+    }
+    const update = () => {
+      const pt = map.latLngToContainerPoint([room.latitude, room.longitude]);
+      setPos({ x: pt.x, y: pt.y });
+    };
+    update();
+    map.on("move zoom", update);
+    return () => map.off("move zoom", update);
+  }, [room, map]);
+
+  if (!room || !pos) return null;
+
+  const img = getRoomImage(room);
+
+  return createPortal(
+    <div
+      className="rs-map-detail"
+      style={{ left: pos.x, top: pos.y }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="rs-map-detail-thumb">
+        {img ? <img src={img} alt="" /> : <MapPin size={20} />}
+      </div>
+      <div className="rs-map-detail-title">{room.title}</div>
+      <div className="rs-map-detail-meta">
+        {room.category}
+        {room.gender && room.gender !== "Any" ? ` · ${room.gender}` : ""}
+      </div>
+      {room.address && (
+        <div className="rs-map-detail-addr">
+          <MapPin size={11} />
+          {room.address}
+        </div>
+      )}
+      <div className="rs-map-detail-footer">
+        <span className="rs-map-detail-price">₹{room.price}/mo</span>
+        <button onClick={() => onView(room)}>View</button>
+      </div>
+    </div>,
+    map.getContainer()
+  );
 }
 
 function LockToBounds({ bounds }) {
@@ -305,7 +410,18 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
     (m) => m.location?.coordinates?.length === 2
   );
 
-  const cardRooms = visibleRooms;
+  let prefCollege = null;
+  try {
+    const u = JSON.parse(localStorage.getItem("user") || "null");
+    prefCollege = indoreColleges.find((c) => c.name === u?.preferredCollege) || null;
+  } catch {
+    prefCollege = null;
+  }
+  const refPoint = prefCollege
+    ? [prefCollege.latitude, prefCollege.longitude]
+    : userPos || INDORE_CENTER;
+  const refLabel = prefCollege ? getShortName(prefCollege) : userPos ? "you" : "city center";
+  const cardRooms = orderByArea(visibleRooms, refPoint);
   const selectedRoom = cardRooms.find((r) => r._id === selectedId) || null;
   const CARD_STEP = 260;
 
@@ -474,10 +590,80 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           .rs-card-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
           .rs-card-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
           .rs-card-price { margin-top: 8px; font-size: 14px; font-weight: 600; color: #22c55e; }
+          .rs-map-detail {
+            position: absolute;
+            transform: translate(-50%, calc(-100% - 40px));
+            width: 180px;
+            background: #0f172a;
+            border: 1.5px solid #22c55e;
+            border-radius: 14px;
+            padding: 10px;
+            color: #fff;
+            z-index: 1200;
+            pointer-events: auto;
+          }
+          .rs-map-detail-thumb {
+            width: 100%;
+            height: 84px;
+            border-radius: 10px;
+            background: #1e293b;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            margin-bottom: 6px;
+          }
+          .rs-map-detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+          .rs-map-detail-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .rs-map-detail-meta { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+          .rs-map-detail-addr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+          }
+          .rs-map-detail-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+          }
+          .rs-map-detail-price { font-size: 14px; font-weight: 600; color: #22c55e; }
+          .rs-map-detail-footer button {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+          }
           .rs-pill-sel { background: var(--c); color: #0b1220; border-color: #fff; z-index: 1000; }
           .rs-pill-sel svg { color: #0b1220; }
           body.dark .map-fullscreen-wrap .leaflet-marker-icon.rs-icon { filter: none; }
           .rs-cluster { font-size: 13px; padding: 6px 12px; }
+          .rs-college {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: #0f172a;
+            border: 1.5px solid #a78bfa;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+          }
+          .rs-college svg { color: #a78bfa; flex-shrink: 0; }
+          .leaflet-map-wrapper.rs-zoomed-out .rs-college span { display: none; }
+          .leaflet-map-wrapper.rs-zoomed-out .rs-college { padding: 6px; border-radius: 8px; }
           .rs-cluster-big { background: #22c55e; color: #052e16; border-color: #22c55e; }
           .rs-cluster-big svg { color: #052e16; }
         `}</style>
@@ -539,8 +725,10 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           <LockToBounds bounds={MP_BOUNDS} />
           <AutoLocate onLocate={setUserPos} />
           <FlyToSelected room={selectedRoom} />
+          <SelectedRoomCard room={selectedRoom} onView={(r) => navigate(roomPath(r))} />
           <ZoomControl position="topright" />
           <ViewCounter rooms={visibleRooms} onCount={setInViewCount} />
+          <ZoomClass threshold={13} />
           <LocateButton onLocate={setUserPos} />
 
           {userPos && (
@@ -554,7 +742,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
               <Marker
                 key={college.name}
                 position={[college.latitude, college.longitude]}
-                icon={collegeIcon}
+                icon={getCollegeIcon(college)}
               >
                 <Popup>
                   <strong>{college.name}</strong>
@@ -632,6 +820,9 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                       {room.gender && room.gender !== "Any" ? ` · ${room.gender}` : ""}
                     </div>
                     <div className="rs-card-price">₹{room.price}/mo</div>
+                    <div className="rs-card-meta">
+                      {kmBetween(refPoint, [Number(room.latitude), Number(room.longitude)]).toFixed(1)} km from {refLabel}
+                    </div>
                   </div>
                 </div>
               );
