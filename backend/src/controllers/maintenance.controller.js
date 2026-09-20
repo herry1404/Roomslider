@@ -14,7 +14,7 @@ const createRequest = async (req, res) => {
       });
     }
 
-    const room = await Room.findById(roomId).select("_id currentTenant");
+    const room = await Room.findById(roomId).select("_id currentTenantUser");
 
     if (!room) {
       return res.status(404).json({
@@ -23,7 +23,7 @@ const createRequest = async (req, res) => {
       });
     }
 
-    if (!room.currentTenant || String(room.currentTenant) !== String(req.user._id)) {
+    if (!room.currentTenantUser || String(room.currentTenantUser) !== String(req.user._id)) {
       return res.status(403).json({ success: false, message: "You are not the tenant of this room" });
     }
 
