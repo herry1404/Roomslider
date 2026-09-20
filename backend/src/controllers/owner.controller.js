@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -56,7 +57,7 @@ const createOwner = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to create owner", error: error.message });
+    res.status(500).json({ message: "Failed to create owner", error: safeMsg(error) });
   }
 };
 
@@ -96,7 +97,7 @@ const ownerLogin = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Login failed", error: error.message });
+    res.status(500).json({ message: "Login failed", error: safeMsg(error) });
   }
 };
 
@@ -122,7 +123,7 @@ const getAllOwners = async (req, res) => {
 
     res.json(ownersWithStats);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch owners", error: error.message });
+    res.status(500).json({ message: "Failed to fetch owners", error: safeMsg(error) });
   }
 };
 
@@ -148,7 +149,7 @@ const getSingleOwner = async (req, res) => {
 
     res.json({ owner, rooms: roomsWithStatus });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch owner", error: error.message });
+    res.status(500).json({ message: "Failed to fetch owner", error: safeMsg(error) });
   }
 };
 
@@ -168,7 +169,7 @@ const updateOwner = async (req, res) => {
 
     res.json({ message: "Owner updated", owner });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update owner", error: error.message });
+    res.status(500).json({ message: "Failed to update owner", error: safeMsg(error) });
   }
 };
 
@@ -182,7 +183,7 @@ const deleteOwner = async (req, res) => {
 
     res.json({ message: "Owner deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete owner", error: error.message });
+    res.status(500).json({ message: "Failed to delete owner", error: safeMsg(error) });
   }
 };
 
@@ -209,7 +210,7 @@ const getMyRooms = async (req, res) => {
 
     res.json({ owner, rooms: roomsWithStatus });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch dashboard data", error: error.message });
+    res.status(500).json({ message: "Failed to fetch dashboard data", error: safeMsg(error) });
   }
 };
 
@@ -224,7 +225,7 @@ const getPublicOwnerProfile = async (req, res) => {
 
     res.json({ owner, totalListings });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch owner profile", error: error.message });
+    res.status(500).json({ message: "Failed to fetch owner profile", error: safeMsg(error) });
   }
 };
 

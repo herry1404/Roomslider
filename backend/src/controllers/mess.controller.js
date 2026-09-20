@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Mess = require("../models/Mess");
@@ -49,7 +50,7 @@ const messLogin = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Login failed", error: error.message });
+    res.status(500).json({ message: "Login failed", error: safeMsg(error) });
   }
 };
 
@@ -103,7 +104,7 @@ const createMess = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to create mess", error: error.message });
+    res.status(500).json({ message: "Failed to create mess", error: safeMsg(error) });
   }
 };
 
@@ -115,7 +116,7 @@ const getAllMess = async (req, res) => {
     const messList = await Mess.find().select("-password");
     res.json(messList);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch mess list", error: error.message });
+    res.status(500).json({ message: "Failed to fetch mess list", error: safeMsg(error) });
   }
 };
 
@@ -128,7 +129,7 @@ const getSingleMess = async (req, res) => {
     if (!mess) return res.status(404).json({ message: "Mess not found" });
     res.json(mess);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch mess", error: error.message });
+    res.status(500).json({ message: "Failed to fetch mess", error: safeMsg(error) });
   }
 };
 
@@ -160,7 +161,7 @@ const updateMess = async (req, res) => {
 
     res.json({ message: "Mess updated", mess });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update mess", error: error.message });
+    res.status(500).json({ message: "Failed to update mess", error: safeMsg(error) });
   }
 };
 
@@ -173,7 +174,7 @@ const deleteMess = async (req, res) => {
     if (!mess) return res.status(404).json({ message: "Mess not found" });
     res.json({ message: "Mess deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete mess", error: error.message });
+    res.status(500).json({ message: "Failed to delete mess", error: safeMsg(error) });
   }
 };
 
@@ -204,7 +205,7 @@ const getNearbyMess = async (req, res) => {
 
     res.json(messList);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch nearby mess", error: error.message });
+    res.status(500).json({ message: "Failed to fetch nearby mess", error: safeMsg(error) });
   }
 };
 
@@ -217,7 +218,7 @@ const getMessDetail = async (req, res) => {
     if (!mess) return res.status(404).json({ message: "Mess not found" });
     res.json(mess);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch mess", error: error.message });
+    res.status(500).json({ message: "Failed to fetch mess", error: safeMsg(error) });
   }
 };
 
@@ -240,7 +241,7 @@ const updateTodayMenu = async (req, res) => {
 
     res.json({ message: "Menu updated", mess });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update menu", error: error.message });
+    res.status(500).json({ message: "Failed to update menu", error: safeMsg(error) });
   }
 };
 
@@ -262,7 +263,7 @@ const getMyMessDashboard = async (req, res) => {
 
     res.json({ mess, todayOrderCount });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch dashboard", error: error.message });
+    res.status(500).json({ message: "Failed to fetch dashboard", error: safeMsg(error) });
   }
 };
 
@@ -283,7 +284,7 @@ const getTodayOrders = async (req, res) => {
 
     res.json({ orders });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+    res.status(500).json({ message: "Failed to fetch orders", error: safeMsg(error) });
   }
 };
 

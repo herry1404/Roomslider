@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
 const User = require("../models/user.model");
 
@@ -115,7 +116,7 @@ const createRoom = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -165,7 +166,7 @@ const getRooms = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -200,7 +201,7 @@ const getSingleRoom = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -288,7 +289,7 @@ const updateRoom = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -328,7 +329,7 @@ const deleteRoom = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -446,7 +447,7 @@ const createBulkRooms = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -553,7 +554,7 @@ const assignTenant = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -621,7 +622,7 @@ const vacateTenant = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -702,7 +703,7 @@ const recordPayment = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
   }
 };
@@ -785,7 +786,7 @@ const resolveVacateNotice = async (req, res) => {
     });
   } catch (error) {
     console.error("RESOLVE VACATE NOTICE ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -838,7 +839,7 @@ const uploadLeaseDocument = async (req, res) => {
     });
   } catch (error) {
     console.error("UPLOAD LEASE DOCUMENT ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 

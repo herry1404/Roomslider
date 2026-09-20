@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const HourlyRoom = require("../models/HourlyRoom.model");
 
 // Admin: create hourly room directly
@@ -14,7 +15,7 @@ const createHourlyRoom = async (req, res) => {
     });
     res.status(201).json(room);
   } catch (err) {
-    res.status(500).json({ message: "Failed to create hourly room", error: err.message });
+    res.status(500).json({ message: "Failed to create hourly room", error: safeMsg(err) });
   }
 };
 
@@ -26,7 +27,7 @@ const getAllHourlyRooms = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(rooms);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch hourly rooms", error: err.message });
+    res.status(500).json({ message: "Failed to fetch hourly rooms", error: safeMsg(err) });
   }
 };
 
@@ -38,7 +39,7 @@ const getPublicHourlyRooms = async (req, res) => {
     });
     res.json(rooms);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch hourly rooms", error: err.message });
+    res.status(500).json({ message: "Failed to fetch hourly rooms", error: safeMsg(err) });
   }
 };
 
@@ -57,7 +58,7 @@ const updateHourlyRoom = async (req, res) => {
     if (!room) return res.status(404).json({ message: "Hourly room not found" });
     res.json(room);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update hourly room", error: err.message });
+    res.status(500).json({ message: "Failed to update hourly room", error: safeMsg(err) });
   }
 };
 
@@ -68,7 +69,7 @@ const deleteHourlyRoom = async (req, res) => {
     if (!room) return res.status(404).json({ message: "Hourly room not found" });
     res.json({ message: "Hourly room deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete hourly room", error: err.message });
+    res.status(500).json({ message: "Failed to delete hourly room", error: safeMsg(err) });
   }
 };
 
@@ -88,7 +89,7 @@ const approveHourlyRoomRequest = async (req, res) => {
     if (!room) return res.status(404).json({ message: "Hourly room not found" });
     res.json(room);
   } catch (err) {
-    res.status(500).json({ message: "Failed to approve request", error: err.message });
+    res.status(500).json({ message: "Failed to approve request", error: safeMsg(err) });
   }
 };
 
@@ -108,7 +109,7 @@ const rejectHourlyRoomRequest = async (req, res) => {
     if (!room) return res.status(404).json({ message: "Hourly room not found" });
     res.json(room);
   } catch (err) {
-    res.status(500).json({ message: "Failed to reject request", error: err.message });
+    res.status(500).json({ message: "Failed to reject request", error: safeMsg(err) });
   }
 };
 

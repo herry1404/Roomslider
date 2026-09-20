@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const Expense = require("../models/Expense");
 const Room = require("../models/room.model");
 
@@ -42,7 +43,7 @@ const addExpense = async (req, res) => {
     });
   } catch (error) {
     console.error("ADD EXPENSE ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -74,7 +75,7 @@ const getMyExpenses = async (req, res) => {
     });
   } catch (error) {
     console.error("GET EXPENSES ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -94,7 +95,7 @@ const deleteExpense = async (req, res) => {
     res.status(200).json({ success: true, message: "Expense deleted" });
   } catch (error) {
     console.error("DELETE EXPENSE ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -151,7 +152,7 @@ const getSummary = async (req, res) => {
     });
   } catch (error) {
     console.error("GET SUMMARY ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -220,7 +221,7 @@ const getTransactions = async (req, res) => {
     });
   } catch (error) {
     console.error("GET TRANSACTIONS ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 

@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const User = require("../models/user.model");
 const { registerSchema, loginSchema, preferencesSchema } = require("../validators/auth.validator");
 const bcrypt = require("bcryptjs");
@@ -107,7 +108,7 @@ const register = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
 
   }
@@ -188,7 +189,7 @@ const login = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
 
   }
@@ -370,7 +371,7 @@ const getMyTenancy = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: safeMsg(error),
     });
 
   }
@@ -428,7 +429,7 @@ const giveVacateNotice = async (req, res) => {
   } catch (error) {
 
     console.error("GIVE VACATE NOTICE ERROR 👉", error);
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: safeMsg(error) });
 
   }
 
@@ -470,7 +471,7 @@ const cancelVacateNotice = async (req, res) => {
   } catch (error) {
 
     console.error("CANCEL VACATE NOTICE ERROR 👉", error);
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: safeMsg(error) });
 
   }
 
@@ -530,7 +531,7 @@ const updatePhone = async (req, res) => {
   } catch (error) {
 
     console.error("UPDATE PHONE ERROR 👉", error);
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: safeMsg(error) });
 
   }
 
@@ -586,7 +587,7 @@ const updatePreferences = async (req, res) => {
 
     }
 
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: safeMsg(error) });
 
   }
 

@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const Owner = require("../models/Owner");
 const Room = require("../models/room.model");
 const ElectricityBill = require("../models/ElectricityBill");
@@ -29,7 +30,7 @@ const setRate = async (req, res) => {
     });
   } catch (error) {
     console.error("SET RATE ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -102,7 +103,7 @@ const bulkUpdateUnits = async (req, res) => {
     });
   } catch (error) {
     console.error("BULK UPDATE UNITS ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -147,7 +148,7 @@ const getMyElectricitySetup = async (req, res) => {
     });
   } catch (error) {
     console.error("GET ELECTRICITY SETUP ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -167,7 +168,7 @@ const getMyBill = async (req, res) => {
     res.status(200).json({ success: true, bill });
   } catch (error) {
     console.error("GET MY BILL ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -194,7 +195,7 @@ const markBillPaid = async (req, res) => {
     res.status(200).json({ success: true, message: "Bill marked as paid", bill });
   } catch (error) {
     console.error("MARK BILL PAID ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 

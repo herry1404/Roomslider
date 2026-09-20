@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
 const Notification = require("../models/Notification");
 const ElectricityBill = require("../models/ElectricityBill");
@@ -45,7 +46,7 @@ const getOverdueTenants = async (req, res) => {
     res.status(200).json({ success: true, overdue });
   } catch (error) {
     console.error("GET OVERDUE TENANTS ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -83,7 +84,7 @@ const sendBulkReminders = async (req, res) => {
     });
   } catch (error) {
     console.error("SEND BULK REMINDERS ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -104,7 +105,7 @@ const getMyNotifications = async (req, res) => {
     res.status(200).json({ success: true, notifications, unreadCount });
   } catch (error) {
     console.error("GET MY NOTIFICATIONS ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -121,7 +122,7 @@ const markNotificationRead = async (req, res) => {
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("MARK NOTIFICATION READ ERROR 👉", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 

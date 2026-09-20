@@ -1,3 +1,4 @@
+const safeMsg = require("../utils/safeMsg");
 const Activity = require('../models/activity.model');
 
 const logActivity = async (type, message, refId = null, refModel = null, meta = {}) => {
@@ -14,7 +15,7 @@ const getRecentActivities = async (req, res) => {
     const activities = await Activity.find().sort({ createdAt: -1 }).limit(limit);
     res.json({ success: true, activities });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: safeMsg(err) });
   }
 };
 
