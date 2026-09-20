@@ -1,0 +1,77 @@
+.cp-section {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cp-card {
+  max-width: 400px;
+  width: 100%;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text, #0f172a);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.cp-title {
+  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.cp-subtitle {
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.cp-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: transparent;
+}
+
+.cp-field svg {
+  color: var(--color-text-muted, #6b7280);
+  flex-shrink: 0;
+}
+
+.cp-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  color: var(--color-text, #0f172a);
+}
+
+.cp-input::placeholder {
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.cp-button {
+  width: 100%;
+  padding: 12px;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cp-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
