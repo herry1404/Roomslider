@@ -1,14 +1,22 @@
 import { useGoogleOneTapLogin } from "@react-oauth/google";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 // Pages jahan popup nahi dikhana (login/register mein button pehle se hai)
-const HIDDEN_ON = ["/login", "/register", "/admin", "/owner", "/mess"];
+const HIDDEN_ON = [
+  "/login",
+  "/register",
+  "/complete-profile",
+  "/admin",
+  "/owner",
+  "/mess",
+];
 
 function GoogleOneTap() {
   const { user, googleLogin } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const hidden = HIDDEN_ON.some((p) => pathname.startsWith(p));
 
@@ -18,8 +26,15 @@ function GoogleOneTap() {
     onSuccess: async (credentialResponse) => {
       try {
         const result = await googleLogin(credentialResponse.credential);
-        if (result?.success) {
-          toast.success("Logged in with Google");
+
+        if (!result?.success) return;
+
+        toast.success(result.message || "Login successful");
+
+        if (result.needsPhone) {
+          navigate("/complete-profile", { replace: true });
+        } else if (result.user?.role === "admin") {
+          navigate("/admin/dashboard", { replace: true });
         }
       } catch (error) {
         toast.error(
