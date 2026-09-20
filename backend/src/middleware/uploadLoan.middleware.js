@@ -8,6 +8,7 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "roomslider/loan-kyc",
     resource_type: "image",
+    type: "authenticated",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
     transformation: [{ width: 1200, crop: "limit", quality: "auto" }],
   },

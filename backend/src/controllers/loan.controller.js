@@ -1,4 +1,5 @@
 const Loan = require("../models/loan.model");
+const cloudinary = require("../config/cloudinary");
 
 // Student submits a loan lead.
 const createLoanRequest = async (req, res) => {
@@ -56,6 +57,7 @@ const createLoanRequest = async (req, res) => {
       familyIncomeRange,
       idType,
       idPhotoUrl: req.file ? req.file.path : null,
+      idPhotoPublicId: req.file ? req.file.filename : null,
       consentGiven: true,
     });
 
@@ -78,7 +80,24 @@ const getAllLoanRequests = async (req, res) => {
       .populate("user", "name phone email")
       .lean();
 
-    res.status(200).json({ success: true, loans });
+    const withSignedPhotos = loans.map((loan) => {
+      if (!loan.idPhotoPublicId) return loan;
+      const format = (loan.idPhotoUrl || "").split(".").pop() || "jpg";
+      return {
+        ...loan,
+        idPhotoUrl: cloudinary.utils.private_download_url(
+          loan.idPhotoPublicId,
+          format,
+          {
+            resource_type: "image",
+            type: "authenticated",
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+          }
+        ),
+      };
+    });
+
+    res.status(200).json({ success: true, loans: withSignedPhotos });
   } catch (error) {
     console.error("GET LOAN REQUESTS ERROR:", error);
     res.status(500).json({
