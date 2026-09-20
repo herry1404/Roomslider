@@ -76,11 +76,25 @@ const ManageLoans = () => {
   };
 
   const handleStatusChange = async (id, newStatus) => {
+    if (
+      ["approved", "rejected"].includes(newStatus) &&
+      !window.confirm(
+        "Applicant ki ID photo hamesha ke liye delete ho jayegi. Continue?"
+      )
+    ) {
+      return;
+    }
     try {
       await axios.put(`/loans/${id}/status`, { status: newStatus });
       setLoans((prev) =>
         prev.map((loan) =>
-          loan._id === id ? { ...loan, status: newStatus } : loan
+          loan._id === id ? {
+                ...loan,
+                status: newStatus,
+                ...(["approved", "rejected"].includes(newStatus)
+                  ? { idPhotoUrl: null }
+                  : {}),
+              } : loan
         )
       );
       toast.success("Status updated");

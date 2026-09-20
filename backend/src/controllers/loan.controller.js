@@ -132,6 +132,21 @@ const updateLoanStatus = async (req, res) => {
       });
     }
 
+    if (["approved", "rejected"].includes(status) && loan.idPhotoPublicId) {
+      try {
+        await cloudinary.uploader.destroy(loan.idPhotoPublicId, {
+          resource_type: "image",
+          type: "authenticated",
+          invalidate: true,
+        });
+        loan.idPhotoUrl = null;
+        loan.idPhotoPublicId = null;
+        await loan.save();
+      } catch (e) {
+        console.error("KYC PHOTO DELETE ERROR:", e);
+      }
+    }
+
     res.status(200).json({ success: true, loan });
   } catch (error) {
     console.error("UPDATE LOAN STATUS ERROR:", error);
