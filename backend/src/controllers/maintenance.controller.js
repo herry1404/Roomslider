@@ -23,6 +23,10 @@ const createRequest = async (req, res) => {
       });
     }
 
+    if (!room.currentTenant || String(room.currentTenant) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: "You are not the tenant of this room" });
+    }
+
     const request = await Maintenance.create({
       room: roomId,
       tenant: req.user._id,
