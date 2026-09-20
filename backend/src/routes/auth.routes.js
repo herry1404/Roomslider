@@ -14,10 +14,11 @@ const {
 
 const { protect } = require("../middleware/auth.middleware");
 const authLimiter = require("../middleware/authLimiter");
+const registerLimiter = require("../middleware/registerLimiter");
 
 
 // Register Route
-router.post("/register", register);
+router.post("/register", registerLimiter, register);
 
 
 // Login Route
