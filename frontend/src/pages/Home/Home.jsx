@@ -3,9 +3,8 @@ import { Helmet } from "react-helmet-async";
 
 import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
-import HourlyBanner from "../../components/home/HourlyBanner";
+import ExploreTeaser from "../../components/home/ExploreTeaser";
 import CategorySection from "../../components/home/CategorySection";
-import SavingsCalculator from "../../components/SavingsCalculator";
 import api from "../../api/axios";
 
 function Home() {
@@ -44,40 +43,35 @@ function Home() {
       <Hero />
       <Categories />
 
-      <section className="container" style={{ padding: "16px 0" }}>
-        <HourlyBanner />
-      </section>
-
       {!loading && (
         <>
           <CategorySection
-            title="Latest"
+            title="Rooms"
             viewAllPath="/rooms"
-            rooms={rooms.slice(0, 10)}
+            rooms={byCategory("Room")}
           />
 
           <CategorySection
-            title="Latest PGs"
-            viewAllPath="/pg"
-            rooms={byCategory("PG")}
-          />
-
-          <CategorySection
-            title="Latest Flats"
+            title="Flats"
             viewAllPath="/flats"
             rooms={byCategory("Flat")}
           />
 
           <CategorySection
-            title="Latest Hostels"
+            title="PG"
+            viewAllPath="/pg"
+            rooms={byCategory("PG")}
+          />
+
+          <CategorySection
+            title="Hostels"
             viewAllPath="/hostels"
             rooms={byCategory("Hostel")}
           />
         </>
       )}
-      <section className="container" style={{ padding: "16px 0" }}>
-        <SavingsCalculator />
-      </section>
+
+      <ExploreTeaser />
     </>
   );
 }
