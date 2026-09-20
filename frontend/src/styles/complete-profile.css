@@ -27,7 +27,7 @@
 .cp-subtitle {
   margin-bottom: 24px;
   font-size: 14px;
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-light, #6b7280);
 }
 
 .cp-field {
@@ -42,7 +42,7 @@
 }
 
 .cp-field svg {
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-light, #6b7280);
   flex-shrink: 0;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .cp-input::placeholder {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-light, #9ca3af);
 }
 
 .cp-button {
