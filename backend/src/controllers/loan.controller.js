@@ -24,18 +24,61 @@ const createLoanRequest = async (req, res) => {
       consentGiven,
     } = req.body;
 
-    if (!name || !phone || !amount) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, phone and amount are required",
-      });
+    const fail = async (message) => {
+      if (req.file && req.file.filename) {
+        try {
+          await cloudinary.uploader.destroy(req.file.filename, {
+            resource_type: "image",
+            type: "authenticated",
+            invalidate: true,
+          });
+        } catch (e) {
+          console.error("ORPHAN KYC PHOTO DELETE ERROR:", e);
+        }
+      }
+      return res.status(400).json({ success: false, message });
+    };
+
+    const requiredFields = {
+      name, phone, email, dob, address, amount, college, course, pan,
+      guardianName, guardianPhone, guardianOccupation, familyIncomeRange, idType,
+    };
+    for (const [key, value] of Object.entries(requiredFields)) {
+      if (value === undefined || value === null || !String(value).trim()) {
+        return fail(`${key} is required`);
+      }
     }
+
+    if (!/^[6-9]\d{9}$/.test(phone)) return fail("Invalid phone number");
+    if (!/^[6-9]\d{9}$/.test(guardianPhone)) return fail("Invalid guardian phone number");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Invalid email");
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/i.test(pan)) return fail("Invalid PAN number");
+    if (!(Number(amount) > 0)) return fail("Invalid amount");
+    if (Number.isNaN(new Date(dob).getTime())) return fail("Invalid date of birth");
+    if (!["below_2l", "2l_5l", "5l_10l", "above_10l"].includes(familyIncomeRange)) {
+      return fail("Invalid family income range");
+    }
+    if (!["aadhaar", "voter_id", "driving_license", "college_id"].includes(idType)) {
+      return fail("Invalid ID type");
+    }
+    if (!req.file) return fail("ID photo is required");
 
     if (consentGiven !== "true" && consentGiven !== true) {
       return res.status(400).json({
         success: false,
         message: "Consent is required to submit this form",
       });
+    }
+
+    const existing = await Loan.findOne({
+      $or: [
+        { user: req.user._id },
+        { phone },
+        { pan: new RegExp(`^${pan}$`, "i") },
+      ],
+    });
+    if (existing) {
+      return fail("You have already submitted a loan request");
     }
 
     const loan = await Loan.create({
