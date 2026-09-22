@@ -18,6 +18,9 @@ const maintenanceRoutes = require("./routes/maintenance.routes");
 const loanRoutes = require("./routes/loan.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
+const vehicleShopRoutes = require("./routes/vehicleShop.routes");
+const vehicleRoutes = require("./routes/vehicle.routes");
+const vehicleBookingRoutes = require("./routes/vehicleBooking.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
 const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
@@ -280,6 +283,24 @@ app.use(
 app.use(
   "/api/hourly-rooms",
   hourlyRoomRoutes
+);
+
+// ✅ VEHICLE SHOP ROUTES
+app.use(
+  "/api/vehicle-shops",
+  vehicleShopRoutes
+);
+
+// ✅ VEHICLE ROUTES
+app.use(
+  "/api/vehicles",
+  vehicleRoutes
+);
+
+// ✅ VEHICLE BOOKING ROUTES
+app.use(
+  "/api/vehicle-bookings",
+  vehicleBookingRoutes
 );
 
 // ✅ SITEMAP ROUTE (for SEO)

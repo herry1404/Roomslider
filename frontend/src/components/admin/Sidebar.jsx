@@ -12,6 +12,7 @@ import {
   DoorOpen,
   UtensilsCrossed,
   Banknote,
+  Bike,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -58,6 +59,11 @@ function Sidebar({ open, closeSidebar }) {
       title: "Loan Requests",
       icon: <Banknote size={20} />,
       path: "/admin/loans",
+    },
+    {
+      title: "Vehicles",
+      icon: <Bike size={20} />,
+      path: "/admin/vehicles",
     },
     {
       title: "Hourly Rooms",

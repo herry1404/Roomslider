@@ -21,6 +21,11 @@ import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 import MapView from "./pages/MapView/MapView";
 import Explore from "./pages/Explore/Explore";
+import VehicleList from "./pages/Vehicles/VehicleList";
+import VehicleShopDetail from "./pages/Vehicles/VehicleShopDetail";
+import ManageVehicles from "./pages/Admin/ManageVehicles";
+import AddVehicleShop from "./pages/Admin/AddVehicleShop";
+import AddVehicle from "./pages/Admin/AddVehicle";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
@@ -84,6 +89,8 @@ function App() {
         <Route path="/mess/login" element={<MessLogin />} />
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
+        <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
+        <Route path="/vehicles/shop/:id" element={<MainLayout><VehicleShopDetail /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
         <Route path="/rooms/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
         <Route path="/pg/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
@@ -124,6 +131,9 @@ function App() {
         <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
         <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
         <Route path="/admin/loans" element={<AdminRoute><ManageLoans /></AdminRoute>} />
+        <Route path="/admin/vehicles" element={<AdminRoute><ManageVehicles /></AdminRoute>} />
+        <Route path="/admin/vehicles/shops/add" element={<AdminRoute><AddVehicleShop /></AdminRoute>} />
+        <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
