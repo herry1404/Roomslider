@@ -13,6 +13,8 @@ import {
   UtensilsCrossed,
   Banknote,
   Bike,
+  Sparkles,
+  Home,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -24,86 +26,66 @@ function Sidebar({ open, closeSidebar }) {
 
   const { logout } = useAuth();
 
-  const menu = [
+  const groups = [
     {
-      title: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
-      path: "/admin/dashboard",
+      label: "Housing",
+      items: [
+        { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
+        { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
+        { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
+        { title: "Hourly Rooms", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
+        { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
+      ],
     },
     {
-      title: "Manage Rooms",
-      icon: <Building2 size={20} />,
-      path: "/admin/rooms",
+      label: "Services",
+      items: [
+        { title: "Vehicles", icon: <Bike size={18} />, path: "/admin/vehicles" },
+        { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
+        { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
+        { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
+      ],
     },
     {
-      title: "Add Room",
-      icon: <HousePlus size={20} />,
-      path: "/admin/rooms/add",
+      label: "Finance",
+      items: [
+        { title: "Loan Requests", icon: <Banknote size={18} />, path: "/admin/loans" },
+      ],
     },
     {
-      title: "Manage Owners",
-      icon: <UserCog size={20} />,
-      path: "/admin/owners",
+      label: "Users",
+      items: [
+        { title: "Users", icon: <Users size={18} />, path: "/admin/users" },
+        { title: "Wishlist", icon: <Heart size={18} />, path: "/admin/wishlist" },
+      ],
     },
     {
-      title: "Laundry Vendors",
-      icon: <Shirt size={20} />,
-      path: "/admin/laundry-vendors",
-    },
-    {
-      title: "Mess Vendors",
-      icon: <UtensilsCrossed size={20} />,
-      path: "/admin/mess",
-    },
-    {
-      title: "Loan Requests",
-      icon: <Banknote size={20} />,
-      path: "/admin/loans",
-    },
-    {
-      title: "Vehicles",
-      icon: <Bike size={20} />,
-      path: "/admin/vehicles",
-    },
-    {
-      title: "Hourly Rooms",
-      icon: <DoorOpen size={20} />,
-      path: "/admin/hourly-rooms",
-    },
-    {
-      title: "Users",
-      icon: <Users size={20} />,
-      path: "/admin/users",
-    },
-    {
-      title: "Wishlist",
-      icon: <Heart size={20} />,
-      path: "/admin/wishlist",
-    },
-    {
-      title: "Settings",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
+      label: "System",
+      items: [
+        { title: "Settings", icon: <Settings size={18} />, path: "/admin/settings" },
+      ],
     },
   ];
 
   return (
     <aside className={`sidebar ${open ? "show-sidebar" : ""}`}>
 
-      {/* FIX: menu ab scrollable hai (sidebar-scroll), Logout button
-          hamesha neeche fixed/visible rahega, chahe menu items kitne
-          bhi badh jayein future me. */}
       <div className="sidebar-scroll">
 
         <div className="sidebar-top">
 
           <div className="sidebar-logo">
 
-            <h2>
-              Room<span>Slider</span>
-            </h2>
+            <div className="sidebar-logo-icon">
+              <Home size={20} strokeWidth={2.5} />
+            </div>
 
-            <p>SUPER ADMIN</p>
+            <div>
+              <h2>
+                Room<span>Slider</span>
+              </h2>
+              <p>SUPER ADMIN</p>
+            </div>
 
           </div>
 
@@ -111,34 +93,34 @@ function Sidebar({ open, closeSidebar }) {
             className="close-sidebar"
             onClick={closeSidebar}
           >
-            <X size={24} />
+            <X size={22} />
           </button>
 
         </div>
 
-        <nav>
+        {groups.map((group) => (
+          <div className="sidebar-group" key={group.label}>
 
-          {menu.map((item) => (
+            <div className="sidebar-group-label">{group.label}</div>
 
-            <NavLink
-              key={item.title}
-              to={item.path}
-              onClick={closeSidebar}
-              className={({ isActive }) =>
-                isActive
-                  ? "side-link active"
-                  : "side-link"
-              }
-            >
-              {item.icon}
+            <nav>
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.title}
+                  to={item.path}
+                  onClick={closeSidebar}
+                  className={({ isActive }) =>
+                    isActive ? "side-link active" : "side-link"
+                  }
+                >
+                  {item.icon}
+                  <span>{item.title}</span>
+                </NavLink>
+              ))}
+            </nav>
 
-              <span>{item.title}</span>
-
-            </NavLink>
-
-          ))}
-
-        </nav>
+          </div>
+        ))}
 
       </div>
 

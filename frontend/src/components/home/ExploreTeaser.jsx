@@ -1,6 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { BedDouble, Banknote, Bike, LayoutGrid, ArrowRight } from "lucide-react";
+import {
+  BedDouble,
+  Banknote,
+  Bike,
+  LayoutGrid,
+  ArrowRight,
+  UtensilsCrossed,
+  Shirt,
+  Sparkles,
+  Truck,
+  Sofa,
+  Wifi,
+  Wrench,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
 
@@ -33,13 +46,6 @@ const pillStyle = {
   gap: "4px",
 };
 
-const comingSoonPillStyle = {
-  ...pillStyle,
-  background: "var(--color-surface)",
-  color: "var(--color-text-light)",
-  border: "1px solid var(--color-border)",
-};
-
 function ExploreTeaser() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -64,14 +70,69 @@ function ExploreTeaser() {
       icon: Bike,
       title: "Rent a Vehicle",
       desc: "Bike and scooty rental by the day",
-      pill: "Coming Soon",
-      comingSoon: true,
-      onClick: () => navigate("/explore"),
+      pill: "Explore Now",
+      onClick: () => navigate("/vehicles"),
+    },
+    {
+      icon: UtensilsCrossed,
+      title: "Hungry? Order a Thali",
+      desc: "Mess near you with today's menu",
+      pill: "Explore Mess",
+      extra: true,
+      onClick: () => navigate("/mess"),
+    },
+    {
+      icon: Shirt,
+      title: "Need Laundry?",
+      desc: "Get your building's laundry vendor",
+      pill: "Explore Laundry",
+      extra: true,
+      onClick: () => navigate(user ? "/my-place" : "/login"),
+    },
+    {
+      icon: Sparkles,
+      title: "Cleaning & Housekeeping",
+      desc: "Room and bathroom cleaning",
+      pill: "Find Cleaners",
+      extra: true,
+      onClick: () => navigate("/services/cleaning"),
+    },
+    {
+      icon: Truck,
+      title: "Packers & Movers",
+      desc: "Easy shifting to your new place",
+      pill: "Find Movers",
+      extra: true,
+      onClick: () => navigate("/services/packers"),
+    },
+    {
+      icon: Sofa,
+      title: "Furniture & Appliance Rental",
+      desc: "Bed, cooler, AC, fridge on rent",
+      pill: "Explore Rentals",
+      extra: true,
+      onClick: () => navigate("/services/furniture"),
+    },
+    {
+      icon: Wifi,
+      title: "WiFi & RO Water",
+      desc: "Broadband and RO purifier service",
+      pill: "Find Providers",
+      extra: true,
+      onClick: () => navigate("/services/wifi"),
+    },
+    {
+      icon: Wrench,
+      title: "Appliance Repair",
+      desc: "Cooler, AC and geyser repair",
+      pill: "Find Repair",
+      extra: true,
+      onClick: () => navigate("/services/appliance-repair"),
     },
     {
       icon: LayoutGrid,
-      title: "More Services",
-      desc: "Mess, laundry and more",
+      title: "More",
+      desc: "See everything RoomSlider offers",
       pill: "View All",
       onClick: () => navigate("/explore"),
     },
@@ -82,10 +143,6 @@ function ExploreTeaser() {
       <div className="container">
         <div className="section-header">
           <h2>Explore</h2>
-          <Link to="/explore" className="view-all">
-            View All
-            <ArrowRight size={16} />
-          </Link>
         </div>
 
         <div
@@ -95,14 +152,19 @@ function ExploreTeaser() {
             gap: "12px",
           }}
         >
-          {tiles.map(({ icon: Icon, title, desc, pill, onClick, comingSoon }) => (
-            <div key={title} onClick={onClick} style={tileStyle}>
+          {tiles.map(({ icon: Icon, title, desc, pill, onClick, extra }) => (
+            <div
+              key={title}
+              onClick={onClick}
+              style={tileStyle}
+              className={extra ? "explore-extra-tile" : ""}
+            >
               <Icon size={22} color="var(--color-primary)" />
               <div style={titleStyle}>{title}</div>
               <div style={descStyle}>{desc}</div>
-              <span style={comingSoon ? comingSoonPillStyle : pillStyle}>
+              <span style={pillStyle}>
                 {pill}
-                {!comingSoon && <ArrowRight size={12} />}
+                <ArrowRight size={12} />
               </span>
             </div>
           ))}

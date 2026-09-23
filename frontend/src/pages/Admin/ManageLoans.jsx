@@ -6,10 +6,9 @@ import {
   Phone,
   Mail,
   GraduationCap,
-  User,
   MessageCircle,
 } from "lucide-react";
-import "../../styles/admin-loans.css";
+import "../../styles/admin/theme.css";
 
 const STATUS_OPTIONS = ["new", "contacted", "approved", "rejected"];
 
@@ -36,28 +35,20 @@ const ID_LABELS = {
 
 const tenDigits = (p) => String(p || "").replace(/\D/g, "").slice(-10);
 
-const formatAmount = (n) =>
-  n || n === 0 ? `₹${Number(n).toLocaleString("en-IN")}` : "-";
+const formatAmount = (n) => (n || n === 0 ? `₹${Number(n).toLocaleString("en-IN")}` : "-");
 
 const formatDate = (d) =>
   d
-    ? new Date(d).toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
+    ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
     : "-";
 
-const Row = ({ label, children }) => (
-  <div className="ml-row">
-    <span className="ml-label">{label}</span>
-    <span className="ml-value">{children || "-"}</span>
-  </div>
-);
+const statusBadgeColor = (status) =>
+  status === "approved" ? "green" : status === "rejected" ? "red" : status === "contacted" ? "blue" : "amber";
 
-const ManageLoans = () => {
+function ManageLoans() {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     fetchLoans();
@@ -78,9 +69,7 @@ const ManageLoans = () => {
   const handleStatusChange = async (id, newStatus) => {
     if (
       ["approved", "rejected"].includes(newStatus) &&
-      !window.confirm(
-        "Applicant ki ID photo hamesha ke liye delete ho jayegi. Continue?"
-      )
+      !window.confirm("Applicant ki ID photo hamesha ke liye delete ho jayegi. Continue?")
     ) {
       return;
     }
@@ -88,13 +77,13 @@ const ManageLoans = () => {
       await axios.put(`/loans/${id}/status`, { status: newStatus });
       setLoans((prev) =>
         prev.map((loan) =>
-          loan._id === id ? {
+          loan._id === id
+            ? {
                 ...loan,
                 status: newStatus,
-                ...(["approved", "rejected"].includes(newStatus)
-                  ? { idPhotoUrl: null }
-                  : {}),
-              } : loan
+                ...(["approved", "rejected"].includes(newStatus) ? { idPhotoUrl: null } : {}),
+              }
+            : loan
         )
       );
       toast.success("Status updated");
@@ -103,139 +92,172 @@ const ManageLoans = () => {
     }
   };
 
+  const pending = loans.filter((l) => l.status === "new").length;
+  const approved = loans.filter((l) => l.status === "approved").length;
+
   if (loading) {
-    return <div className="ml-page">Loading loan requests...</div>;
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading loan requests...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="ml-page">
-      <h2 className="ml-title">
-        <Banknote size={22} /> Student Loan Requests
-      </h2>
-
-      {loans.length === 0 ? (
-        <p className="ml-empty">No loan requests yet.</p>
-      ) : (
-        <div className="ml-grid">
-          {loans.map((loan) => {
-            const phone = tenDigits(loan.phone);
-            const guardianPhone = tenDigits(loan.guardianPhone);
-            const waText = encodeURIComponent(
-              `Hi ${loan.name}, this is RoomSlider about your student loan request.`
-            );
-
-            return (
-              <div className="ml-card" key={loan._id}>
-                <div className="ml-card-header">
-                  <User size={18} />
-                  <h3 className="ml-name">{loan.name}</h3>
-                  <span className={`ml-badge ml-badge--${loan.status}`}>
-                    {loan.status}
-                  </span>
-                </div>
-
-                <div className="ml-actions">
-                  <a className="ml-btn ml-btn--call" href={`tel:+91${phone}`}>
-                    <Phone size={16} /> Call
-                  </a>
-                  <a
-                    className="ml-btn ml-btn--wa"
-                    href={`https://wa.me/91${phone}?text=${waText}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <MessageCircle size={16} /> WhatsApp
-                  </a>
-                </div>
-
-                <div className="ml-amount">{formatAmount(loan.amount)}</div>
-
-                <div className="ml-rows">
-                  <div className="ml-row">
-                    <Phone size={14} />
-                    <span className="ml-value">{phone}</span>
-                  </div>
-                  {loan.email && (
-                    <div className="ml-row">
-                      <Mail size={14} />
-                      <span className="ml-value">{loan.email}</span>
-                    </div>
-                  )}
-                  <div className="ml-row">
-                    <GraduationCap size={14} />
-                    <span className="ml-value">
-                      {[loan.course, loan.college].filter(Boolean).join(", ") ||
-                        "-"}
-                    </span>
-                  </div>
-
-                  <Row label="Purpose">
-                    {PURPOSE_LABELS[loan.purpose] || loan.purpose}
-                  </Row>
-                  {loan.note && <Row label="Note">{loan.note}</Row>}
-                  <Row label="Family income">
-                    {INCOME_LABELS[loan.familyIncomeRange]}
-                  </Row>
-                  <Row label="ID type">
-                    {ID_LABELS[loan.idType] || loan.idType}
-                  </Row>
-                  {loan.idPhotoUrl && (
-                    <Row label="ID photo">
-                      <a
-                        className="ml-link"
-                        href={loan.idPhotoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View ID Photo
-                      </a>
-                    </Row>
-                  )}
-                  {(loan.guardianName || guardianPhone) && (
-                    <Row label="Guardian">
-                      {loan.guardianName}
-                      {loan.guardianOccupation
-                        ? ` (${loan.guardianOccupation})`
-                        : ""}
-                      {guardianPhone && (
-                        <>
-                          {" "}
-                          <a
-                            className="ml-link"
-                            href={`tel:+91${guardianPhone}`}
-                          >
-                            {guardianPhone}
-                          </a>
-                        </>
-                      )}
-                    </Row>
-                  )}
-                  <Row label="Applied on">{formatDate(loan.createdAt)}</Row>
-                </div>
-
-                <div className="ml-footer">
-                  <label>Status:</label>
-                  <select
-                    className="ml-select"
-                    value={loan.status}
-                    onChange={(e) =>
-                      handleStatusChange(loan._id, e.target.value)
-                    }
-                  >
-                    {STATUS_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            );
-          })}
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <h1>Student Loan Requests</h1>
+          <p>Applicant details and their loan status.</p>
         </div>
-      )}
+      </div>
+
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Requests</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Banknote size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{loans.length}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">New</span>
+            <div className="admin-stat-icon admin-badge amber">
+              <Banknote size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{pending}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Approved</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Banknote size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{approved}</div>
+        </div>
+      </div>
+
+      <div className="admin-table-wrap">
+        {loans.length === 0 ? (
+          <div className="admin-empty">
+            <h3>No loan requests yet</h3>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Applicant</th>
+                <th>Amount</th>
+                <th>Purpose</th>
+                <th>Applied On</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loans.map((loan) => {
+                const phone = tenDigits(loan.phone);
+                const guardianPhone = tenDigits(loan.guardianPhone);
+                const waText = encodeURIComponent(
+                  `Hi ${loan.name}, this is RoomSlider about your student loan request.`
+                );
+                const expanded = expandedId === loan._id;
+
+                return (
+                  <>
+                    <tr
+                      key={loan._id}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setExpandedId(expanded ? null : loan._id)}
+                    >
+                      <td style={{ fontWeight: 600 }}>{loan.name}</td>
+                      <td style={{ fontWeight: 700 }}>{formatAmount(loan.amount)}</td>
+                      <td style={{ color: "var(--admin-muted)" }}>
+                        {PURPOSE_LABELS[loan.purpose] || loan.purpose}
+                      </td>
+                      <td style={{ color: "var(--admin-muted)" }}>{formatDate(loan.createdAt)}</td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <select
+                          value={loan.status}
+                          onChange={(e) => handleStatusChange(loan._id, e.target.value)}
+                          style={{
+                            background: "var(--admin-bg)",
+                            border: "1px solid var(--admin-border)",
+                            borderRadius: 8,
+                            padding: "4px 8px",
+                            color: "var(--admin-text)",
+                            fontSize: 12.5,
+                          }}
+                        >
+                          {STATUS_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                          <a className="admin-icon-btn accent" href={`tel:+91${phone}`} title="Call">
+                            <Phone size={16} />
+                          </a>
+                          <a
+                            className="admin-icon-btn accent"
+                            href={`https://wa.me/91${phone}?text=${waText}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            title="WhatsApp"
+                          >
+                            <MessageCircle size={16} />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {expanded && (
+                      <tr>
+                        <td colSpan={6} style={{ background: "rgba(15,23,42,0.4)" }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10, padding: "10px 4px", fontSize: 13.5 }}>
+                            <div><Phone size={13} style={{ verticalAlign: -2 }} /> {phone}</div>
+                            {loan.email && <div><Mail size={13} style={{ verticalAlign: -2 }} /> {loan.email}</div>}
+                            <div><GraduationCap size={13} style={{ verticalAlign: -2 }} /> {[loan.course, loan.college].filter(Boolean).join(", ") || "-"}</div>
+                            {loan.note && <div>Note: {loan.note}</div>}
+                            <div>Family income: {INCOME_LABELS[loan.familyIncomeRange]}</div>
+                            <div>ID type: {ID_LABELS[loan.idType] || loan.idType}</div>
+                            {loan.idPhotoUrl && (
+                              <div>
+                                <a href={loan.idPhotoUrl} target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>
+                                  View ID Photo
+                                </a>
+                              </div>
+                            )}
+                            {(loan.guardianName || guardianPhone) && (
+                              <div>
+                                Guardian: {loan.guardianName} {loan.guardianOccupation ? `(${loan.guardianOccupation})` : ""}{" "}
+                                {guardianPhone && (
+                                  <a href={`tel:+91${guardianPhone}`} style={{ color: "var(--admin-accent)" }}>
+                                    {guardianPhone}
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
-};
+}
 
 export default ManageLoans;

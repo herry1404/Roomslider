@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Plus } from "lucide-react";
+import { Plus, Trash2, Bike, Store, MapPin } from "lucide-react";
 import api from "../../api/axios";
+import "../../styles/admin/theme.css";
 
 function ManageVehicles() {
   const [shops, setShops] = useState([]);
@@ -49,59 +50,131 @@ function ManageVehicles() {
     }
   };
 
-  if (loading) return <div style={{ padding: 24 }}>Loading...</div>;
+  const totalVehicles = Object.values(vehiclesByShop).reduce((sum, v) => sum + v.length, 0);
+  const availableVehicles = Object.values(vehiclesByShop)
+    .flat()
+    .filter((v) => v.available).length;
+
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1>Manage Vehicles</h1>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <h1>Manage Vehicles</h1>
+          <p>Vehicle rental shops and their listed vehicles.</p>
+        </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link to="/admin/vehicles/shops/add" className="publish-btn" style={{ padding: "10px 16px" }}>
-            <Plus size={16} style={{ verticalAlign: "-3px" }} /> Add Shop
+          <Link to="/admin/vehicles/shops/add" className="admin-btn secondary">
+            <Plus size={16} /> Add Shop
           </Link>
-          <Link to="/admin/vehicles/add" className="publish-btn" style={{ padding: "10px 16px" }}>
-            <Plus size={16} style={{ verticalAlign: "-3px" }} /> Add Vehicle
+          <Link to="/admin/vehicles/add" className="admin-btn">
+            <Plus size={16} /> Add Vehicle
           </Link>
         </div>
       </div>
 
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Shops</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Store size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{shops.length}</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Vehicles</span>
+            <div className="admin-stat-icon admin-badge blue">
+              <Bike size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{totalVehicles}</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Available Now</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Bike size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{availableVehicles}</div>
+        </div>
+      </div>
+
       {shops.length === 0 ? (
-        <p>No vehicle shops yet. Add one to get started.</p>
+        <div className="admin-table-wrap">
+          <div className="admin-empty">
+            <h3>No vehicle shops yet</h3>
+            <p>Add one to get started.</p>
+          </div>
+        </div>
       ) : (
         shops.map((shop) => (
-          <div key={shop._id} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, marginBottom: 18 }}>
-            <h3 style={{ marginBottom: 4 }}>{shop.shopName}</h3>
-            <p style={{ color: "#64748b", marginBottom: 12, fontSize: 14 }}>
-              {shop.address}, {shop.city} · {shop.contactNumber}
-            </p>
+          <div key={shop._id} className="admin-table-wrap" style={{ marginBottom: 18 }}>
+            <div style={{ padding: "16px 18px", borderBottom: "1px solid var(--admin-border)" }}>
+              <h3 style={{ margin: 0, fontSize: 16 }}>{shop.shopName}</h3>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: 13,
+                  color: "var(--admin-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <MapPin size={13} /> {shop.address}, {shop.city} · {shop.contactNumber}
+              </p>
+            </div>
 
             {(vehiclesByShop[shop._id] || []).length === 0 ? (
-              <p style={{ fontSize: 14, color: "#94a3b8" }}>No vehicles added for this shop yet</p>
+              <div className="admin-empty" style={{ padding: "24px" }}>
+                <p style={{ margin: 0 }}>No vehicles added for this shop yet</p>
+              </div>
             ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+              <table className="admin-table">
                 <thead>
-                  <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
-                    <th style={{ padding: "6px 8px" }}>Name</th>
-                    <th style={{ padding: "6px 8px" }}>Type</th>
-                    <th style={{ padding: "6px 8px" }}>Day Price</th>
-                    <th style={{ padding: "6px 8px" }}>Available</th>
-                    <th style={{ padding: "6px 8px" }}></th>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Day Price</th>
+                    <th>Available</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {vehiclesByShop[shop._id].map((v) => (
-                    <tr key={v._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "6px 8px" }}>{v.name}</td>
-                      <td style={{ padding: "6px 8px" }}>{v.type}</td>
-                      <td style={{ padding: "6px 8px" }}>₹{v.pricePerDay}</td>
-                      <td style={{ padding: "6px 8px" }}>{v.available ? "Yes" : "No"}</td>
-                      <td style={{ padding: "6px 8px" }}>
-                        <button
-                          onClick={() => deleteVehicle(v._id)}
-                          style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}
-                        >
-                          Delete
-                        </button>
+                    <tr key={v._id}>
+                      <td style={{ fontWeight: 600 }}>{v.name}</td>
+                      <td style={{ color: "var(--admin-muted)" }}>{v.type}</td>
+                      <td style={{ fontWeight: 700 }}>₹{v.pricePerDay}</td>
+                      <td>
+                        <span className={`admin-badge ${v.available ? "green" : "red"}`}>
+                          <span className="admin-badge-dot" />
+                          {v.available ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                          <button
+                            className="admin-icon-btn danger"
+                            title="Delete"
+                            onClick={() => deleteVehicle(v._id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

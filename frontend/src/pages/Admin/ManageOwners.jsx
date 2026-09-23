@@ -12,7 +12,7 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import "../../styles/manageOwners.css";
+import "../../styles/admin/theme.css";
 
 function ManageOwners() {
   const [owners, setOwners] = useState([]);
@@ -28,17 +28,13 @@ function ManageOwners() {
     propertyName: "",
   });
 
-  // GET ALL OWNERS
   const fetchOwners = async () => {
     try {
       setLoading(true);
       const res = await api.get("/owners");
       setOwners(res.data || []);
     } catch (error) {
-      console.log(error);
-      toast.error(
-        error.response?.data?.message || "Owners load nahi ho paye"
-      );
+      toast.error(error.response?.data?.message || "Owners load nahi ho paye");
     } finally {
       setLoading(false);
     }
@@ -48,7 +44,6 @@ function ManageOwners() {
     fetchOwners();
   }, []);
 
-  // CREATE OWNER
   const handleAddOwner = async (e) => {
     e.preventDefault();
     try {
@@ -58,18 +53,12 @@ function ManageOwners() {
       setForm({ name: "", phone: "", password: "", propertyName: "" });
       fetchOwners();
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Owner create failed"
-      );
+      toast.error(error.response?.data?.message || "Owner create failed");
     }
   };
 
-  // DELETE OWNER
   const handleDelete = async (id) => {
-    const confirm = window.confirm(
-      "Kya aap is owner ko delete karna chahte ho?"
-    );
-    if (!confirm) return;
+    if (!window.confirm("Kya aap is owner ko delete karna chahte ho?")) return;
 
     try {
       await api.delete(`/owners/${id}`);
@@ -80,7 +69,6 @@ function ManageOwners() {
     }
   };
 
-  // SEARCH
   const filteredOwners = owners.filter((owner) => {
     const value = search.toLowerCase();
     return (
@@ -90,115 +78,208 @@ function ManageOwners() {
     );
   });
 
+  const totalRooms = owners.reduce((sum, o) => sum + (o.totalRooms || 0), 0);
+  const occupiedRooms = owners.reduce((sum, o) => sum + (o.occupiedRooms || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading owners...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="manage-owners-page">
-      <div className="owners-header">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div>
           <h1>Manage Owners</h1>
-          <p>Property owners ko manage kare</p>
+          <p>Property owners ko manage kare.</p>
+        </div>
+        <button className="admin-btn" onClick={() => setShowAddModal(true)}>
+          <Plus size={18} /> Add Owner
+        </button>
+      </div>
+
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Owners</span>
+            <div className="admin-stat-icon admin-badge green">
+              <UserCog size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{owners.length}</div>
         </div>
 
-        <div className="owners-header-actions">
-          <div className="owners-search">
-            <Search size={20} />
-            <input
-              type="text"
-              placeholder="Search owner or property..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Rooms</span>
+            <div className="admin-stat-icon admin-badge blue">
+              <Home size={18} />
+            </div>
           </div>
+          <div className="admin-stat-value">{totalRooms}</div>
+        </div>
 
-          <button className="add-owner-btn" onClick={() => setShowAddModal(true)}>
-            <Plus size={18} />
-            Add Owner
-          </button>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Occupied Rooms</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Building2 size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{occupiedRooms}</div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading-box">Loading Owners...</div>
-      ) : (
-        <div className="owners-grid">
-          {filteredOwners.map((owner) => (
-            <div
-              className="owner-card"
-              key={owner._id}
-              onClick={() => navigate(`/admin/owners/${owner._id}`)}
-            >
-              <div className="owner-top">
-                <div className="avatar">
-                  <UserCog size={28} />
-                </div>
-                <div>
-                  <h3>{owner.name}</h3>
-                  <span>{owner.propertyName || "No property name"}</span>
-                </div>
-              </div>
-
-              <div className="owner-details">
-                <div className="detail-row">
-                  <Phone size={16} />
-                  <p>{owner.phone}</p>
-                </div>
-              </div>
-
-              <div className="owner-stats">
-                <div className="stat-box">
-                  <Home size={16} />
-                  <span>{owner.totalRooms}</span>
-                  <p>Total</p>
-                </div>
-                <div className="stat-box occupied">
-                  <span>{owner.occupiedRooms}</span>
-                  <p>Occupied</p>
-                </div>
-                <div className="stat-box vacant">
-                  <span>{owner.vacantRooms}</span>
-                  <p>Vacant</p>
-                </div>
-              </div>
-
-              <button
-                className="delete-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(owner._id);
-                }}
-              >
-                <Trash2 size={17} />
-                Delete
-              </button>
-            </div>
-          ))}
+      <div className="admin-toolbar">
+        <div className="admin-search">
+          <Search size={16} />
+          <input
+            type="text"
+            placeholder="Search owner or property..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-      )}
+      </div>
 
-      {filteredOwners.length === 0 && !loading && (
-        <div className="empty-owners">
-          <Building2 size={45} />
-          <h3>No Owners Found</h3>
-          <p>Koi owner add nahi hua hai abhi tak.</p>
-        </div>
-      )}
+      <div className="admin-table-wrap">
+        {filteredOwners.length === 0 ? (
+          <div className="admin-empty">
+            <h3>No owners found</h3>
+            <p>Koi owner add nahi hua hai abhi tak.</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Owner</th>
+                <th>Phone</th>
+                <th>Total</th>
+                <th>Occupied</th>
+                <th>Vacant</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOwners.map((owner) => (
+                <tr
+                  key={owner._id}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/admin/owners/${owner._id}`)}
+                >
+                  <td>
+                    <div className="admin-row-thumb">
+                      <div
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: "50%",
+                          background: "var(--admin-accent-soft)",
+                          color: "var(--admin-accent)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <UserCog size={18} />
+                      </div>
+                      <div>
+                        <div>{owner.name}</div>
+                        <div style={{ fontSize: 12, color: "var(--admin-muted)", fontWeight: 400 }}>
+                          {owner.propertyName || "No property name"}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>{owner.phone}</td>
+                  <td style={{ fontWeight: 700 }}>{owner.totalRooms || 0}</td>
+                  <td>
+                    <span className="admin-badge blue">
+                      <span className="admin-badge-dot" />
+                      {owner.occupiedRooms || 0}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="admin-badge amber">
+                      <span className="admin-badge-dot" />
+                      {owner.vacantRooms || 0}
+                    </span>
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                      <button
+                        className="admin-icon-btn danger"
+                        title="Delete"
+                        onClick={() => handleDelete(owner._id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-      {/* ADD OWNER MODAL */}
       {showAddModal && (
-        <div className="profile-overlay">
-          <div className="profile-modal">
-            <button className="close-modal" onClick={() => setShowAddModal(false)}>
+        <div
+          onClick={() => setShowAddModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--admin-card)",
+              border: "1px solid var(--admin-border)",
+              borderRadius: 16,
+              padding: 26,
+              width: "90%",
+              maxWidth: 400,
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowAddModal(false)}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 14,
+                background: "none",
+                border: "none",
+                color: "var(--admin-muted)",
+                cursor: "pointer",
+              }}
+            >
               <X size={20} />
             </button>
 
-            <h2>Add New Owner</h2>
+            <h2 style={{ marginBottom: 18 }}>Add New Owner</h2>
 
-            <form className="add-owner-form" onSubmit={handleAddOwner}>
+            <form
+              onSubmit={handleAddOwner}
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
+              {["name", "phone", "password", "propertyName"].map((f) => null)}
               <input
                 type="text"
                 placeholder="Owner Name"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="tel"
@@ -207,9 +288,8 @@ function ManageOwners() {
                 pattern="[6-9][0-9]{9}"
                 maxLength={10}
                 value={form.phone}
-                onChange={(e) =>
-                  setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
-                }
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })}
+                style={inputStyle}
               />
               <input
                 type="password"
@@ -217,15 +297,17 @@ function ManageOwners() {
                 required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="text"
                 placeholder="Property Name (e.g. Ambe's Building)"
                 value={form.propertyName}
                 onChange={(e) => setForm({ ...form, propertyName: e.target.value })}
+                style={inputStyle}
               />
 
-              <button type="submit" className="submit-btn">
+              <button type="submit" className="admin-btn" style={{ justifyContent: "center" }}>
                 Create Owner
               </button>
             </form>
@@ -235,5 +317,14 @@ function ManageOwners() {
     </div>
   );
 }
+
+const inputStyle = {
+  background: "var(--admin-bg)",
+  border: "1px solid var(--admin-border)",
+  borderRadius: 12,
+  padding: "10px 12px",
+  color: "var(--admin-text)",
+  fontSize: 14,
+};
 
 export default ManageOwners;

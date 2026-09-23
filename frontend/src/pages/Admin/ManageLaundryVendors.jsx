@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Shirt, Phone, Trash2, Plus, X, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
-import "../../styles/manageOwners.css";
+import "../../styles/admin/theme.css";
 
 function ManageLaundryVendors() {
   const [vendors, setVendors] = useState([]);
@@ -11,12 +11,7 @@ function ManageLaundryVendors() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const [form, setForm] = useState({
-    ownerId: "",
-    vendorName: "",
-    phone: "",
-    area: "",
-  });
+  const [form, setForm] = useState({ ownerId: "", vendorName: "", phone: "", area: "" });
 
   const fetchData = async () => {
     try {
@@ -28,7 +23,6 @@ function ManageLaundryVendors() {
       setVendors(vendorsRes.data.vendors || []);
       setOwners(ownersRes.data || []);
     } catch (error) {
-      console.error("FETCH LAUNDRY VENDORS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to load vendors");
     } finally {
       setLoading(false);
@@ -69,106 +63,155 @@ function ManageLaundryVendors() {
       setShowModal(false);
       fetchData();
     } catch (error) {
-      console.error("SAVE LAUNDRY VENDOR ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to save vendor");
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete this vendor?");
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Delete this vendor?")) return;
     try {
       await api.delete(`/laundry-vendors/${id}`);
       toast.success("Vendor deleted");
       fetchData();
     } catch (error) {
-      console.error("DELETE LAUNDRY VENDOR ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to delete vendor");
     }
   };
 
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading vendors...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="manage-owners-page">
-      <div className="owners-header">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div>
           <h1>Laundry Vendors</h1>
-          <p>Har owner (building) ke liye laundry vendor set karo</p>
+          <p>Har owner (building) ke liye laundry vendor set karo.</p>
         </div>
+        <button className="admin-btn" onClick={openAddModal}>
+          <Plus size={18} /> Add Vendor
+        </button>
+      </div>
 
-        <div className="owners-header-actions">
-          <button className="add-owner-btn" onClick={openAddModal}>
-            <Plus size={18} />
-            Add Vendor
-          </button>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Vendors</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Shirt size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{vendors.length}</div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading-box">Loading vendors...</div>
-      ) : (
-        <div className="owners-grid">
-          {vendors.map((v) => (
-            <div className="owner-card" key={v._id}>
-              <div className="owner-top">
-                <div className="avatar">
-                  <Shirt size={28} />
-                </div>
-                <div>
-                  <h3>{v.vendorName}</h3>
-                  <span>{v.owner?.propertyName || v.owner?.name || "Unknown building"}</span>
-                </div>
-              </div>
-
-              <div className="owner-details">
-                <div className="detail-row">
-                  <Phone size={16} />
-                  <p>{v.phone}</p>
-                </div>
-                {v.area && (
-                  <div className="detail-row">
-                    <p>Area: {v.area}</p>
-                  </div>
-                )}
-              </div>
-
-              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                <button className="delete-btn" style={{ background: "#eff6ff", color: "#2563eb" }} onClick={() => openEditModal(v)}>
-                  <Pencil size={16} />
-                  Edit
-                </button>
-                <button className="delete-btn" onClick={() => handleDelete(v._id)}>
-                  <Trash2 size={16} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {vendors.length === 0 && !loading && (
-        <div className="empty-owners">
-          <Shirt size={45} />
-          <h3>No Vendors Yet</h3>
-          <p>Koi laundry vendor add nahi hua hai abhi tak.</p>
-        </div>
-      )}
+      <div className="admin-table-wrap">
+        {vendors.length === 0 ? (
+          <div className="admin-empty">
+            <h3>No vendors yet</h3>
+            <p>Koi laundry vendor add nahi hua hai abhi tak.</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                <th>Building</th>
+                <th>Phone</th>
+                <th>Area</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vendors.map((v) => (
+                <tr key={v._id}>
+                  <td>
+                    <div className="admin-row-thumb">
+                      <div
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 10,
+                          background: "var(--admin-accent-soft)",
+                          color: "var(--admin-accent)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Shirt size={16} />
+                      </div>
+                      <span>{v.vendorName}</span>
+                    </div>
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>
+                    {v.owner?.propertyName || v.owner?.name || "Unknown building"}
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>{v.phone}</td>
+                  <td style={{ color: "var(--admin-muted)" }}>{v.area || "-"}</td>
+                  <td>
+                    <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                      <button className="admin-icon-btn accent" title="Edit" onClick={() => openEditModal(v)}>
+                        <Pencil size={16} />
+                      </button>
+                      <button className="admin-icon-btn danger" title="Delete" onClick={() => handleDelete(v._id)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {showModal && (
-        <div className="profile-overlay">
-          <div className="profile-modal">
-            <button className="close-modal" onClick={() => setShowModal(false)}>
+        <div
+          onClick={() => setShowModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--admin-card)",
+              border: "1px solid var(--admin-border)",
+              borderRadius: 16,
+              padding: 26,
+              width: "100%",
+              maxWidth: 400,
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              style={{ position: "absolute", top: 12, right: 14, background: "none", border: "none", color: "var(--admin-muted)", cursor: "pointer" }}
+            >
               <X size={20} />
             </button>
 
-            <h2>{editingId ? "Edit Vendor" : "Add Vendor"}</h2>
+            <h2 style={{ marginBottom: 18 }}>{editingId ? "Edit Vendor" : "Add Vendor"}</h2>
 
-            <form className="add-owner-form" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <select
                 required
                 value={form.ownerId}
                 onChange={(e) => setForm({ ...form, ownerId: e.target.value })}
+                style={inputStyle}
               >
                 <option value="">Select Owner (Building)</option>
                 {owners.map((o) => (
@@ -183,6 +226,7 @@ function ManageLaundryVendors() {
                 required
                 value={form.vendorName}
                 onChange={(e) => setForm({ ...form, vendorName: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="text"
@@ -190,15 +234,17 @@ function ManageLaundryVendors() {
                 required
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="text"
                 placeholder="Area label (optional, e.g. Bawarkuan)"
                 value={form.area}
                 onChange={(e) => setForm({ ...form, area: e.target.value })}
+                style={inputStyle}
               />
 
-              <button type="submit" className="submit-btn">
+              <button type="submit" className="admin-btn" style={{ justifyContent: "center" }}>
                 {editingId ? "Update Vendor" : "Add Vendor"}
               </button>
             </form>
@@ -208,5 +254,14 @@ function ManageLaundryVendors() {
     </div>
   );
 }
+
+const inputStyle = {
+  background: "var(--admin-bg)",
+  border: "1px solid var(--admin-border)",
+  borderRadius: 12,
+  padding: "10px 12px",
+  color: "var(--admin-text)",
+  fontSize: 14,
+};
 
 export default ManageLaundryVendors;

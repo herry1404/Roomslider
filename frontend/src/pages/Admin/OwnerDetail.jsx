@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-
+import { ArrowLeft, Home, DoorOpen, Building2 } from "lucide-react";
 import api from "../../api/axios";
-
-import "../../styles/owner/dashboard.css";
+import "../../styles/admin/theme.css";
 
 function OwnerDetail() {
   const { id } = useParams();
@@ -21,10 +20,7 @@ function OwnerDetail() {
         setOwner(res.data.owner);
         setRooms(res.data.rooms || []);
       } catch (error) {
-        console.error("OWNER DETAIL ERROR:", error);
-        toast.error(
-          error.response?.data?.message || "Failed to load owner"
-        );
+        toast.error(error.response?.data?.message || "Failed to load owner");
       } finally {
         setLoading(false);
       }
@@ -39,133 +35,121 @@ function OwnerDetail() {
 
   if (loading) {
     return (
-      <div className="owner-dashboard">
-        <p>Loading owner details...</p>
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading owner details...</p>
       </div>
     );
   }
 
   if (!owner) {
     return (
-      <div className="owner-dashboard">
-        <p>Owner not found.</p>
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Owner not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="owner-dashboard">
-
-      <div className="owner-dashboard-top">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div>
-          <h2>{owner.name}</h2>
+          <h1>{owner.name}</h1>
           <p>{owner.phone}</p>
         </div>
+        <button className="admin-btn secondary" onClick={() => navigate("/admin/owners")}>
+          <ArrowLeft size={16} /> Back to Owners
+        </button>
+      </div>
 
-        <div className="owner-dashboard-actions">
-          <button
-            className="owner-btn owner-btn-secondary"
-            onClick={() => navigate("/admin/owners")}
-          >
-            Back to Owners
-          </button>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Rooms</span>
+            <div className="admin-stat-icon admin-badge green">
+              <Home size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{totalRooms}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Vacant</span>
+            <div className="admin-stat-icon admin-badge amber">
+              <DoorOpen size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{vacantRooms}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Occupied</span>
+            <div className="admin-stat-icon admin-badge blue">
+              <Building2 size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{occupiedRooms}</div>
         </div>
       </div>
 
-      <div className="owner-stats-grid">
-        <div className="owner-stat-card total">
-          <span>Total Rooms</span>
-          <h2>{totalRooms}</h2>
-        </div>
-
-        <div className="owner-stat-card vacant">
-          <span>Vacant</span>
-          <h2>{vacantRooms}</h2>
-        </div>
-
-        <div className="owner-stat-card occupied">
-          <span>Occupied</span>
-          <h2>{occupiedRooms}</h2>
-        </div>
-      </div>
-
-      <div className="owner-rooms-section">
-        <div className="owner-rooms-header">
-          <h3>Rooms</h3>
-        </div>
-
+      <div className="admin-table-wrap">
         {rooms.length === 0 ? (
-          <div className="owner-empty-state">
+          <div className="admin-empty">
+            <h3>No rooms yet</h3>
             <p>This owner hasn't added any rooms yet.</p>
           </div>
         ) : (
-          <div className="owner-rooms-grid">
-            {rooms.map((room) => (
-              <div
-                key={room._id}
-                className="owner-room-card"
-                onClick={() => navigate(`/admin/rooms/${room._id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <img
-                  src={room.images?.[0] || "/placeholder-room.jpg"}
-                  alt={room.title || "Room"}
-                  className="owner-room-image"
-                />
-                <div className="owner-room-body">
-                  <div className="owner-room-top-row">
-                    <div>
-                      <div className="owner-room-title">
-                        {room.title || "Untitled Room"}
-                      </div>
-                      {room.roomNumber && (
-                        <div className="owner-room-number">
-                          Room #{room.roomNumber}
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ textAlign: "right" }}>
-                      <span
-                        className={`owner-status-badge ${room.status || "vacant"}`}
-                      >
-                        {room.status || "vacant"}
-                      </span>
-                      {room.status === "occupied" && room.liveRentStatus && (
-                        <div>
-                          <span className={`owner-rent-badge ${room.liveRentStatus}`}>
-                            Rent: {room.liveRentStatus}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="owner-room-price">
-                    ₹{room.price?.toLocaleString("en-IN") || 0}
-                    <span> /month</span>
-                  </div>
-
-                  {room.status === "occupied" && (
-                    <div style={{ marginTop: 8, fontSize: 13, color: "#374151" }}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Rent (₹/mo)</th>
+                <th>Status</th>
+                <th>Tenant</th>
+                <th>Advance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rooms.map((room) => (
+                <tr
+                  key={room._id}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/admin/rooms/${room._id}`)}
+                >
+                  <td>
+                    <div className="admin-row-thumb">
+                      <img src={room.images?.[0] || "/placeholder-room.jpg"} alt={room.title} />
                       <div>
-                        Tenant: <strong>{room.currentTenant?.name || "—"}</strong>
-                      </div>
-                      <div style={{ color: "#6b7280" }}>
-                        {room.currentTenant?.phone || "No phone on file"}
-                      </div>
-                      <div className="owner-advance-tag">
-                        Advance: <strong>₹{room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}</strong>
+                        <div>{room.title || "Untitled Room"}</div>
+                        {room.roomNumber && (
+                          <div style={{ fontSize: 12, color: "var(--admin-muted)", fontWeight: 400 }}>
+                            Room #{room.roomNumber}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+                  </td>
+                  <td style={{ fontWeight: 700 }}>₹{room.price?.toLocaleString("en-IN") || 0}</td>
+                  <td>
+                    <span className={`admin-badge ${room.status === "occupied" ? "blue" : "green"}`}>
+                      <span className="admin-badge-dot" />
+                      {room.status || "vacant"}
+                      {room.status === "occupied" && room.liveRentStatus ? ` · ${room.liveRentStatus}` : ""}
+                    </span>
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>
+                    {room.status === "occupied" ? room.currentTenant?.name || "—" : "-"}
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>
+                    {room.status === "occupied"
+                      ? `₹${room.currentTenant?.advanceAmount?.toLocaleString("en-IN") || 0}`
+                      : "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
-
     </div>
   );
 }

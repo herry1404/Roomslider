@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { UtensilsCrossed, Phone, MapPin, Trash2, Plus, X, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
-import "../../styles/manageOwners.css";
+import "../../styles/admin/theme.css";
 
 function ManageMess() {
   const [messList, setMessList] = useState([]);
@@ -24,13 +24,8 @@ function ManageMess() {
   const [form, setForm] = useState(emptyForm);
   const [images, setImages] = useState([]);
 
-  const handleImageChange = (e) => {
-    setImages(Array.from(e.target.files));
-  };
-
-  const removeImage = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  const handleImageChange = (e) => setImages(Array.from(e.target.files));
+  const removeImage = (index) => setImages(images.filter((_, i) => i !== index));
 
   const fetchData = async () => {
     try {
@@ -38,7 +33,6 @@ function ManageMess() {
       const res = await api.get("/mess");
       setMessList(res.data || []);
     } catch (error) {
-      console.error("FETCH MESS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to load mess list");
     } finally {
       setLoading(false);
@@ -89,10 +83,7 @@ function ManageMess() {
       data.append("latitude", form.latitude);
       data.append("longitude", form.longitude);
       data.append("pricePerPerson", form.pricePerPerson);
-
-      images.forEach((image) => {
-        data.append("images", image);
-      });
+      images.forEach((image) => data.append("images", image));
 
       if (editingId) {
         await api.put(`/mess/${editingId}`, data, {
@@ -108,7 +99,6 @@ function ManageMess() {
       setShowModal(false);
       fetchData();
     } catch (error) {
-      console.error("SAVE MESS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to save mess");
     } finally {
       setSaving(false);
@@ -116,15 +106,12 @@ function ManageMess() {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete this mess?");
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Delete this mess?")) return;
     try {
       await api.delete(`/mess/${id}`);
       toast.success("Mess deleted");
       fetchData();
     } catch (error) {
-      console.error("DELETE MESS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to delete mess");
     }
   };
@@ -136,103 +123,169 @@ function ManageMess() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setForm((f) => ({
-          ...f,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        }));
+        setForm((f) => ({ ...f, latitude: pos.coords.latitude, longitude: pos.coords.longitude }));
         toast.success("Location captured");
       },
       () => toast.error("Could not get location")
     );
   };
 
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading mess list...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="manage-owners-page">
-      <div className="owners-header">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div>
           <h1>Mess Vendors</h1>
-          <p>Sab mess add/manage karo — har mess ka apna login aur menu hoga</p>
+          <p>Sab mess add/manage karo — har mess ka apna login aur menu hoga.</p>
         </div>
+        <button className="admin-btn" onClick={openAddModal}>
+          <Plus size={18} /> Add Mess
+        </button>
+      </div>
 
-        <div className="owners-header-actions">
-          <button className="add-owner-btn" onClick={openAddModal}>
-            <Plus size={18} />
-            Add Mess
-          </button>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total Mess</span>
+            <div className="admin-stat-icon admin-badge green">
+              <UtensilsCrossed size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{messList.length}</div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading-box">Loading mess list...</div>
-      ) : (
-        <div className="owners-grid">
-          {messList.map((m) => (
-            <div className="owner-card" key={m._id}>
-              <div className="owner-top">
-                <div className="avatar" style={{ overflow: "hidden" }}>
-                  {m.images && m.images[0] ? (
-                    <img src={m.images[0]} alt={m.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  ) : (
-                    <UtensilsCrossed size={28} />
-                  )}
-                </div>
-                <div>
-                  <h3>{m.name}</h3>
-                  <span>₹{m.pricePerPerson}/thali</span>
-                </div>
-              </div>
-
-              <div className="owner-details">
-                <div className="detail-row">
-                  <Phone size={16} />
-                  <p>{m.phone}</p>
-                </div>
-                <div className="detail-row">
-                  <MapPin size={16} />
-                  <p>{m.address}</p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                <button className="delete-btn" style={{ background: "#eff6ff", color: "#2563eb" }} onClick={() => openEditModal(m)}>
-                  <Pencil size={16} />
-                  Edit
-                </button>
-                <button className="delete-btn" onClick={() => handleDelete(m._id)}>
-                  <Trash2 size={16} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {messList.length === 0 && !loading && (
-        <div className="empty-owners">
-          <UtensilsCrossed size={45} />
-          <h3>No Mess Yet</h3>
-          <p>Koi mess add nahi hua hai abhi tak.</p>
-        </div>
-      )}
+      <div className="admin-table-wrap">
+        {messList.length === 0 ? (
+          <div className="admin-empty">
+            <h3>No mess yet</h3>
+            <p>Koi mess add nahi hua hai abhi tak.</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Mess</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Price/Thali</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {messList.map((m) => (
+                <tr key={m._id}>
+                  <td>
+                    <div className="admin-row-thumb">
+                      {m.images?.[0] ? (
+                        <img src={m.images[0]} alt={m.name} />
+                      ) : (
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 10,
+                            background: "var(--admin-accent-soft)",
+                            color: "var(--admin-accent)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <UtensilsCrossed size={18} />
+                        </div>
+                      )}
+                      <span>{m.name}</span>
+                    </div>
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>{m.phone}</td>
+                  <td style={{ color: "var(--admin-muted)" }}>{m.address}</td>
+                  <td style={{ fontWeight: 700 }}>₹{m.pricePerPerson}</td>
+                  <td>
+                    <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                      <button
+                        className="admin-icon-btn accent"
+                        title="Edit"
+                        onClick={() => openEditModal(m)}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        className="admin-icon-btn danger"
+                        title="Delete"
+                        onClick={() => handleDelete(m._id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {showModal && (
-        <div className="profile-overlay">
-          <div className="profile-modal">
-            <button className="close-modal" onClick={() => setShowModal(false)}>
+        <div
+          onClick={() => setShowModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--admin-card)",
+              border: "1px solid var(--admin-border)",
+              borderRadius: 16,
+              padding: 26,
+              width: "100%",
+              maxWidth: 420,
+              maxHeight: "85vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 14,
+                background: "none",
+                border: "none",
+                color: "var(--admin-muted)",
+                cursor: "pointer",
+              }}
+            >
               <X size={20} />
             </button>
 
-            <h2>{editingId ? "Edit Mess" : "Add Mess"}</h2>
+            <h2 style={{ marginBottom: 18 }}>{editingId ? "Edit Mess" : "Add Mess"}</h2>
 
-            <form className="add-owner-form" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <input
                 type="text"
                 placeholder="Mess Name"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="text"
@@ -240,6 +293,7 @@ function ManageMess() {
                 required
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="password"
@@ -247,6 +301,7 @@ function ManageMess() {
                 required={!editingId}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="text"
@@ -254,6 +309,7 @@ function ManageMess() {
                 required
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
+                style={inputStyle}
               />
               <input
                 type="number"
@@ -261,6 +317,7 @@ function ManageMess() {
                 required
                 value={form.pricePerPerson}
                 onChange={(e) => setForm({ ...form, pricePerPerson: e.target.value })}
+                style={inputStyle}
               />
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -271,6 +328,7 @@ function ManageMess() {
                   required
                   value={form.latitude}
                   onChange={(e) => setForm({ ...form, latitude: e.target.value })}
+                  style={inputStyle}
                 />
                 <input
                   type="number"
@@ -279,31 +337,27 @@ function ManageMess() {
                   required
                   value={form.longitude}
                   onChange={(e) => setForm({ ...form, longitude: e.target.value })}
+                  style={inputStyle}
                 />
               </div>
 
-              <button type="button" className="submit-btn" style={{ background: "var(--color-surface-2)", color: "var(--color-text)" }} onClick={useMyLocation}>
+              <button type="button" className="admin-btn secondary" onClick={useMyLocation}>
                 Use My Current Location
               </button>
 
-              <label style={{ fontWeight: 600, marginTop: 8 }}>
+              <label style={{ fontSize: 13, color: "var(--admin-muted)" }}>
                 Mess Images {editingId ? "(leave empty to keep existing)" : ""}
               </label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-              />
+              <input type="file" multiple accept="image/*" onChange={handleImageChange} />
 
               {images.length > 0 && (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {images.map((img, idx) => (
                     <div key={idx} style={{ position: "relative" }}>
                       <img
                         src={URL.createObjectURL(img)}
                         alt="preview"
-                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
+                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
                       />
                       <button
                         type="button"
@@ -312,7 +366,7 @@ function ManageMess() {
                           position: "absolute",
                           top: -6,
                           right: -6,
-                          background: "#dc2626",
+                          background: "#f43f5e",
                           color: "#fff",
                           border: "none",
                           borderRadius: "50%",
@@ -329,12 +383,8 @@ function ManageMess() {
                 </div>
               )}
 
-              <button type="submit" className="submit-btn" disabled={saving}>
-                {saving
-                  ? "Saving..."
-                  : editingId
-                  ? "Update Mess"
-                  : "Add Mess"}
+              <button type="submit" className="admin-btn" disabled={saving} style={{ justifyContent: "center" }}>
+                {saving ? "Saving..." : editingId ? "Update Mess" : "Add Mess"}
               </button>
             </form>
           </div>
@@ -343,5 +393,14 @@ function ManageMess() {
     </div>
   );
 }
+
+const inputStyle = {
+  background: "var(--admin-bg)",
+  border: "1px solid var(--admin-border)",
+  borderRadius: 12,
+  padding: "10px 12px",
+  color: "var(--admin-text)",
+  fontSize: 14,
+};
 
 export default ManageMess;
