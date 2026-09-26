@@ -86,11 +86,9 @@ export function AuthProvider({ children }) {
 
   const googleLogin = async (credential) => {
     try {
-      console.log("Google Login Credential Received");
 
       const res = await api.post("/auth/google", { credential });
 
-      console.log("Google Login Response:", res.data);
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
@@ -120,7 +118,6 @@ export function AuthProvider({ children }) {
 
   const ownerLogin = async (data) => {
     try {
-      console.log("Owner Login Data:", data);
 
       const res = await api.post("/owners/login", data);
 

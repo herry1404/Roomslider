@@ -25,7 +25,7 @@ import {
   Bar,
 } from "recharts";
 import api from "../../api/axios";
-import AdminLayout from "../../components/admin/AdminLayout";
+import "../../styles/admin/theme.css";
 import "../../styles/admin/dashboard.css";
 import RecentActivity from "./RecentActivity";
 
@@ -58,10 +58,20 @@ function StatCard({ label, value, icon, accent, prefix = "" }) {
   const count = useCountUp(value);
 
   return (
-    <div className="dashboard-card" style={{ "--accent": accent }}>
-      <div className="dashboard-card-icon">{icon}</div>
-      <span>{label}</span>
-      <h2>{prefix}{count.toLocaleString("en-IN")}</h2>
+    <div className="admin-stat-card">
+      <div className="admin-stat-top">
+        <span className="admin-stat-label">{label}</span>
+        <div
+          className="admin-stat-icon"
+          style={{ color: accent, background: `${accent}22` }}
+        >
+          {icon}
+        </div>
+      </div>
+      <h2 className="admin-stat-value">
+        {prefix}
+        {count.toLocaleString("en-IN")}
+      </h2>
     </div>
   );
 }
@@ -101,88 +111,101 @@ function AdminDashboard() {
   ];
 
   return (
-    <AdminLayout>
-      <div className="dashboard">
-        <div className="dashboard-top">
-          <div>
-            <h2>Dashboard Overview</h2>
-            <p>Welcome to the RoomSlider Super Admin Panel 🚀</p>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <StatCard label="Total Rooms" value={stats.totalRooms} icon={<Building2 size={18} />} accent="#3b82f6" />
-          <StatCard label="Total Users" value={stats.totalUsers} icon={<Users size={18} />} accent="#22c55e" />
-          <StatCard label="Wishlist" value={stats.totalWishlist} icon={<Heart size={18} />} accent="#ec4899" />
-          <StatCard label="Total Owners" value={stats.totalOwners} icon={<UserCog size={18} />} accent="#a855f7" />
-          <StatCard label="Pending Approvals" value={0} icon={<ClockAlert size={18} />} accent="#f97316" />
-          <StatCard label="New Users This Week" value={stats.newUsersThisWeek} icon={<TrendingUp size={18} />} accent="#06b6d4" />
-          <StatCard label="Total Views" value={stats.totalViews} icon={<Eye size={18} />} accent="#3b82f6" />
-          <StatCard label="Total Earnings" value={stats.totalEarnings} icon={<Wallet size={18} />} accent="#22c55e" prefix="₹" />
-        </div>
-
-        {/* Listings Growth */}
-        <div className="dashboard-section">
-          <h3>Listings Growth</h3>
-          <div style={{ width: "100%", height: 220 }}>
-            <ResponsiveContainer>
-              <LineChart data={stats.listingsGrowth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="month" stroke="var(--color-text-light)" fontSize={12} />
-                <YAxis stroke="var(--color-text-light)" fontSize={12} allowDecimals={false} />
-                <Tooltip />
-                <Line type="monotone" dataKey="total" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Demand by Locality */}
-        <div className="dashboard-section">
-          <h3>Demand by Locality</h3>
-          {stats.localityDemand.length === 0 ? (
-            <div className="activity-box">
-              <p>No listings yet to show locality demand.</p>
-            </div>
-          ) : (
-            <div style={{ width: "100%", height: Math.max(stats.localityDemand.length * 40 + 40, 160) }}>
-              <ResponsiveContainer>
-                <BarChart data={stats.localityDemand} layout="vertical" margin={{ left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis type="number" stroke="var(--color-text-light)" fontSize={12} allowDecimals={false} />
-                  <YAxis type="category" dataKey="locality" stroke="var(--color-text-light)" fontSize={12} width={100} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-
-        {/* Recent Activity */}
-        <div className="dashboard-section">
-          <h3>Recent Activity</h3>
-          <RecentActivity />
-        </div>
-
-        {/* Quick Actions */}
-        <div className="dashboard-section">
-          <h3>Quick Actions</h3>
-          <div className="quick-actions">
-            {quickActions.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => (item.action ? item.action() : navigate(item.path))}
-              >
-                {item.icon}
-                {item.label}
-              </button>
-            ))}
-          </div>
+    <div className="admin-page dashboard-page">
+      <div className="admin-page-header">
+        <div>
+          <h1>Dashboard Overview</h1>
+          <p>Welcome to the RoomSlider Super Admin Panel 🚀</p>
         </div>
       </div>
-    </AdminLayout>
+
+      {/* Stats Cards */}
+      <div className="admin-stats-grid">
+        <StatCard label="Total Rooms" value={stats.totalRooms} icon={<Building2 size={18} />} accent="#3b82f6" />
+        <StatCard label="Total Users" value={stats.totalUsers} icon={<Users size={18} />} accent="#22c55e" />
+        <StatCard label="Wishlist" value={stats.totalWishlist} icon={<Heart size={18} />} accent="#ec4899" />
+        <StatCard label="Total Owners" value={stats.totalOwners} icon={<UserCog size={18} />} accent="#a855f7" />
+        <StatCard label="Pending Approvals" value={0} icon={<ClockAlert size={18} />} accent="#f97316" />
+        <StatCard label="New Users This Week" value={stats.newUsersThisWeek} icon={<TrendingUp size={18} />} accent="#06b6d4" />
+        <StatCard label="Total Views" value={stats.totalViews} icon={<Eye size={18} />} accent="#3b82f6" />
+        <StatCard label="Total Earnings" value={stats.totalEarnings} icon={<Wallet size={18} />} accent="#22c55e" prefix="₹" />
+      </div>
+
+      {/* Listings Growth */}
+      <div className="dashboard-section">
+        <h3>Listings Growth</h3>
+        <div style={{ width: "100%", height: 220 }}>
+          <ResponsiveContainer>
+            <LineChart data={stats.listingsGrowth}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
+              <XAxis dataKey="month" stroke="var(--admin-muted)" fontSize={12} />
+              <YAxis stroke="var(--admin-muted)" fontSize={12} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--admin-card)",
+                  border: "1px solid var(--admin-border)",
+                  borderRadius: 10,
+                  color: "var(--admin-text)",
+                }}
+              />
+              <Line type="monotone" dataKey="total" stroke="var(--admin-accent)" strokeWidth={2} dot={{ r: 3 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Demand by Locality */}
+      <div className="dashboard-section">
+        <h3>Demand by Locality</h3>
+        {stats.localityDemand.length === 0 ? (
+          <div className="admin-empty">
+            <p>No listings yet to show locality demand.</p>
+          </div>
+        ) : (
+          <div style={{ width: "100%", height: Math.max(stats.localityDemand.length * 40 + 40, 160) }}>
+            <ResponsiveContainer>
+              <BarChart data={stats.localityDemand} layout="vertical" margin={{ left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
+                <XAxis type="number" stroke="var(--admin-muted)" fontSize={12} allowDecimals={false} />
+                <YAxis type="category" dataKey="locality" stroke="var(--admin-muted)" fontSize={12} width={100} />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--admin-card)",
+                    border: "1px solid var(--admin-border)",
+                    borderRadius: 10,
+                    color: "var(--admin-text)",
+                  }}
+                />
+                <Bar dataKey="count" fill="var(--admin-accent)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="dashboard-section">
+        <h3>Recent Activity</h3>
+        <RecentActivity />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="dashboard-section">
+        <h3>Quick Actions</h3>
+        <div className="quick-actions">
+          {quickActions.map((item) => (
+            <button
+              key={item.label}
+              className="admin-btn secondary qa-btn"
+              onClick={() => (item.action ? item.action() : navigate(item.path))}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

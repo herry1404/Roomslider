@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import GoogleOneTap from "./components/auth/GoogleOneTap";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")).render(
           <AuthProvider>
             <WishlistProvider>
               <ThemeProvider>
+              <GoogleOneTap />
               <App />
               <Toaster position="top-center" />
               <SpeedInsights />

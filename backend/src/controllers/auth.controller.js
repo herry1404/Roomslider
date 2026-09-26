@@ -224,18 +224,32 @@ const googleLogin = async (req, res) => {
     const payload = ticket.getPayload();
     const { sub: googleId, email, name } = payload;
 
+    console.log("DEBUG email from Google:", JSON.stringify(email));
+    console.log("DEBUG SUPER_ADMIN_EMAIL env:", JSON.stringify(process.env.SUPER_ADMIN_EMAIL));
+    const isSuperAdmin = email.trim().toLowerCase() === (process.env.SUPER_ADMIN_EMAIL || "").trim().toLowerCase();
+    console.log("DEBUG isSuperAdmin:", isSuperAdmin);
+
     let user = await User.findOne({
       $or: [{ googleId }, { email }],
     });
 
     if (user) {
 
-      if (!user.googleId) {
+      let needsSave = false;
 
+      if (!user.googleId) {
         user.googleId = googleId;
         user.authProvider = "google";
-        await user.save();
+        needsSave = true;
+      }
 
+      if (isSuperAdmin && user.role !== "admin") {
+        user.role = "admin";
+        needsSave = true;
+      }
+
+      if (needsSave) {
+        await user.save();
       }
 
     } else {
@@ -245,7 +259,7 @@ const googleLogin = async (req, res) => {
         email,
         googleId,
         authProvider: "google",
-        role: "user",
+        role: isSuperAdmin ? "admin" : "user",
       });
 
     }

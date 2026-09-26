@@ -5,6 +5,7 @@ import { Phone } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
+import "../../styles/complete-profile.css";
 
 function CompleteProfile() {
 
@@ -73,51 +74,28 @@ function CompleteProfile() {
         <title>Complete Your Profile | RoomSlider</title>
       </Helmet>
 
-      <section style={{
-        minHeight: "70vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px",
-      }}>
+      <section className="cp-section">
 
-        <div style={{
-          maxWidth: "400px",
-          width: "100%",
-          background: "white",
-          borderRadius: "16px",
-          padding: "32px",
-          boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
-        }}>
+        <div className="cp-card">
 
-          <h2 style={{ marginBottom: "8px", fontSize: "22px", fontWeight: 700 }}>
-            One last step
-          </h2>
+          <h2 className="cp-title">One last step</h2>
 
-          <p style={{ marginBottom: "24px", color: "#6b7280", fontSize: "14px" }}>
+          <p className="cp-subtitle">
             Add your phone number so you can log in with either your email or phone.
           </p>
 
           <form onSubmit={handleSubmit}>
 
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              border: "1px solid #e2e8f0",
-              borderRadius: "10px",
-              padding: "12px 14px",
-              marginBottom: "16px",
-            }}>
+            <div className="cp-field">
 
-              <Phone size={18} color="#6b7280" />
+              <Phone size={18} />
 
               <input
+                className="cp-input"
                 type="tel"
                 placeholder="10-digit phone number"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                style={{ border: "none", outline: "none", flex: 1, fontSize: "15px" }}
               />
 
             </div>
@@ -125,16 +103,7 @@ function CompleteProfile() {
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: "100%",
-                padding: "12px",
-                background: "#16a34a",
-                color: "white",
-                border: "none",
-                borderRadius: "10px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              className="cp-button"
             >
               {loading ? "Saving..." : "Save & Continue"}
             </button>

@@ -485,3 +485,10 @@
 
     }
 }
+
+/* Explore teaser: extra tiles fill desktop space, hidden on mobile (only 4 tiles show) */
+@media(max-width:576px){
+  .explore-extra-tile{
+    display:none !important;
+  }
+}

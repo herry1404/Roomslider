@@ -43,6 +43,7 @@ const loanSchema = new mongoose.Schema(
       enum: ["aadhaar", "voter_id", "driving_license", "college_id"],
     },
     idPhotoUrl: { type: String, default: null },
+    idPhotoPublicId: { type: String, default: null },
     consentGiven: { type: Boolean, required: true, default: false },
 
     status: {

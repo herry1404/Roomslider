@@ -1,0 +1,54 @@
+.service-page { padding: 32px 0 48px; }
+.service-page h1 { margin-bottom: 6px; }
+.service-sub { color: var(--color-text-light); margin-bottom: 24px; }
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.service-card {
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-card h3 { margin: 0; font-size: 18px; }
+.service-meta { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--color-text-light); }
+
+.service-price {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.service-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+.service-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+.service-btn.call { background: #16a34a; color: #fff; }
+.service-btn.wa { background: #25d366; color: #fff; }
+
+@media (max-width: 600px) {
+  .service-page { padding: 20px 0 40px; }
+  .service-grid { grid-template-columns: 1fr; }
+}

@@ -19,16 +19,10 @@ import {
 import LoanModal from "../services/LoanModal";
 
 const comingSoon = [
-  { icon: Sparkles, title: "Cleaning & Housekeeping", desc: "Room and bathroom cleaning" },
-  { icon: Truck, title: "Packers & Movers", desc: "Easy shifting to your new place" },
-  { icon: Sofa, title: "Furniture & Appliance Rental", desc: "Bed, cooler, AC, fridge on rent" },
-  { icon: Wifi, title: "WiFi & RO Water", desc: "Broadband and RO purifier service" },
-  { icon: Wrench, title: "Appliance Repair", desc: "Cooler, AC and geyser repair" },
   { icon: Users, title: "Roommate Finder", desc: "Find a roommate for shared rooms" },
   { icon: FileText, title: "Rent Agreement & Verification", desc: "Agreement and police verification" },
   { icon: ShoppingBasket, title: "Groceries & Daily Needs", desc: "Order from nearby shops" },
   { icon: BookOpen, title: "Study Support", desc: "Printing, stationery and coaching" },
-  { icon: Bike, title: "Bike & Scooty Rental", desc: "Rent a bike or scooty by the day" },
 ];
 
 const cardStyle = {
@@ -85,6 +79,48 @@ function ComingSoonServices() {
       desc: "Get help finding a loan for rent, deposit or fees",
       button: "Apply Now",
       onClick: () => (user ? setShowLoanModal(true) : navigate("/login")),
+    },
+    {
+      icon: Bike,
+      title: "Rent a Vehicle",
+      desc: "Bike and scooty rental by the day",
+      button: "Explore Vehicles",
+      onClick: () => navigate("/vehicles"),
+    },
+    {
+      icon: Sparkles,
+      title: "Cleaning & Housekeeping",
+      desc: "Room and bathroom cleaning",
+      button: "Find Cleaners",
+      onClick: () => navigate("/services/cleaning"),
+    },
+    {
+      icon: Truck,
+      title: "Packers & Movers",
+      desc: "Easy shifting to your new place",
+      button: "Find Movers",
+      onClick: () => navigate("/services/packers"),
+    },
+    {
+      icon: Sofa,
+      title: "Furniture & Appliance Rental",
+      desc: "Bed, cooler, AC, fridge on rent",
+      button: "Explore Rentals",
+      onClick: () => navigate("/services/furniture"),
+    },
+    {
+      icon: Wifi,
+      title: "WiFi & RO Water",
+      desc: "Broadband and RO purifier service",
+      button: "Find Providers",
+      onClick: () => navigate("/services/wifi"),
+    },
+    {
+      icon: Wrench,
+      title: "Appliance Repair",
+      desc: "Cooler, AC and geyser repair",
+      button: "Find Repair",
+      onClick: () => navigate("/services/appliance-repair"),
     },
   ];
 

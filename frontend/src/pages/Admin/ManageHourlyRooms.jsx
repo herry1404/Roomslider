@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { DoorOpen, MapPin, IndianRupee, Trash2, Plus, X, Pencil, Check, Ban } from "lucide-react";
+import { DoorOpen, MapPin, Trash2, Plus, X, Pencil, Check, Ban } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
-import "../../styles/manageOwners.css";
+import "../../styles/admin/theme.css";
 
 function ManageHourlyRooms() {
   const [rooms, setRooms] = useState([]);
@@ -32,7 +32,6 @@ function ManageHourlyRooms() {
       setRooms(roomsRes.data || []);
       setOwners(ownersRes.data || []);
     } catch (error) {
-      console.error("FETCH HOURLY ROOMS ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to load hourly rooms");
     } finally {
       setLoading(false);
@@ -46,15 +45,7 @@ function ManageHourlyRooms() {
   const openAddModal = () => {
     setEditingId(null);
     setImages([]);
-    setForm({
-      ownerId: "",
-      title: "",
-      description: "",
-      address: "",
-      city: "",
-      pricePerHour: "",
-      amenities: "",
-    });
+    setForm({ ownerId: "", title: "", description: "", address: "", city: "", pricePerHour: "", amenities: "" });
     setShowModal(true);
   };
 
@@ -73,13 +64,8 @@ function ManageHourlyRooms() {
     setShowModal(true);
   };
 
-  const handleImageChange = (e) => {
-    setImages(Array.from(e.target.files));
-  };
-
-  const removeImage = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  const handleImageChange = (e) => setImages(Array.from(e.target.files));
+  const removeImage = (index) => setImages(images.filter((_, i) => i !== index));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,44 +85,31 @@ function ManageHourlyRooms() {
       data.append("pricePerHour", form.pricePerHour);
       data.append(
         "amenities",
-        JSON.stringify(
-          form.amenities ? form.amenities.split(",").map((a) => a.trim()).filter(Boolean) : []
-        )
+        JSON.stringify(form.amenities ? form.amenities.split(",").map((a) => a.trim()).filter(Boolean) : [])
       );
-
-      images.forEach((image) => {
-        data.append("images", image);
-      });
+      images.forEach((image) => data.append("images", image));
 
       if (editingId) {
-        await api.put(`/hourly-rooms/${editingId}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.put(`/hourly-rooms/${editingId}`, data, { headers: { "Content-Type": "multipart/form-data" } });
         toast.success("Room updated");
       } else {
-        await api.post("/hourly-rooms", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.post("/hourly-rooms", data, { headers: { "Content-Type": "multipart/form-data" } });
         toast.success("Room added");
       }
       setShowModal(false);
       fetchData();
     } catch (error) {
-      console.error("SAVE HOURLY ROOM ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to save room");
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete this hourly room?");
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Delete this hourly room?")) return;
     try {
       await api.delete(`/hourly-rooms/${id}`);
       toast.success("Room deleted");
       fetchData();
     } catch (error) {
-      console.error("DELETE HOURLY ROOM ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to delete room");
     }
   };
@@ -147,7 +120,6 @@ function ManageHourlyRooms() {
       toast.success("Request approved");
       fetchData();
     } catch (error) {
-      console.error("APPROVE HOURLY ROOM ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to approve");
     }
   };
@@ -159,120 +131,174 @@ function ManageHourlyRooms() {
       toast.success("Request rejected");
       fetchData();
     } catch (error) {
-      console.error("REJECT HOURLY ROOM ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to reject");
     }
   };
 
+  const pendingCount = rooms.filter((r) => r.status === "pending").length;
+  const approvedCount = rooms.filter((r) => r.status === "approved").length;
+
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <p style={{ color: "var(--admin-muted)" }}>Loading rooms...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="manage-owners-page">
-      <div className="owners-header">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div>
           <h1>Hourly Rooms</h1>
-          <p>Ghante ke hisaab se book hone wale rooms manage karo</p>
+          <p>Ghante ke hisaab se book hone wale rooms manage karo.</p>
         </div>
+        <button className="admin-btn" onClick={openAddModal}>
+          <Plus size={18} /> Add Room
+        </button>
+      </div>
 
-        <div className="owners-header-actions">
-          <button className="add-owner-btn" onClick={openAddModal}>
-            <Plus size={18} />
-            Add Room
-          </button>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Total</span>
+            <div className="admin-stat-icon admin-badge green">
+              <DoorOpen size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{rooms.length}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Pending</span>
+            <div className="admin-stat-icon admin-badge amber">
+              <DoorOpen size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{pendingCount}</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Approved</span>
+            <div className="admin-stat-icon admin-badge green">
+              <DoorOpen size={18} />
+            </div>
+          </div>
+          <div className="admin-stat-value">{approvedCount}</div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading-box">Loading rooms...</div>
-      ) : (
-        <div className="owners-grid">
-          {rooms.map((r) => (
-            <div className="owner-card" key={r._id}>
-              <div className="owner-top">
-                <div className="avatar">
-                  {r.images && r.images[0] ? (
-                    <img src={r.images[0]} alt={r.title} style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />
-                  ) : (
-                    <DoorOpen size={28} />
-                  )}
-                </div>
-                <div>
-                  <h3>{r.title}</h3>
-                  <span>{r.requestedByOwner?.name || "Admin added"}</span>
-                </div>
-              </div>
-
-              <div className="owner-details">
-                <div className="detail-row">
-                  <MapPin size={16} />
-                  <p>{r.location?.address}, {r.location?.city}</p>
-                </div>
-                <div className="detail-row">
-                  <IndianRupee size={16} />
-                  <p>{r.pricePerHour} / hour</p>
-                </div>
-                <div className="detail-row">
-                  <p>
-                    Status:{" "}
-                    <strong style={{
-                      color:
-                        r.status === "approved" ? "#16a34a" :
-                        r.status === "rejected" ? "#dc2626" : "#d97706"
-                    }}>
+      <div className="admin-table-wrap">
+        {rooms.length === 0 ? (
+          <div className="admin-empty">
+            <h3>No hourly rooms yet</h3>
+            <p>Koi hourly room add nahi hua hai abhi tak.</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Location</th>
+                <th>Price/Hour</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rooms.map((r) => (
+                <tr key={r._id}>
+                  <td>
+                    <div className="admin-row-thumb">
+                      {r.images?.[0] ? (
+                        <img src={r.images[0]} alt={r.title} />
+                      ) : (
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 10,
+                            background: "var(--admin-accent-soft)",
+                            color: "var(--admin-accent)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <DoorOpen size={18} />
+                        </div>
+                      )}
+                      <div>
+                        <div>{r.title}</div>
+                        <div style={{ fontSize: 12, color: "var(--admin-muted)", fontWeight: 400 }}>
+                          {r.requestedByOwner?.name || "Admin added"}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ color: "var(--admin-muted)" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <MapPin size={13} /> {r.location?.address}, {r.location?.city}
+                    </span>
+                  </td>
+                  <td style={{ fontWeight: 700 }}>₹{r.pricePerHour}</td>
+                  <td>
+                    <span
+                      className={`admin-badge ${
+                        r.status === "approved" ? "green" : r.status === "rejected" ? "red" : "amber"
+                      }`}
+                    >
+                      <span className="admin-badge-dot" />
                       {r.status}
-                    </strong>
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                {r.status === "pending" && (
-                  <>
-                    <button className="delete-btn" style={{ background: "#f0fdf4", color: "#16a34a" }} onClick={() => handleApprove(r._id)}>
-                      <Check size={16} />
-                      Approve
-                    </button>
-                    <button className="delete-btn" style={{ background: "#fef2f2", color: "#dc2626" }} onClick={() => handleReject(r._id)}>
-                      <Ban size={16} />
-                      Reject
-                    </button>
-                  </>
-                )}
-                <button className="delete-btn" style={{ background: "#eff6ff", color: "#2563eb" }} onClick={() => openEditModal(r)}>
-                  <Pencil size={16} />
-                  Edit
-                </button>
-                <button className="delete-btn" onClick={() => handleDelete(r._id)}>
-                  <Trash2 size={16} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {rooms.length === 0 && !loading && (
-        <div className="empty-owners">
-          <DoorOpen size={45} />
-          <h3>No Hourly Rooms Yet</h3>
-          <p>Koi hourly room add nahi hua hai abhi tak.</p>
-        </div>
-      )}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                      {r.status === "pending" && (
+                        <>
+                          <button className="admin-icon-btn accent" title="Approve" onClick={() => handleApprove(r._id)}>
+                            <Check size={16} />
+                          </button>
+                          <button className="admin-icon-btn danger" title="Reject" onClick={() => handleReject(r._id)}>
+                            <Ban size={16} />
+                          </button>
+                        </>
+                      )}
+                      <button className="admin-icon-btn accent" title="Edit" onClick={() => openEditModal(r)}>
+                        <Pencil size={16} />
+                      </button>
+                      <button className="admin-icon-btn danger" title="Delete" onClick={() => handleDelete(r._id)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {showModal && (
-        <div className="profile-overlay">
-          <div className="profile-modal">
-            <button className="close-modal" onClick={() => setShowModal(false)}>
+        <div
+          onClick={() => setShowModal(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 16 }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 16, padding: 26, width: "100%", maxWidth: 440, maxHeight: "85vh", overflowY: "auto", position: "relative" }}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              style={{ position: "absolute", top: 12, right: 14, background: "none", border: "none", color: "var(--admin-muted)", cursor: "pointer" }}
+            >
               <X size={20} />
             </button>
 
-            <h2>{editingId ? "Edit Room" : "Add Room"}</h2>
+            <h2 style={{ marginBottom: 18 }}>{editingId ? "Edit Room" : "Add Room"}</h2>
 
-            <form className="add-owner-form" onSubmit={handleSubmit}>
-              <select
-                required
-                value={form.ownerId}
-                onChange={(e) => setForm({ ...form, ownerId: e.target.value })}
-              >
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <select required value={form.ownerId} onChange={(e) => setForm({ ...form, ownerId: e.target.value })} style={inputStyle}>
                 <option value="">Select Owner</option>
                 {owners.map((o) => (
                   <option key={o._id} value={o._id}>
@@ -280,82 +306,27 @@ function ManageHourlyRooms() {
                   </option>
                 ))}
               </select>
-              <input
-                type="text"
-                placeholder="Room Title"
-                required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Description (optional)"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Address"
-                required
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="City"
-                required
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-              />
-              <input
-                type="number"
-                placeholder="Price per hour"
-                required
-                value={form.pricePerHour}
-                onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Amenities (comma separated)"
-                value={form.amenities}
-                onChange={(e) => setForm({ ...form, amenities: e.target.value })}
-              />
+              <input type="text" placeholder="Room Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={inputStyle} />
+              <input type="text" placeholder="Description (optional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} style={inputStyle} />
+              <input type="text" placeholder="Address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} style={inputStyle} />
+              <input type="text" placeholder="City" required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+              <input type="number" placeholder="Price per hour" required value={form.pricePerHour} onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })} style={inputStyle} />
+              <input type="text" placeholder="Amenities (comma separated)" value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} style={inputStyle} />
 
-              <label style={{ fontWeight: 600, marginTop: 8 }}>
+              <label style={{ fontSize: 13, color: "var(--admin-muted)" }}>
                 Room Images {editingId ? "(leave empty to keep existing)" : ""}
               </label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-              />
+              <input type="file" multiple accept="image/*" onChange={handleImageChange} />
 
               {images.length > 0 && (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {images.map((img, idx) => (
                     <div key={idx} style={{ position: "relative" }}>
-                      <img
-                        src={URL.createObjectURL(img)}
-                        alt="preview"
-                        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 6 }}
-                      />
+                      <img src={URL.createObjectURL(img)} alt="preview" style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }} />
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        style={{
-                          position: "absolute",
-                          top: -6,
-                          right: -6,
-                          background: "#dc2626",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "50%",
-                          width: 18,
-                          height: 18,
-                          fontSize: 12,
-                          cursor: "pointer",
-                        }}
+                        style={{ position: "absolute", top: -6, right: -6, background: "#f43f5e", color: "#fff", border: "none", borderRadius: "50%", width: 18, height: 18, cursor: "pointer" }}
                       >
                         <X size={12} />
                       </button>
@@ -364,7 +335,7 @@ function ManageHourlyRooms() {
                 </div>
               )}
 
-              <button type="submit" className="submit-btn">
+              <button type="submit" className="admin-btn" style={{ justifyContent: "center" }}>
                 {editingId ? "Update Room" : "Add Room"}
               </button>
             </form>
@@ -374,5 +345,14 @@ function ManageHourlyRooms() {
     </div>
   );
 }
+
+const inputStyle = {
+  background: "var(--admin-bg)",
+  border: "1px solid var(--admin-border)",
+  borderRadius: 12,
+  padding: "10px 12px",
+  color: "var(--admin-text)",
+  fontSize: 14,
+};
 
 export default ManageHourlyRooms;

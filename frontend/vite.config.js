@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icons.svg"],
+      includeAssets: ["favicon.svg", "icons.svg", "offline.html"],
       manifest: {
         name: "RoomSlider",
         short_name: "RoomSlider",
@@ -37,7 +37,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: "/offline.html",
+        navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           {
@@ -46,6 +46,13 @@ export default defineConfig({
             options: {
               cacheName: "pages-cache",
               networkTimeoutSeconds: 5,
+              plugins: [
+                {
+                  handlerDidError: async () => {
+                    return caches.match("/offline.html");
+                  },
+                },
+              ],
             },
           },
         ],
