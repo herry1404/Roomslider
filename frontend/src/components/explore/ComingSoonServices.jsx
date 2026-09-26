@@ -126,13 +126,21 @@ function ComingSoonServices() {
 
   return (
     <>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          gap: "12px",
-        }}
-      >
+      <style>{`
+        .css-services-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 12px;
+        }
+        @media (max-width: 576px) {
+          .css-services-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+        }
+      `}</style>
+
+      <div className="css-services-grid">
         {liveServices.map(({ icon: Icon, title, desc, button, onClick }) => (
           <div
             key={title}

@@ -19,31 +19,31 @@ export default function SavingsCalculator() {
           background: var(--color-surface-2);
           color: var(--color-text);
           border-radius: 16px;
-          padding: 24px;
+          padding: 16px;
           max-width: 600px;
           margin: 0 auto;
         }
         .sc-title {
-          font-size: 20px;
+          font-size: 17px;
           font-weight: 600;
-          margin: 0 0 4px;
+          margin: 0 0 3px;
           display: flex;
           align-items: center;
           gap: 8px;
         }
         .sc-subtitle {
-          font-size: 14px;
+          font-size: 12px;
           color: var(--color-text-light);
-          margin: 0 0 20px;
+          margin: 0 0 12px;
         }
         .sc-slider-row {
           display: flex;
           align-items: center;
           gap: 14px;
-          margin-bottom: 20px;
+          margin-bottom: 12px;
         }
         .sc-slider-label {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--color-text-light);
           white-space: nowrap;
         }
@@ -51,7 +51,7 @@ export default function SavingsCalculator() {
           flex: 1;
         }
         .sc-slider-value {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 600;
           min-width: 78px;
           text-align: right;
@@ -59,22 +59,22 @@ export default function SavingsCalculator() {
         .sc-cards {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 12px;
-          margin-bottom: 16px;
+          gap: 8px;
+          margin-bottom: 10px;
         }
         .sc-card {
           background: var(--color-surface);
           border: 1px solid var(--color-border);
           border-radius: 10px;
-          padding: 14px 16px;
+          padding: 10px 14px;
         }
         .sc-card-label {
-          font-size: 12px;
+          font-size: 11px;
           color: var(--color-text-light);
-          margin: 0 0 4px;
+          margin: 0 0 3px;
         }
         .sc-card-value {
-          font-size: 22px;
+          font-size: 18px;
           font-weight: 600;
           margin: 0;
         }
@@ -83,25 +83,25 @@ export default function SavingsCalculator() {
         .sc-savings-box {
           background: color-mix(in srgb, var(--color-primary) 15%, transparent);
           border-radius: 10px;
-          padding: 14px 18px;
+          padding: 10px 14px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 18px;
+          margin-bottom: 12px;
         }
         .sc-savings-label {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--color-primary-hover);
         }
         .sc-savings-value {
-          font-size: 20px;
+          font-size: 17px;
           font-weight: 700;
           color: var(--color-primary-hover);
         }
         .sc-cta {
           width: 100%;
-          padding: 12px;
-          font-size: 15px;
+          padding: 10px;
+          font-size: 14px;
           font-weight: 600;
           background: var(--color-primary);
           color: var(--color-background);
@@ -116,27 +116,27 @@ export default function SavingsCalculator() {
         /* Laptop / desktop view — screen 768px se bada */
         @media (min-width: 768px) {
           .sc-wrapper {
-            padding: 32px 36px;
-            max-width: 720px;
+            padding: 22px 26px;
+            max-width: 480px;
           }
           .sc-title {
-            font-size: 24px;
+            font-size: 19px;
           }
           .sc-cards {
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 12px;
           }
           .sc-card {
-            padding: 18px 20px;
+            padding: 13px 16px;
           }
           .sc-card-value {
-            font-size: 26px;
+            font-size: 20px;
           }
           .sc-savings-value {
-            font-size: 24px;
+            font-size: 18px;
           }
           .sc-cta {
-            max-width: 280px;
+            max-width: 240px;
             margin: 0 auto;
             display: block;
           }

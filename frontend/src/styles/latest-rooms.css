@@ -18,14 +18,19 @@
 
     margin-bottom:25px;
 
+    padding-left:14px;
+
+    border-left:4px solid var(--color-primary);
+
 }
 
 
 .section-header h2{
 
-    font-size:28px;
+    font-size:26px;
     font-weight:800;
     color:var(--color-text);
+    letter-spacing:-0.3px;
 
 }
 
@@ -405,15 +410,24 @@
 
     .latest-rooms{
 
-        padding:20px 0 40px;
+        padding:5px 0 20px;
 
     }
 
 
 
+    .section-header{
+
+        padding-left:10px;
+
+        border-left-width:3px;
+
+    }
+
+
     .section-header h2{
 
-        font-size:21px;
+        font-size:20px;
 
     }
 
