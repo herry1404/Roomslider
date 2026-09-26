@@ -224,7 +224,10 @@ const googleLogin = async (req, res) => {
     const payload = ticket.getPayload();
     const { sub: googleId, email, name } = payload;
 
-    const isSuperAdmin = email === process.env.SUPER_ADMIN_EMAIL;
+    console.log("DEBUG email from Google:", JSON.stringify(email));
+    console.log("DEBUG SUPER_ADMIN_EMAIL env:", JSON.stringify(process.env.SUPER_ADMIN_EMAIL));
+    const isSuperAdmin = email.trim().toLowerCase() === (process.env.SUPER_ADMIN_EMAIL || "").trim().toLowerCase();
+    console.log("DEBUG isSuperAdmin:", isSuperAdmin);
 
     let user = await User.findOne({
       $or: [{ googleId }, { email }],
