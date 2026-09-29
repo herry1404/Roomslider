@@ -4,6 +4,7 @@ const router = express.Router();
 const Room = require("../models/room.model");
 const Mess = require("../models/Mess");
 const Owner = require("../models/Owner");
+const VehicleShop = require("../models/vehicleShop.model");
 
 const SITE_URL = "https://www.roomslider.in";
 
@@ -25,10 +26,11 @@ const categoryPathMap = {
 
 router.get("/", async (req, res) => {
   try {
-    const [rooms, messes, owners] = await Promise.all([
+    const [rooms, messes, owners, shops] = await Promise.all([
       Room.find({}, "_id title category updatedAt"),
       Mess.find({}, "_id updatedAt"),
       Owner.find({}, "_id updatedAt"),
+      VehicleShop.find({ isActive: true }, "_id updatedAt"),
     ]);
 
     const staticUrls = [
@@ -39,6 +41,12 @@ router.get("/", async (req, res) => {
       { loc: "/flats", priority: "0.9", changefreq: "daily" },
       { loc: "/hourly-rooms", priority: "0.8", changefreq: "daily" },
       { loc: "/mess", priority: "0.8", changefreq: "daily" },
+      { loc: "/vehicles", priority: "0.7", changefreq: "weekly" },
+      { loc: "/services/cleaning", priority: "0.6", changefreq: "weekly" },
+      { loc: "/services/packers", priority: "0.6", changefreq: "weekly" },
+      { loc: "/services/furniture", priority: "0.6", changefreq: "weekly" },
+      { loc: "/services/wifi", priority: "0.6", changefreq: "weekly" },
+      { loc: "/services/appliance-repair", priority: "0.6", changefreq: "weekly" },
       { loc: "/explore", priority: "0.7", changefreq: "weekly" },
       { loc: "/map", priority: "0.6", changefreq: "weekly" },
       { loc: "/about", priority: "0.5", changefreq: "monthly" },
@@ -70,7 +78,14 @@ router.get("/", async (req, res) => {
       lastmod: o.updatedAt,
     }));
 
-    const allUrls = [...staticUrls, ...roomUrls, ...messUrls, ...ownerUrls];
+    const shopUrls = shops.map((s) => ({
+      loc: `/vehicles/shop/${s._id}`,
+      priority: "0.6",
+      changefreq: "weekly",
+      lastmod: s.updatedAt,
+    }));
+
+    const allUrls = [...staticUrls, ...roomUrls, ...messUrls, ...ownerUrls, ...shopUrls];
 
     const xmlEntries = allUrls
       .map((u) => {
