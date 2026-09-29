@@ -2,6 +2,7 @@ import { roomPath } from "../../utils/roomUrl";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, MapPin, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
+import ShareButton from "../ui/ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
@@ -70,6 +71,8 @@ function CategorySection({ title, viewAllPath, rooms }) {
                     alt={room.title}
                     className="room-image"
                   />
+
+                  <ShareButton room={room} variant="tile" />
 
                   <button
                     className={`wishlist-btn ${wishlisted ? "active" : ""}`}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MapPin, IndianRupee, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import ShareButton from "./ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
@@ -77,6 +78,8 @@ function RoomCard({ room, onWishlistChange }) {
           loading="lazy"
           decoding="async"
         />
+
+        <ShareButton room={room} variant="card" />
 
         <button
           className={`wishlist-icon ${wishlisted ? "active" : ""} ${burst ? "burst" : ""}`}
