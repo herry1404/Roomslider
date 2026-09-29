@@ -1,7 +1,14 @@
+import { Helmet } from "react-helmet-async";
 import "./Terms.css";
 
 export default function Terms() {
   return (
+    <>
+      <Helmet>
+        <title>Terms of Use | RoomSlider</title>
+        <meta name="description" content="Terms of Use and conditions for using the RoomSlider rental marketplace in Indore." />
+        <link rel="canonical" href="https://www.roomslider.in/terms" />
+      </Helmet>
     <div className="legal-page">
       <div className="legal-container">
         <h1>Terms of Use & Conditions</h1>
@@ -113,5 +120,6 @@ export default function Terms() {
         <p className="legal-disclaimer"><em>This document is a general template and does not constitute legal advice.</em></p>
       </div>
     </div>
+    </>
   );
 }
