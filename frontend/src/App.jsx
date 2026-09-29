@@ -28,6 +28,9 @@ import AddVehicleShop from "./pages/Admin/AddVehicleShop";
 import AddVehicle from "./pages/Admin/AddVehicle";
 import ManageServices from "./pages/Admin/ManageServices";
 import AddService from "./pages/Admin/AddService";
+import ManageFurniture from "./pages/Admin/ManageFurniture";
+import FurnitureList from "./pages/Furniture/FurnitureList";
+import AddFurniture from "./pages/Admin/AddFurniture";
 import ServiceList from "./pages/Services/ServiceList";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
@@ -98,6 +101,7 @@ function App() {
         <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
         <Route path="/vehicles/shop/:id" element={<MainLayout><VehicleShopDetail /></MainLayout>} />
         <Route path="/services/:category" element={<MainLayout><ServiceList /></MainLayout>} />
+        <Route path="/furniture" element={<MainLayout><FurnitureList /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
         <Route path="/rooms/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
         <Route path="/pg/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
@@ -146,6 +150,9 @@ function App() {
         <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
+        <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />
+        <Route path="/admin/furniture/add" element={<AdminRoute><AddFurniture /></AdminRoute>} />
+        <Route path="/admin/furniture/edit/:id" element={<AdminRoute><AddFurniture /></AdminRoute>} />
 
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />

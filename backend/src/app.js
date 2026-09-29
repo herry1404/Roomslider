@@ -25,6 +25,7 @@ const vehicleRoutes = require("./routes/vehicle.routes");
 const vehicleBookingRoutes = require("./routes/vehicleBooking.routes");
 const serviceRoutes = require("./routes/service.routes");
 const serviceBookingRoutes = require("./routes/serviceBooking.routes");
+const furnitureRoutes = require("./routes/furniture.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
 const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
@@ -330,6 +331,8 @@ app.use(
   "/api/service-bookings",
   serviceBookingRoutes
 );
+
+app.use("/api/furniture", furnitureRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)
 app.use(
