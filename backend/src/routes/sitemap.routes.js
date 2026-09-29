@@ -42,6 +42,7 @@ router.get("/", async (req, res) => {
       { loc: "/hourly-rooms", priority: "0.8", changefreq: "daily" },
       { loc: "/mess", priority: "0.8", changefreq: "daily" },
       { loc: "/vehicles", priority: "0.7", changefreq: "weekly" },
+      { loc: "/furniture", priority: "0.6", changefreq: "weekly" },
       { loc: "/services/cleaning", priority: "0.6", changefreq: "weekly" },
       { loc: "/services/packers", priority: "0.6", changefreq: "weekly" },
       { loc: "/services/furniture", priority: "0.6", changefreq: "weekly" },
