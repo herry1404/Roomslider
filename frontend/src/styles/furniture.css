@@ -80,3 +80,10 @@
   .fu-aside { display: block; position: sticky; top: 90px; align-self: start; }
   .fu-cart-btn, .fu-floatbar, .fu-cart-overlay { display: none; }
 }
+
+.fu-user { font-size: 13px; color: var(--color-text-light); margin: 0 0 8px; }
+.fu-user b { color: var(--color-text); }
+.fu-loc { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; padding: 10px; border-radius: 10px; border: 1px dashed var(--color-primary); background: transparent; color: var(--color-primary); font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.fu-loc.on { background: rgba(22, 163, 74, 0.12); border-style: solid; }
+.fu-loc:disabled { opacity: 0.6; cursor: wait; }
+.fu-wa:disabled { opacity: 0.6; cursor: wait; }

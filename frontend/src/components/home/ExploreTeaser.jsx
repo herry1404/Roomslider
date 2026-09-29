@@ -111,7 +111,7 @@ function ExploreTeaser() {
       desc: "Bed, cooler, AC, fridge on rent",
       pill: "Explore Rentals",
       extra: true,
-      onClick: () => navigate("/services/furniture"),
+      onClick: () => navigate("/furniture"),
     },
     {
       icon: Wifi,

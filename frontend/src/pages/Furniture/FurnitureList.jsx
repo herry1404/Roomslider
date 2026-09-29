@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Search, ShoppingCart, X, Plus, Minus, MessageCircle, Sofa } from "lucide-react";
+import { Search, ShoppingCart, X, Plus, Minus, MessageCircle, Sofa, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
@@ -34,11 +35,23 @@ const buyPriceFor = (i, cond) =>
 const variantText = (l) =>
   l.mode === "rent" ? `Rent, ${l.months} months` : `Buy, ${l.cond === "used" ? "Second-hand" : "New"}`;
 
+const readUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+};
+
 function Thumb({ src }) {
   return src ? <img src={src} alt="" loading="lazy" /> : <Sofa size={26} />;
 }
 
 function FurnitureList() {
+  const navigate = useNavigate();
+  const user = readUser();
+  const loggedIn = Boolean(user && localStorage.getItem("token"));
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState("rent");
@@ -48,7 +61,11 @@ function FurnitureList() {
   const [d, setD] = useState({ mode: "rent", months: 6, cond: "new", qty: 1 });
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", area: "", date: "" });
+  const [addr, setAddr] = useState({ house: "", building: "", area: "", landmark: "", date: "", phone: "" });
+  const [loc, setLoc] = useState(null);
+  const [locBusy, setLocBusy] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(null);
 
   useEffect(() => {
     api
@@ -97,6 +114,7 @@ function FurnitureList() {
         ...prev,
         {
           key,
+          itemId: sel._id,
           name: sel.name,
           image: sel.images && sel.images[0],
           mode: d.mode,
@@ -133,86 +151,178 @@ function FurnitureList() {
     return { rentMonthly, deposit, buyTotal, delivery, count, initial: rentMonthly + deposit + buyTotal + delivery };
   }, [cart]);
 
-  const sendWhatsApp = () => {
-    if (cart.length === 0) return toast.error("Cart is empty");
-    if (!form.name.trim()) return toast.error("Please enter your name");
-    if (!/^\d{10}$/.test(form.phone.replace(/\D/g, "").slice(-10))) return toast.error("Enter a valid 10 digit phone number");
-    if (!form.area) return toast.error("Please choose your area");
-
-    const lines = cart.map(
-      (l, i) =>
-        `${i + 1}. ${l.qty}x ${l.name} (${variantText(l)}) - ${fmt(l.unit)}${l.mode === "rent" ? "/month" : ""}`
+  const fetchLocation = () => {
+    if (!navigator.geolocation) return toast.error("Location is not supported on this device");
+    setLocBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocBusy(false);
+        toast.success("Location added");
+      },
+      () => {
+        setLocBusy(false);
+        toast.error("Location permission denied. You can still type your address.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
-    const msg = [
-      "Hi RoomSlider, I want to request furniture/appliances:",
+  };
+
+  const buildMessage = (r) => {
+    const a = r.address;
+    const lines = r.items.map(
+      (l, i) => `${i + 1}. ${l.qty}x ${l.name} (${variantText(l)}) - ${fmt(l.unit)}${l.mode === "rent" ? "/month" : ""}`
+    );
+    return [
+      `Hi RoomSlider, new furniture request ${r.requestCode}`,
       "",
       ...lines,
       "",
-      `Monthly rent: ${fmt(totals.rentMonthly)}`,
-      `Security deposit (refundable): ${fmt(totals.deposit)}`,
-      `Buy total: ${fmt(totals.buyTotal)}`,
-      `Delivery: ${fmt(totals.delivery)}`,
-      `Initial payment: ${fmt(totals.initial)}`,
+      `Monthly rent: ${fmt(r.totals.rentMonthly)}`,
+      `Security deposit (refundable): ${fmt(r.totals.deposit)}`,
+      `Buy total: ${fmt(r.totals.buyTotal)}`,
+      `Delivery: ${fmt(r.totals.delivery)}`,
+      `Initial payment: ${fmt(r.totals.initial)}`,
       "",
-      `Name: ${form.name}`,
-      `Phone: ${form.phone}`,
-      `Area: ${form.area}, Indore`,
-      form.date ? `Preferred delivery date: ${form.date}` : "",
+      `Name: ${r.name}`,
+      `Phone: ${r.phone}`,
+      `Address: ${[a.house, a.building, a.area, a.landmark ? "Near " + a.landmark : ""].filter(Boolean).join(", ")}, ${a.city}`,
+      ...(r.mapsLink ? [`Location: ${r.mapsLink}`] : []),
+      ...(r.deliveryDate ? [`Preferred delivery date: ${r.deliveryDate}`] : []),
     ].join("\n");
-
-    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  const renderCart = () => (
-    <div className="fu-cart">
-      <h3>Your Cart Summary</h3>
-      {cart.length === 0 ? (
-        <p className="fu-muted">Cart is empty. Add items to send a request.</p>
-      ) : (
-        <>
-          {cart.map((l) => (
-            <div className="fu-line" key={l.key}>
-              <div className="fu-thumb"><Thumb src={l.image} /></div>
-              <div className="fu-info">
-                <b>{l.name}</b>
-                <span>{variantText(l)} · {fmt(l.unit)}{l.mode === "rent" ? "/mo" : ""}</span>
-              </div>
-              <div className="fu-stepper">
-                <button type="button" onClick={() => changeQty(l.key, -1)}><Minus size={14} /></button>
-                <span>{l.qty}</span>
-                <button type="button" onClick={() => changeQty(l.key, 1)}><Plus size={14} /></button>
-              </div>
-            </div>
-          ))}
+  const sendRequest = async () => {
+    if (!loggedIn) {
+      toast("Please login to send your request");
+      navigate("/login");
+      return;
+    }
+    if (cart.length === 0) return toast.error("Cart is empty");
+    if (!addr.house.trim()) return toast.error("Enter your house / flat number");
+    if (!addr.area) return toast.error("Please choose your area");
+    const phone = String((user && user.phone) || addr.phone || "").replace(/\D/g, "").slice(-10);
+    if (phone.length !== 10) return toast.error("Enter a valid 10 digit phone number");
 
-          <h4>Delivery Details</h4>
-          <input className="fu-input" placeholder="Your name" value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input className="fu-input" placeholder="Phone number" inputMode="numeric" value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          <select className="fu-input" value={form.area}
-            onChange={(e) => setForm({ ...form, area: e.target.value })}>
-            <option value="">Choose your area in Indore</option>
-            {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
-          <input className="fu-input" type="date" value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })} />
+    setSending(true);
+    try {
+      const res = await api.post("/furniture-requests", {
+        items: cart.map((l) => ({ itemId: l.itemId, mode: l.mode, months: l.months, cond: l.cond, qty: l.qty })),
+        address: { house: addr.house, building: addr.building, area: addr.area, landmark: addr.landmark },
+        location: loc,
+        deliveryDate: addr.date,
+        phone,
+      });
+      const r = res.data;
+      const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(buildMessage(r))}`;
+      setDone({ code: r.requestCode, url });
+      setCart([]);
+      window.open(url, "_blank");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not send request");
+    } finally {
+      setSending(false);
+    }
+  };
 
-          <h4>Order Total</h4>
-          {totals.rentMonthly > 0 && <div className="fu-row"><span>Monthly rent</span><span>{fmt(totals.rentMonthly)}</span></div>}
-          {totals.deposit > 0 && <div className="fu-row"><span>Deposit (refundable)</span><span>{fmt(totals.deposit)}</span></div>}
-          {totals.buyTotal > 0 && <div className="fu-row"><span>Buy total</span><span>{fmt(totals.buyTotal)}</span></div>}
-          {totals.delivery > 0 && <div className="fu-row"><span>Delivery</span><span>{fmt(totals.delivery)}</span></div>}
-          <div className="fu-row total"><span>Initial payment</span><span>{fmt(totals.initial)}</span></div>
-
-          <button type="button" className="fu-wa" onClick={sendWhatsApp}>
-            <MessageCircle size={18} /> Request on WhatsApp
+  const renderCart = () => {
+    if (done) {
+      return (
+        <div className="fu-cart">
+          <h3>Request saved</h3>
+          <p className="fu-muted">
+            Your request ID is <b>{done.code}</b>. Send it on WhatsApp so we can confirm quickly.
+          </p>
+          <a className="fu-wa" href={done.url} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+            <MessageCircle size={18} /> Open WhatsApp
+          </a>
+          <button type="button" className="fu-add" style={{ background: "var(--color-surface)", color: "var(--color-text)", border: "1px solid var(--color-border)" }}
+            onClick={() => { setDone(null); setCartOpen(false); }}>
+            Done
           </button>
-          <p className="fu-muted" style={{ textAlign: "center", margin: "8px 0 0" }}>Confirm and start chat</p>
-        </>
-      )}
-    </div>
-  );
+        </div>
+      );
+    }
+
+    return (
+      <div className="fu-cart">
+        <h3>Your Cart Summary</h3>
+        {cart.length === 0 ? (
+          <p className="fu-muted">Cart is empty. Add items to send a request.</p>
+        ) : (
+          <>
+            {cart.map((l) => (
+              <div className="fu-line" key={l.key}>
+                <div className="fu-thumb"><Thumb src={l.image} /></div>
+                <div className="fu-info">
+                  <b>{l.name}</b>
+                  <span>{variantText(l)} · {fmt(l.unit)}{l.mode === "rent" ? "/mo" : ""}</span>
+                </div>
+                <div className="fu-stepper">
+                  <button type="button" onClick={() => changeQty(l.key, -1)}><Minus size={14} /></button>
+                  <span>{l.qty}</span>
+                  <button type="button" onClick={() => changeQty(l.key, 1)}><Plus size={14} /></button>
+                </div>
+              </div>
+            ))}
+
+            <h4>Delivery Details</h4>
+            {!loggedIn ? (
+              <>
+                <p className="fu-muted">Please login to send your request. Your name and phone will be filled automatically.</p>
+                <button type="button" className="fu-add" style={{ marginTop: 0 }} onClick={() => navigate("/login")}>
+                  Login to continue
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="fu-user">
+                  Ordering as <b>{user.name}</b>{user.phone ? <> · <b>{user.phone}</b></> : null}
+                </p>
+                {!user.phone && (
+                  <input className="fu-input" placeholder="Phone number" inputMode="numeric" value={addr.phone}
+                    onChange={(e) => setAddr({ ...addr, phone: e.target.value })} />
+                )}
+                <input className="fu-input" placeholder="House / flat number *" value={addr.house}
+                  onChange={(e) => setAddr({ ...addr, house: e.target.value })} />
+                <input className="fu-input" placeholder="Building / PG / hostel name" value={addr.building}
+                  onChange={(e) => setAddr({ ...addr, building: e.target.value })} />
+                <select className="fu-input" value={addr.area}
+                  onChange={(e) => setAddr({ ...addr, area: e.target.value })}>
+                  <option value="">Choose your area in Indore *</option>
+                  {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <input className="fu-input" placeholder="Landmark (optional)" value={addr.landmark}
+                  onChange={(e) => setAddr({ ...addr, landmark: e.target.value })} />
+                <button type="button" className={`fu-loc ${loc ? "on" : ""}`} onClick={fetchLocation} disabled={locBusy}>
+                  <MapPin size={16} />
+                  {locBusy ? "Getting location..." : loc ? "Location added (tap to update)" : "Use my current location"}
+                </button>
+                <input className="fu-input" type="date" value={addr.date}
+                  onChange={(e) => setAddr({ ...addr, date: e.target.value })} />
+              </>
+            )}
+
+            <h4>Order Total</h4>
+            {totals.rentMonthly > 0 && <div className="fu-row"><span>Monthly rent</span><span>{fmt(totals.rentMonthly)}</span></div>}
+            {totals.deposit > 0 && <div className="fu-row"><span>Deposit (refundable)</span><span>{fmt(totals.deposit)}</span></div>}
+            {totals.buyTotal > 0 && <div className="fu-row"><span>Buy total</span><span>{fmt(totals.buyTotal)}</span></div>}
+            {totals.delivery > 0 && <div className="fu-row"><span>Delivery</span><span>{fmt(totals.delivery)}</span></div>}
+            <div className="fu-row total"><span>Initial payment</span><span>{fmt(totals.initial)}</span></div>
+
+            {loggedIn && (
+              <>
+                <button type="button" className="fu-wa" onClick={sendRequest} disabled={sending}>
+                  <MessageCircle size={18} /> {sending ? "Sending..." : "Request on WhatsApp"}
+                </button>
+                <p className="fu-muted" style={{ textAlign: "center", margin: "8px 0 0" }}>Confirm and start chat</p>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>

@@ -31,6 +31,7 @@ import AddService from "./pages/Admin/AddService";
 import ManageFurniture from "./pages/Admin/ManageFurniture";
 import FurnitureList from "./pages/Furniture/FurnitureList";
 import AddFurniture from "./pages/Admin/AddFurniture";
+import ManageFurnitureRequests from "./pages/Admin/ManageFurnitureRequests";
 import ServiceList from "./pages/Services/ServiceList";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
@@ -151,6 +152,7 @@ function App() {
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
         <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />
+        <Route path="/admin/furniture/requests" element={<AdminRoute><ManageFurnitureRequests /></AdminRoute>} />
         <Route path="/admin/furniture/add" element={<AdminRoute><AddFurniture /></AdminRoute>} />
         <Route path="/admin/furniture/edit/:id" element={<AdminRoute><AddFurniture /></AdminRoute>} />
 

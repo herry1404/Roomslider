@@ -1,3 +1,4 @@
+import { ClipboardList } from "lucide-react";
 import { Sofa } from "lucide-react";
 import {
   LayoutDashboard,
@@ -46,6 +47,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
+        { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
       ],
     },
     {
