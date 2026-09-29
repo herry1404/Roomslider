@@ -43,6 +43,9 @@ import Flats from "./pages/Flats/Flats";
 
 import AdminLogin from "./pages/Admin/AdminLogin";
 import OwnerLogin from "./pages/Owner/OwnerLogin";
+import HourlyManagerLogin from "./pages/HourlyManager/HourlyManagerLogin";
+import HourlyManagerDashboard from "./pages/HourlyManager/HourlyManagerDashboard";
+import HourlyRoomCheckout from "./pages/Rooms/HourlyRoomCheckout";
 import OwnerDashboard from "./pages/Owner/OwnerDashboard";
 import OwnerAddRoom from "./pages/Owner/OwnerAddRoom";
 import OwnerRoomDetail from "./pages/Owner/OwnerRoomDetail";
@@ -116,6 +119,9 @@ function App() {
         <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
 
         <Route path="/owner/login" element={<OwnerLogin />} />
+        <Route path="/hourly-manager/login" element={<HourlyManagerLogin />} />
+        <Route path="/hourly-manager/dashboard" element={<HourlyManagerDashboard />} />
+        <Route path="/hourly-rooms/:id/book" element={<HourlyRoomCheckout />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />

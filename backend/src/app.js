@@ -17,6 +17,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const loanRoutes = require("./routes/loan.routes");
 const hourlyRoomManagerRoutes = require("./routes/hourlyRoomManager.routes");
+const hourlyBookingRoutes = require("./routes/hourlyBooking.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
 const vehicleShopRoutes = require("./routes/vehicleShop.routes");
@@ -274,6 +275,12 @@ app.use(
 app.use(
   "/api/hourly-managers",
   hourlyRoomManagerRoutes
+);
+
+// ✅ HOURLY BOOKING ROUTES
+app.use(
+  "/api/hourly-bookings",
+  hourlyBookingRoutes
 );
 
 // ✅ LAUNDRY VENDOR ROUTES

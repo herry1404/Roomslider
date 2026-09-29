@@ -153,7 +153,7 @@ const getRooms = async (req, res) => {
     }
 
     const rooms = await Room.find(filter)
-      .populate("owner", "name")
+      .populate("owner", "name slug")
       .sort({
         priority: 1,
         createdAt: -1,
@@ -177,7 +177,7 @@ const getRooms = async (req, res) => {
 
 const getSingleRoom = async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id);
+    const room = await Room.findById(req.params.id).populate("owner", "name slug");
 
     if (!room) {
       return res.status(404).json({

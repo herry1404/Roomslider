@@ -9,6 +9,7 @@ const {
   createHourlyRoom,
   getAllHourlyRooms,
   getPublicHourlyRooms,
+  getPublicHourlyRoomById,
   updateHourlyRoom,
   deleteHourlyRoom,
   approveHourlyRoomRequest,
@@ -20,6 +21,7 @@ const {
 // ===============================
 
 router.get("/public", getPublicHourlyRooms);
+router.get("/public/:id", getPublicHourlyRoomById);
 
 // ===============================
 // Admin

@@ -43,6 +43,23 @@ const getPublicHourlyRooms = async (req, res) => {
   }
 };
 
+// Public: single room by id (for detail/checkout page)
+const getPublicHourlyRoomById = async (req, res) => {
+  try {
+    const room = await HourlyRoom.findOne({
+      _id: req.params.id,
+      isActive: true,
+      status: "approved",
+    });
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    res.json(room);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch room", error: safeMsg(err) });
+  }
+};
+
 // Admin: update any field
 const updateHourlyRoom = async (req, res) => {
   try {
@@ -117,6 +134,7 @@ module.exports = {
   createHourlyRoom,
   getAllHourlyRooms,
   getPublicHourlyRooms,
+  getPublicHourlyRoomById,
   updateHourlyRoom,
   deleteHourlyRoom,
   approveHourlyRoomRequest,

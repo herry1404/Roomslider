@@ -66,10 +66,11 @@ exports.loginManager = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      manager: {
+      user: {
         _id: manager._id,
         name: manager.name,
         phone: manager.phone,
+        role: "hourlyManager",
       },
     });
   } catch (err) {

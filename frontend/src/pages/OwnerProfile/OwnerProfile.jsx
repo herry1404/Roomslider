@@ -18,10 +18,10 @@ function OwnerProfile() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [profileRes, roomsRes] = await Promise.all([
-          api.get(`/owners/public/${id}`),
-          api.get("/rooms", { params: { owner: id } }),
-        ]);
+        const profileRes = await api.get(`/owners/public/${id}`);
+        const roomsRes = await api.get("/rooms", {
+          params: { owner: profileRes.data.owner._id },
+        });
 
         setOwner(profileRes.data.owner);
         setTotalListings(profileRes.data.totalListings);
@@ -64,7 +64,7 @@ function OwnerProfile() {
     <>
       <Helmet>
         <title>{displayName} | RoomSlider</title>
-        <link rel="canonical" href={`https://www.roomslider.in/owners/${id}`} />
+        <link rel="canonical" href={`https://www.roomslider.in/owners/${owner.slug || id}`} />
       </Helmet>
 
       <section className="container" style={{ padding: "40px 0" }}>

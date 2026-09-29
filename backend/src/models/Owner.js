@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const slugify = require('slugify');
 
 const ownerSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -11,6 +12,7 @@ const ownerSchema = new mongoose.Schema({
   },
   password: { type: String, required: true },
   propertyName: { type: String },
+  slug: { type: String, unique: true, sparse: true },
   totalRooms: { type: Number, default: 0 },
   role: { type: String, default: "owner" },
   // Electricity rate this owner charges tenants, per unit consumed (₹/unit)
@@ -22,8 +24,18 @@ const ownerSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 ownerSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
-  this.password = await bcrypt.hash(this.password, 10);
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  if (!this.slug) {
+    const base =
+      slugify(`${this.name} ${this.propertyName || ''}`, { lower: true, strict: true }) ||
+      'owner';
+    let slug = base;
+    let i = 1;
+    while (await this.constructor.exists({ slug })) slug = `${base}-${++i}`;
+    this.slug = slug;
+  }
 });
 
 module.exports = mongoose.model('Owner', ownerSchema);

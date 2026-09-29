@@ -52,6 +52,13 @@ const hourlyRoomSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    // Real-time occupancy status (managed by Admin / Hourly Room Manager)
+    availabilityStatus: {
+      type: String,
+      enum: ["available", "occupied", "maintenance"],
+      default: "available",
+    },
   },
   { timestamps: true }
 );
