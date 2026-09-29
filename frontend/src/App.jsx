@@ -74,7 +74,6 @@ import OwnerDetail from "./pages/Admin/OwnerDetail";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import OwnerRoute from "./components/OwnerRoute";
-import LoginRoute from "./components/LoginRoute";
 import MessRoute from "./components/MessRoute";
 
 function App() {
@@ -104,10 +103,10 @@ function App() {
         <Route path="/services/:category" element={<MainLayout><ServiceList /></MainLayout>} />
         <Route path="/furniture" element={<MainLayout><FurnitureList /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
-        <Route path="/rooms/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/pg/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/hostels/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/flats/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
+        <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />

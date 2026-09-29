@@ -14,13 +14,6 @@ function CategorySection({ title, viewAllPath, rooms }) {
   const goToDetails = (room) => {
     const detailsPath = roomPath(room);
 
-    // Login required: guest ko login page pe bhejo
-    if (!user) {
-      toast.error("Login first", { id: "login-first" });
-      navigate("/login", { state: { from: detailsPath } });
-      return;
-    }
-
     navigate(detailsPath);
   };
 
@@ -98,7 +91,15 @@ function CategorySection({ title, viewAllPath, rooms }) {
                 </div>
 
                 <div className="room-info">
-                  <h3>{room.title}</h3>
+                  <h3>
+                    <Link
+                      to={roomPath(room)}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ color: "inherit", textDecoration: "none" }}
+                    >
+                      {room.title}
+                    </Link>
+                  </h3>
 
                   <p className="room-location">
                     <MapPin size={14} />
