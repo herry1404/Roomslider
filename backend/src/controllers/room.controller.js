@@ -1,5 +1,6 @@
 const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
+require("../models/property.model"); // register model so populate("property") works
 const User = require("../models/user.model");
 
 // ============================
@@ -101,7 +102,51 @@ const createRoom = async (req, res) => {
       roomData.whatsapp = roomData.whatsapp || req.user.phone;
     }
 
-    const room = await Room.create(roomData);
+    // ---- Property link (1 room = 1 property, unless propertyId is given) ----
+    const Property = require("../models/property.model");
+    const { propertyId, sharingType } = req.body;
+
+    if (["Single", "Double", "Triple", "Other"].includes(sharingType)) {
+      roomData.sharingType = sharingType;
+    }
+
+    let createdProperty = null;
+
+    if (propertyId) {
+      const existing = await Property.findById(propertyId).lean();
+      if (!existing) {
+        return res.status(404).json({
+          success: false,
+          message: "Property not found",
+        });
+      }
+      if (
+        req.user.role === "owner" &&
+        String(existing.owner) !== String(req.user._id)
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only add rooms to your own property",
+        });
+      }
+      roomData.property = existing._id;
+    } else {
+      createdProperty = await Property.create({
+        name: (title || "").trim(),
+        area: (location || "").trim(),
+        owner: roomData.owner || null,
+        propertyType: category || "Room",
+      });
+      roomData.property = createdProperty._id;
+    }
+
+    let room;
+    try {
+      room = await Room.create(roomData);
+    } catch (err) {
+      if (createdProperty) await Property.deleteOne({ _id: createdProperty._id });
+      throw err;
+    }
 
     const { logActivity } = require("./activity.controller");
     await logActivity("room_added", `New room added: ${room.title || room.propertyName || "Untitled"}`, room._id, "Room");
@@ -155,12 +200,36 @@ const getRooms = async (req, res) => {
       filter.owner = req.query.owner;
     }
 
-    const rooms = await Room.find(filter)
-      .populate("owner", "name slug")
-      .sort({
-        priority: 1,
-        createdAt: -1,
-      });
+    const grouped = req.query.grouped === "true";
+
+    let query = Room.find(filter).populate("owner", "name slug");
+    if (grouped) {
+      query = query.populate("property", "name area propertyType");
+    }
+
+    let rooms = await query.sort({
+      priority: 1,
+      createdAt: -1,
+    });
+
+    // Grouped mode (homepage): one card per distinct sharingType per property, max 3
+    if (grouped) {
+      const seen = new Map();
+      const cards = [];
+      for (const r of rooms) {
+        const pid = r.property && r.property._id ? String(r.property._id) : "solo-" + r._id;
+        const key = r.sharingType || "none";
+        if (!seen.has(pid)) seen.set(pid, new Set());
+        const keys = seen.get(pid);
+        if (keys.has(key) || keys.size >= 3) continue;
+        keys.add(key);
+        cards.push(r);
+      }
+      rooms = cards;
+
+      const limit = parseInt(req.query.limit, 10);
+      if (limit > 0) rooms = rooms.slice(0, Math.min(limit, 100));
+    }
 
     res.status(200).json({
       success: true,
@@ -430,6 +499,44 @@ const createBulkRooms = async (req, res) => {
       baseData.whatsapp = baseData.whatsapp || req.user.phone;
     }
 
+    // ---- Property link: whole batch shares ONE property ----
+    const Property = require("../models/property.model");
+    const { propertyId, sharingType } = req.body;
+
+    if (["Single", "Double", "Triple", "Other"].includes(sharingType)) {
+      baseData.sharingType = sharingType;
+    }
+
+    let createdProperty = null;
+
+    if (propertyId) {
+      const existing = await Property.findById(propertyId).lean();
+      if (!existing) {
+        return res.status(404).json({
+          success: false,
+          message: "Property not found",
+        });
+      }
+      if (
+        req.user.role === "owner" &&
+        String(existing.owner) !== String(req.user._id)
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only add rooms to your own property",
+        });
+      }
+      baseData.property = existing._id;
+    } else {
+      createdProperty = await Property.create({
+        name: (title || "").trim(),
+        area: (location || "").trim(),
+        owner: baseData.owner || null,
+        propertyType: category || "Room",
+      });
+      baseData.property = createdProperty._id;
+    }
+
     const roomDocs = [];
     for (let num = start; num <= end; num++) {
       roomDocs.push({
@@ -438,7 +545,13 @@ const createBulkRooms = async (req, res) => {
       });
     }
 
-    const createdRooms = await Room.insertMany(roomDocs);
+    let createdRooms;
+    try {
+      createdRooms = await Room.insertMany(roomDocs);
+    } catch (err) {
+      if (createdProperty) await Property.deleteOne({ _id: createdProperty._id });
+      throw err;
+    }
 
     res.status(201).json({
       success: true,
