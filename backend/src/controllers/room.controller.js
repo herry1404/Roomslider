@@ -130,6 +130,7 @@ const createRoom = async (req, res) => {
         });
       }
       roomData.property = existing._id;
+      if (!roomData.owner && existing.owner) roomData.owner = existing.owner;
     } else {
       createdProperty = await Property.create({
         name: (title || "").trim(),
@@ -535,6 +536,7 @@ const createBulkRooms = async (req, res) => {
         });
       }
       baseData.property = existing._id;
+      if (!baseData.owner && existing.owner) baseData.owner = existing.owner;
     } else {
       createdProperty = await Property.create({
         name: (title || "").trim(),
