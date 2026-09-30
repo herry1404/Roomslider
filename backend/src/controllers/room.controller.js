@@ -332,6 +332,14 @@ const updateRoom = async (req, res) => {
     if (description !== undefined) room.description = description;
     if (category !== undefined) room.category = category;
     if (gender !== undefined) room.gender = gender;
+    if (req.body.sharingType !== undefined) {
+      const st = req.body.sharingType;
+      if (st === "" || st === "null") {
+        room.sharingType = null;
+      } else if (["Single", "Double", "Triple", "Other"].includes(st)) {
+        room.sharingType = st;
+      }
+    }
     if (rooms !== undefined) room.rooms = rooms;
     if (bathrooms !== undefined) room.bathrooms = bathrooms;
     if (furnished !== undefined) room.furnished = furnished === "true" || furnished === true;
