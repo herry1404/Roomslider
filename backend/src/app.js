@@ -17,6 +17,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const loanRoutes = require("./routes/loan.routes");
 const hourlyRoomManagerRoutes = require("./routes/hourlyRoomManager.routes");
+const hourlyBookingRoutes = require("./routes/hourlyBooking.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
 const vehicleShopRoutes = require("./routes/vehicleShop.routes");
@@ -24,6 +25,9 @@ const vehicleRoutes = require("./routes/vehicle.routes");
 const vehicleBookingRoutes = require("./routes/vehicleBooking.routes");
 const serviceRoutes = require("./routes/service.routes");
 const serviceBookingRoutes = require("./routes/serviceBooking.routes");
+const furnitureRoutes = require("./routes/furniture.routes");
+const homeSectionRoutes = require("./routes/homeSection.routes");
+const furnitureRequestRoutes = require("./routes/furnitureRequest.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
 const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
@@ -276,6 +280,12 @@ app.use(
   hourlyRoomManagerRoutes
 );
 
+// ✅ HOURLY BOOKING ROUTES
+app.use(
+  "/api/hourly-bookings",
+  hourlyBookingRoutes
+);
+
 // ✅ LAUNDRY VENDOR ROUTES
 app.use(
   "/api/laundry-vendors",
@@ -323,6 +333,10 @@ app.use(
   "/api/service-bookings",
   serviceBookingRoutes
 );
+
+app.use("/api/furniture", furnitureRoutes);
+app.use("/api/home-sections", homeSectionRoutes);
+app.use("/api/furniture-requests", furnitureRequestRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)
 app.use(

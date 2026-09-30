@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
   const maybePromptPreferences = (userData) => {
 
     if (!userData || userData.preferredCollege) return;
+    if (userData.role && userData.role !== "user") return;
 
     const promptKey = `prefsPrompted:${userData.id}`;
 
@@ -137,6 +138,22 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const hourlyManagerLogin = async (data) => {
+    try {
+      const res = await api.post("/hourly-managers/login", data);
+      saveSession(res.data.token, res.data.user);
+      return {
+        success: true,
+        message: res.data.message || "Login successful",
+        user: res.data.user,
+      };
+    } catch (error) {
+      console.error("HOURLY MANAGER LOGIN API ERROR:", error);
+      console.error("SERVER RESPONSE:", error.response?.data);
+      throw error;
+    }
+  };
+
   const messLogin = async (data) => {
     try {
       const res = await api.post("/mess/login", data);
@@ -191,6 +208,7 @@ export function AuthProvider({ children }) {
         googleLogin,
         ownerLogin,
         messLogin,
+        hourlyManagerLogin,
         register,
         logout,
         showPreferences,

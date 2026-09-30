@@ -27,7 +27,12 @@ import ManageVehicles from "./pages/Admin/ManageVehicles";
 import AddVehicleShop from "./pages/Admin/AddVehicleShop";
 import AddVehicle from "./pages/Admin/AddVehicle";
 import ManageServices from "./pages/Admin/ManageServices";
+import ManageHomeLayout from "./pages/Admin/ManageHomeLayout";
 import AddService from "./pages/Admin/AddService";
+import ManageFurniture from "./pages/Admin/ManageFurniture";
+import FurnitureList from "./pages/Furniture/FurnitureList";
+import AddFurniture from "./pages/Admin/AddFurniture";
+import ManageFurnitureRequests from "./pages/Admin/ManageFurnitureRequests";
 import ServiceList from "./pages/Services/ServiceList";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import Terms from "./pages/Terms/Terms";
@@ -43,6 +48,9 @@ import Flats from "./pages/Flats/Flats";
 
 import AdminLogin from "./pages/Admin/AdminLogin";
 import OwnerLogin from "./pages/Owner/OwnerLogin";
+import HourlyManagerLogin from "./pages/HourlyManager/HourlyManagerLogin";
+import HourlyManagerDashboard from "./pages/HourlyManager/HourlyManagerDashboard";
+import HourlyRoomCheckout from "./pages/Rooms/HourlyRoomCheckout";
 import OwnerDashboard from "./pages/Owner/OwnerDashboard";
 import OwnerAddRoom from "./pages/Owner/OwnerAddRoom";
 import OwnerRoomDetail from "./pages/Owner/OwnerRoomDetail";
@@ -67,7 +75,6 @@ import OwnerDetail from "./pages/Admin/OwnerDetail";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import OwnerRoute from "./components/OwnerRoute";
-import LoginRoute from "./components/LoginRoute";
 import MessRoute from "./components/MessRoute";
 
 function App() {
@@ -95,11 +102,12 @@ function App() {
         <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
         <Route path="/vehicles/shop/:id" element={<MainLayout><VehicleShopDetail /></MainLayout>} />
         <Route path="/services/:category" element={<MainLayout><ServiceList /></MainLayout>} />
+        <Route path="/furniture" element={<MainLayout><FurnitureList /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
-        <Route path="/rooms/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/pg/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/hostels/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
-        <Route path="/flats/:id" element={<LoginRoute><MainLayout><PropertyDetails /></MainLayout></LoginRoute>} />
+        <Route path="/rooms/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
+        <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />
@@ -116,6 +124,9 @@ function App() {
         <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
 
         <Route path="/owner/login" element={<OwnerLogin />} />
+        <Route path="/hourly-manager/login" element={<HourlyManagerLogin />} />
+        <Route path="/hourly-manager/dashboard" element={<HourlyManagerDashboard />} />
+        <Route path="/hourly-rooms/:id/book" element={<HourlyRoomCheckout />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />
@@ -139,7 +150,12 @@ function App() {
         <Route path="/admin/vehicles/shops/add" element={<AdminRoute><AddVehicleShop /></AdminRoute>} />
         <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
+        <Route path="/admin/home-layout" element={<AdminRoute><ManageHomeLayout /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
+        <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />
+        <Route path="/admin/furniture/requests" element={<AdminRoute><ManageFurnitureRequests /></AdminRoute>} />
+        <Route path="/admin/furniture/add" element={<AdminRoute><AddFurniture /></AdminRoute>} />
+        <Route path="/admin/furniture/edit/:id" element={<AdminRoute><AddFurniture /></AdminRoute>} />
 
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />

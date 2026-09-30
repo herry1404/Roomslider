@@ -57,7 +57,7 @@ function ExploreTeaser() {
       title: "Hourly Rooms",
       desc: "Short stays, day use, hourly rate",
       pill: "Explore Now",
-      onClick: () => navigate("/hourly-rooms"),
+      to: "/hourly-rooms",
     },
     {
       icon: Banknote,
@@ -71,7 +71,7 @@ function ExploreTeaser() {
       title: "Rent a Vehicle",
       desc: "Bike and scooty rental by the day",
       pill: "Explore Now",
-      onClick: () => navigate("/vehicles"),
+      to: "/vehicles",
     },
     {
       icon: UtensilsCrossed,
@@ -79,7 +79,7 @@ function ExploreTeaser() {
       desc: "Mess near you with today's menu",
       pill: "Explore Mess",
       extra: true,
-      onClick: () => navigate("/mess"),
+      to: "/mess",
     },
     {
       icon: Shirt,
@@ -95,7 +95,7 @@ function ExploreTeaser() {
       desc: "Room and bathroom cleaning",
       pill: "Find Cleaners",
       extra: true,
-      onClick: () => navigate("/services/cleaning"),
+      to: "/services/cleaning",
     },
     {
       icon: Truck,
@@ -103,7 +103,7 @@ function ExploreTeaser() {
       desc: "Easy shifting to your new place",
       pill: "Find Movers",
       extra: true,
-      onClick: () => navigate("/services/packers"),
+      to: "/services/packers",
     },
     {
       icon: Sofa,
@@ -111,7 +111,7 @@ function ExploreTeaser() {
       desc: "Bed, cooler, AC, fridge on rent",
       pill: "Explore Rentals",
       extra: true,
-      onClick: () => navigate("/services/furniture"),
+      to: "/furniture",
     },
     {
       icon: Wifi,
@@ -119,7 +119,7 @@ function ExploreTeaser() {
       desc: "Broadband and RO purifier service",
       pill: "Find Providers",
       extra: true,
-      onClick: () => navigate("/services/wifi"),
+      to: "/services/wifi",
     },
     {
       icon: Wrench,
@@ -127,14 +127,14 @@ function ExploreTeaser() {
       desc: "Cooler, AC and geyser repair",
       pill: "Find Repair",
       extra: true,
-      onClick: () => navigate("/services/appliance-repair"),
+      to: "/services/appliance-repair",
     },
     {
       icon: LayoutGrid,
       title: "More",
       desc: "See everything RoomSlider offers",
       pill: "View All",
-      onClick: () => navigate("/explore"),
+      to: "/explore",
     },
   ];
 
@@ -152,11 +152,14 @@ function ExploreTeaser() {
             gap: "12px",
           }}
         >
-          {tiles.map(({ icon: Icon, title, desc, pill, onClick, extra }) => (
-            <div
+          {tiles.map(({ icon: Icon, title, desc, pill, onClick, to, extra }) => {
+            const Tag = to ? Link : "div";
+            const tagProps = to ? { to } : { onClick };
+            return (
+            <Tag
               key={title}
-              onClick={onClick}
-              style={tileStyle}
+              {...tagProps}
+              style={{ ...tileStyle, textDecoration: "none", color: "inherit" }}
               className={extra ? "explore-extra-tile" : ""}
             >
               <Icon size={22} color="var(--color-primary)" />
@@ -166,8 +169,9 @@ function ExploreTeaser() {
                 {pill}
                 <ArrowRight size={12} />
               </span>
-            </div>
-          ))}
+            </Tag>
+            );
+          })}
         </div>
       </div>
 

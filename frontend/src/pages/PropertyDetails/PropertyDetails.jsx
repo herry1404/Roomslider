@@ -362,7 +362,7 @@ function PropertyDetails() {
 
                     <p className="owner-name">
                       {room.owner ? (
-                        <Link to={`/owners/${room.owner}`} className="owner-name-link">
+                        <Link to={`/owners/${room.owner?.slug || room.owner?._id || room.owner}`} className="owner-name-link">
                           {room.ownerName}
                         </Link>
                       ) : (

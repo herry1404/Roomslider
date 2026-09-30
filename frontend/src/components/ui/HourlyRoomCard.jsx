@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { MapPin, IndianRupee, Clock } from "lucide-react";
 import "../../styles/room-card.css";
 
@@ -9,6 +10,7 @@ function getThumbnailUrl(url) {
 }
 
 function HourlyRoomCard({ room }) {
+  const navigate = useNavigate();
   const firstImage = getThumbnailUrl(room.images?.[0]);
 
   return (
@@ -54,6 +56,13 @@ function HourlyRoomCard({ room }) {
             {room.amenities.join(" • ")}
           </p>
         )}
+
+        <button
+          className="hourly-book-btn"
+          onClick={() => navigate(`/hourly-rooms/${room._id}/book`)}
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );

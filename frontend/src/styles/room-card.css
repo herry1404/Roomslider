@@ -414,3 +414,17 @@
     transform: translate(28px, -28px) scale(0.3) rotate(var(--angle, 0deg));
   }
 }
+
+.hourly-book-btn{
+  width:100%;
+  margin-top:10px;
+  background:#2563EB;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:11px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+.hourly-book-btn:hover{background:#1d4ed8}

@@ -106,7 +106,7 @@ function ComingSoonServices() {
       title: "Furniture & Appliance Rental",
       desc: "Bed, cooler, AC, fridge on rent",
       button: "Explore Rentals",
-      onClick: () => navigate("/services/furniture"),
+      onClick: () => navigate("/furniture"),
     },
     {
       icon: Wifi,

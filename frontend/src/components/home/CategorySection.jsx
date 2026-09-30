@@ -2,6 +2,7 @@ import { roomPath } from "../../utils/roomUrl";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, MapPin, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
+import ShareButton from "../ui/ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
@@ -13,13 +14,6 @@ function CategorySection({ title, viewAllPath, rooms }) {
 
   const goToDetails = (room) => {
     const detailsPath = roomPath(room);
-
-    // Login required: guest ko login page pe bhejo
-    if (!user) {
-      toast.error("Login first", { id: "login-first" });
-      navigate("/login", { state: { from: detailsPath } });
-      return;
-    }
 
     navigate(detailsPath);
   };
@@ -78,6 +72,8 @@ function CategorySection({ title, viewAllPath, rooms }) {
                     className="room-image"
                   />
 
+                  <ShareButton room={room} variant="tile" />
+
                   <button
                     className={`wishlist-btn ${wishlisted ? "active" : ""}`}
                     onClick={(e) => {
@@ -98,7 +94,15 @@ function CategorySection({ title, viewAllPath, rooms }) {
                 </div>
 
                 <div className="room-info">
-                  <h3>{room.title}</h3>
+                  <h3>
+                    <Link
+                      to={roomPath(room)}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ color: "inherit", textDecoration: "none" }}
+                    >
+                      {room.title}
+                    </Link>
+                  </h3>
 
                   <p className="room-location">
                     <MapPin size={14} />

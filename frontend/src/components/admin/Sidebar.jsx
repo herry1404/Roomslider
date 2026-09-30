@@ -1,3 +1,6 @@
+import { LayoutGrid } from "lucide-react";
+import { ClipboardList } from "lucide-react";
+import { Sofa } from "lucide-react";
 import {
   LayoutDashboard,
   HousePlus,
@@ -44,6 +47,14 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
+        { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
+        { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
+      ],
+    },
+    {
+      label: "Site",
+      items: [
+        { title: "Home Layout", icon: <LayoutGrid size={18} />, path: "/admin/home-layout" },
       ],
     },
     {

@@ -1,7 +1,14 @@
+import { Helmet } from "react-helmet-async";
 import "./Privacy.css";
 
 export default function Privacy() {
   return (
+    <>
+      <Helmet>
+        <title>Privacy Policy | RoomSlider</title>
+        <meta name="description" content="How RoomSlider collects, uses and protects your personal data on roomslider.in." />
+        <link rel="canonical" href="https://www.roomslider.in/privacy" />
+      </Helmet>
     <div className="legal-page">
       <div className="legal-container">
         <h1>Privacy Policy</h1>
@@ -103,5 +110,6 @@ export default function Privacy() {
         <p className="legal-disclaimer"><em>This document is a general template and does not constitute legal advice.</em></p>
       </div>
     </div>
+    </>
   );
 }

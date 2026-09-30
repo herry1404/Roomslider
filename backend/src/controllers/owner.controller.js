@@ -216,8 +216,10 @@ const getMyRooms = async (req, res) => {
 
 const getPublicOwnerProfile = async (req, res) => {
   try {
-    const owner = await Owner.findById(req.params.id).select(
-      "name propertyName instagram facebook youtube createdAt"
+    const idOrSlug = req.params.id;
+    const query = /^[0-9a-fA-F]{24}$/.test(idOrSlug) ? { _id: idOrSlug } : { slug: idOrSlug };
+    const owner = await Owner.findOne(query).select(
+      "name propertyName slug instagram facebook youtube createdAt"
     );
     if (!owner) return res.status(404).json({ message: "Owner not found" });
 
