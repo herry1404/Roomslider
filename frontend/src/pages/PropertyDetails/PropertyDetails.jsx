@@ -28,6 +28,7 @@ import { useWishlist } from "../../context/WishlistContext";
 import "../../styles/property-details.css";
 import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 import RoomMap from "../../components/map/RoomMap";
+import NearbyRooms from "../../components/property/NearbyRooms";
 
 function PropertyDetails() {
   const navHidden = useHideOnScroll(80);
@@ -303,7 +304,6 @@ function PropertyDetails() {
               </div>
             </div>
           )}
-
         </div>
 
         <div className="property-right">
@@ -429,6 +429,8 @@ function PropertyDetails() {
         </div>
 
       </div>
+
+      <NearbyRooms roomId={room._id} location={room.location} />
 
             {(callLink || whatsappLink || guestContact) && (
         <div className={`mobile-sticky-bar ${navHidden ? "mobile-sticky-bar-visible" : ""}`}>

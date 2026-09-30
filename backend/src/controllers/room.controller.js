@@ -1,5 +1,6 @@
 const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
+const { findNearestPlace, findPlaceByLocationText } = require("../data/nearbyPlaces");
 const User = require("../models/user.model");
 
 // ============================
@@ -861,39 +862,75 @@ const getNearbyRooms = async (req, res) => {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
+    // Step 1: find nearest college/area to this room
+    let nearestPlace = findNearestPlace(room.latitude, room.longitude);
+    if (!nearestPlace) {
+      nearestPlace = findPlaceByLocationText(room.location);
+    }
+
     const areaName = room.location.split(",")[0].trim();
     const escaped = areaName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const areaRegex = new RegExp(escaped, "i");
 
-    let nearbyRooms = await Room.find({
+    const allVacant = await Room.find({
       _id: { $ne: room._id },
       status: "vacant",
-      location: areaRegex,
     })
-      .select("title price location images category")
+      .select("title price location images category latitude longitude")
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(50);
+
+    let nearbyRooms = [];
+
+    if (nearestPlace) {
+      // Rooms with coordinates: keep ones within 4km of the nearest place
+      const withCoords = allVacant.filter(
+        (r) =>
+          r.latitude != null &&
+          r.longitude != null &&
+          distanceKmHelper(r.latitude, r.longitude, nearestPlace.latitude, nearestPlace.longitude) <= 4
+      );
+
+      // Rooms without coordinates: fall back to text match on location
+      const withoutCoords = allVacant.filter(
+        (r) => (r.latitude == null || r.longitude == null) && areaRegex.test(r.location)
+      );
+
+      nearbyRooms = [...withCoords, ...withoutCoords].slice(0, 10);
+    } else {
+      nearbyRooms = allVacant.filter((r) => areaRegex.test(r.location)).slice(0, 10);
+    }
 
     if (nearbyRooms.length < 4) {
       const excludeIds = [room._id, ...nearbyRooms.map((r) => r._id)];
-
-      const extra = await Room.find({
-        _id: { $nin: excludeIds },
-        status: "vacant",
-      })
-        .select("title price location images category")
-        .sort({ createdAt: -1 })
-        .limit(10 - nearbyRooms.length);
-
+      const extra = allVacant
+        .filter((r) => !excludeIds.some((id) => id.equals(r._id)))
+        .slice(0, 10 - nearbyRooms.length);
       nearbyRooms = [...nearbyRooms, ...extra];
     }
 
-    res.status(200).json({ success: true, rooms: nearbyRooms });
+    res.status(200).json({
+      success: true,
+      rooms: nearbyRooms,
+      nearestPlace: nearestPlace ? nearestPlace.name : null,
+    });
   } catch (error) {
     console.error("GET NEARBY ROOMS ERROR 👉", error);
     res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
+
+function distanceKmHelper(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
 
 module.exports = {
   createRoom,
