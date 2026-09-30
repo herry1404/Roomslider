@@ -1,3 +1,4 @@
+import { LayoutGrid } from "lucide-react";
 import { ClipboardList } from "lucide-react";
 import { Sofa } from "lucide-react";
 import {
@@ -48,6 +49,12 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
         { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
+      ],
+    },
+    {
+      label: "Site",
+      items: [
+        { title: "Home Layout", icon: <LayoutGrid size={18} />, path: "/admin/home-layout" },
       ],
     },
     {

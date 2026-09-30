@@ -27,6 +27,7 @@ import ManageVehicles from "./pages/Admin/ManageVehicles";
 import AddVehicleShop from "./pages/Admin/AddVehicleShop";
 import AddVehicle from "./pages/Admin/AddVehicle";
 import ManageServices from "./pages/Admin/ManageServices";
+import ManageHomeLayout from "./pages/Admin/ManageHomeLayout";
 import AddService from "./pages/Admin/AddService";
 import ManageFurniture from "./pages/Admin/ManageFurniture";
 import FurnitureList from "./pages/Furniture/FurnitureList";
@@ -149,6 +150,7 @@ function App() {
         <Route path="/admin/vehicles/shops/add" element={<AdminRoute><AddVehicleShop /></AdminRoute>} />
         <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
+        <Route path="/admin/home-layout" element={<AdminRoute><ManageHomeLayout /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
         <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />
         <Route path="/admin/furniture/requests" element={<AdminRoute><ManageFurnitureRequests /></AdminRoute>} />
