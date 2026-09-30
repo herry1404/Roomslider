@@ -136,7 +136,10 @@ const getRooms = async (req, res) => {
     }
 
     if (req.query.search) {
-      const regex = new RegExp(req.query.search, "i");
+      const searchText = String(req.query.search)
+        .slice(0, 100)
+        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(searchText, "i");
       filter.$or = [{ title: regex }, { location: regex }, { category: regex }];
     }
 
