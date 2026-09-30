@@ -13,20 +13,20 @@
 
 /* RoomCard: heart ke jaisa (transparent, white icon) */
 .share-btn--card {
-  top: 16px;
-  right: 62px;
-  width: 42px;
-  height: 42px;
+  top: 18px;
+  right: 60px;
+  width: 38px;
+  height: 38px;
   background: transparent;
   color: #fff;
 }
 
 /* Home CategorySection card: heart ke jaisa (white circle) */
 .share-btn--tile {
-  top: 12px;
-  right: 56px;
-  width: 36px;
-  height: 36px;
+  top: 14px;
+  right: 52px;
+  width: 32px;
+  height: 32px;
   background: white;
   color: #374151;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);

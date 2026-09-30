@@ -55,7 +55,7 @@ function ShareButton({ room, variant = "card" }) {
         aria-label="Share"
         title="Share"
       >
-        <Share2 size={variant === "tile" ? 16 : 20} />
+        <Share2 size={variant === "tile" ? 14 : 17} />
       </button>
 
       {open &&
