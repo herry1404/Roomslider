@@ -27,6 +27,7 @@ const serviceRoutes = require("./routes/service.routes");
 const serviceBookingRoutes = require("./routes/serviceBooking.routes");
 const furnitureRoutes = require("./routes/furniture.routes");
 const homeSectionRoutes = require("./routes/homeSection.routes");
+const propertyRoutes = require("./routes/property.routes");
 const furnitureRequestRoutes = require("./routes/furnitureRequest.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
@@ -336,6 +337,7 @@ app.use(
 
 app.use("/api/furniture", furnitureRoutes);
 app.use("/api/home-sections", homeSectionRoutes);
+app.use("/api/properties", propertyRoutes);
 app.use("/api/furniture-requests", furnitureRequestRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)

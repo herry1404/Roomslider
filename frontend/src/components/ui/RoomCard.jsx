@@ -26,10 +26,19 @@ function RoomCard({ room, onWishlistChange }) {
 
   const wishlisted = isWishlisted(room._id);
 
+  // Grouped homepage cards -> property page; otherwise old room page
+  const cardPath = room.property?._id
+    ? `/property/${room.property._id}${
+        room.sharingType && room.sharingType !== "Other"
+          ? `?sharing=${room.sharingType.toLowerCase()}`
+          : ""
+      }`
+    : roomPath(room);
+
   const handleDetails = (e) => {
     if (e) e.stopPropagation();
 
-    const detailsPath = roomPath(room);
+    const detailsPath = cardPath;
 
     navigate(detailsPath);
   };
@@ -116,11 +125,11 @@ function RoomCard({ room, onWishlistChange }) {
       <div className="room-content">
         <h3>
           <Link
-            to={roomPath(room)}
+            to={cardPath}
             onClick={(e) => e.stopPropagation()}
             style={{ color: "inherit", textDecoration: "none" }}
           >
-            {room.title}
+            {room.property?.name || room.title}
           </Link>
         </h3>
 
@@ -133,6 +142,11 @@ function RoomCard({ room, onWishlistChange }) {
           <IndianRupee size={17} />
           <strong>{room.price?.toLocaleString()}</strong>
           <span>/month</span>
+          {room.sharingType && room.sharingType !== "Other" && (
+            <span style={{ marginLeft: "8px", fontWeight: 600 }}>
+              · {room.sharingType} sharing
+            </span>
+          )}
         </div>
 
         <p>

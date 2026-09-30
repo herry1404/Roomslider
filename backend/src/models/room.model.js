@@ -112,6 +112,20 @@ const roomSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Building/property ye room kis ke andar aata hai (Phase 3 backfill se bharega)
+    property: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Property",
+      default: null,
+    },
+
+    // Sharing label: sirf dikhane ke liye (whole-room booking, tenant logic same)
+    sharingType: {
+      type: String,
+      enum: ["Single", "Double", "Triple", "Other"],
+      default: null,
+    },
+
     status: {
       type: String,
       enum: ["vacant", "occupied"],
