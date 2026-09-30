@@ -120,7 +120,7 @@ function RoomCard({ room, onWishlistChange }) {
             onClick={(e) => e.stopPropagation()}
             style={{ color: "inherit", textDecoration: "none" }}
           >
-            {room.title}
+            {room.property?.name || room.title}
           </Link>
         </h3>
 
@@ -133,6 +133,11 @@ function RoomCard({ room, onWishlistChange }) {
           <IndianRupee size={17} />
           <strong>{room.price?.toLocaleString()}</strong>
           <span>/month</span>
+          {room.sharingType && room.sharingType !== "Other" && (
+            <span style={{ marginLeft: "8px", fontWeight: 600 }}>
+              · {room.sharingType} sharing
+            </span>
+          )}
         </div>
 
         <p>

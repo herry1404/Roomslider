@@ -59,7 +59,7 @@ function Home() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await api.get("/rooms");
+        const res = await api.get("/rooms", { params: { grouped: "true" } });
         setRooms(res.data?.rooms || []);
       } catch (error) {
         console.error("Home Rooms Error:", error);

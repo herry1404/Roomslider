@@ -31,6 +31,7 @@ function OwnerAddRoom() {
     const [formData, setFormData] = useState({
         title: "",
         category: "Room",
+        sharingType: "",
         location: "",
         price: "",
         deposit: "",
@@ -110,6 +111,7 @@ function OwnerAddRoom() {
             data.append("deposit", formData.deposit);
             data.append("location", formData.location);
             data.append("category", formData.category);
+            if (formData.sharingType) data.append("sharingType", formData.sharingType);
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
             data.append("furnished", formData.furnished);
@@ -253,6 +255,18 @@ function OwnerAddRoom() {
                                 <option value="PG">PG</option>
                                 <option value="Hostel">Hostel</option>
                                 <option value="Flat">Flat</option>
+                            </select>
+
+                            <select
+                                name="sharingType"
+                                value={formData.sharingType}
+                                onChange={handleChange}
+                            >
+                                <option value="">Sharing type (optional)</option>
+                                <option value="Single">Single sharing</option>
+                                <option value="Double">Double sharing</option>
+                                <option value="Triple">Triple sharing</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                     </div>

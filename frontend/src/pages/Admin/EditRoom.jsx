@@ -21,6 +21,7 @@ function EditRoom() {
     description: "",
     category: "Room",
     gender: "Any",
+    sharingType: "",
     rooms: 1,
     bathrooms: 1,
     furnished: false,
@@ -51,6 +52,7 @@ function EditRoom() {
         description: room.description || "",
         category: room.category || "Room",
         gender: room.gender || "Any",
+        sharingType: room.sharingType || "",
         rooms: room.rooms || 1,
         bathrooms: room.bathrooms || 1,
         furnished: room.furnished || false,
@@ -184,6 +186,18 @@ function EditRoom() {
           <option>PG</option>
           <option>Hostel</option>
           <option>Flat</option>
+        </select>
+
+        <select
+          name="sharingType"
+          value={formData.sharingType}
+          onChange={changeHandler}
+        >
+          <option value="">Sharing type (not set)</option>
+          <option value="Single">Single sharing</option>
+          <option value="Double">Double sharing</option>
+          <option value="Triple">Triple sharing</option>
+          <option value="Other">Other</option>
         </select>
 
         <select
