@@ -35,6 +35,7 @@ import AddFurniture from "./pages/Admin/AddFurniture";
 import ManageFurnitureRequests from "./pages/Admin/ManageFurnitureRequests";
 import ServiceList from "./pages/Services/ServiceList";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
+import PropertyPage from "./pages/PropertyPage/PropertyPage";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
 
@@ -109,6 +110,7 @@ function App() {
         <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
+        <Route path="/property/:id" element={<MainLayout><PropertyPage /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />
         <Route path="/flats" element={<MainLayout><Flats /></MainLayout>} />
