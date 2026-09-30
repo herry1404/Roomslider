@@ -843,6 +843,55 @@ const uploadLeaseDocument = async (req, res) => {
   }
 };
 
+// ============================
+// Get Nearby Rooms (same area, any category)
+// Matches on the first part of the location string (before a comma)
+// so "Vijaynagar" matches "Vijaynagar, Indore" etc. Falls back to latest
+// vacant rooms if not enough area matches are found.
+// ============================
+
+const getNearbyRooms = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const areaName = room.location.split(",")[0].trim();
+    const escaped = areaName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const areaRegex = new RegExp(escaped, "i");
+
+    let nearbyRooms = await Room.find({
+      _id: { $ne: room._id },
+      status: "vacant",
+      location: areaRegex,
+    })
+      .select("title price location images category")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    if (nearbyRooms.length < 4) {
+      const excludeIds = [room._id, ...nearbyRooms.map((r) => r._id)];
+
+      const extra = await Room.find({
+        _id: { $nin: excludeIds },
+        status: "vacant",
+      })
+        .select("title price location images category")
+        .sort({ createdAt: -1 })
+        .limit(10 - nearbyRooms.length);
+
+      nearbyRooms = [...nearbyRooms, ...extra];
+    }
+
+    res.status(200).json({ success: true, rooms: nearbyRooms });
+  } catch (error) {
+    console.error("GET NEARBY ROOMS ERROR 👉", error);
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
 module.exports = {
   createRoom,
   getRooms,
@@ -857,4 +906,5 @@ module.exports = {
   addOneMonth,
   resolveVacateNotice,
   uploadLeaseDocument,
+  getNearbyRooms,
 };

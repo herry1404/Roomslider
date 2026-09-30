@@ -13,6 +13,7 @@ const {
   recordPayment,
   resolveVacateNotice,
   uploadLeaseDocument,
+  getNearbyRooms,
 } = require("../controllers/room.controller");
 
 const upload = require("../middleware/upload.middleware");
@@ -27,6 +28,9 @@ router.get("/", getRooms);
 
 // Get single room
 router.get("/:id", getSingleRoom);
+
+// Get other rooms in the same area (any category)
+router.get("/:id/nearby", getNearbyRooms);
 
 // ===== ADMIN OR OWNER (ownership enforced inside controller) =====
 
