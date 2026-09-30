@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -23,6 +23,17 @@ function OwnerAddRoom() {
     const nearbyPlaces = [
         "College", "Bus Stop", "Railway Station", "Hospital", "Market", "ATM"
     ];
+
+    const [properties, setProperties] = useState([]);
+    const [propertyId, setPropertyId] = useState("");
+
+    useEffect(() => {
+        api.get("/properties/mine")
+            .then((res) => setProperties(res.data?.properties || []))
+            .catch(() => {
+                // list na aaye to form pehle jaisa chalega (nayi property banegi)
+            });
+    }, []);
 
     const [mode, setMode] = useState("single"); // "single" or "multiple"
 
@@ -112,6 +123,7 @@ function OwnerAddRoom() {
             data.append("location", formData.location);
             data.append("category", formData.category);
             if (formData.sharingType) data.append("sharingType", formData.sharingType);
+            if (propertyId) data.append("propertyId", propertyId);
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
             data.append("furnished", formData.furnished);
@@ -186,6 +198,23 @@ function OwnerAddRoom() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+
+                    {properties.length > 0 && (
+                        <div className="form-section">
+                            <h2 className="section-title">Property</h2>
+                            <select
+                                value={propertyId}
+                                onChange={(e) => setPropertyId(e.target.value)}
+                            >
+                                <option value="">New property (created from title below)</option>
+                                {properties.map((p) => (
+                                    <option key={p._id} value={p._id}>
+                                        {p.name} - {p.area} ({p.totalRooms} rooms)
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     {mode === "multiple" && (
                         <div className="form-section">

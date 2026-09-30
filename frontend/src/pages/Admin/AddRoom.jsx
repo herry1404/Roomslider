@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -77,6 +77,17 @@ function AddRoom() {
     /* ======================================================
                         STATES
     ====================================================== */
+
+    const [properties, setProperties] = useState([]);
+    const [propertyId, setPropertyId] = useState("");
+
+    useEffect(() => {
+        api.get("/properties/mine")
+            .then((res) => setProperties(res.data?.properties || []))
+            .catch(() => {
+                // list na aaye to form pehle jaisa chalega (nayi property banegi)
+            });
+    }, []);
 
     const [loading, setLoading] = useState(false);
 
@@ -242,6 +253,7 @@ function AddRoom() {
             data.append("location", formData.location);
             data.append("category", formData.category);
             if (formData.sharingType) data.append("sharingType", formData.sharingType);
+            if (propertyId) data.append("propertyId", propertyId);
             data.append("gender", formData.gender);
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
@@ -297,6 +309,23 @@ function AddRoom() {
                 <h1>Add New Room</h1>
 
                 <form onSubmit={handleSubmit}>
+
+                    {properties.length > 0 && (
+                        <div className="form-section">
+                            <h2 className="section-title">Property</h2>
+                            <select
+                                value={propertyId}
+                                onChange={(e) => setPropertyId(e.target.value)}
+                            >
+                                <option value="">New property (created from title below)</option>
+                                {properties.map((p) => (
+                                    <option key={p._id} value={p._id}>
+                                        {p.name} - {p.area} ({p.totalRooms} rooms)
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
 
 {/* ===========================
