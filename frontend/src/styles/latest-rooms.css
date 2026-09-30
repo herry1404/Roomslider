@@ -506,3 +506,12 @@
     display:none !important;
   }
 }
+
+/* ===== Mobile: cards row edge-to-edge (full-bleed) ===== */
+@media (max-width: 768px) {
+  .latest-rooms .rooms-grid {
+    margin-inline: -1rem;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+}

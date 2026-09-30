@@ -36,6 +36,8 @@ import ManageFurnitureRequests from "./pages/Admin/ManageFurnitureRequests";
 import ServiceList from "./pages/Services/ServiceList";
 import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
 import PropertyPage from "./pages/PropertyPage/PropertyPage";
+import Profile from "./pages/Profile/Profile";
+import ProfileEdit from "./pages/Profile/ProfileEdit";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
 
@@ -120,6 +122,8 @@ function App() {
         <Route path="/forgot-password" element={<MainLayout><ForgotPassword /></MainLayout>} />
         <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
         <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
+        <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+        <Route path="/profile/edit" element={<MainLayout><ProfileEdit /></MainLayout>} />
         <Route path="/my-place" element={<MainLayout><TenantDashboard /></MainLayout>} />
         <Route path="/recently-viewed" element={<MainLayout><RecentlyViewed /></MainLayout>} />
         <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />

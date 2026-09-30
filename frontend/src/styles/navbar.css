@@ -547,3 +547,29 @@ html, body {
     right: -10px;
   }
 }
+
+/* ===== Profile menu: avatar photo + clickable user box ===== */
+.profile-btn-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.bottom-profile-menu .profile-btn-avatar {
+  width: 20px;
+  height: 20px;
+}
+
+.profile-user-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.profile-user-link:hover {
+  background: var(--color-surface-2, rgba(128, 128, 128, 0.12));
+}

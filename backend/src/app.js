@@ -32,6 +32,7 @@ const furnitureRequestRoutes = require("./routes/furnitureRequest.routes");
 const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
 const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
+const userRoutes = require("./routes/user.routes");
 
 
 const {
@@ -339,6 +340,7 @@ app.use("/api/furniture", furnitureRoutes);
 app.use("/api/home-sections", homeSectionRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/furniture-requests", furnitureRequestRoutes);
+app.use("/api/users", userRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)
 app.use(

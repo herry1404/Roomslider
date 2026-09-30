@@ -134,7 +134,9 @@ function Home() {
         <link rel="canonical" href="https://www.roomslider.in/" />
       </Helmet>
 
-      {sections.map(renderSection)}
+      <div className="home-page">
+        {sections.map(renderSection)}
+      </div>
     </>
   );
 }

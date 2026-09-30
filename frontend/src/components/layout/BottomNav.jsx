@@ -1,18 +1,15 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Home, MapPin, Compass } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
-import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const hidden = useHideOnScroll(80);
-
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className={`bottom-nav ${hidden ? "bottom-nav-hidden" : ""}`} aria-label="Bottom Navigation">
+    <nav className="bottom-nav" aria-label="Bottom Navigation">
       <NavLink
         to="/"
         end

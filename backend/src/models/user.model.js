@@ -76,6 +76,70 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // Public profile
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 20,
+    },
+
+    bio: {
+      type: String,
+      maxlength: 150,
+      default: "",
+    },
+
+    avatar: {
+      type: String,
+      default: null,
+    },
+
+    // Bio data (private, shown only to the user)
+    occupation: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    organization: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    gender: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    dob: {
+      type: Date,
+      default: null,
+    },
+
+    city: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    area: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    hometown: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
 
   },
   {

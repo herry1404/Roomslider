@@ -238,3 +238,9 @@ body.dark {
   background:var(--color-background);
   color:var(--color-text);
 }
+
+/* Home page: full-width edges */
+.home-page .container{
+  max-width:none;
+  padding:0;
+}

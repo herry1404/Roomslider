@@ -26,6 +26,8 @@ function ProfileMenu({ variant }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const [isTenant, setIsTenant] = useState(false);
 
+  const hasProfilePage = user && (user.role === "user" || user.role === "admin");
+
   useEffect(() => {
     if (user && user.role === "user") {
       api
@@ -65,6 +67,13 @@ function ProfileMenu({ variant }) {
     window.location.reload();
   };
 
+  const renderIcon = (size) =>
+    user && user.avatar ? (
+      <img className="profile-btn-avatar" src={user.avatar} alt="" />
+    ) : (
+      <UserCircle size={size} />
+    );
+
   return (
     <div className={variant === "bottom" ? "profile-menu bottom-profile-menu" : "profile-menu"} ref={menuRef}>
       <button
@@ -74,21 +83,28 @@ function ProfileMenu({ variant }) {
       >
         {variant === "bottom" ? (
           <>
-            <UserCircle size={18} />
+            {renderIcon(18)}
             <span>Profile</span>
           </>
         ) : (
-          <UserCircle size={26} />
+          renderIcon(26)
         )}
       </button>
 
       <div className={isOpen ? "profile-dropdown open" : "profile-dropdown"}>
         {user ? (
           <>
-            <div className="profile-user">
-              <h4>{user.name}</h4>
-              <p>{user.email}</p>
-            </div>
+            {hasProfilePage ? (
+              <NavLink to="/profile" className="profile-user profile-user-link" onClick={closeMenu}>
+                <h4>{user.name}</h4>
+                <p>{user.username ? "@" + user.username : user.email}</p>
+              </NavLink>
+            ) : (
+              <div className="profile-user">
+                <h4>{user.name}</h4>
+                <p>{user.username ? "@" + user.username : user.email}</p>
+              </div>
+            )}
 
             <div className="profile-divider" />
 
