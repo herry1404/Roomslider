@@ -428,3 +428,95 @@
   cursor:pointer;
 }
 .hourly-book-btn:hover{background:#1d4ed8}
+
+/* ===== Airbnb-style listing card (RoomCard) ===== */
+.room-card.rc-air{
+  background:none;
+  border:none;
+  box-shadow:none;
+  border-radius:0;
+  overflow:visible;
+}
+.room-card.rc-air:hover{
+  transform:none;
+  box-shadow:none;
+}
+.rc-air .room-image-wrapper{
+  height:auto;
+  aspect-ratio:1 / 1;
+  border-radius:20px;
+  overflow:hidden;
+}
+.rc-air .room-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .4s ease;
+}
+.rc-air:hover .room-image{
+  transform:scale(1.04);
+}
+.rc-air .room-content{
+  padding:10px 2px 0;
+}
+.rc-air .room-content h3{
+  font-size:15px;
+  font-weight:600;
+  margin:0 0 2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rc-price{
+  font-size:15px;
+  color:var(--color-text);
+  margin-bottom:2px;
+}
+.rc-price strong{ font-weight:700; }
+.rc-price span{
+  font-size:13px;
+  color:var(--color-text-light);
+  margin-left:3px;
+}
+.rc-type{
+  font-size:14px;
+  color:var(--color-text-light);
+  margin:0 0 2px;
+}
+.rc-air .room-location{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:14px;
+  color:var(--color-text-light);
+  margin:0;
+}
+.rc-air .room-location span{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@media(max-width:600px){
+  .rc-air .room-image-wrapper{ border-radius:16px; }
+  .rc-air .room-content h3,
+  .rc-price{ font-size:14px; }
+  .rc-type,
+  .rc-air .room-location{ font-size:12px; }
+}
+
+/* Listing pages grid: 2 cols mobile, 3 tablet, 4 desktop, 5 wide */
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+  margin-top: 30px;
+}
+@media (min-width: 768px) {
+  .listing-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; }
+}
+@media (min-width: 1100px) {
+  .listing-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1500px) {
+  .listing-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}

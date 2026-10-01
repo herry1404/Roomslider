@@ -52,14 +52,7 @@ function PG() {
       {rooms.length === 0 ? (
         <h3 style={{ marginTop: "30px" }}>No listings available yet</h3>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
-            gap: "25px",
-            marginTop: "30px",
-          }}
-        >
+        <div className="listing-grid">
           {rooms.map((room) => (
             <RoomCard key={room._id} room={room} />
           ))}

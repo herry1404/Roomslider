@@ -1,6 +1,6 @@
 import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
-import { MapPin, IndianRupee, Heart } from "lucide-react";
+import { MapPin, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ShareButton from "./ShareButton";
@@ -13,7 +13,7 @@ import "../../styles/room-card.css";
 // Cloudinary on-the-fly thumbnail (small image for cards)
 function getThumbnailUrl(url) {
   if (!url || !url.includes("/upload/")) return url;
-  return url.replace("/upload/", "/upload/w_500,h_320,c_fill,q_auto,f_auto/");
+  return url.replace("/upload/", "/upload/w_600,h_600,c_fill,q_auto,f_auto/");
 }
 
 function RoomCard({ room, onWishlistChange }) {
@@ -76,12 +76,15 @@ function RoomCard({ room, onWishlistChange }) {
   };
 
   const firstImage = getThumbnailUrl(room.images?.[0]);
+  const genderLabel = { Male: "Boys", Female: "Girls" }[room.gender];
+  const sharingLabel = { Single: "Single Room", Double: "Double Sharing", Triple: "Triple Sharing" }[room.sharingType] || room.category;
+  const typeLine = [sharingLabel, genderLabel].filter(Boolean).join(" · ");
 
   return (
-    <div className="room-card" onClick={handleDetails} style={{ cursor: "pointer" }}>
+    <div className="room-card rc-air" onClick={handleDetails} style={{ cursor: "pointer" }}>
       <div className="room-image-wrapper">
         <img
-          src={firstImage || "https://via.placeholder.com/500x320"}
+          src={firstImage || "data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27600%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23e5e7eb%27/></svg>"}
           alt={room.title}
           className="room-image"
           loading="lazy"
@@ -110,16 +113,6 @@ function RoomCard({ room, onWishlistChange }) {
             </span>
           )}
         </button>
-
-        <span className="room-category">{room.category}</span>
-        {room.gender && room.gender !== "Any" && (
-          <span
-            className="room-category"
-            style={{ left: "auto", right: "12px", background: room.gender === "Male" ? "#3b82f6" : "#ec4899" }}
-          >
-            {room.gender}
-          </span>
-        )}
       </div>
 
       <div className="room-content">
@@ -133,31 +126,17 @@ function RoomCard({ room, onWishlistChange }) {
           </Link>
         </h3>
 
+        <div className="rc-price">
+          <strong>₹{room.price?.toLocaleString()}</strong>
+          <span>/month</span>
+        </div>
+
+        <p className="rc-type">{typeLine}</p>
+
         <div className="room-location">
-          <MapPin size={16} />
+          <MapPin size={14} />
           <span>{room.location}</span>
         </div>
-
-        <div className="room-price">
-          <IndianRupee size={17} />
-          <strong>{room.price?.toLocaleString()}</strong>
-          <span>/month</span>
-          {room.sharingType && room.sharingType !== "Other" && (
-            <span style={{ marginLeft: "8px", fontWeight: 600 }}>
-              · {room.sharingType} sharing
-            </span>
-          )}
-        </div>
-
-        <p>
-          {room.description?.length > 80
-            ? room.description.substring(0, 80) + "..."
-            : room.description}
-        </p>
-
-        <button className="view-btn" onClick={handleDetails} type="button">
-          View Details
-        </button>
       </div>
     </div>
   );
