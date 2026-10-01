@@ -628,3 +628,113 @@
 .latest-rooms .room-card:hover .room-image{
   transform:scale(1.04);
 }
+
+/* ===== STEP 2: premium section headers + home cards ===== */
+.section-header h2{
+  position:relative;
+  padding-bottom:8px;
+}
+.section-header h2::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:32px;
+  height:3px;
+  border-radius:3px;
+  background:linear-gradient(90deg,#10b981,#6ee7b7);
+  transition:width .3s ease;
+}
+.section-header:hover h2::after{ width:56px; }
+
+.view-all{
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:13px;
+  border:1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  background:color-mix(in srgb, var(--color-primary) 8%, transparent);
+  transition:background .25s ease, gap .25s ease, transform .2s ease;
+}
+.view-all:hover{
+  gap:10px;
+  background:color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+.view-all:active{ transform:scale(.96); }
+
+/* room for card shadow inside the scroll row */
+.rooms-grid{ padding-bottom:18px; }
+
+/* image: soft gradient so icons stay readable + lift on hover */
+.latest-rooms .room-image-wrap{
+  box-shadow:0 8px 22px rgba(0,0,0,.18);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.latest-rooms .room-image-wrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.28), transparent 38%, transparent 70%, rgba(0,0,0,.18));
+  pointer-events:none;
+}
+@media (hover:hover){
+  .latest-rooms .room-card:hover .room-image-wrap{
+    transform:translateY(-4px);
+    box-shadow:0 16px 34px rgba(16,185,129,.22), 0 0 0 1px rgba(16,185,129,.35);
+  }
+}
+.latest-rooms .room-card:active .room-image-wrap{ transform:scale(.98); }
+
+.latest-rooms .room-price{ color:var(--color-primary); }
+.latest-rooms .room-price small{ color:var(--color-text-light); }
+
+/* glass wishlist button */
+.wishlist-btn{
+  z-index:2;
+  color:#fff;
+  background:rgba(0,0,0,.35);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:none;
+}
+.wishlist-btn:hover{ color:#ff5a6e; background:rgba(0,0,0,.5); }
+.wishlist-btn.active{ color:#ff4d6d; background:rgba(255,255,255,.92); }
+
+@media(max-width:576px){
+  .view-all{ padding:6px 12px; font-size:12px; }
+}
+
+/* ===== STEP 2 v2: shine-sweep hover (no green glow) ===== */
+.latest-rooms .room-image-wrap{
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+.latest-rooms .room-image-wrap::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-80%;
+  width:50%;
+  height:100%;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(105deg, transparent 20%, rgba(255,255,255,.28) 50%, transparent 80%);
+  transform:skewX(-18deg);
+  opacity:0;
+}
+@media (hover:hover){
+  .latest-rooms .room-card:hover .room-image-wrap{
+    transform:translateY(-6px);
+    box-shadow:0 22px 40px rgba(0,0,0,.40);
+  }
+  .latest-rooms .room-card:hover .room-image{
+    transform:scale(1.07);
+  }
+  .latest-rooms .room-card:hover .room-image-wrap::after{
+    opacity:1;
+    animation:rcShine .9s ease forwards;
+  }
+}
+@keyframes rcShine{
+  from{ left:-80%; }
+  to{ left:140%; }
+}
