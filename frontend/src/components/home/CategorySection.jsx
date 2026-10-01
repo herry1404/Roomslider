@@ -57,6 +57,9 @@ function CategorySection({ title, viewAllPath, rooms }) {
         <div className="rooms-grid">
           {rooms.map((room) => {
             const wishlisted = isWishlisted(room._id);
+            const genderLabel = { Male: "Boys", Female: "Girls" }[room.gender];
+            const sharingLabel = { Single: "Single Room", Double: "Double Sharing", Triple: "Triple Sharing" }[room.sharingType] || room.category;
+            const typeLine = [sharingLabel, genderLabel].filter(Boolean).join(" · ");
 
             return (
               <article
@@ -86,11 +89,6 @@ function CategorySection({ title, viewAllPath, rooms }) {
                       fill={wishlisted ? "currentColor" : "none"}
                     />
                   </button>
-
-                  <span className="price-badge">
-                    ₹{room.price}
-                    <small>/month</small>
-                  </span>
                 </div>
 
                 <div className="room-info">
@@ -103,6 +101,10 @@ function CategorySection({ title, viewAllPath, rooms }) {
                       {room.title}
                     </Link>
                   </h3>
+
+                  <p className="room-price">₹{room.price}<small>/month</small></p>
+
+                  <p className="room-type">{typeLine}</p>
 
                   <p className="room-location">
                     <MapPin size={14} />

@@ -485,3 +485,81 @@ font-size:15px;
     display: none !important;
   }
 }
+
+/* ===== Airbnb-style search pill ===== */
+.hs-section{
+  padding:20px 0 10px;
+}
+.hs-pill{
+  display:flex;
+  align-items:center;
+  width:min(860px,100%);
+  margin:0 auto;
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:999px;
+  box-shadow:0 3px 12px rgba(0,0,0,.12);
+}
+.hs-field{
+  flex:1;
+  min-width:0;
+  position:relative;
+  padding:14px 30px;
+  border-radius:999px;
+  display:block;
+  cursor:text;
+}
+.hs-field + .hs-field::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:16px;
+  bottom:16px;
+  width:1px;
+  background:var(--color-border);
+}
+.hs-field:hover{
+  background:var(--color-surface-2);
+}
+.hs-field small{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:var(--color-text);
+}
+.hs-field span{
+  display:block;
+  font-size:14px;
+  color:var(--color-text-light);
+}
+.hs-field input{
+  width:100%;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:14px;
+  color:var(--color-text);
+  padding:0;
+}
+.hs-field input::placeholder{
+  color:var(--color-text-light);
+}
+.hs-go{
+  flex:none;
+  width:48px;
+  height:48px;
+  margin:8px;
+  border:none;
+  border-radius:50%;
+  background:var(--color-primary);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+@media(max-width:700px){
+  .hs-section{ padding:10px 0 6px; }
+  .hs-field{ padding:10px 16px; }
+  .hs-field + .hs-field::before{ top:12px; bottom:12px; }
+  .hs-go{ width:40px; height:40px; margin:5px; }
+}

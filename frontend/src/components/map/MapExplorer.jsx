@@ -370,6 +370,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   const [showColleges, setShowColleges] = useState(false);
   const [showMess, setShowMess] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
   const [inViewCount, setInViewCount] = useState(0);
   const rowRef = useRef(null);
   const lockRef = useRef(false);
@@ -423,6 +424,14 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   const refLabel = prefCollege ? getShortName(prefCollege) : userPos ? "you" : "city center";
   const cardRooms = orderByArea(visibleRooms, refPoint);
   const selectedRoom = cardRooms.find((r) => r._id === selectedId) || null;
+
+  // Map popup auto-closes after 5s; bottom card stack stays as it is
+  useEffect(() => {
+    if (!selectedId) return;
+    setPopupOpen(true);
+    const t = setTimeout(() => setPopupOpen(false), 5000);
+    return () => clearTimeout(t);
+  }, [selectedId]);
   const CARD_STEP = 260;
 
   const scrollToCard = (idx) => {
@@ -725,7 +734,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           <LockToBounds bounds={MP_BOUNDS} />
           <AutoLocate onLocate={setUserPos} />
           <FlyToSelected room={selectedRoom} />
-          <SelectedRoomCard room={selectedRoom} onView={(r) => navigate(roomPath(r))} />
+          <SelectedRoomCard room={popupOpen ? selectedRoom : null} onView={(r) => navigate(roomPath(r))} />
           <ZoomControl position="topright" />
           <ViewCounter rooms={visibleRooms} onCount={setInViewCount} />
           <ZoomClass threshold={13} />

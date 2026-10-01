@@ -515,3 +515,116 @@
     scroll-padding-inline: 0;
   }
 }
+
+/* Hover lift: room for cards to rise without being clipped (net layout shift = 0) */
+.rooms-grid{
+  padding-top:10px;
+  margin-top:-10px;
+}
+
+/* Hide the scrollbar on card rows (scrolling still works) */
+.rooms-grid{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.rooms-grid::-webkit-scrollbar{
+  display:none;
+  height:0;
+}
+
+/* ===== Airbnb-style room card ===== */
+.latest-rooms .room-card{
+  background:none;
+  box-shadow:none;
+  border-radius:0;
+  overflow:visible;
+}
+.latest-rooms .room-card:hover{
+  transform:none;
+  box-shadow:none;
+}
+.latest-rooms .room-image-wrap{
+  height:auto;
+  aspect-ratio:1 / 1;
+  border-radius:20px;
+  background:var(--color-surface-2, #eee);
+}
+.latest-rooms .room-image{
+  height:100%;
+  object-fit:cover;
+}
+.latest-rooms .room-info{
+  padding:10px 2px 0;
+}
+.latest-rooms .room-info h3{
+  font-size:15px;
+  font-weight:600;
+  margin:0 0 2px;
+}
+.latest-rooms .room-price{
+  font-size:15px;
+  font-weight:700;
+  color:var(--color-text);
+  margin:0 0 2px;
+}
+.latest-rooms .room-price small{
+  font-size:13px;
+  font-weight:400;
+  color:var(--color-text-light);
+  margin-left:3px;
+}
+.latest-rooms .room-type{
+  font-size:14px;
+  color:var(--color-text-light);
+  margin:0 0 2px;
+}
+.latest-rooms .room-location{
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+@media(max-width:576px){
+  .latest-rooms .room-info h3,
+  .latest-rooms .room-price{ font-size:14px; }
+  .latest-rooms .room-type,
+  .latest-rooms .room-location{ font-size:12px; }
+}
+
+/* ===== Airbnb-style section headers (no green bar) ===== */
+.section-header{
+  border-left:none;
+  padding-left:0;
+  margin-bottom:14px;
+}
+.section-header h2{
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:-.3px;
+}
+@media(max-width:576px){
+  .section-header{ border-left-width:0; padding-left:0; }
+  .section-header h2{ font-size:18px; }
+}
+
+/* ===== Card sizes like the mockup ===== */
+.latest-rooms .room-card{
+  width:auto;
+  flex:0 0 calc((100% - 6 * 18px) / 7);
+  min-width:200px;
+}
+@media(max-width:1100px){
+  .latest-rooms .room-card{
+    flex:0 0 calc((100% - 3 * 18px) / 4);
+  }
+}
+@media(max-width:576px){
+  .latest-rooms .room-card{
+    flex:0 0 160px;
+    min-width:0;
+  }
+  .latest-rooms .rooms-grid{ gap:10px; }
+  .latest-rooms .room-image-wrap{ border-radius:16px; }
+}
+.latest-rooms .room-card:hover .room-image{
+  transform:scale(1.04);
+}

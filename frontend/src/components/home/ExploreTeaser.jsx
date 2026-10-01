@@ -18,28 +18,28 @@ import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
 
 const tileStyle = {
-  background: "var(--color-surface-2)",
+  background: "var(--color-surface)",
   border: "1px solid var(--color-border)",
-  borderRadius: "14px",
-  padding: "14px",
+  borderRadius: "20px",
+  padding: "20px",
   display: "flex",
   flexDirection: "column",
   gap: "6px",
   cursor: "pointer",
 };
 
-const titleStyle = { fontWeight: 600, fontSize: "14px", color: "var(--color-text)" };
+const titleStyle = { fontWeight: 600, fontSize: "16px", color: "var(--color-text)" };
 const descStyle = { fontSize: "12.5px", color: "var(--color-text-light)" };
 
 const pillStyle = {
   alignSelf: "flex-start",
   marginTop: "4px",
-  fontSize: "11px",
+  fontSize: "13px",
   fontWeight: 600,
-  padding: "3px 9px",
+  padding: "0",
   borderRadius: "999px",
-  background: "var(--color-primary)",
-  color: "#fff",
+  background: "none",
+  color: "var(--color-primary)",
   border: "none",
   display: "flex",
   alignItems: "center",
@@ -142,7 +142,7 @@ function ExploreTeaser() {
     <section className="latest-rooms">
       <div className="container">
         <div className="section-header">
-          <h2>Explore</h2>
+          <h2>Everything you need away from home</h2>
         </div>
 
         <div
