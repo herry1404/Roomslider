@@ -163,7 +163,7 @@ function AddFurniture() {
             {oldImages.map((src) => (
               <div className="fa-img" key={src}>
                 <img src={src} alt="" />
-                <button type="button" onClick={() => setOldImages(oldImages.filter((x) => x !== src))}>×</button>
+                <button type="button" aria-label={`Remove ${src}`} onClick={() => setOldImages((current) => current.filter((image) => image !== src))}>×</button>
               </div>
             ))}
           </div>

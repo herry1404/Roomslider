@@ -112,9 +112,7 @@ function HourlyRoomDetail() {
       data.append("bookedTo", new Date(form.bookedTo).toISOString());
       data.append("idProofPhoto", idPhoto);
 
-      const orderResponse = await api.post("/hourly-bookings/create-order", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const orderResponse = await api.post("/hourly-bookings/create-order", data);
       const { bookingId, orderId, amount, currency, key } = orderResponse.data;
       const checkout = new window.Razorpay({
         key,

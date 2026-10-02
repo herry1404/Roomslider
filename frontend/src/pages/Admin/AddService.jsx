@@ -43,9 +43,7 @@ function AddService() {
       Object.entries(formData).forEach(([key, value]) => data.append(key, value));
       images.forEach((image) => data.append("images", image));
 
-      await api.post("/services", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post("/services", data);
 
       toast.success("Provider added ✅");
       navigate("/admin/services");

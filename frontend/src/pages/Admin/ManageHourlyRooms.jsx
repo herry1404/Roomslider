@@ -90,10 +90,10 @@ function ManageHourlyRooms() {
       images.forEach((image) => data.append("images", image));
 
       if (editingId) {
-        await api.put(`/hourly-rooms/${editingId}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.put(`/hourly-rooms/${editingId}`, data);
         toast.success("Room updated");
       } else {
-        await api.post("/hourly-rooms", data, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.post("/hourly-rooms", data);
         toast.success("Room added");
       }
       setShowModal(false);

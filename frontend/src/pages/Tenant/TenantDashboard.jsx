@@ -169,9 +169,7 @@ function TenantDashboard() {
         formData.append("photo", maintenancePhoto);
       }
 
-      const res = await api.post("/maintenance", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.post("/maintenance", formData);
 
       setMyRequests((prev) => [res.data.request, ...prev]);
       setMaintenanceForm({ title: "", description: "", category: "other" });

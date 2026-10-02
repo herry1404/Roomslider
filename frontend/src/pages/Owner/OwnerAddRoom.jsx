@@ -177,15 +177,11 @@ function OwnerAddRoom() {
                 data.append("roomNumberStart", formData.roomNumberStart);
                 data.append("roomNumberEnd", formData.roomNumberEnd);
 
-                const res = await api.post("/rooms/bulk", data, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                const res = await api.post("/rooms/bulk", data);
 
                 toast.success(res.data.message || "Rooms published successfully ✅");
             } else {
-                await api.post("/rooms", data, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                await api.post("/rooms", data);
 
                 toast.success("Room published successfully ✅");
             }

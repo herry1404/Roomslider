@@ -272,9 +272,7 @@ function AddRoom() {
                 data.append("images", image);
             });
 
-            await api.post("/rooms", data, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            await api.post("/rooms", data);
 
             toast.success("Room published successfully ✅");
 

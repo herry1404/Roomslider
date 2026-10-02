@@ -171,9 +171,7 @@ function ProfileEdit() {
       setUploading(true);
       const fd = new FormData();
       fd.append("avatar", file);
-      const res = await api.put("/users/me/avatar", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.put("/users/me/avatar", fd);
       const u = res.data.user;
       setAvatar(u.avatar);
       syncLocalUser(u);

@@ -86,14 +86,10 @@ function ManageMess() {
       images.forEach((image) => data.append("images", image));
 
       if (editingId) {
-        await api.put(`/mess/${editingId}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.put(`/mess/${editingId}`, data);
         toast.success("Mess updated");
       } else {
-        await api.post("/mess", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.post("/mess", data);
         toast.success("Mess added");
       }
       setShowModal(false);

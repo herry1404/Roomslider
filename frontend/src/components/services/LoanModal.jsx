@@ -86,9 +86,7 @@ function LoanModal({ onClose }) {
       data.append("consentGiven", "true");
       if (idPhoto) data.append("idPhoto", idPhoto);
 
-      await api.post("/loans", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post("/loans", data);
 
       toast.success("Request submit ho gayi! Hum jald contact karenge.");
       onClose();

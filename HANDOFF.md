@@ -3,9 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- Previous completed work is on `origin/main` in commit `d700ce6` (`Add push notifications and hourly booking receipts`).
-- The laundry, villa, and roommate privacy/chat changes in this handoff are in the working tree and are **not committed or pushed**.
-- Do not discard the working tree: it contains the new laundry directory, villa reservations, roommate profile/chat updates, and homepage/admin integrations.
+- `main` and `origin/main` are at `547d571` (`Property details redesign, vehicle requests, seed script and UI updates`).
+- Laundry, villa, and roommate privacy/chat changes were pushed in `b1f97bd` (`Add laundry, villa bookings, and private roommate chat`); vehicle catalog work and property UI are included in `547d571`.
+- The current furniture/vehicle multipart-upload fix and other active workspace changes are not committed. Do not discard them.
 
 ## Completed work
 
@@ -66,6 +66,15 @@
 - Added a compact floating search on the home page after scrolling; the large search stays prominent at the top and the main navigation remains sticky.
 - Simplified Explore service names and actions (for example, Food, Laundry, Cleaning, and Explore).
 - Added `UI-CHANGES.md` with a step-by-step before/after record of the interface changes.
+
+### Furniture and vehicle photo upload fix
+
+- Root cause: the shared Axios instance set `Content-Type: application/json` for every request. Axios serialized browser `FormData` as JSON under that header, so Multer/Cloudinary did not receive uploaded files on furniture or vehicle create/edit requests.
+- The request interceptor now removes `Content-Type` whenever request data is `FormData`, allowing the browser/Axios adapter to generate multipart content type and boundary. Explicit multipart headers were removed from other FormData callers as well.
+- Furniture edit keeps submitted existing `images`, appends new uploads, and can remove selected existing images by submitting the remaining list. Vehicle edit follows the same keep/remove/add pattern with `photos`.
+- Furniture and vehicle schema/API/public UI paths already expose their respective image arrays; no backend schema/controller changes were needed for the root fix.
+- Verified locally that the interceptor leaves `FormData` intact and Axios sends a multipart body with an automatically generated boundary. An isolated HTTP PUT + public GET test passed for both controllers using simulated Cloudinary URLs; it also verified keeping and removing existing photo URLs. Frontend build, focused lint, backend syntax checks, and `git diff --check` passed.
+- Live authenticated Cloudinary upload + database GET remains untested: the running local API returned 404 for `/api/vehicles`, and no admin token was available. Avoided writing test data to configured persistent database/cloud storage. Browser end-to-end checks for furniture/vehicle add/edit and photo removal also remain outstanding.
 
 ## Important files
 

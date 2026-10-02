@@ -87,9 +87,7 @@ function OwnerRoomDetail() {
 
     setUploadingLease(true);
     try {
-      await api.put(`/rooms/${id}/lease-document`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.put(`/rooms/${id}/lease-document`, formData);
       toast.success("Lease document uploaded");
       fetchRoom();
     } catch (error) {

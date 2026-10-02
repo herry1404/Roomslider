@@ -128,10 +128,10 @@ function ManageVillas() {
       data.append("amenities", JSON.stringify(form.amenities.split(",").map((item) => item.trim()).filter(Boolean)));
       images.forEach((image) => data.append("images", image));
       if (editingId) {
-        await api.put(`/villas/${editingId}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.put(`/villas/${editingId}`, data);
         toast.success("Villa updated");
       } else {
-        await api.post("/villas", data, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.post("/villas", data);
         toast.success("Villa added");
       }
       setModal(false);
