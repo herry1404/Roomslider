@@ -78,10 +78,10 @@ function Profile() {
       }
 
       if (key === "activity") {
-        const [f, s, v, villas] = await Promise.allSettled([
+        const [f, s, vehicles, villas] = await Promise.allSettled([
           api.get("/furniture-requests/mine"),
           api.get("/service-bookings/my"),
-          api.get("/vehicle-bookings/my"),
+          api.get("/vehicle-requests/mine"),
           api.get("/villa-bookings/mine"),
         ]);
 
@@ -113,15 +113,15 @@ function Profile() {
           );
         }
 
-        if (v.status === "fulfilled" && Array.isArray(v.value.data)) {
-          v.value.data.forEach((b) =>
+        if (vehicles.status === "fulfilled" && Array.isArray(vehicles.value.data)) {
+          vehicles.value.data.forEach((request) =>
             list.push({
-              id: "v" + b._id,
+              id: "v" + request._id,
               type: "Vehicle",
-              title: b.vehicle?.name || "Vehicle booking",
-              sub: b.shop?.shopName || "",
-              status: b.status,
-              createdAt: b.createdAt,
+              title: request.vehicle ? `${request.vehicle.brand} ${request.vehicle.name}` : "Vehicle rental request",
+              sub: `${request.durationType} · ${request.pickupOption} · ₹${request.totalPrice}`,
+              status: request.status,
+              createdAt: request.createdAt,
             })
           );
         }

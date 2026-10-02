@@ -4,7 +4,7 @@ const router = express.Router();
 const Room = require("../models/room.model");
 const Mess = require("../models/Mess");
 const Owner = require("../models/Owner");
-const VehicleShop = require("../models/vehicleShop.model");
+const Vehicle = require("../models/vehicle.model");
 
 const SITE_URL = "https://www.roomslider.in";
 
@@ -26,11 +26,11 @@ const categoryPathMap = {
 
 router.get("/", async (req, res) => {
   try {
-    const [rooms, messes, owners, shops] = await Promise.all([
+    const [rooms, messes, owners, vehicles] = await Promise.all([
       Room.find({}, "_id title category updatedAt"),
       Mess.find({}, "_id updatedAt"),
       Owner.find({}, "_id updatedAt"),
-      VehicleShop.find({ isActive: true }, "_id updatedAt"),
+      Vehicle.find({ isVisible: true, brand: { $exists: true } }, "_id updatedAt"),
     ]);
 
     const staticUrls = [
@@ -79,14 +79,14 @@ router.get("/", async (req, res) => {
       lastmod: o.updatedAt,
     }));
 
-    const shopUrls = shops.map((s) => ({
-      loc: `/vehicles/shop/${s._id}`,
+    const vehicleUrls = vehicles.map((vehicle) => ({
+      loc: `/vehicles/${vehicle._id}`,
       priority: "0.6",
       changefreq: "weekly",
-      lastmod: s.updatedAt,
+      lastmod: vehicle.updatedAt,
     }));
 
-    const allUrls = [...staticUrls, ...roomUrls, ...messUrls, ...ownerUrls, ...shopUrls];
+    const allUrls = [...staticUrls, ...roomUrls, ...messUrls, ...ownerUrls, ...vehicleUrls];
 
     const xmlEntries = allUrls
       .map((u) => {

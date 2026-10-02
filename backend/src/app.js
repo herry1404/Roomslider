@@ -20,9 +20,8 @@ const hourlyRoomManagerRoutes = require("./routes/hourlyRoomManager.routes");
 const hourlyBookingRoutes = require("./routes/hourlyBooking.routes");
 const laundryVendorRoutes = require("./routes/laundryVendor.routes");
 const hourlyRoomRoutes = require("./routes/hourlyRoom.routes");
-const vehicleShopRoutes = require("./routes/vehicleShop.routes");
 const vehicleRoutes = require("./routes/vehicle.routes");
-const vehicleBookingRoutes = require("./routes/vehicleBooking.routes");
+const vehicleRequestRoutes = require("./routes/vehicleRequest.routes");
 const serviceRoutes = require("./routes/service.routes");
 const serviceBookingRoutes = require("./routes/serviceBooking.routes");
 const furnitureRoutes = require("./routes/furniture.routes");
@@ -309,23 +308,13 @@ app.use(
   hourlyRoomRoutes
 );
 
-// ✅ VEHICLE SHOP ROUTES
-app.use(
-  "/api/vehicle-shops",
-  vehicleShopRoutes
-);
-
 // ✅ VEHICLE ROUTES
 app.use(
   "/api/vehicles",
   vehicleRoutes
 );
 
-// ✅ VEHICLE BOOKING ROUTES
-app.use(
-  "/api/vehicle-bookings",
-  vehicleBookingRoutes
-);
+app.use("/api/vehicle-requests", vehicleRequestRoutes);
 
 // ✅ SERVICE ROUTES
 app.use(

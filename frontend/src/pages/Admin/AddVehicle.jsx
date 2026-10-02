@@ -1,182 +1,109 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
-import "../../styles/add-room.css";
+import "../../styles/admin/theme.css";
+import "../../styles/admin/furniture-admin.css";
+
+const emptyVehicle = {
+  name: "", brand: "", type: "Scooty", fuel: "Petrol", transmission: "Automatic", seats: "2",
+  pricePerDay: "", pricePerWeek: "", pricePerMonth: "", pricePerHour: "",
+  securityDeposit: "2000", freeKmPerDay: "130", extraKmCharge: "3.5",
+  helmetIncluded: true, fuelPolicy: "", documentsRequired: "",
+  isAvailable: true, isVisible: true,
+};
 
 function AddVehicle() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [shops, setShops] = useState([]);
-
-  const [formData, setFormData] = useState({
-    shop: "",
-    name: "",
-    type: "Scooty",
-    fuel: "",
-    kmLimit: "",
-    docRequired: "",
-    pricePerHour: "",
-    pricePerDay: "",
-    pricePerMonth: "",
-    deposit: "",
-    availabilityNote: "Available now",
-  });
+  const editing = Boolean(id);
+  const [form, setForm] = useState(emptyVehicle);
+  const [oldPhotos, setOldPhotos] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(editing);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api
-      .get("/vehicle-shops")
-      .then((res) => {
-        const data = Array.isArray(res.data) ? res.data : res.data?.shops || [];
-        setShops(data);
-      })
-      .catch(() => toast.error("Shops load nahi ho paayi"));
-  }, []);
+    if (!editing) return;
+    api.get(`/vehicles/admin/${id}`).then(({ data }) => {
+      setForm(Object.fromEntries(Object.keys(emptyVehicle).map((key) => {
+        if (typeof emptyVehicle[key] === "boolean") return [key, data[key] !== false];
+        return [key, data[key] == null ? "" : String(data[key])];
+      })));
+      setOldPhotos(data.photos || []);
+    }).catch((error) => toast.error(error.response?.data?.message || "Vehicle load nahi hua")).finally(() => setLoading(false));
+  }, [id, editing]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const setField = (key) => (event) => {
+    const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+    setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.shop) {
-      toast.error("Please select a shop");
-      return;
-    }
-
-    setLoading(true);
+  const submit = async (event) => {
+    event.preventDefault();
+    const data = new FormData();
+    Object.entries(form).forEach(([key, value]) => data.append(key, value));
+    if (editing) data.append("existingPhotos", JSON.stringify(oldPhotos));
+    files.forEach((file) => data.append("photos", file));
     try {
-      await api.post("/vehicles", formData);
-      toast.success("Vehicle added ✅");
+      setSaving(true);
+      if (editing) await api.put(`/vehicles/${id}`, data);
+      else await api.post("/vehicles", data);
+      toast.success(editing ? "Vehicle updated" : "Vehicle added");
       navigate("/admin/vehicles");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Vehicle add nahi ho paayi");
+      toast.error(error.response?.data?.message || "Vehicle save nahi hua");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (loading) return <div className="admin-page"><p>Loading vehicle...</p></div>;
+
   return (
-    <div className="add-room-page">
-      <div className="add-room-card">
-        <h1>Add Vehicle</h1>
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-section">
-            <h2 className="section-title">Shop</h2>
-            <select name="shop" value={formData.shop} onChange={handleChange} required>
-              <option value="">Select Shop</option>
-              {shops.map((s) => (
-                <option key={s._id} value={s._id}>
-                  {s.shopName} — {s.city}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-section">
-            <h2>Vehicle Details</h2>
-
-            <div className="form-row">
-              <input
-                type="text"
-                name="name"
-                placeholder="Vehicle Name (e.g. Activa 6G)"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-              <select name="type" value={formData.type} onChange={handleChange}>
-                <option value="Scooty">Scooty</option>
-                <option value="Bike">Bike</option>
-                <option value="Electric">Electric</option>
-                <option value="Cycle">Cycle</option>
-              </select>
-            </div>
-
-            <div className="form-row">
-              <input
-                type="text"
-                name="fuel"
-                placeholder="Fuel (Petrol / Electric / None)"
-                value={formData.fuel}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="kmLimit"
-                placeholder="KM Limit (e.g. 100 km/day)"
-                value={formData.kmLimit}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-row">
-              <input
-                type="text"
-                name="docRequired"
-                placeholder="Documents Required (e.g. Aadhar + DL)"
-                value={formData.docRequired}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="availabilityNote"
-                placeholder="Availability Note"
-                value={formData.availabilityNote}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h2>Pricing</h2>
-            <div className="input-grid">
-              <input
-                type="number"
-                name="pricePerHour"
-                placeholder="Price / Hour"
-                value={formData.pricePerHour}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="pricePerDay"
-                placeholder="Price / Day"
-                value={formData.pricePerDay}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="pricePerMonth"
-                placeholder="Price / Month"
-                value={formData.pricePerMonth}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="deposit"
-                placeholder="Security Deposit"
-                value={formData.deposit}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <button className="publish-btn" disabled={loading}>
-            {loading ? "Publishing..." : "Add Vehicle"}
-          </button>
-        </form>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div><h1>{editing ? "Edit Vehicle" : "Add Vehicle"}</h1><p>Vehicle catalog details, rental prices and requirements.</p></div>
+        <Link to="/admin/vehicles" className="admin-btn secondary"><ArrowLeft size={16} /> Back</Link>
       </div>
+      <form className="fa-form" onSubmit={submit}>
+        <div className="fa-section">Vehicle details</div>
+        <div className="fa-grid">
+          <div className="fa-field"><label>Name *</label><input required value={form.name} onChange={setField("name")} placeholder="Activa 6G" /></div>
+          <div className="fa-field"><label>Brand *</label><input required value={form.brand} onChange={setField("brand")} placeholder="Honda" /></div>
+          <div className="fa-field"><label>Type *</label><select value={form.type} onChange={setField("type")}>{["Scooty", "Bike", "Car", "SUV", "Van"].map((value) => <option key={value}>{value}</option>)}</select></div>
+          <div className="fa-field"><label>Fuel *</label><select value={form.fuel} onChange={setField("fuel")}>{["Petrol", "Diesel", "Electric"].map((value) => <option key={value}>{value}</option>)}</select></div>
+          <div className="fa-field"><label>Transmission *</label><select value={form.transmission} onChange={setField("transmission")}>{["Manual", "Automatic"].map((value) => <option key={value}>{value}</option>)}</select></div>
+          <div className="fa-field"><label>Seats *</label><input required type="number" min="1" value={form.seats} onChange={setField("seats")} /></div>
+        </div>
+
+        <div className="fa-section">Rental pricing (INR)</div>
+        <div className="fa-grid">
+          <div className="fa-field"><label>Price per day *</label><input required type="number" min="0" value={form.pricePerDay} onChange={setField("pricePerDay")} /></div>
+          <div className="fa-field"><label>Price per week *</label><input required type="number" min="0" value={form.pricePerWeek} onChange={setField("pricePerWeek")} /></div>
+          <div className="fa-field"><label>Price per month *</label><input required type="number" min="0" value={form.pricePerMonth} onChange={setField("pricePerMonth")} /></div>
+          <div className="fa-field"><label>Price per hour (optional)</label><input type="number" min="0" value={form.pricePerHour} onChange={setField("pricePerHour")} /></div>
+          <div className="fa-field"><label>Security deposit</label><input type="number" min="0" value={form.securityDeposit} onChange={setField("securityDeposit")} /></div>
+          <div className="fa-field"><label>Free km per day</label><input type="number" min="0" value={form.freeKmPerDay} onChange={setField("freeKmPerDay")} /></div>
+          <div className="fa-field"><label>Extra km charge (₹)</label><input type="number" min="0" step="0.5" value={form.extraKmCharge} onChange={setField("extraKmCharge")} /></div>
+        </div>
+
+        <div className="fa-section">Rental terms</div>
+        <div className="fa-grid">
+          <div className="fa-field"><label>Fuel policy</label><textarea rows="3" value={form.fuelPolicy} onChange={setField("fuelPolicy")} /></div>
+          <div className="fa-field"><label>Documents required</label><textarea rows="3" value={form.documentsRequired} onChange={setField("documentsRequired")} /></div>
+        </div>
+        <div className="fa-section">Photos</div>
+        {oldPhotos.length > 0 && <div className="fa-imgs">{oldPhotos.map((photo) => <div className="fa-img" key={photo}><img src={photo} alt="" loading="lazy" /><button type="button" aria-label="Remove photo" onClick={() => setOldPhotos((current) => current.filter((item) => item !== photo))}>×</button></div>)}</div>}
+        <div className="fa-field"><label>Upload photos</label><input type="file" accept="image/*" multiple onChange={(event) => setFiles(Array.from(event.target.files || []))} /></div>
+        <div className="fa-checks">
+          <label><input type="checkbox" checked={Boolean(form.helmetIncluded)} onChange={setField("helmetIncluded")} /> Helmet included</label>
+          <label><input type="checkbox" checked={Boolean(form.isAvailable)} onChange={setField("isAvailable")} /> Available</label>
+          <label><input type="checkbox" checked={Boolean(form.isVisible)} onChange={setField("isVisible")} /> Visible on catalog</label>
+        </div>
+        <div className="fa-actions"><button className="admin-btn" type="submit" disabled={saving}>{saving ? "Saving..." : editing ? "Update Vehicle" : "Add Vehicle"}</button><Link to="/admin/vehicles" className="admin-btn secondary">Cancel</Link></div>
+      </form>
     </div>
   );
 }

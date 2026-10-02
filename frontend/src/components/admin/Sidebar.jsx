@@ -48,6 +48,7 @@ function Sidebar({ open, closeSidebar }) {
       label: "Services",
       items: [
         { title: "Vehicles", icon: <Bike size={18} />, path: "/admin/vehicles" },
+        { title: "Vehicle Requests", icon: <ClipboardList size={18} />, path: "/admin/vehicle-requests" },
         { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },

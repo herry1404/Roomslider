@@ -22,10 +22,10 @@ import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 import MapView from "./pages/MapView/MapView";
 import Explore from "./pages/Explore/Explore";
 import VehicleList from "./pages/Vehicles/VehicleList";
-import VehicleShopDetail from "./pages/Vehicles/VehicleShopDetail";
+import VehicleDetail from "./pages/Vehicles/VehicleDetail";
 import ManageVehicles from "./pages/Admin/ManageVehicles";
-import AddVehicleShop from "./pages/Admin/AddVehicleShop";
 import AddVehicle from "./pages/Admin/AddVehicle";
+import ManageVehicleRequests from "./pages/Admin/ManageVehicleRequests";
 import ManageServices from "./pages/Admin/ManageServices";
 import ManageHomeLayout from "./pages/Admin/ManageHomeLayout";
 import AddService from "./pages/Admin/AddService";
@@ -116,7 +116,7 @@ function App() {
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/roommates" element={<MainLayout><RoommateFinder /></MainLayout>} />
         <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
-        <Route path="/vehicles/shop/:id" element={<MainLayout><VehicleShopDetail /></MainLayout>} />
+        <Route path="/vehicles/:id" element={<MainLayout><VehicleDetail /></MainLayout>} />
         <Route path="/services/:category" element={<MainLayout><ServiceList /></MainLayout>} />
         <Route path="/furniture" element={<MainLayout><FurnitureList /></MainLayout>} />
         <Route path="/map" element={<MapLayout><MapView /></MapLayout>} />
@@ -167,13 +167,14 @@ function App() {
         <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
         <Route path="/admin/loans" element={<AdminRoute><ManageLoans /></AdminRoute>} />
         <Route path="/admin/vehicles" element={<AdminRoute><ManageVehicles /></AdminRoute>} />
-        <Route path="/admin/vehicles/shops/add" element={<AdminRoute><AddVehicleShop /></AdminRoute>} />
         <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
         <Route path="/admin/home-layout" element={<AdminRoute><ManageHomeLayout /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
         <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />
         <Route path="/admin/furniture/requests" element={<AdminRoute><ManageFurnitureRequests /></AdminRoute>} />
+        <Route path="/admin/vehicles/edit/:id" element={<AdminRoute><AddVehicle /></AdminRoute>} />
+        <Route path="/admin/vehicle-requests" element={<AdminRoute><ManageVehicleRequests /></AdminRoute>} />
         <Route path="/admin/furniture/add" element={<AdminRoute><AddFurniture /></AdminRoute>} />
         <Route path="/admin/furniture/edit/:id" element={<AdminRoute><AddFurniture /></AdminRoute>} />
 
