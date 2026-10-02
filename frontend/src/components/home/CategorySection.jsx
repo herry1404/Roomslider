@@ -7,6 +7,11 @@ import ShareButton from "../ui/ShareButton";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 
+function thumb(url) {
+  if (!url || !url.includes("/upload/")) return url;
+  return url.replace("/upload/", "/upload/w_500,h_500,c_fill,q_auto,f_auto/");
+}
+
 function CategorySection({ title, viewAllPath, rooms }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -81,7 +86,9 @@ function CategorySection({ title, viewAllPath, rooms }) {
               >
                 <div className="room-image-wrap">
                   <img
-                    src={room.images?.[0]}
+                    src={thumb(room.images?.[0])}
+                    loading="lazy"
+                    decoding="async"
                     alt={room.title}
                     className="room-image"
                   />
