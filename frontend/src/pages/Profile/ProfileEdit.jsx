@@ -235,213 +235,217 @@ function ProfileEdit() {
   return (
     <div className="profile-page">
       <form className="profile-card" onSubmit={handleSave}>
-        <div className="profile-avatar-wrap">
-          {avatar ? (
-            <img className="profile-avatar-img" src={avatar} alt="Profile" />
-          ) : (
-            <div className="profile-avatar">{initial}</div>
+        <div className="profile-form-fields">
+          <div className="profile-avatar-wrap">
+            {avatar ? (
+              <img className="profile-avatar-img" src={avatar} alt="Profile" />
+            ) : (
+              <div className="profile-avatar">{initial}</div>
+            )}
+          </div>
+
+          <div className="profile-photo-actions">
+            <button
+              type="button"
+              className="profile-photo-btn"
+              disabled={uploading}
+              onClick={() => cameraRef.current && cameraRef.current.click()}
+            >
+              Take photo
+            </button>
+            <button
+              type="button"
+              className="profile-photo-btn"
+              disabled={uploading}
+              onClick={() => galleryRef.current && galleryRef.current.click()}
+            >
+              Gallery
+            </button>
+          </div>
+          {uploading && <span className="profile-hint profile-center">Photo upload ho rahi hai...</span>}
+
+          <input
+            ref={cameraRef}
+            type="file"
+            accept="image/*"
+            capture="user"
+            hidden
+            onChange={handlePhoto}
+          />
+          <input
+            ref={galleryRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handlePhoto}
+          />
+
+          <h1 className="profile-title">Edit Profile</h1>
+
+          <label className="profile-label">Name</label>
+          <input
+            className="profile-input"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            maxLength={60}
+            required
+          />
+
+          <label className="profile-label">Username</label>
+          <input
+            className="profile-input"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            placeholder="e.g. jams_indore"
+            maxLength={20}
+            autoCapitalize="none"
+          />
+          <span className="profile-hint">3-20 characters: a-z, 0-9, _ aur .</span>
+
+          <label className="profile-label">Bio</label>
+          <textarea
+            className="profile-input profile-textarea"
+            name="bio"
+            value={form.bio}
+            onChange={handleChange}
+            maxLength={BIO_MAX}
+            rows={3}
+            placeholder="Apne baare mein kuch likho"
+          />
+          <span className="profile-hint">
+            {form.bio.length}/{BIO_MAX}
+          </span>
+
+          <h2 className="profile-section">About you</h2>
+
+          <label className="profile-label">Occupation</label>
+          <select
+            className="profile-input"
+            name="occupation"
+            value={form.occupation}
+            onChange={handleChange}
+          >
+            <option value="">Select</option>
+            <option value="student">Student</option>
+            <option value="working">Working professional</option>
+            <option value="business">Business</option>
+            <option value="other">Other</option>
+          </select>
+
+          <label className="profile-label">{orgLabel}</label>
+          <input
+            className="profile-input"
+            name="organization"
+            value={form.organization}
+            onChange={handleChange}
+            maxLength={80}
+            placeholder={form.occupation === "student" ? "e.g. IET DAVV" : "e.g. company ya business ka naam"}
+          />
+
+          {form.occupation === "student" && (
+            <>
+              <label className="profile-label">Degree / course</label>
+              <input
+                className="profile-input"
+                name="course"
+                value={form.course}
+                onChange={handleChange}
+                maxLength={100}
+                placeholder="e.g. B.Tech, B.Com, MBA"
+              />
+
+              <label className="profile-label">Subject / branch / major</label>
+              <input
+                className="profile-input"
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
+                maxLength={100}
+                placeholder="e.g. Computer Science"
+              />
+
+              <label className="profile-label">Current year / semester</label>
+              <input
+                className="profile-input"
+                name="studyYear"
+                value={form.studyYear}
+                onChange={handleChange}
+                maxLength={40}
+                placeholder="e.g. 2nd year or Semester 4"
+              />
+            </>
           )}
+
+          <label className="profile-label">Gender</label>
+          <select
+            className="profile-input"
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+          >
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+
+          <label className="profile-label">Date of birth</label>
+          <input
+            className="profile-input"
+            type="date"
+            name="dob"
+            value={form.dob}
+            onChange={handleChange}
+            max={today}
+          />
+
+          <h2 className="profile-section">Location</h2>
+
+          <label className="profile-label">City</label>
+          <input
+            className="profile-input"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            maxLength={60}
+            placeholder="e.g. Indore"
+          />
+
+          <label className="profile-label">Area</label>
+          <input
+            className="profile-input"
+            name="area"
+            value={form.area}
+            onChange={handleChange}
+            maxLength={60}
+            placeholder="e.g. Vijay Nagar"
+          />
+
+          <label className="profile-label">Hometown</label>
+          <input
+            className="profile-input"
+            name="hometown"
+            value={form.hometown}
+            onChange={handleChange}
+            maxLength={60}
+          />
+          <span className="profile-hint">
+            Roommate suggestions may show your gender, education and basic profile info. DOB and hometown remain private.
+          </span>
+          <RoommatePreferencesFields
+            value={roommatePreferences}
+            onChange={changeRoommatePreference}
+            onLifestyleChange={changeRoommateLifestyle}
+          />
         </div>
 
-        <div className="profile-photo-actions">
-          <button
-            type="button"
-            className="profile-photo-btn"
-            disabled={uploading}
-            onClick={() => cameraRef.current && cameraRef.current.click()}
-          >
-            Take photo
-          </button>
-          <button
-            type="button"
-            className="profile-photo-btn"
-            disabled={uploading}
-            onClick={() => galleryRef.current && galleryRef.current.click()}
-          >
-            Gallery
+        <div className="profile-save-bar">
+          <button className="profile-save" type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Save Profile"}
           </button>
         </div>
-        {uploading && <span className="profile-hint profile-center">Photo upload ho rahi hai...</span>}
-
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/*"
-          capture="user"
-          hidden
-          onChange={handlePhoto}
-        />
-        <input
-          ref={galleryRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={handlePhoto}
-        />
-
-        <h1 className="profile-title">Edit Profile</h1>
-
-        <label className="profile-label">Name</label>
-        <input
-          className="profile-input"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          maxLength={60}
-          required
-        />
-
-        <label className="profile-label">Username</label>
-        <input
-          className="profile-input"
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          placeholder="e.g. jams_indore"
-          maxLength={20}
-          autoCapitalize="none"
-        />
-        <span className="profile-hint">3-20 characters: a-z, 0-9, _ aur .</span>
-
-        <label className="profile-label">Bio</label>
-        <textarea
-          className="profile-input profile-textarea"
-          name="bio"
-          value={form.bio}
-          onChange={handleChange}
-          maxLength={BIO_MAX}
-          rows={3}
-          placeholder="Apne baare mein kuch likho"
-        />
-        <span className="profile-hint">
-          {form.bio.length}/{BIO_MAX}
-        </span>
-
-        <h2 className="profile-section">About you</h2>
-
-        <label className="profile-label">Occupation</label>
-        <select
-          className="profile-input"
-          name="occupation"
-          value={form.occupation}
-          onChange={handleChange}
-        >
-          <option value="">Select</option>
-          <option value="student">Student</option>
-          <option value="working">Working professional</option>
-          <option value="business">Business</option>
-          <option value="other">Other</option>
-        </select>
-
-        <label className="profile-label">{orgLabel}</label>
-        <input
-          className="profile-input"
-          name="organization"
-          value={form.organization}
-          onChange={handleChange}
-          maxLength={80}
-          placeholder={form.occupation === "student" ? "e.g. IET DAVV" : "e.g. company ya business ka naam"}
-        />
-
-        {form.occupation === "student" && (
-          <>
-            <label className="profile-label">Degree / course</label>
-            <input
-              className="profile-input"
-              name="course"
-              value={form.course}
-              onChange={handleChange}
-              maxLength={100}
-              placeholder="e.g. B.Tech, B.Com, MBA"
-            />
-
-            <label className="profile-label">Subject / branch / major</label>
-            <input
-              className="profile-input"
-              name="subject"
-              value={form.subject}
-              onChange={handleChange}
-              maxLength={100}
-              placeholder="e.g. Computer Science"
-            />
-
-            <label className="profile-label">Current year / semester</label>
-            <input
-              className="profile-input"
-              name="studyYear"
-              value={form.studyYear}
-              onChange={handleChange}
-              maxLength={40}
-              placeholder="e.g. 2nd year or Semester 4"
-            />
-          </>
-        )}
-
-        <label className="profile-label">Gender</label>
-        <select
-          className="profile-input"
-          name="gender"
-          value={form.gender}
-          onChange={handleChange}
-        >
-          <option value="">Select</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select>
-
-        <label className="profile-label">Date of birth</label>
-        <input
-          className="profile-input"
-          type="date"
-          name="dob"
-          value={form.dob}
-          onChange={handleChange}
-          max={today}
-        />
-
-        <h2 className="profile-section">Location</h2>
-
-        <label className="profile-label">City</label>
-        <input
-          className="profile-input"
-          name="city"
-          value={form.city}
-          onChange={handleChange}
-          maxLength={60}
-          placeholder="e.g. Indore"
-        />
-
-        <label className="profile-label">Area</label>
-        <input
-          className="profile-input"
-          name="area"
-          value={form.area}
-          onChange={handleChange}
-          maxLength={60}
-          placeholder="e.g. Vijay Nagar"
-        />
-
-        <label className="profile-label">Hometown</label>
-        <input
-          className="profile-input"
-          name="hometown"
-          value={form.hometown}
-          onChange={handleChange}
-          maxLength={60}
-        />
-        <span className="profile-hint">
-          Roommate suggestions may show your gender, education and basic profile info. DOB and hometown remain private.
-        </span>
-        <RoommatePreferencesFields
-          value={roommatePreferences}
-          onChange={changeRoommatePreference}
-          onLifestyleChange={changeRoommateLifestyle}
-        />
-
-        <button className="profile-save" type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Profile"}
-        </button>
       </form>
     </div>
   );
