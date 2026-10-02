@@ -44,6 +44,10 @@ import RoommateFinder from "./pages/Roommates/RoommateFinder";
 
 import Rooms from "./pages/Rooms/Rooms";
 import HourlyRooms from "./pages/Rooms/HourlyRooms";
+import LaundryList from "./pages/Laundry/LaundryList";
+import LaundryDetail from "./pages/Laundry/LaundryDetail";
+import VillaList from "./pages/Villas/VillaList";
+import VillaDetail from "./pages/Villas/VillaDetail";
 import MessList from "./pages/Mess/MessList";
 import MessDetail from "./pages/Mess/MessDetail";
 import PG from "./pages/PG/PG";
@@ -74,6 +78,7 @@ import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
 import ManageLoans from "./pages/Admin/ManageLoans";
 import ManageMess from "./pages/Admin/ManageMess";
 import ManageHourlyRooms from "./pages/Admin/ManageHourlyRooms";
+import ManageVillas from "./pages/Admin/ManageVillas";
 import ManageNotifications from "./pages/Admin/ManageNotifications";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
 import HourlyBookingReceipt from "./pages/Rooms/HourlyBookingReceipt";
@@ -100,6 +105,10 @@ function App() {
         <Route path="/team" element={<MainLayout><Team /></MainLayout>} />
         <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
+        <Route path="/laundry" element={<MainLayout><LaundryList /></MainLayout>} />
+        <Route path="/laundry/:id" element={<MainLayout><LaundryDetail /></MainLayout>} />
+        <Route path="/villas" element={<MainLayout><VillaList /></MainLayout>} />
+        <Route path="/villas/:id" element={<MainLayout><VillaDetail /></MainLayout>} />
         <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
         <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/mess/login" element={<MessLogin />} />
@@ -170,6 +179,7 @@ function App() {
 
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
+        <Route path="/admin/villas" element={<AdminRoute><ManageVillas /></AdminRoute>} />
         <Route path="/admin/notifications" element={<AdminRoute><ManageNotifications /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />

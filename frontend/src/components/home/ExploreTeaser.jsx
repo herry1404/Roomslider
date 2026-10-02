@@ -14,6 +14,7 @@ import {
   Wifi,
   Wrench,
   Users,
+  Castle,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
@@ -68,6 +69,13 @@ function ExploreTeaser() {
       to: "/roommates",
     },
     {
+      icon: Castle,
+      title: "Villas for Stays & Events",
+      desc: "Book a private villa for a stay or party",
+      pill: "Explore Villas",
+      to: "/villas",
+    },
+    {
       icon: Banknote,
       title: "Student Loan",
       desc: "Help finding a loan for rent or fees",
@@ -92,10 +100,10 @@ function ExploreTeaser() {
     {
       icon: Shirt,
       title: "Need Laundry?",
-      desc: "Get your building's laundry vendor",
+      desc: "Find nearby laundries and order clothes",
       pill: "Explore Laundry",
       extra: true,
-      onClick: () => navigate(user ? "/my-place" : "/login"),
+      to: "/laundry",
     },
     {
       icon: Sparkles,

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const HomeSection = require("../models/homeSection.model");
 
-const BUILT_IN = ["hero", "categories", "explore"];
+const BUILT_IN = ["hero", "categories", "explore", "hourlyRooms", "villas"];
 const CUSTOM = ["listings", "banner"];
 const CATEGORIES = ["Room", "PG", "Hostel", "Flat"];
 
@@ -12,7 +12,9 @@ const DEFAULT_SECTIONS = [
   { type: "listings", title: "Flats", order: 3, config: { category: "Flat", limit: 10, viewAllPath: "/flats" } },
   { type: "listings", title: "PG", order: 4, config: { category: "PG", limit: 10, viewAllPath: "/pg" } },
   { type: "listings", title: "Hostels", order: 5, config: { category: "Hostel", limit: 10, viewAllPath: "/hostels" } },
-  { type: "explore", title: "Explore", order: 6 },
+  { type: "hourlyRooms", title: "Hourly Rooms", order: 6 },
+  { type: "villas", title: "Villas", order: 7 },
+  { type: "explore", title: "Explore", order: 8 },
 ];
 
 // Pehli baar collection khaali ho to default layout bana do
@@ -21,7 +23,38 @@ const ensureDefaults = () => {
   if (!seedPromise) {
     seedPromise = (async () => {
       const count = await HomeSection.countDocuments();
-      if (count === 0) await HomeSection.insertMany(DEFAULT_SECTIONS);
+      if (count === 0) {
+        await HomeSection.insertMany(DEFAULT_SECTIONS);
+        return;
+      }
+
+      for (const sectionType of ["hourlyRooms", "villas"]) {
+        const exists = await HomeSection.exists({ type: sectionType });
+        if (exists) continue;
+
+        const precedingTypes = sectionType === "villas"
+          ? ["listings", "hourlyRooms"]
+          : ["listings"];
+        const precedingSections = await HomeSection.find({
+          type: { $in: precedingTypes },
+        }).select("order").lean();
+        const exploreSection = await HomeSection.findOne({ type: "explore" })
+          .select("order")
+          .lean();
+        const lastSection = await HomeSection.findOne().sort({ order: -1 }).select("order").lean();
+        const insertOrder = precedingSections.length
+          ? Math.max(...precedingSections.map((section) => section.order)) + 1
+          : exploreSection?.order ?? ((lastSection?.order ?? -1) + 1);
+        await HomeSection.updateMany(
+          { order: { $gte: insertOrder } },
+          { $inc: { order: 1 } }
+        );
+        await HomeSection.create({
+          type: sectionType,
+          title: sectionType === "hourlyRooms" ? "Hourly Rooms" : "Villas",
+          order: insertOrder,
+        });
+      }
     })().catch((err) => {
       seedPromise = null;
       throw err;

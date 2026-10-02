@@ -1,134 +1,155 @@
+const mongoose = require("mongoose");
 const LaundryVendor = require("../models/laundryVendor.model");
 
-// Admin: add a vendor, linked to a specific owner (building)
+const cleanCatalog = (input) => {
+  if (!Array.isArray(input)) return [];
+  return input
+    .filter((item) => item && typeof item.name === "string")
+    .map((item) => ({
+      name: item.name.trim().slice(0, 80),
+      price: Number(item.price),
+    }))
+    .filter((item) => item.name && Number.isFinite(item.price) && item.price >= 0);
+};
+
+const vendorFields = (body) => {
+  const fields = {
+    vendorName: typeof body.vendorName === "string" ? body.vendorName.trim() : "",
+    phone: typeof body.phone === "string" ? body.phone.trim() : "",
+    whatsapp: typeof body.whatsapp === "string" ? body.whatsapp.trim() : "",
+    area: typeof body.area === "string" ? body.area.trim() : "",
+    address: typeof body.address === "string" ? body.address.trim() : "",
+    catalog: cleanCatalog(body.catalog),
+    isActive: body.isActive !== false,
+  };
+
+  const lat = Number(body.latitude);
+  const lng = Number(body.longitude);
+  if (
+    body.latitude === "" ||
+    body.latitude == null ||
+    body.longitude === "" ||
+    body.longitude == null ||
+    !Number.isFinite(lat) ||
+    lat < -90 ||
+    lat > 90 ||
+    !Number.isFinite(lng) ||
+    lng < -180 ||
+    lng > 180
+  ) {
+    throw new Error("Valid vendor latitude and longitude are required for nearby listings");
+  }
+  fields.location = { type: "Point", coordinates: [lng, lat] };
+  return fields;
+};
+
 const createVendor = async (req, res) => {
   try {
-    const { ownerId, vendorName, phone, area } = req.body;
-
-    if (!ownerId || !vendorName || !phone) {
+    const fields = vendorFields(req.body || {});
+    if (!fields.vendorName || !fields.phone || !fields.address || !fields.catalog.length) {
       return res.status(400).json({
         success: false,
-        message: "Owner, vendor name and phone are required",
+        message: "Vendor name, phone, address, and at least one priced clothing item are required",
       });
     }
+    if (!fields.whatsapp) fields.whatsapp = fields.phone;
 
-    const vendor = await LaundryVendor.create({
-      owner: ownerId,
-      vendorName,
-      phone,
-      area,
-    });
-
+    const vendor = await LaundryVendor.create(fields);
     res.status(201).json({ success: true, vendor });
   } catch (error) {
     console.error("CREATE LAUNDRY VENDOR ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to add vendor",
-    });
+    res.status(400).json({ success: false, message: error.message || "Failed to add vendor" });
   }
 };
 
-// Admin: list all vendors with owner name
-const getAllVendors = async (req, res) => {
+const getAllVendors = async (_req, res) => {
   try {
-    const vendors = await LaundryVendor.find()
-      .populate("owner", "name email")
-      .sort({ createdAt: -1 })
-      .lean();
-
+    const vendors = await LaundryVendor.find().sort({ createdAt: -1 }).lean();
     res.status(200).json({ success: true, vendors });
   } catch (error) {
     console.error("GET LAUNDRY VENDORS ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch vendors",
-    });
+    res.status(500).json({ success: false, message: "Failed to fetch vendors" });
   }
 };
 
-// Admin: update a vendor
 const updateVendor = async (req, res) => {
   try {
-    const { ownerId, vendorName, phone, area } = req.body;
-
-    const update = { vendorName, phone, area };
-    if (ownerId) update.owner = ownerId;
-
-    const vendor = await LaundryVendor.findByIdAndUpdate(
-      req.params.id,
-      update,
-      { new: true, runValidators: true }
-    );
-
-    if (!vendor) {
-      return res.status(404).json({
+    const fields = vendorFields(req.body || {});
+    if (!fields.vendorName || !fields.phone || !fields.address || !fields.catalog.length) {
+      return res.status(400).json({
         success: false,
-        message: "Vendor not found",
+        message: "Vendor name, phone, address, and at least one priced clothing item are required",
       });
     }
+    if (!fields.whatsapp) fields.whatsapp = fields.phone;
 
+    const vendor = await LaundryVendor.findByIdAndUpdate(req.params.id, fields, {
+      new: true,
+      runValidators: true,
+    });
+    if (!vendor) return res.status(404).json({ success: false, message: "Vendor not found" });
     res.status(200).json({ success: true, vendor });
   } catch (error) {
     console.error("UPDATE LAUNDRY VENDOR ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update vendor",
-    });
+    res.status(400).json({ success: false, message: error.message || "Failed to update vendor" });
   }
 };
 
-// Admin: delete a vendor
 const deleteVendor = async (req, res) => {
   try {
     const vendor = await LaundryVendor.findByIdAndDelete(req.params.id);
-
-    if (!vendor) {
-      return res.status(404).json({
-        success: false,
-        message: "Vendor not found",
-      });
-    }
-
+    if (!vendor) return res.status(404).json({ success: false, message: "Vendor not found" });
     res.status(200).json({ success: true, message: "Vendor deleted" });
   } catch (error) {
     console.error("DELETE LAUNDRY VENDOR ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete vendor",
-    });
+    res.status(500).json({ success: false, message: "Failed to delete vendor" });
   }
 };
 
-// Tenant: get the vendor for their own room's owner, plus full list as fallback
-// if no vendor is set for that specific owner yet.
-const getVendorForMyRoom = async (req, res) => {
+const getPublicVendors = async (req, res) => {
   try {
-    const { ownerId } = req.query;
-
-    const allVendors = await LaundryVendor.find()
-      .populate("owner", "name")
-      .sort({ createdAt: -1 })
-      .lean();
-
-    let matched = [];
-    if (ownerId) {
-      matched = allVendors.filter(
-        (v) => String(v.owner?._id) === String(ownerId)
-      );
+    const { lat, lng } = req.query;
+    let vendors;
+    if (lat !== undefined && lng !== undefined) {
+      const latitude = Number(lat);
+      const longitude = Number(lng);
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        return res.status(400).json({ success: false, message: "Invalid coordinates" });
+      }
+      vendors = await LaundryVendor.find({
+        isActive: true,
+        location: {
+          $near: {
+            $geometry: { type: "Point", coordinates: [longitude, latitude] },
+          },
+        },
+      }).lean();
+    } else {
+      vendors = await LaundryVendor.find({ isActive: true })
+        .sort({ area: 1, vendorName: 1 })
+        .lean();
     }
-
-    res.status(200).json({
-      success: true,
-      matched,
-      all: allVendors,
-    });
+    res.status(200).json({ success: true, vendors });
   } catch (error) {
-    console.error("GET VENDOR FOR ROOM ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch vendor",
-    });
+    console.error("GET PUBLIC LAUNDRY VENDORS ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch laundry vendors" });
+  }
+};
+
+const getPublicVendor = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid vendor id" });
+    }
+    const vendor = await LaundryVendor.findOne({
+      _id: req.params.id,
+      isActive: true,
+    }).lean();
+    if (!vendor) return res.status(404).json({ success: false, message: "Laundry vendor not found" });
+    res.status(200).json({ success: true, vendor });
+  } catch (error) {
+    console.error("GET PUBLIC LAUNDRY VENDOR ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch laundry vendor" });
   }
 };
 
@@ -137,5 +158,6 @@ module.exports = {
   getAllVendors,
   updateVendor,
   deleteVendor,
-  getVendorForMyRoom,
+  getPublicVendors,
+  getPublicVendor,
 };

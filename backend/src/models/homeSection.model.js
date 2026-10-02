@@ -4,7 +4,7 @@ const homeSectionSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["hero", "categories", "explore", "listings", "banner"],
+      enum: ["hero", "categories", "explore", "listings", "banner", "hourlyRooms", "villas"],
       required: true,
     },
     title: { type: String, default: "", trim: true },

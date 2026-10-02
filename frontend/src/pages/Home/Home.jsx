@@ -6,6 +6,7 @@ import Categories from "../../components/home/Categories";
 import ExploreTeaser from "../../components/home/ExploreTeaser";
 import CategorySection from "../../components/home/CategorySection";
 import HomeBanner from "../../components/home/HomeBanner";
+import HomeRentalSection from "../../components/home/HomeRentalSection";
 import api from "../../api/axios";
 
 const CACHE_KEY = "homeSectionsV1";
@@ -18,6 +19,8 @@ const DEFAULT_SECTIONS = [
   { _id: "d-flats", type: "listings", title: "Flats", config: { category: "Flat", limit: 10, viewAllPath: "/flats" } },
   { _id: "d-pg", type: "listings", title: "PG", config: { category: "PG", limit: 10, viewAllPath: "/pg" } },
   { _id: "d-hostels", type: "listings", title: "Hostels", config: { category: "Hostel", limit: 10, viewAllPath: "/hostels" } },
+  { _id: "d-hourly-rooms", type: "hourlyRooms", title: "Hourly Rooms" },
+  { _id: "d-villas", type: "villas", title: "Villas for Stays & Events" },
   { _id: "d-explore", type: "explore" },
 ];
 
@@ -103,6 +106,9 @@ function Home() {
         return <Categories key={s._id} />;
       case "explore":
         return <ExploreTeaser key={s._id} />;
+      case "hourlyRooms":
+      case "villas":
+        return <HomeRentalSection key={s._id} type={s.type} title={s.title || (s.type === "villas" ? "Villas" : "Hourly Rooms")} />;
       case "banner":
         return <HomeBanner key={s._id} section={s} />;
       case "listings": {

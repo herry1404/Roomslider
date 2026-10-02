@@ -1,0 +1,51 @@
+.laundry-page {
+  min-height: 65vh;
+  padding-block: clamp(28px, 5vw, 56px);
+  color: var(--color-text);
+}
+
+.laundry-page-heading { margin-bottom: 26px; }
+.laundry-page-heading h1 { margin: 10px 0 6px; font-size: clamp(28px, 5vw, 40px); }
+.laundry-page-heading p,.laundry-profile-header p { display:flex;align-items:center;gap:6px;color:var(--color-text-light); }
+.laundry-eyebrow { display:inline-flex;align-items:center;gap:7px;color:var(--color-primary);font-size:12px;font-weight:800;letter-spacing:.08em; }
+.laundry-vendor-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px; }
+.laundry-vendor-card { display:flex;align-items:center;gap:14px;padding:18px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;min-width:0; }
+.laundry-vendor-icon { display:grid;place-items:center;width:52px;height:52px;flex-shrink:0;color:var(--color-primary);background:var(--color-surface-2);border-radius:14px; }
+.laundry-vendor-icon.large { width:64px;height:64px; }
+.laundry-vendor-copy { flex:1;min-width:0; }
+.laundry-vendor-copy h2 { margin:0 0 6px;font-size:17px; }
+.laundry-vendor-copy p { display:flex;align-items:flex-start;gap:5px;margin:0;color:var(--color-text-light);font-size:13px; }
+.laundry-vendor-copy p svg { flex-shrink:0;margin-top:2px; }
+.laundry-vendor-copy span { display:block;margin-top:8px;color:var(--color-primary);font-size:12px;font-weight:700; }
+.laundry-card-link { display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;color:var(--color-primary);background:var(--color-surface-2);border-radius:50%; }
+.laundry-empty { padding:28px;text-align:center;color:var(--color-text-light);background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px; }
+.laundry-back-link { display:inline-flex;align-items:center;gap:6px;color:var(--color-primary);text-decoration:none;font-weight:600; }
+.laundry-profile-header { display:flex;align-items:center;gap:16px;margin:24px 0; }
+.laundry-profile-header h1 { margin:0;font-size:clamp(24px,5vw,34px); }
+.laundry-profile-header p { margin:7px 0;font-size:14px; }
+.laundry-profile-header a { color:var(--color-text-light);font-size:14px; }
+.laundry-order-card { max-width:760px;padding:clamp(16px,4vw,28px);background:var(--color-surface);border:1px solid var(--color-border);border-radius:20px; }
+.laundry-order-heading { display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px; }
+.laundry-order-heading h2 { margin:0 0 5px;font-size:20px; }
+.laundry-order-heading p,.laundry-order-disclaimer { margin:0;color:var(--color-text-light);font-size:13px;line-height:1.5; }
+.laundry-order-heading>strong { color:var(--color-primary);font-size:13px;white-space:nowrap; }
+.laundry-customer-catalog { display:grid; }
+.laundry-catalog-item { display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--color-border); }
+.laundry-catalog-item>div:first-child { display:grid;gap:4px; }
+.laundry-catalog-item span { color:var(--color-text-light);font-size:13px; }
+.laundry-quantity { display:flex;align-items:center;gap:12px; }
+.laundry-quantity button { display:grid;place-items:center;width:34px;height:34px;color:var(--color-text);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:10px; }
+.laundry-quantity button:disabled { opacity:.45; }
+.laundry-quantity span { min-width:18px;text-align:center;color:var(--color-text)!important;font-weight:700; }
+.laundry-order-footer { display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:18px; }
+.laundry-address-field { display:grid;gap:6px;margin-top:16px;color:var(--color-text-light);font-size:13px; }
+.laundry-address-field input { width:100%;box-sizing:border-box;padding:11px 12px;color:var(--color-text);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:10px;font:inherit; }
+.laundry-order-footer>div { display:grid;gap:3px; }
+.laundry-order-footer>div span { color:var(--color-text-light);font-size:12px; }
+.laundry-order-footer>div strong { font-size:22px; }
+.laundry-order-footer>button { display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 16px;color:#fff;background:#16a34a;border:0;border-radius:12px;font-weight:700; }
+.laundry-order-disclaimer { margin-top:14px; }
+@media(max-width:520px) {
+  .laundry-order-footer { align-items:stretch;flex-direction:column; }
+  .laundry-order-footer>button { width:100%; }
+}

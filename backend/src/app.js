@@ -34,6 +34,8 @@ const messRoutes = require("./routes/mess.routes");
 const activityRoutes = require("./routes/activity.routes");
 const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO sitemap
 const userRoutes = require("./routes/user.routes");
+const villaRoutes = require("./routes/villa.routes");
+const villaBookingRoutes = require("./routes/villaBooking.routes");
 
 
 const {
@@ -343,6 +345,8 @@ app.use("/api/roommates", roommateRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/furniture-requests", furnitureRequestRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/villas", villaRoutes);
+app.use("/api/villa-bookings", villaBookingRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)
 app.use(

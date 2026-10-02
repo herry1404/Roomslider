@@ -78,10 +78,11 @@ function Profile() {
       }
 
       if (key === "activity") {
-        const [f, s, v] = await Promise.allSettled([
+        const [f, s, v, villas] = await Promise.allSettled([
           api.get("/furniture-requests/mine"),
           api.get("/service-bookings/my"),
           api.get("/vehicle-bookings/my"),
+          api.get("/villa-bookings/mine"),
         ]);
 
         const list = [];
@@ -121,6 +122,19 @@ function Profile() {
               sub: b.shop?.shopName || "",
               status: b.status,
               createdAt: b.createdAt,
+            })
+          );
+        }
+
+        if (villas.status === "fulfilled" && Array.isArray(villas.value.data.bookings)) {
+          villas.value.data.bookings.forEach((booking) =>
+            list.push({
+              id: "villa" + booking._id,
+              type: "Villa",
+              title: booking.villa?.name || "Villa booking",
+              sub: `${booking.bookingType} · ${booking.guestCount} guests · ₹${booking.amount}`,
+              status: booking.status,
+              createdAt: booking.createdAt,
             })
           );
         }

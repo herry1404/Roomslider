@@ -75,9 +75,9 @@ function ComingSoonServices() {
     {
       icon: Shirt,
       title: "Need Laundry?",
-      desc: "Get your building's laundry vendor contact instantly",
+      desc: "Find nearby laundries and order clothes on WhatsApp",
       button: "Explore Laundry",
-      onClick: () => navigate(user ? "/my-place" : "/login"),
+      onClick: () => navigate("/laundry"),
     },
     {
       icon: Banknote,

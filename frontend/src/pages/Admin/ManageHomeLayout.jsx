@@ -10,6 +10,8 @@ const TYPE_LABEL = {
   explore: "Explore",
   listings: "Listings",
   banner: "Banner",
+  hourlyRooms: "Hourly Rooms",
+  villas: "Villas",
 };
 const CUSTOM = ["listings", "banner"];
 const CATEGORIES = ["", "Room", "PG", "Hostel", "Flat"];

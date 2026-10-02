@@ -2,12 +2,15 @@ const express = require("express");
 const { protect } = require("../middleware/auth.middleware");
 const {
   getMyProfile,
+  getPublicProfile,
   updateMyProfile,
   getDiscover,
   sendRequest,
   getRequests,
   respondToRequest,
   getConnections,
+  getChatMessages,
+  sendChatMessage,
   blockUser,
   reportUser,
 } = require("../controllers/roommate.controller");
@@ -17,6 +20,9 @@ const router = express.Router();
 router.use(protect);
 router.get("/me", getMyProfile);
 router.put("/me", updateMyProfile);
+router.get("/profiles/:userId", getPublicProfile);
+router.get("/chat/:userId", getChatMessages);
+router.post("/chat/:userId", sendChatMessage);
 router.get("/discover", getDiscover);
 router.get("/requests", getRequests);
 router.get("/connections", getConnections);

@@ -9,11 +9,13 @@ const {
   getAllVendors,
   updateVendor,
   deleteVendor,
-  getVendorForMyRoom,
+  getPublicVendors,
+  getPublicVendor,
 } = require("../controllers/laundryVendor.controller");
 
-// Tenant: fetch vendor for their room's owner (query param ownerId)
-router.get("/my-vendor", protect, getVendorForMyRoom);
+// Public location-based vendor directory and individual vendor profile.
+router.get("/public", getPublicVendors);
+router.get("/public/:id", getPublicVendor);
 
 // Admin CRUD
 router.get("/", protect, adminOnly, getAllVendors);

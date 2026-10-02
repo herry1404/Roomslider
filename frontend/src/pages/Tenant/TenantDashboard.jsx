@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { X, Wallet, Sparkles, ShoppingBasket, Zap, Wrench, MessageCircle } from "lucide-react";
+import { X, Wallet, Sparkles, ShoppingBasket, Wrench } from "lucide-react";
 
 import api from "../../api/axios";
 
@@ -34,10 +34,6 @@ function TenantDashboard() {
   const [maintenanceSubmitting, setMaintenanceSubmitting] = useState(false);
   const [myRequests, setMyRequests] = useState([]);
   const [requestsLoaded, setRequestsLoaded] = useState(false);
-  const [showLaundryModal, setShowLaundryModal] = useState(false);
-  const [laundryVendors, setLaundryVendors] = useState({ matched: [], all: [] });
-  const [laundryLoaded, setLaundryLoaded] = useState(false);
-  const [laundryLoading, setLaundryLoading] = useState(false);
 
   const fetchTenancy = async () => {
     try {
@@ -191,36 +187,6 @@ function TenantDashboard() {
     }
   };
 
-  const openLaundryModal = async () => {
-    setShowLaundryModal(true);
-
-    if (!laundryLoaded) {
-      setLaundryLoading(true);
-      try {
-        const ownerId = data?.owner?.id;
-        const res = await api.get("/laundry-vendors/my-vendor", {
-          params: { ownerId },
-        });
-        setLaundryVendors({
-          matched: res.data.matched || [],
-          all: res.data.all || [],
-        });
-        setLaundryLoaded(true);
-      } catch (error) {
-        console.error("FETCH LAUNDRY VENDORS ERROR:", error);
-      } finally {
-        setLaundryLoading(false);
-      }
-    }
-  };
-
-  const buildLaundryWhatsAppLink = (vendorName, phone) => {
-    const cleanPhone = (phone || "").replace(/\D/g, "");
-    const phoneWithCountryCode = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
-    const message = `Hi ${vendorName}, I'm a tenant on RoomSlider and would like to get laundry service.`;
-    return `https://wa.me/${phoneWithCountryCode}?text=${encodeURIComponent(message)}`;
-  };
-
   const handleGiveNotice = async (e) => {
     e.preventDefault();
 
@@ -266,11 +232,9 @@ function TenantDashboard() {
     return null;
   }
 
-  const { room, owner, tenancy } = data;
+  const { room, tenancy } = data;
   const payments = [...(tenancy.payments || [])].reverse();
   const hasNotice = !!tenancy.vacateNoticeDate;
-  const laundryList = laundryVendors.matched.length > 0 ? laundryVendors.matched : laundryVendors.all;
-
   return (
     <div className="tenant-page">
       <div className="tenant-header">
@@ -410,7 +374,7 @@ function TenantDashboard() {
               const handleClick = isMaintenance
                 ? openMaintenanceModal
                 : isLaundry
-                ? openLaundryModal
+                ? () => navigate("/laundry")
                 : undefined;
 
               return (
@@ -617,60 +581,6 @@ function TenantDashboard() {
                   </div>
                 </div>
               ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Laundry modal */}
-      {showLaundryModal && (
-        <div
-          className="tenant-modal-overlay"
-          onClick={() => setShowLaundryModal(false)}
-        >
-          <div className="tenant-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="tenant-modal-header">
-              <h3>Laundry</h3>
-              <button
-                className="tenant-modal-close"
-                onClick={() => setShowLaundryModal(false)}
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            {laundryLoading ? (
-              <p className="tenant-empty">Loading vendors...</p>
-            ) : laundryList.length === 0 ? (
-              <p className="tenant-empty">No laundry vendors available yet.</p>
-            ) : (
-              <>
-                {laundryVendors.matched.length === 0 && (
-                  <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 10 }}>
-                    No vendor set for your building yet — here are nearby options:
-                  </p>
-                )}
-                {laundryList.map((v) => (
-                  <div key={v._id} className="tenant-payment-item">
-                    <div>
-                      <div className="tenant-payment-date">{v.vendorName}</div>
-                      <div className="tenant-payment-method">
-                        {v.area || v.owner?.name || "Nearby"}
-                      </div>
-                    </div>
-                    <a
-                      href={buildLaundryWhatsAppLink(v.vendorName, v.phone)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="owner-whatsapp-btn"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <MessageCircle size={15} />
-                      WhatsApp
-                    </a>
-                  </div>
-                ))}
-              </>
             )}
           </div>
         </div>

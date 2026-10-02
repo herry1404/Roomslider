@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, MapPin, ShieldAlert, Ban } from "lucide-react";
+import { Heart, MapPin, ShieldAlert, Ban, MessageCircle, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import RoommateChat from "./RoommateChat";
+import RoommateProfileDialog from "./RoommateProfileDialog";
 import "../../styles/profile.css";
+import "../../styles/roommate-chat.css";
 
 const formatSeeking = (value) => ({
   room: "Looking for a room",
@@ -21,6 +24,8 @@ function RoommateFinder() {
   const [requests, setRequests] = useState([]);
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profileUserId, setProfileUserId] = useState(null);
+  const [chatPerson, setChatPerson] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -108,16 +113,16 @@ function RoommateFinder() {
   const outgoing = requests.filter((request) => request.direction === "outgoing" && request.status === "pending");
 
   return (
-    <div className="profile-view">
+    <div className="profile-view roommate-finder">
       <h1 className="profile-head-name">Roommate suggestions</h1>
       <p className="profile-head-line">
-        Suggestions use your one RoomSlider profile. Contact details stay private until you both accept.
+        View roommate profiles and saved rooms. Contact details are never revealed; chat opens only after a request is accepted.
       </p>
 
       {!profileReady ? (
         <div className="profile-empty">
           <p>Complete your RoomSlider profile and roommate preferences to get suggestions.</p>
-          <p>Set them in your main profile&apos;s Edit Profile page. Contact details are never shown to suggestions.</p>
+          <p>Set them in your main profile&apos;s Edit Profile page. Your contact details stay private.</p>
         </div>
       ) : !profile.active ? (
         <div className="profile-empty">Roommate suggestions are paused. Turn them on in your RoomSlider profile to see matches.</div>
@@ -155,12 +160,15 @@ function RoommateFinder() {
                 {person.incomingStatus === "pending" ? (
                   <span className="profile-hint">They sent you a request — respond below.</span>
                 ) : person.outgoingStatus === "accepted" || person.incomingStatus === "accepted" ? (
-                  <span className="profile-hint">Connected — contact details are in Matches.</span>
+                  <span className="profile-hint">Connected — open a private chat in Matches.</span>
                 ) : person.outgoingStatus === "pending" ? (
                   <span className="profile-hint">Request sent</span>
                 ) : (
                   <button className="profile-photo-btn" onClick={() => sendRequest(person.id)}>Request to connect</button>
                 )}
+                <button className="profile-photo-btn" onClick={() => setProfileUserId(person.id)}>
+                  <UserRound size={15} /> View profile & saved rooms
+                </button>
                 <button className="profile-photo-btn" title="Block profile" onClick={() => block(person.id)}>
                   <Ban size={15} /> Block
                 </button>
@@ -185,8 +193,18 @@ function RoommateFinder() {
               </div>
               {request.direction === "incoming" && (
                 <div className="profile-item-side">
+                  <button className="profile-photo-btn" onClick={() => setProfileUserId(request.person._id)}>
+                    <UserRound size={15} /> Profile & saved rooms
+                  </button>
                   <button className="profile-photo-btn" onClick={() => respond(request.id, "accepted")}>Accept</button>
                   <button className="profile-photo-btn" onClick={() => respond(request.id, "declined")}>Decline</button>
+                </div>
+              )}
+              {request.direction === "outgoing" && (
+                <div className="profile-item-side">
+                  <button className="profile-photo-btn" onClick={() => setProfileUserId(request.person._id)}>
+                    <UserRound size={15} /> Profile & saved rooms
+                  </button>
                 </div>
               )}
             </div>
@@ -197,7 +215,7 @@ function RoommateFinder() {
       {profileReady && (
         <section className="profile-list">
           <h2 className="profile-section">Connected roommates</h2>
-          <p className="profile-hint">Phone and email are shown only after the request is accepted.</p>
+          <p className="profile-hint">Phone and email stay private. Use RoomSlider chat to share details only when you choose.</p>
           {connections.length === 0 ? (
             <div className="profile-empty">Accepted connections will appear here.</div>
           ) : connections.map((connection) => (
@@ -205,17 +223,37 @@ function RoommateFinder() {
               <div className="profile-item-main">
                 <strong>{connection.name}</strong>
                 {connection.username && <span className="profile-hint">@{connection.username}</span>}
-                <span className="profile-hint">{connection.email}{connection.phone ? ` · ${connection.phone}` : ""}</span>
+              </div>
+              <div className="profile-item-side">
+                <button className="profile-photo-btn" onClick={() => setProfileUserId(connection.id)}>
+                  <UserRound size={15} /> Profile
+                </button>
+                <button className="profile-photo-btn" onClick={() => setChatPerson(connection)}>
+                  <MessageCircle size={15} /> Chat
+                </button>
               </div>
             </div>
           ))}
+          {chatPerson && (
+            <RoommateChat
+              person={chatPerson}
+              currentUserId={user?._id || user?.id}
+              onClose={() => setChatPerson(null)}
+            />
+          )}
         </section>
       )}
 
       <p className="profile-hint">
-        <ShieldAlert size={14} /> Meet in a public place first and never send money to someone you have not met.{" "}
+        <ShieldAlert size={14} /> Your contact information is not shared by RoomSlider. Meet in a public place first and never send money to someone you have not met.{" "}
         <Link to="/privacy">Privacy details</Link>
       </p>
+      {profileUserId && (
+        <RoommateProfileDialog
+          userId={profileUserId}
+          onClose={() => setProfileUserId(null)}
+        />
+      )}
     </div>
   );
 }

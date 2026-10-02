@@ -19,6 +19,7 @@ import {
   Sparkles,
   Home,
   Megaphone,
+  Castle,
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
@@ -38,6 +39,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
         { title: "Hourly Rooms", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
+        { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],

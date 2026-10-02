@@ -3,10 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- Latest pulled commit: `215a054` (`Roommate finder + profile edit updates`)
-- Remote: `origin/main` was up to date when pulled before these changes.
-- All changes listed below are in the working tree and are **not committed or pushed**.
-- Do not discard the working tree: it contains the finished UI, notifications, and hourly booking receipt work.
+- Previous completed work is on `origin/main` in commit `d700ce6` (`Add push notifications and hourly booking receipts`).
+- The laundry, villa, and roommate privacy/chat changes in this handoff are in the working tree and are **not committed or pushed**.
+- Do not discard the working tree: it contains the new laundry directory, villa reservations, roommate profile/chat updates, and homepage/admin integrations.
 
 ## Completed work
 
@@ -31,6 +30,33 @@
 - Successful checkout now navigates directly to its receipt.
 - Added VAPID deployment setup instructions to `README.md`.
 
+### Public laundry directory
+
+- Replaced owner/building-based laundry matching with public, location-based laundry profiles.
+- Admins can manage vendor contact/WhatsApp details, address, map coordinates, visibility, and each vendor's clothing catalog and prices.
+- Added public laundry listing and vendor-detail pages. The listing requests browser location when available and otherwise shows all public vendors.
+- Customers can select item quantities, see an estimated total, optionally add a pickup address, and send the order details to the vendor through WhatsApp. Final order and price confirmation remains with the vendor.
+- The tenant dashboard now links to the public laundry directory instead of showing its former building-specific laundry modal.
+- Existing vendor records without coordinates/catalog need to be edited and completed before they can be found nearby or accept a priced WhatsApp order.
+
+### Villa discovery and reservations
+
+- Added villa records with photos, address/map location, capacity/amenities, and separate nightly-stay and event/day rates.
+- Added public villa discovery/detail pages and a Villas homepage section after Hourly Rooms. Homepage sections can be reordered or hidden from the existing layout manager; missing built-in sections are added to existing layouts.
+- Added an admin Villas & Reservations page to manage listings and review reservations.
+- Added date availability checks and server-calculated Razorpay orders for stay/event reservations. A short per-villa lock and pending payment hold protect overlapping date ranges.
+- Payment verification checks the Razorpay signature and fetched payment's order, amount, currency, and captured status before confirming the reservation.
+- Villa reservation history appears in Profile Activity. Admins can mark ended confirmed bookings complete; villas with reservation history are hidden rather than deleted to preserve booking records.
+- If payment is captured after a hold expires or a booking conflict occurs, the guest must contact support for manual follow-up/refund; automated refunds are not implemented.
+
+### Roommate profiles and private chat
+
+- Roommate Finder users can open an active roommate profile and see its preferences plus available saved rooms. The endpoint only returns curated room/profile fields; email and phone are excluded.
+- Accepted matches can chat through RoomSlider. Chat history and sends are allowed only while an accepted connection exists and neither user has blocked the other.
+- Removed phone/email from the connections API and UI; acceptance now opens private chat instead of revealing contact details.
+- Added `backend/src/models/roommateMessage.model.js`, authenticated profile/chat endpoints in `roommate.routes.js` and `roommate.controller.js`, and the profile dialog/chat UI under `frontend/src/pages/Roommates/`.
+- Chat currently refreshes messages by polling every five seconds; real-time socket delivery and unread push notifications are not implemented.
+
 ## Important files
 
 ### New files
@@ -46,12 +72,23 @@
 - `frontend/src/pages/Rooms/HourlyBookingReceipt.jsx`
 - `frontend/src/styles/notifications.css`
 - `frontend/src/styles/hourly-receipt.css`
+- `backend/src/models/Villa.js`, `backend/src/models/VillaBooking.js`
+- `backend/src/controllers/villa.controller.js`, `backend/src/controllers/villaBooking.controller.js`
+- `backend/src/routes/villa.routes.js`, `backend/src/routes/villaBooking.routes.js`
+- `frontend/src/pages/Laundry/LaundryList.jsx`, `LaundryDetail.jsx`
+- `frontend/src/pages/Villas/VillaList.jsx`, `VillaDetail.jsx`
+- `frontend/src/pages/Admin/ManageVillas.jsx`
+- `frontend/src/components/home/HomeRentalSection.jsx`, `VillaCard.jsx`
+- `frontend/src/styles/laundry.css`, `villas.css`
+- `backend/src/models/roommateMessage.model.js`
+- `frontend/src/pages/Roommates/RoommateChat.jsx`, `RoommateProfileDialog.jsx`
+- `frontend/src/styles/roommate-chat.css`
 
 ### Updated files
 
 - `README.md`
-- Backend: `package.json`, `package-lock.json`, `src/controllers/hourlyBooking.controller.js`, `src/controllers/notification.controller.js`, `src/models/HourlyBooking.model.js`, `src/models/Notification.js`, `src/routes/hourlyBooking.routes.js`, `src/routes/notification.routes.js`
-- Frontend: `vite.config.js`, `src/App.jsx`, `src/components/admin/Sidebar.jsx`, `src/components/explore/ComingSoonServices.jsx`, `src/components/layout/Navbar.jsx`, `src/pages/Admin/AdminDashboard.jsx`, `src/pages/HourlyManager/HourlyManagerDashboard.jsx`, `src/pages/Profile/Profile.jsx`, `src/pages/Rooms/HourlyRoomCheckout.jsx`, `src/styles/admin/sidebar.css`, `src/styles/hourly-manager.css`, `src/styles/profile.css`
+- Backend: `package.json`, `package-lock.json`, `src/controllers/hourlyBooking.controller.js`, `src/controllers/notification.controller.js`, `src/controllers/homeSection.controller.js`, `src/controllers/laundryVendor.controller.js`, `src/controllers/roommate.controller.js`, `src/models/HourlyBooking.model.js`, `src/models/Notification.js`, `src/models/homeSection.model.js`, `src/models/laundryVendor.model.js`, `src/routes/hourlyBooking.routes.js`, `src/routes/notification.routes.js`, `src/routes/laundryVendor.routes.js`, `src/routes/roommate.routes.js`, `src/app.js`
+- Frontend: `vite.config.js`, `src/App.jsx`, `src/components/admin/Sidebar.jsx`, `src/components/explore/ComingSoonServices.jsx`, `src/components/home/ExploreTeaser.jsx`, `src/components/layout/Navbar.jsx`, `src/pages/Admin/AdminDashboard.jsx`, `src/pages/Admin/ManageHomeLayout.jsx`, `src/pages/Admin/ManageLaundryVendors.jsx`, `src/pages/HourlyManager/HourlyManagerDashboard.jsx`, `src/pages/Home/Home.jsx`, `src/pages/Profile/Profile.jsx`, `src/pages/Rooms/HourlyRoomCheckout.jsx`, `src/pages/Roommates/RoommateFinder.jsx`, `src/pages/Tenant/TenantDashboard.jsx`, `src/styles/admin/sidebar.css`, `src/styles/hourly-manager.css`, `src/styles/profile.css`
 
 ## Deployment / operational setup still required
 
@@ -78,3 +115,18 @@ Keep the private key secret. Deploy the frontend over HTTPS and users/managers m
 - Targeted ESLint checks for the new notification UI, routes, and admin components: passed.
 - A broader targeted ESLint invocation including existing profile/checkout/hourly-manager pages reported existing rule violations in those files (for example effect/state and hook-order lint rules, plus unused imports/variables). Those pre-existing areas were not broadly refactored as part of this work.
 - `git diff --check`: passed.
+
+### Current laundry/villa changes
+
+- Frontend production build: passed; Vite emitted its existing config and large-chunk warnings.
+- Backend `node --check` for the added/updated laundry, villa, booking, home-section, and app files: passed.
+- Targeted ESLint for the new laundry/villa screens and home components: passed. A wider changed-file lint run still reports existing `react-hooks/set-state-in-effect` issues in `ManageHomeLayout.jsx`, `Profile.jsx`, and `TenantDashboard.jsx`; Profile also has two unused catch variables.
+- `git diff --check`: passed.
+- Manual/live MongoDB, Cloudinary upload, Razorpay checkout/capture, WhatsApp handoff, mobile layout, and geolocation testing remain outstanding.
+
+### Current roommate profile/chat changes
+
+- Frontend production build: passed; Vite emitted its existing large-chunk warning.
+- Backend syntax checks for roommate controller, routes, and message model: passed.
+- Targeted ESLint for the Roommate Finder, profile dialog, and private chat UI: passed.
+- Manual multi-account acceptance, block, saved-room visibility, and chat authorization tests remain outstanding.
