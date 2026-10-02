@@ -32,6 +32,7 @@ const hourlyBookingSchema = new mongoose.Schema(
     },
     razorpayOrderId: { type: String },
     razorpayPaymentId: { type: String },
+    paidAt: { type: Date },
 
     // Booking lifecycle — "confirmed" only happens after payment succeeds
     status: {

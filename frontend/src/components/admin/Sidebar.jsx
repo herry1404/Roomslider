@@ -18,9 +18,10 @@ import {
   Bike,
   Sparkles,
   Home,
+  Megaphone,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import "../../styles/admin/sidebar.css";
@@ -37,6 +38,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
         { title: "Hourly Rooms", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
+        { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],
     },
@@ -85,7 +87,7 @@ function Sidebar({ open, closeSidebar }) {
 
         <div className="sidebar-top">
 
-          <div className="sidebar-logo">
+          <Link to="/" className="sidebar-logo" onClick={closeSidebar}>
 
             <div className="sidebar-logo-icon">
               <Home size={20} strokeWidth={2.5} />
@@ -98,7 +100,7 @@ function Sidebar({ open, closeSidebar }) {
               <p>SUPER ADMIN</p>
             </div>
 
-          </div>
+          </Link>
 
           <button
             className="close-sidebar"

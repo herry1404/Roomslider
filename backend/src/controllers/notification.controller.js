@@ -1,8 +1,106 @@
 const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
 const Notification = require("../models/Notification");
+const User = require("../models/user.model");
+const PushSubscription = require("../models/PushSubscription");
+const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
 const ElectricityBill = require("../models/ElectricityBill");
 const { computeRentStatus } = require("./room.controller");
+
+const notificationAccountModel = (role) =>
+  role === "hourlyManager" ? "HourlyRoomManager" : "User";
+
+const getPushConfig = (req, res) => {
+  res.status(200).json({
+    success: true,
+    publicKey: process.env.VAPID_PUBLIC_KEY || null,
+  });
+};
+
+const savePushSubscription = async (req, res) => {
+  try {
+    const { endpoint, keys } = req.body || {};
+    const role = req.user.role || "user";
+    if (!["user", "admin", "hourlyManager"].includes(role)) {
+      return res.status(403).json({ success: false, message: "Push notifications are not available for this account" });
+    }
+    if (
+      typeof endpoint !== "string" ||
+      !endpoint.startsWith("https://") ||
+      !keys?.p256dh ||
+      !keys?.auth
+    ) {
+      return res.status(400).json({ success: false, message: "A valid browser push subscription is required" });
+    }
+
+    await PushSubscription.findOneAndUpdate(
+      { endpoint },
+      {
+        recipient: req.user._id,
+        recipientModel: notificationAccountModel(role),
+        endpoint,
+        keys: { p256dh: keys.p256dh, auth: keys.auth },
+      },
+      { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+    );
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("SAVE PUSH SUBSCRIPTION ERROR:", error);
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const removePushSubscription = async (req, res) => {
+  try {
+    const { endpoint } = req.body || {};
+    if (typeof endpoint !== "string" || !endpoint) {
+      return res.status(400).json({ success: false, message: "Subscription endpoint is required" });
+    }
+    await PushSubscription.deleteOne({
+      endpoint,
+      recipient: req.user._id,
+      recipientModel: notificationAccountModel(req.user.role || "user"),
+    });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("REMOVE PUSH SUBSCRIPTION ERROR:", error);
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const sendBroadcast = async (req, res) => {
+  try {
+    if (!["admin", "hourlyManager"].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "Only admins and hourly room managers can send announcements" });
+    }
+
+    const body = req.body || {};
+    const title = typeof body.title === "string" ? body.title.trim() : "";
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    if (!title || !message || title.length > 100 || message.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: "Title (1-100 characters) and message (1-500 characters) are required",
+      });
+    }
+
+    const users = await User.find({}).select("_id");
+    const result = await sendNotificationToRecipients(
+      users.map((user) => ({ id: user._id, model: "User" })),
+      { title, message }
+    );
+
+    res.status(200).json({
+      success: true,
+      recipientCount: result.recipientCount,
+      push: result.push,
+    });
+  } catch (error) {
+    console.error("SEND BROADCAST ERROR:", error);
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
 
 // ============================
 // Get all of the owner's currently overdue tenants, with enough info
@@ -93,12 +191,16 @@ const sendBulkReminders = async (req, res) => {
 // ============================
 const getMyNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipient: req.user._id })
+    const notifications = await Notification.find({
+      recipient: req.user._id,
+      recipientModel: notificationAccountModel(req.user.role || "user"),
+    })
       .sort({ createdAt: -1 })
       .limit(20);
 
     const unreadCount = await Notification.countDocuments({
       recipient: req.user._id,
+      recipientModel: notificationAccountModel(req.user.role || "user"),
       read: false,
     });
 
@@ -115,7 +217,11 @@ const getMyNotifications = async (req, res) => {
 const markNotificationRead = async (req, res) => {
   try {
     await Notification.findOneAndUpdate(
-      { _id: req.params.id, recipient: req.user._id },
+      {
+        _id: req.params.id,
+        recipient: req.user._id,
+        recipientModel: notificationAccountModel(req.user.role || "user"),
+      },
       { read: true }
     );
 
@@ -131,4 +237,8 @@ module.exports = {
   sendBulkReminders,
   getMyNotifications,
   markNotificationRead,
+  getPushConfig,
+  savePushSubscription,
+  removePushSubscription,
+  sendBroadcast,
 };

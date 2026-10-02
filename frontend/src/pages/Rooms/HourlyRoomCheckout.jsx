@@ -123,14 +123,17 @@ function HourlyRoomCheckout() {
         description: `${room.title} - Hourly Booking`,
         handler: async (response) => {
           try {
-            await api.post("/hourly-bookings/verify-payment", {
+            const verification = await api.post("/hourly-bookings/verify-payment", {
               bookingId,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
             toast.success("Booking confirmed!");
-            navigate("/hourly-rooms");
+            if (verification.data.notificationWarning) {
+              toast.error(verification.data.notificationWarning);
+            }
+            navigate(`/hourly-bookings/${bookingId}/receipt`);
           } catch (verifyError) {
             toast.error(
               verifyError.response?.data?.message || "Payment verify nahi hua. Support se contact karo."

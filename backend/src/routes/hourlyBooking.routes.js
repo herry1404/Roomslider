@@ -8,6 +8,7 @@ const {
   getAllRoomsWithStatus,
   createBookingOrder,
   verifyBookingPayment,
+  getBookingReceipt,
   getAllBookings,
   completeBooking,
   cancelBooking,
@@ -30,6 +31,7 @@ router.get("/check-availability", protect, checkAvailability);
 router.post("/create-order", protect, uploadHourlyBookingId.single("idProofPhoto"), createBookingOrder);
 router.post("/verify-payment", protect, verifyBookingPayment);
 router.patch("/:bookingId/cancel", protect, cancelBooking);
+router.get("/:bookingId/receipt", protect, getBookingReceipt);
 
 // Staff dashboard
 router.get("/", protect, staffOnly, getAllBookings);

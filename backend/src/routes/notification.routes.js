@@ -8,7 +8,16 @@ const {
   sendBulkReminders,
   getMyNotifications,
   markNotificationRead,
+  getPushConfig,
+  savePushSubscription,
+  removePushSubscription,
+  sendBroadcast,
 } = require("../controllers/notification.controller");
+
+router.get("/push-config", getPushConfig);
+router.put("/push-subscriptions", protect, savePushSubscription);
+router.delete("/push-subscriptions", protect, removePushSubscription);
+router.post("/broadcast", protect, sendBroadcast);
 
 // Owner routes
 router.get("/overdue-tenants", protect, getOverdueTenants);

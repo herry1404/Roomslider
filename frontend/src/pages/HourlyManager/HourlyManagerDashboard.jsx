@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Phone, LogOut, BedDouble, KeyRound, Users, Clock, Search } from "lucide-react";
+import { Phone, LogOut, BedDouble, KeyRound, Users, Clock, Search, Bell } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import EnablePushButton from "../../components/notifications/EnablePushButton";
+import BroadcastComposer from "../../components/notifications/BroadcastComposer";
 
 import "../../styles/hourly-manager.css";
 
@@ -31,6 +33,7 @@ function HourlyManagerDashboard() {
 
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -41,12 +44,14 @@ function HourlyManagerDashboard() {
 
   const loadData = async () => {
     try {
-      const [roomsRes, bookingsRes] = await Promise.all([
+      const [roomsRes, bookingsRes, notificationsRes] = await Promise.all([
         api.get("/hourly-bookings/rooms"),
         api.get("/hourly-bookings"),
+        api.get("/notifications/my-notifications"),
       ]);
       setRooms(roomsRes.data);
       setBookings(bookingsRes.data);
+      setNotifications(notificationsRes.data.notifications || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Data load nahi hua");
     } finally {
@@ -88,6 +93,22 @@ function HourlyManagerDashboard() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Update fail");
     }
+  };
+
+  const openNotification = async (notification) => {
+    if (!notification.read) {
+      try {
+        await api.put(`/notifications/${notification._id}/read`);
+        setNotifications((current) =>
+          current.map((item) =>
+            item._id === notification._id ? { ...item, read: true } : item
+          )
+        );
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Notification update nahi hui");
+      }
+    }
+    if (notification.actionUrl) navigate(notification.actionUrl);
   };
 
   const handleLogout = () => {
@@ -135,6 +156,9 @@ function HourlyManagerDashboard() {
             }}
           />
         </div>
+        <EnablePushButton className="hm-push-btn" aria-label="Enable push notifications" title="Enable push notifications">
+          <Bell size={18} />
+        </EnablePushButton>
         <button className="hm-logout" onClick={handleLogout}>
           <LogOut size={18} />
         </button>
@@ -163,7 +187,28 @@ function HourlyManagerDashboard() {
         </div>
       </section>
 
+      <BroadcastComposer />
+
       <div className="hm-main">
+      <h2 className="hm-title">Notifications</h2>
+      {notifications.length === 0 ? (
+        <p className="hm-muted">Abhi koi notification nahi hai</p>
+      ) : (
+        <section className="hm-notifications">
+          {notifications.map((notification) => (
+            <button
+              className={`hm-notification${notification.read ? "" : " unread"}`}
+              key={notification._id}
+              onClick={() => openNotification(notification)}
+            >
+              <strong>{notification.title}</strong>
+              <span>{notification.message}</span>
+              <small>{timeAgo(notification.createdAt)}</small>
+            </button>
+          ))}
+        </section>
+      )}
+
       <h2 className="hm-title">Rooms</h2>
 
       <div className="hm-filters">

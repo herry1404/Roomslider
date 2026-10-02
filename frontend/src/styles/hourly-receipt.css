@@ -1,0 +1,132 @@
+.hourly-receipt-page {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: grid;
+  place-items: start center;
+  padding: 36px 16px;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.hourly-receipt {
+  width: min(100%, 620px);
+  box-sizing: border-box;
+  padding: clamp(20px, 5vw, 40px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  box-shadow: 0 16px 45px rgba(15, 23, 42, .08);
+}
+
+.hourly-receipt-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  color: #16a34a;
+}
+
+.hourly-receipt-brand {
+  margin: 0 0 6px;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.hourly-receipt h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(22px, 5vw, 30px);
+}
+
+.hourly-receipt-paid {
+  margin: 24px 0 4px;
+  color: #15803d;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.hourly-receipt-id {
+  margin: 0;
+  color: #6b7280;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.hourly-receipt dl {
+  margin: 24px 0 0;
+}
+
+.hourly-receipt dl > div {
+  display: grid;
+  grid-template-columns: minmax(100px, .7fr) 1.3fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hourly-receipt dt {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.hourly-receipt dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.hourly-receipt-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  font-size: 16px;
+}
+
+.hourly-receipt-total strong {
+  font-size: 22px;
+}
+
+.hourly-receipt-note {
+  margin: 16px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hourly-receipt-print {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 12px;
+  color: #fff;
+  background: #16a34a;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media print {
+  .hourly-receipt-page {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  .hourly-receipt {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .hourly-receipt-print {
+    display: none;
+  }
+}

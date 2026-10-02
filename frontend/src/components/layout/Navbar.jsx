@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Search, X, Bell, MapPin } from "lucide-react";
-import toast from "react-hot-toast";
 
 import Container from "../ui/Container";
 import Logo from "../ui/Logo";
 import ProfileMenu from "./ProfileMenu";
+import EnablePushButton from "../notifications/EnablePushButton";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -15,7 +15,6 @@ const navLinks = [
   { name: "PG", path: "/pg" },
   { name: "Hostels", path: "/hostels" },
   { name: "Flats", path: "/flats" },
-  { name: "Roommates", path: "/roommates" },
   { name: "About", path: "/about" },
   { name: "Explore", path: "/explore" },
 ];
@@ -93,10 +92,6 @@ function Navbar() {
     setSearchValue("");
   };
 
-  const handleNotificationClick = () => {
-    toast("Coming soon", { icon: "🔔" });
-  };
-
   return (
     <header className="navbar">
       <Container>
@@ -130,14 +125,14 @@ function Navbar() {
             >
               <MapPin size={20} />
             </button>
-            <button
-              type="button"
+            <EnablePushButton
               className="navbar-notification-btn"
-              aria-label="Notifications"
-              onClick={handleNotificationClick}
+              aria-label="Enable push notifications"
+              title="Enable push notifications"
+              onEnabled={() => navigate("/profile?tab=notifications")}
             >
               <Bell size={20} />
-            </button>
+            </EnablePushButton>
             <SearchPill
               searchOpen={searchOpen}
               setSearchOpen={setSearchOpen}
@@ -150,14 +145,14 @@ function Navbar() {
           </div>
 
           <div className="navbar-mobile-actions">
-            <button
-              type="button"
+            <EnablePushButton
               className="navbar-notification-btn"
-              aria-label="Notifications"
-              onClick={handleNotificationClick}
+              aria-label="Enable push notifications"
+              title="Enable push notifications"
+              onEnabled={() => navigate("/profile?tab=notifications")}
             >
               <Bell size={20} />
-            </button>
+            </EnablePushButton>
             <SearchPill
               searchOpen={searchOpen}
               setSearchOpen={setSearchOpen}

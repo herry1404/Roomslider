@@ -19,7 +19,6 @@ import {
 import LoanModal from "../services/LoanModal";
 
 const comingSoon = [
-  { icon: Users, title: "Roommate Finder", desc: "Find a roommate for shared rooms" },
   { icon: FileText, title: "Rent Agreement & Verification", desc: "Agreement and police verification" },
   { icon: ShoppingBasket, title: "Groceries & Daily Needs", desc: "Order from nearby shops" },
   { icon: BookOpen, title: "Study Support", desc: "Printing, stationery and coaching" },
@@ -59,6 +58,13 @@ function ComingSoonServices() {
   const [showLoanModal, setShowLoanModal] = useState(false);
 
   const liveServices = [
+    {
+      icon: Users,
+      title: "Find a Roommate",
+      desc: "Meet people with similar budgets and plans",
+      button: "Find Matches",
+      onClick: () => navigate(user ? "/roommates" : "/login"),
+    },
     {
       icon: UtensilsCrossed,
       title: "Hungry? Order a Thali",

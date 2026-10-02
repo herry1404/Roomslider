@@ -1,0 +1,37 @@
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch (error) {
+    console.error("Invalid push notification payload:", error);
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title || "RoomSlider", {
+      body: payload.body || "You have a new notification.",
+      icon: "/pwa-192x192.png",
+      badge: "/pwa-192x192.png",
+      data: { url: payload.url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const requestedUrl = new URL(event.notification.data?.url || "/", self.location.origin);
+  const targetUrl =
+    requestedUrl.origin === self.location.origin
+      ? requestedUrl.href
+      : self.location.origin;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const client = clients.find((windowClient) => windowClient.url.startsWith(self.location.origin));
+      if (client) {
+        return client.navigate(targetUrl).then((windowClient) => windowClient.focus());
+      }
+      return self.clients.openWindow(targetUrl);
+    })
+  );
+});

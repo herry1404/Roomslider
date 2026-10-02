@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
+import EnablePushButton from "../../components/notifications/EnablePushButton";
 import "../../styles/profile.css";
 
 const TABS = [
@@ -26,11 +27,14 @@ const fmtDate = (d) =>
 
 function Profile() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("saved");
+  const [tab, setTab] = useState(() =>
+    searchParams.get("tab") === "notifications" ? "notifications" : "saved"
+  );
   const [tabLoading, setTabLoading] = useState(false);
   const [tabData, setTabData] = useState({ saved: null, activity: null, notifications: null });
   const [unread, setUnread] = useState(0);
@@ -238,26 +242,41 @@ function Profile() {
     }
 
     if (tabData.notifications.length === 0) {
-      return <div className="profile-empty">Koi notification nahi hai.</div>;
+      return (
+        <div className="profile-empty">
+          <p>Koi notification nahi hai.</p>
+          <EnablePushButton className="profile-edit-btn">
+            Enable push notifications
+          </EnablePushButton>
+        </div>
+      );
     }
     return (
-      <div className="profile-list">
-        {tabData.notifications.map((n) => (
-          <div
-            className={"profile-item profile-item--click" + (n.read ? "" : " profile-item--unread")}
-            key={n._id}
-            onClick={() => markRead(n)}
-          >
-            <div className="profile-item-main">
-              <strong>{n.title}</strong>
-              <span className="profile-hint">{n.message}</span>
+      <>
+        <EnablePushButton className="profile-edit-btn">
+          Enable push notifications
+        </EnablePushButton>
+        <div className="profile-list">
+          {tabData.notifications.map((n) => (
+            <div
+              className={"profile-item profile-item--click" + (n.read ? "" : " profile-item--unread")}
+              key={n._id}
+              onClick={() => {
+                markRead(n);
+                if (n.actionUrl) navigate(n.actionUrl);
+              }}
+            >
+              <div className="profile-item-main">
+                <strong>{n.title}</strong>
+                <span className="profile-hint">{n.message}</span>
+              </div>
+              <div className="profile-item-side">
+                <span className="profile-hint">{fmtDate(n.createdAt)}</span>
+              </div>
             </div>
-            <div className="profile-item-side">
-              <span className="profile-hint">{fmtDate(n.createdAt)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </>
     );
   };
 

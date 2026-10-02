@@ -74,7 +74,9 @@ import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
 import ManageLoans from "./pages/Admin/ManageLoans";
 import ManageMess from "./pages/Admin/ManageMess";
 import ManageHourlyRooms from "./pages/Admin/ManageHourlyRooms";
+import ManageNotifications from "./pages/Admin/ManageNotifications";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
+import HourlyBookingReceipt from "./pages/Rooms/HourlyBookingReceipt";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -135,6 +137,7 @@ function App() {
         <Route path="/hourly-manager/login" element={<HourlyManagerLogin />} />
         <Route path="/hourly-manager/dashboard" element={<HourlyManagerDashboard />} />
         <Route path="/hourly-rooms/:id/book" element={<HourlyRoomCheckout />} />
+        <Route path="/hourly-bookings/:id/receipt" element={<HourlyBookingReceipt />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />
@@ -167,6 +170,7 @@ function App() {
 
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
+        <Route path="/admin/notifications" element={<AdminRoute><ManageNotifications /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
 

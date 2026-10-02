@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const HourlyRoom = require("../models/HourlyRoom.model");
 const HourlyBooking = require("../models/HourlyBooking.model");
+const HourlyRoomManager = require("../models/HourlyRoomManager");
+const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -216,14 +218,86 @@ exports.verifyBookingPayment = async (req, res) => {
       });
     }
 
+    const alreadyConfirmed = booking.status === "confirmed" && booking.paymentStatus === "paid";
     booking.razorpayPaymentId = razorpay_payment_id;
     booking.paymentStatus = "paid";
     booking.status = "confirmed";
+    booking.paidAt = booking.paidAt || new Date();
     await booking.save();
 
-    res.status(200).json({ message: "Booking confirmed", booking });
+    let notificationWarning = "";
+    if (!alreadyConfirmed) {
+      try {
+        const managers = await HourlyRoomManager.find({ isActive: true }).select("_id");
+        const receiptUrl = `/hourly-bookings/${booking._id}/receipt`;
+        await sendNotificationToRecipients(
+          [{ id: booking.guest, model: "User" }],
+          {
+            title: "Hourly room booking confirmed",
+            message: `Your payment of ₹${booking.amount} is complete. Booking ID: ${booking._id}`,
+            actionUrl: receiptUrl,
+          }
+        );
+        await sendNotificationToRecipients(
+          managers.map((manager) => ({ id: manager._id, model: "HourlyRoomManager" })),
+          {
+            title: "New hourly room booking",
+            message: `A booking has been paid and confirmed. Booking ID: ${booking._id}`,
+            actionUrl: receiptUrl,
+          }
+        );
+      } catch (notificationError) {
+        notificationWarning = "Booking confirmed, but notification delivery was incomplete.";
+        console.error("HOURLY BOOKING NOTIFICATION ERROR:", notificationError);
+      }
+    }
+
+    res.status(200).json({
+      message: "Booking confirmed",
+      booking,
+      ...(notificationWarning ? { notificationWarning } : {}),
+    });
   } catch (err) {
     console.error("VERIFY BOOKING PAYMENT ERROR:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// Guest receipt access is limited to the person who paid; staff can view all receipts.
+exports.getBookingReceipt = async (req, res) => {
+  try {
+    const booking = await HourlyBooking.findById(req.params.bookingId)
+      .select("guest room guestName guestPhone bookedFrom bookedTo amount paymentStatus status razorpayPaymentId paidAt createdAt")
+      .populate("room", "title location pricePerHour");
+
+    if (!booking || booking.paymentStatus !== "paid") {
+      return res.status(404).json({ message: "Paid booking receipt not found" });
+    }
+
+    const isGuest = String(booking.guest) === String(req.user._id);
+    const isStaff = ["admin", "hourlyManager"].includes(req.user.role);
+    if (!isGuest && !isStaff) {
+      return res.status(403).json({ message: "This receipt is not available to your account" });
+    }
+
+    res.status(200).json({
+      success: true,
+      receipt: {
+        bookingId: booking._id,
+        guestName: booking.guestName,
+        guestPhone: isGuest ? booking.guestPhone : undefined,
+        room: booking.room,
+        bookedFrom: booking.bookedFrom,
+        bookedTo: booking.bookedTo,
+        amount: booking.amount,
+        paymentStatus: booking.paymentStatus,
+        status: booking.status,
+        paymentId: booking.razorpayPaymentId,
+        paidAt: booking.paidAt || booking.createdAt,
+      },
+    });
+  } catch (err) {
+    console.error("GET HOURLY BOOKING RECEIPT ERROR:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

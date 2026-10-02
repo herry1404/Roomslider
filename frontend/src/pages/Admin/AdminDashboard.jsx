@@ -12,6 +12,8 @@ import {
   TrendingUp,
   Eye,
   Wallet,
+  Home,
+  Megaphone,
 } from "lucide-react";
 import {
   LineChart,
@@ -107,6 +109,7 @@ function AdminDashboard() {
     { label: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
     { label: "Manage Users", icon: <UserCog size={18} />, path: "/admin/users" },
+    { label: "Send Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
     { label: "Analytics", icon: <BarChart3 size={18} />, action: () => alert("Analytics Coming Soon") },
   ];
 
@@ -117,6 +120,10 @@ function AdminDashboard() {
           <h1>Dashboard Overview</h1>
           <p>Welcome to the RoomSlider Super Admin Panel 🚀</p>
         </div>
+        <button className="admin-btn secondary" onClick={() => navigate("/")}>
+          <Home size={18} />
+          Visit Home
+        </button>
       </div>
 
       {/* Stats Cards */}

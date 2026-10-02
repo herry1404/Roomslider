@@ -3,6 +3,8 @@
 .hm-header h1{font-size:24px;margin:0}
 .hm-muted{color:#94A3B8;font-size:13px;margin:2px 0}
 .hm-logout{background:#131B2E;border:1px solid #1E2A44;color:#60A5FA;width:42px;height:42px;border-radius:50%;cursor:pointer}
+.hm-push-btn{background:#131B2E;border:1px solid #1E2A44;color:#60A5FA;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hm-push-btn:hover{border-color:#60A5FA}
 .hm-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
 .hm-stat{background:#131B2E;border:1px solid #1E2A44;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:4px;color:#60A5FA}
 .hm-stat span{color:#94A3B8;font-size:13px}
@@ -30,6 +32,10 @@
 .hm-chip.confirmed{background:#2563EB;color:#fff;border-color:#2563EB}
 .hm-chip.rejected,.hm-chip.completed{background:#334155;color:#CBD5E1;border-color:#334155}
 .hm-call{background:#2563EB;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hm-notifications{display:grid;gap:8px}
+.hm-notification{display:grid;gap:5px;padding:12px 14px;text-align:left;color:#F1F5F9;background:#131B2E;border:1px solid #1E2A44;border-radius:12px;cursor:pointer}
+.hm-notification.unread{border-left:3px solid #60A5FA}
+.hm-notification span,.hm-notification small{color:#94A3B8}
 @media(min-width:768px){.hm-stats{grid-template-columns:repeat(4,1fr)}.hm-rooms{grid-template-columns:repeat(2,1fr)}}
 
 .hm-header{flex-wrap:wrap;gap:12px}

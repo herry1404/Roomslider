@@ -1,0 +1,75 @@
+.notification-composer {
+  margin: 20px 0;
+  padding: 22px;
+  color: var(--admin-text, #f1f5f9);
+  background: var(--admin-card, #131b2e);
+  border: 1px solid var(--admin-border, #1e2a44);
+  border-radius: 16px;
+}
+
+.notification-composer-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.notification-composer-heading p,
+.notification-composer-result {
+  margin: 6px 0 0;
+  color: var(--admin-muted, #94a3b8);
+  font-size: 13px;
+}
+
+.notification-composer form {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.notification-composer label {
+  display: grid;
+  gap: 7px;
+  color: var(--admin-muted, #94a3b8);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.notification-composer input,
+.notification-composer textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  color: var(--admin-text, #f1f5f9);
+  background: var(--admin-bg, #0b1220);
+  border: 1px solid var(--admin-border, #1e2a44);
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.notification-composer textarea {
+  resize: vertical;
+}
+
+.notification-composer form button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  color: #062e22;
+  background: var(--admin-accent, #10b981);
+  border: 0;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notification-composer form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.notification-composer-result {
+  margin-top: 16px;
+}

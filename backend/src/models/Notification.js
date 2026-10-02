@@ -4,7 +4,13 @@ const notificationSchema = new mongoose.Schema(
   {
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      refPath: "recipientModel",
+      required: true,
+    },
+    recipientModel: {
+      type: String,
+      enum: ["User", "HourlyRoomManager"],
+      default: "User",
       required: true,
     },
     title: {
@@ -15,6 +21,10 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    actionUrl: {
+      type: String,
+      default: "",
+    },
     read: {
       type: Boolean,
       default: false,
@@ -24,5 +34,7 @@ const notificationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+notificationSchema.index({ recipient: 1, recipientModel: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Notification", notificationSchema);
