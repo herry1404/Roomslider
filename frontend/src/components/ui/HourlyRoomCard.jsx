@@ -1,70 +1,67 @@
-import { useNavigate } from "react-router-dom";
-import { MapPin, IndianRupee, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Clock3, MapPin, Star } from "lucide-react";
 import "../../styles/room-card.css";
 
-// FIX (slow images bug): request a Cloudinary-resized thumbnail instead
-// of the full 1600px original — see RoomCard.jsx for the same fix.
 function getThumbnailUrl(url) {
   if (!url || !url.includes("/upload/")) return url;
-  return url.replace("/upload/", "/upload/w_500,h_320,c_fill,q_auto,f_auto/");
+  return url.replace("/upload/", "/upload/w_500,h_500,c_fill,q_auto,f_auto/");
 }
 
 function HourlyRoomCard({ room }) {
-  const navigate = useNavigate();
   const firstImage = getThumbnailUrl(room.images?.[0]);
+  const ratingValue = room.averageRating ?? (
+    typeof room.rating === "object" ? room.rating?.average : room.rating
+  );
+  const rating = Number(ratingValue);
+  const hasRating = Number.isFinite(rating) && rating > 0;
+  const reviewCount = room.reviewCount ?? room.rating?.count;
+  const location = [room.location?.address, room.location?.city].filter(Boolean).join(", ");
 
   return (
-    <div className="room-card">
-      <div className="room-image-wrapper">
-        <img
-          src={firstImage || "https://via.placeholder.com/500x320"}
-          alt={room.title}
-          className="room-image"
-          loading="lazy"
-          decoding="async"
-        />
-        <span className="room-category">Hourly</span>
-      </div>
+    <Link
+      to={`/hourly-rooms/${room._id}`}
+      className="room-card hourly-air-card"
+      aria-label={`View ${room.title}`}
+    >
+      <span className="hourly-air-image-link" aria-hidden="true">
+        {firstImage ? (
+          <img
+            src={firstImage}
+            alt={room.title}
+            className="hourly-air-image"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <span className="hourly-air-image hourly-air-image-placeholder" role="img" aria-label="No room photo available" />
+        )}
+      </span>
 
-      <div className="room-content">
-        <h3>{room.title}</h3>
-
-        <div className="room-location">
-          <MapPin size={16} />
-          <span>{room.location?.address}, {room.location?.city}</span>
+      <div className="hourly-air-content">
+        <div className="hourly-air-title-row">
+          <h3>{room.title}</h3>
+          {hasRating && (
+            <span className="hourly-air-rating" aria-label={`${rating.toFixed(1)} out of 5`}>
+              <Star size={14} fill="currentColor" aria-hidden="true" />
+              {rating.toFixed(1)}
+              {reviewCount != null && <small>({reviewCount})</small>}
+            </span>
+          )}
         </div>
-
-        <div className="room-price">
-          <IndianRupee size={17} />
-          <strong>{room.pricePerHour?.toLocaleString()}</strong>
-          <span>
-            <Clock size={14} style={{ marginLeft: 4, marginRight: 2, verticalAlign: "middle" }} />
-            /hour
-          </span>
-        </div>
-
-        {room.description && (
-          <p>
-            {room.description.length > 80
-              ? room.description.substring(0, 80) + "..."
-              : room.description}
+        {location && (
+          <p className="hourly-air-location">
+            <MapPin size={14} aria-hidden="true" />
+            <span>{location}</span>
           </p>
         )}
-
-        {room.amenities && room.amenities.length > 0 && (
-          <p style={{ fontSize: 13, color: "#666" }}>
-            {room.amenities.join(" • ")}
+        {room.pricePerHour != null && Number.isFinite(Number(room.pricePerHour)) && (
+          <p className="hourly-air-price">
+            <strong>₹{Number(room.pricePerHour).toLocaleString("en-IN")}</strong>
+            <span><Clock3 size={13} aria-hidden="true" /> / hour</span>
           </p>
         )}
-
-        <button
-          className="hourly-book-btn"
-          onClick={() => navigate(`/hourly-rooms/${room._id}/book`)}
-        >
-          Book Now
-        </button>
       </div>
-    </div>
+    </Link>
   );
 }
 

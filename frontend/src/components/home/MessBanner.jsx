@@ -25,7 +25,7 @@ function MessBanner() {
         <UtensilsCrossed size={30} color="var(--color-primary)" style={{ flexShrink: 0 }} />
         <div style={{ minWidth: 0 }}>
           <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>
-            Hungry? Order a Thali
+            Food
           </h3>
           <p style={{ fontSize: "13px", color: "var(--color-text-light)", margin: "2px 0 0" }}>
             Find mess near you with today's menu &amp; pricing.
@@ -54,7 +54,7 @@ function MessBanner() {
           border: "none",
         }}
       >
-        Explore Mess
+        Explore
         <ArrowRight size={15} />
       </button>
     </div>

@@ -1,45 +1,50 @@
-.roommate-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1200;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  background: rgba(15, 23, 42, 0.62);
+.roommate-profile-page {
+  width: min(100% - 2rem, 860px);
+  margin: 0 auto;
+  padding: 24px 0 48px;
+  color: var(--color-text, #111827);
 }
 
-.roommate-profile-dialog {
-  position: relative;
-  width: min(100%, 680px);
-  max-height: min(90dvh, 900px);
-  overflow-y: auto;
-  padding: 24px;
+.roommate-page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--color-text-light, #6b7280);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.roommate-profile-card {
+  padding: clamp(18px, 4vw, 32px);
   color: var(--color-text, #111827);
   background: var(--color-surface, #fff);
   border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 18px;
-}
-
-.roommate-dialog-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  color: var(--color-text-light, #6b7280);
-  background: var(--color-surface-2, #f9fafb);
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 50%;
-  cursor: pointer;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm, 0 8px 24px rgba(15, 23, 42, 0.06));
 }
 
 .roommate-dialog-profile-head {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding-right: 38px;
+}
+
+.roommate-profile-chat-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 10px 16px;
+  color: #fff;
+  background: var(--color-primary, #16a34a);
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .roommate-dialog-profile-head img,
@@ -159,20 +164,101 @@
 }
 
 .roommate-chat {
+  display: flex;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
   overflow: hidden;
   background: var(--color-surface, #fff);
   border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 14px;
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm, 0 8px 24px rgba(15, 23, 42, 0.06));
+}
+
+.roommate-chat-page {
+  position: fixed;
+  z-index: 40;
+  top: var(--navbar-height, 72px);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  padding: 14px 20px 20px;
+  background: var(--color-bg, #f8fafc);
+}
+
+.roommate-chat-message-state {
+  display: grid;
+  min-height: 300px;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--color-text-light, #6b7280);
+  text-align: center;
+}
+
+.roommate-chat-page > .roommate-chat-message-state {
+  width: min(100%, 460px);
+  min-height: 0;
+  margin: auto;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm, 0 8px 24px rgba(15, 23, 42, 0.06));
+}
+
+.roommate-chat-message-state p {
+  margin: 0;
 }
 
 .roommate-chat-header {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 14px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.roommate-chat-back {
+  display: grid;
+  flex: 0 0 38px;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--color-text, #111827);
+  background: var(--color-surface-2, #f3f4f6);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.roommate-chat-avatar {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.roommate-chat-avatar--initial {
+  color: #fff;
+  background: var(--color-primary, #16a34a);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.roommate-chat {
+  max-width: 900px;
+}
+
+.roommate-chat-header > div {
+  min-width: 0;
 }
 
 .roommate-chat-header h3,
@@ -181,47 +267,42 @@
 }
 
 .roommate-chat-header h3 {
-  font-size: 15px;
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .roommate-chat-header p {
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--color-text-light, #6b7280);
   font-size: 12px;
 }
 
-.roommate-chat-close {
-  padding: 7px 11px;
-  color: var(--color-text-light, #6b7280);
-  background: transparent;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
 .roommate-chat-messages {
   display: flex;
-  min-height: 180px;
-  max-height: 360px;
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   overflow-y: auto;
-  padding: 14px;
+  padding: 20px clamp(16px, 4vw, 32px);
+  overscroll-behavior: contain;
 }
 
 .roommate-chat-message {
   align-self: flex-start;
-  max-width: min(85%, 480px);
-  padding: 9px 12px;
+  max-width: min(78%, 560px);
+  padding: 10px 14px;
   background: var(--color-surface-2, #f3f4f6);
-  border-radius: 12px 12px 12px 3px;
+  border-radius: 18px 18px 18px 5px;
 }
 
 .roommate-chat-message.is-mine {
   align-self: flex-end;
   color: #fff;
   background: var(--color-primary, #16a34a);
-  border-radius: 12px 12px 3px 12px;
+  border-radius: 18px 18px 5px 18px;
 }
 
 .roommate-chat-message p {
@@ -244,9 +325,11 @@
 
 .roommate-chat-compose {
   display: flex;
+  flex: 0 0 auto;
   align-items: flex-end;
-  gap: 8px;
-  padding: 12px;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--color-surface, #fff);
   border-top: 1px solid var(--color-border, #e5e7eb);
 }
 
@@ -254,31 +337,38 @@
   box-sizing: border-box;
   flex: 1;
   min-width: 0;
-  resize: vertical;
-  padding: 10px 12px;
+  max-height: 120px;
+  resize: none;
+  padding: 11px 14px;
   color: var(--color-text, #111827);
-  background: var(--color-surface, #fff);
+  background: var(--color-surface-2, #f9fafb);
   border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 10px;
+  border-radius: 22px;
   font: inherit;
 }
 
 .roommate-chat-compose button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  min-height: 40px;
-  padding: 0 12px;
+  min-height: 42px;
+  padding: 0 16px;
   color: #fff;
   background: var(--color-primary, #16a34a);
   border: 0;
-  border-radius: 10px;
+  border-radius: 22px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .roommate-chat-compose button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.roommate-chat-message-state {
+  min-height: 300px;
 }
 
 @media (max-width: 520px) {
@@ -293,21 +383,38 @@
     flex-wrap: wrap;
   }
 
-  .roommate-profile-dialog {
-    max-height: 94dvh;
-    padding: 18px 14px;
+  .roommate-profile-page {
+    width: min(100% - 1.25rem, 860px);
+    padding-top: 16px;
   }
 
-  .roommate-chat-header {
-    align-items: flex-start;
+  .roommate-chat-page {
+    padding: 0;
   }
 
   .roommate-chat-compose {
-    align-items: stretch;
-    flex-direction: column;
+    padding: 10px 12px;
   }
 
   .roommate-chat-compose button {
-    justify-content: center;
+    min-width: 42px;
+    padding: 0 12px;
+  }
+
+  .roommate-chat-compose button span {
+    display: none;
+  }
+
+  .roommate-chat {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .roommate-chat-compose button span {
+    display: none;
+  }
+
+  .roommate-chat-message {
+    max-width: 86%;
   }
 }

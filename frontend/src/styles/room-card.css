@@ -417,17 +417,207 @@
 
 .hourly-book-btn{
   width:100%;
-  margin-top:10px;
-  background:#2563EB;
-  color:#fff;
+  min-height:42px;
+  margin-top:8px;
+  background:var(--color-primary);
+  color:var(--color-surface);
   border:none;
-  border-radius:12px;
-  padding:11px;
+  border-radius:10px;
+  padding:10px 14px;
   font-size:14px;
   font-weight:600;
   cursor:pointer;
+  transition:background var(--transition-fast), transform var(--transition-fast);
 }
-.hourly-book-btn:hover{background:#1d4ed8}
+.hourly-book-btn:hover{background:var(--color-primary-hover)}
+.hourly-book-btn:active{transform:scale(.98)}
+
+.hourly-air-card,
+.latest-rooms .hourly-air-card{
+  display:grid;
+  align-content:start;
+  gap:12px;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  overflow:visible;
+  color:inherit;
+  text-decoration:none;
+}
+.hourly-air-card:hover,
+.latest-rooms .hourly-air-card:hover{
+  transform:none;
+  box-shadow:none;
+}
+.hourly-air-image-link{
+  position:relative;
+  display:block;
+  width:100%;
+  aspect-ratio:1;
+  padding:0;
+  overflow:hidden;
+  background:var(--color-surface-2);
+  border:0;
+  border-radius:16px;
+  cursor:pointer;
+}
+.hourly-air-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform 220ms ease;
+}
+.hourly-air-card:hover .hourly-air-image{
+  transform:scale(1.035);
+}
+.hourly-air-card:focus-visible .hourly-air-image-link{
+  outline:2px solid var(--color-primary);
+  outline-offset:3px;
+}
+.hourly-air-image-placeholder{
+  background:var(--color-surface-2);
+}
+.hourly-air-content{
+  display:grid;
+  gap:5px;
+  padding:0 2px;
+}
+.hourly-air-title-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.hourly-air-title-row h3{
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  color:var(--color-text);
+  font-size:15px;
+  font-weight:600;
+  line-height:1.35;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.hourly-air-rating,
+.villa-card-rating{
+  display:inline-flex;
+  flex:none;
+  align-items:center;
+  gap:4px;
+  color:var(--color-text);
+  font-size:13px;
+}
+.hourly-air-rating svg,
+.villa-card-rating svg{
+  color:var(--color-warning);
+}
+.hourly-air-rating small,
+.villa-card-rating small{
+  color:var(--color-text-light);
+  font-size:11px;
+}
+.hourly-air-location{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  margin:0;
+  color:var(--color-text-light);
+  font-size:13px;
+}
+.hourly-air-location svg{
+  flex:none;
+}
+.hourly-air-location span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.hourly-air-price{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:4px 0 0;
+  color:var(--color-text-light);
+  font-size:13px;
+}
+.hourly-air-price strong{
+  color:var(--color-text);
+  font-size:15px;
+  font-weight:600;
+}
+.hourly-air-price span{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+.hourly-rooms-page{
+  padding-block:32px 64px;
+}
+.hourly-rooms-page > h1{
+  margin-bottom:8px;
+}
+.hourly-rooms-page > p{
+  color:var(--color-text-light);
+}
+.hourly-rooms-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap:24px 16px;
+  margin-top:24px;
+}
+.hourly-rooms-empty{
+  margin-top:24px;
+}
+@media(max-width:560px){
+  .hourly-rooms-page{
+    padding:20px 14px 48px;
+  }
+  .hourly-rooms-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:18px 12px;
+  }
+  .hourly-air-card{
+    gap:8px;
+  }
+  .hourly-air-image-link{
+    border-radius:12px;
+  }
+  .hourly-air-content{
+    gap:4px;
+  }
+  .hourly-air-title-row{
+    display:grid;
+    gap:3px;
+  }
+  .hourly-air-title-row h3{
+    font-size:13px;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .hourly-air-rating{
+    gap:3px;
+    font-size:12px;
+  }
+  .hourly-air-rating small{
+    font-size:10px;
+  }
+  .hourly-air-location{
+    align-items:flex-start;
+    font-size:11px;
+  }
+  .hourly-air-price{
+    flex-wrap:wrap;
+    gap:3px 5px;
+    font-size:11px;
+  }
+  .hourly-air-price strong{
+    font-size:13px;
+  }
+}
 
 /* ===== Airbnb-style listing card (RoomCard) ===== */
 .room-card.rc-air{
@@ -495,6 +685,11 @@
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+}
+.rc-air .rc-distance{
+  margin:2px 0 0;
+  color:var(--color-text-light);
+  font-size:12px;
 }
 @media(max-width:600px){
   .rc-air .room-image-wrapper{ border-radius:16px; }

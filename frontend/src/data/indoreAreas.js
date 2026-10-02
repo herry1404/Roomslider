@@ -54,6 +54,12 @@ const indoreAreas = [
     longitude: 75.8130,
   },
   {
+    name: "Ralamandal",
+    address: "Ralamandal, Indore, Madhya Pradesh",
+    latitude: 22.6525392,
+    longitude: 75.8995242,
+  },
+  {
     name: "Scheme 78 / Bicholi",
     address: "Scheme 78, Bicholi Mardana, Indore, Madhya Pradesh 452016",
     latitude: 22.7650,

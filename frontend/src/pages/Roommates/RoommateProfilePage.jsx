@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { MapPin, X } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 
@@ -10,21 +10,22 @@ const formatSeeking = (value) => ({
   both: "Open to either",
 }[value] || "Roommate preferences");
 
-function RoommateProfileDialog({ userId, onClose }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+function RoommateProfilePage() {
+  const { userId } = useParams();
+  const [profileResult, setProfileResult] = useState(null);
+  const data = profileResult?.userId === userId ? profileResult.data : null;
+  const loading = profileResult?.userId !== userId;
 
   useEffect(() => {
     let active = true;
     api.get(`/roommates/profiles/${userId}`)
       .then((response) => {
-        if (active) setData(response.data);
+        if (active) setProfileResult({ userId, data: response.data });
       })
       .catch((error) => {
-        if (active) toast.error(error.response?.data?.message || "Roommate profile could not be loaded");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+        if (!active) return;
+        setProfileResult({ userId, data: null });
+        toast.error(error.response?.data?.message || "Roommate profile could not be loaded");
       });
     return () => { active = false; };
   }, [userId]);
@@ -36,11 +37,11 @@ function RoommateProfileDialog({ userId, onClose }) {
     : "";
 
   return (
-    <div className="roommate-dialog-backdrop" onMouseDown={(event) => {
-      if (event.target === event.currentTarget) onClose();
-    }}>
-      <section className="roommate-profile-dialog" role="dialog" aria-modal="true" aria-label="Roommate profile">
-        <button type="button" className="roommate-dialog-close" onClick={onClose} aria-label="Close profile"><X size={20} /></button>
+    <main className="roommate-profile-page">
+      <Link className="roommate-page-back" to="/roommates">
+        <ArrowLeft size={17} /> Back to roommate matches
+      </Link>
+      <section className="roommate-profile-card" aria-label="Roommate profile">
         {loading ? <p className="profile-empty">Loading profile...</p> : !profile ? (
           <p className="profile-empty">This roommate profile is not available.</p>
         ) : (
@@ -63,7 +64,7 @@ function RoommateProfileDialog({ userId, onClose }) {
               {profile.subject && <span>{profile.subject}</span>}
               {profile.studyYear && <span>{profile.studyYear}</span>}
               {budget && <span>Budget: {budget}</span>}
-              {profile.sharingType && <span>Sharing: {profile.sharingType}</span>}
+              <span>Sharing: {profile.sharingType || "No preference"}</span>
               {profile.moveInDate && <span>Move-in: {new Date(profile.moveInDate).toLocaleDateString("en-IN")}</span>}
               {preferences.cleanliness && <span>Cleanliness: {preferences.cleanliness}</span>}
               {preferences.sleepSchedule && <span>Sleep schedule: {preferences.sleepSchedule}</span>}
@@ -77,7 +78,7 @@ function RoommateProfileDialog({ userId, onClose }) {
             ) : (
               <div className="roommate-saved-rooms">
                 {data.savedRooms.map((room) => (
-                  <Link className="roommate-saved-room" to={`/rooms/${room._id}`} key={room._id} onClick={onClose}>
+                  <Link className="roommate-saved-room" to={`/rooms/${room._id}`} key={room._id}>
                     {room.images?.[0] && <img src={room.images[0]} alt="" loading="lazy" />}
                     <span className="roommate-saved-room-copy">
                       <strong>{room.title}</strong>
@@ -92,8 +93,8 @@ function RoommateProfileDialog({ userId, onClose }) {
           </>
         )}
       </section>
-    </div>
+    </main>
   );
 }
 
-export default RoommateProfileDialog;
+export default RoommateProfilePage;

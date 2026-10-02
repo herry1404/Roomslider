@@ -104,7 +104,7 @@ function RoommatePreferencesFields({
         disabled={disabled}
       />
       <SelectField
-        label="Preferred sharing"
+        label="Sharing preference"
         value={value.sharingType}
         options={choices.sharingType}
         onChange={(event) => onChange("sharingType", event.target.value)}

@@ -137,6 +137,9 @@ function RoomCard({ room, onWishlistChange }) {
           <MapPin size={14} />
           <span>{room.location}</span>
         </div>
+        {room.searchDistanceKm != null && (
+          <p className="rc-distance">{room.searchDistanceKm.toFixed(1)} km from searched area</p>
+        )}
       </div>
     </div>
   );

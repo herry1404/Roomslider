@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BedDouble, MapPin, Users, CheckCircle2 } from "lucide-react";
+import { MapPin, CheckCircle2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import NearbyVillas from "../../components/home/NearbyVillas";
 import "../../styles/villas.css";
 
 const localDate = (date) => {
@@ -29,6 +30,8 @@ function VillaDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [quote, setQuote] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
   const [form, setForm] = useState({
     bookingType: "stay",
     startDate: tomorrowValue,
@@ -37,10 +40,20 @@ function VillaDetail() {
   });
 
   useEffect(() => {
+    let active = true;
     api.get(`/villas/public/${id}`)
-      .then((response) => setVilla(response.data.villa))
-      .catch((error) => toast.error(error.response?.data?.message || "Villa nahi mili"))
-      .finally(() => setLoading(false));
+      .then((response) => {
+        if (!active) return;
+        setVilla(response.data.villa);
+        setActiveImage(0);
+      })
+      .catch((error) => {
+        if (active) toast.error(error.response?.data?.message || "Villa nahi mili");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
   }, [id]);
 
   const updateForm = (key, value) => {
@@ -140,24 +153,92 @@ function VillaDetail() {
   if (loading) return <main className="container villa-detail-page">Loading villa...</main>;
   if (!villa) return <main className="container villa-detail-page"><div className="villa-empty">Villa nahi mili.</div></main>;
 
+  const images = (villa.images || []).filter(Boolean);
+  const coordinates = villa.location?.coordinates || [];
+  const longitude = Number(coordinates[0]);
+  const latitude = Number(coordinates[1]);
+  const mapsUrl = Number.isFinite(latitude) && Number.isFinite(longitude)
+    ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([villa.address, villa.area, villa.city].filter(Boolean).join(", "))}`;
+  const location = [villa.address, villa.area, villa.city].filter(Boolean).join(", ");
+
   return (
     <main className="container villa-detail-page">
-      <Helmet><title>{villa.name} | Book a Villa | RoomSlider</title></Helmet>
+      <Helmet>
+        <title>{villa.name} | {villa.area}, {villa.city} | RoomSlider</title>
+        <meta name="description" content={`${villa.name} in ${villa.area}, ${villa.city}. View photos, amenities, guest capacity and real rates before booking.`} />
+      </Helmet>
+      <div className="villa-detail-top">
+        <h1>{villa.name}</h1>
+        <p><MapPin size={16} aria-hidden="true" />{location}</p>
+      </div>
+
+      <section className={`villa-detail-gallery${images.length <= 1 ? " villa-detail-gallery-single" : ""}`} aria-label={`${villa.name} photos`}>
+        {images.length ? (
+          <>
+            <div className="villa-detail-gallery-main">
+              <img src={images[activeImage]} alt={`${villa.name}, photo ${activeImage + 1}`} loading="eager" />
+            </div>
+            {images.length > 1 && (
+              <div className="villa-detail-gallery-thumbnails">
+                {images.map((image, index) => (
+                  <button
+                    type="button"
+                    className={activeImage === index ? "active" : ""}
+                    key={`${image}-${index}`}
+                    onClick={() => setActiveImage(index)}
+                    aria-label={`Show villa photo ${index + 1}`}
+                    aria-pressed={activeImage === index}
+                  >
+                    <img src={image} alt="" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="villa-detail-gallery-placeholder" role="img" aria-label="No villa photos available">
+            Photos are not available yet
+          </div>
+        )}
+      </section>
+
       <div className="villa-detail-grid">
         <article className="villa-detail-main">
-          {villa.images?.[0] && <img className="villa-hero-image" src={villa.images[0]} alt={villa.name} />}
-          <h1>{villa.name}</h1>
-          <p className="villa-address"><MapPin size={16} />{villa.address}, {villa.area}, {villa.city}</p>
-          <div className="villa-card-meta">
-            <span><Users size={15} /> Up to {villa.maxGuests} guests</span>
-            <span><BedDouble size={15} /> {villa.bedrooms} bedrooms · {villa.bathrooms} bathrooms</span>
+          <div className="villa-detail-summary">
+            <div>
+              <h2>{villa.name}</h2>
+              <p>{[
+                villa.maxGuests != null && `Up to ${villa.maxGuests} guests`,
+                villa.bedrooms != null && `${villa.bedrooms} bedrooms`,
+                villa.bathrooms != null && `${villa.bathrooms} bathrooms`,
+              ].filter(Boolean).join(" · ")}</p>
+            </div>
           </div>
-          <p className="villa-description">{villa.description}</p>
-          {villa.amenities?.length > 0 && <ul className="villa-amenities">{villa.amenities.map((amenity) => <li key={amenity}>{amenity}</li>)}</ul>}
-          <div className="villa-rates-panel">
-            <div><span>Overnight stay</span><strong>₹{Number(villa.nightlyRate).toLocaleString("en-IN")} / night</strong></div>
-            <div><span>Party / event</span><strong>₹{Number(villa.eventRate).toLocaleString("en-IN")} / day</strong></div>
-          </div>
+          {villa.description && (
+            <section className="villa-detail-section">
+              <h2>About this place</h2>
+              <p className="villa-description">{villa.description}</p>
+            </section>
+          )}
+          {villa.amenities?.length > 0 && (
+            <section className="villa-detail-section">
+              <h2>What this place offers</h2>
+              <ul className="villa-amenities">{villa.amenities.map((amenity) => <li key={amenity}>{amenity}</li>)}</ul>
+            </section>
+          )}
+          <section className="villa-detail-section">
+            <h2>Where you&apos;ll be</h2>
+            <p className="villa-address"><MapPin size={16} aria-hidden="true" />{location}</p>
+            <a className="villa-map-link" href={mapsUrl} target="_blank" rel="noopener noreferrer">
+              View location on map
+            </a>
+          </section>
+          <section className="villa-detail-section villa-detail-rates">
+            <h2>Rates</h2>
+            {villa.nightlyRate != null && <p><span>Overnight stay</span><strong>₹{Number(villa.nightlyRate).toLocaleString("en-IN")} / night</strong></p>}
+            {villa.eventRate != null && <p><span>Party or event</span><strong>₹{Number(villa.eventRate).toLocaleString("en-IN")} / day</strong></p>}
+          </section>
         </article>
 
         <form className="villa-booking-panel" onSubmit={checkAvailability}>
@@ -170,31 +251,50 @@ function VillaDetail() {
             </>
           ) : (
             <>
-              <h2>Book this villa</h2>
-              <div className="villa-booking-type">
-                <button type="button" className={form.bookingType === "stay" ? "active" : ""} onClick={() => updateForm("bookingType", "stay")}>Overnight stay</button>
-                <button type="button" className={form.bookingType === "event" ? "active" : ""} onClick={() => updateForm("bookingType", "event")}>Party / event</button>
-              </div>
-              <label>{form.bookingType === "event" ? "Event date" : "Check-in"}
-                <input type="date" min={tomorrowValue} required value={form.startDate} onChange={(event) => updateForm("startDate", event.target.value)} />
-              </label>
-              <label>{form.bookingType === "event" ? "Event end date" : "Check-out"}
-                <input type="date" min={form.bookingType === "stay" ? localDate(new Date(new Date(form.startDate).getTime() + 86400000)) : form.startDate} required value={form.endDate} onChange={(event) => updateForm("endDate", event.target.value)} />
-              </label>
-              <label>Number of guests
-                <input type="number" min="1" max={villa.maxGuests} required value={form.guestCount} onChange={(event) => updateForm("guestCount", event.target.value)} />
-              </label>
-              <button className="villa-check-btn" type="submit" disabled={checking}>{checking ? "Checking..." : "Check availability"}</button>
-              {quote && <div className={`villa-availability ${quote.available ? "available" : "unavailable"}`}>{quote.available ? `Available · ${quote.dayCount} ${quote.dayCount === 1 ? "day" : "days"}` : "Unavailable for these dates"}</div>}
-              {quote?.available && <>
-                <div className="villa-booking-estimate"><span>{quote.dayCount} × ₹{quote.rate} {form.bookingType === "event" ? "/ event day" : "/ night"}</span><strong>₹{quote.amount.toLocaleString("en-IN")}</strong></div>
-                <button type="button" className="villa-pay-btn" disabled={submitting} onClick={payAndBook}>{submitting ? "Opening payment..." : `Pay ₹${quote.amount.toLocaleString("en-IN")} & Book`}</button>
-                {!user && <small>Login is required to make a reservation.</small>}
-              </>}
+              {!bookingOpen ? (
+                <>
+                  <div className="villa-booking-preview">
+                    <span><strong>₹{Number(villa.nightlyRate).toLocaleString("en-IN")}</strong> / night</span>
+                    <small>Event booking also available</small>
+                  </div>
+                  <button type="button" className="villa-check-btn" onClick={() => setBookingOpen(true)}>
+                    Check availability
+                  </button>
+                  <small className="villa-booking-hint">Choose dates and guest count before you book.</small>
+                </>
+              ) : (
+                <>
+                  <div className="villa-booking-form-heading">
+                    <h2>Choose dates</h2>
+                    <button type="button" onClick={() => { setBookingOpen(false); setQuote(null); }}>Back to details</button>
+                  </div>
+                  <div className="villa-booking-type">
+                    <button type="button" className={form.bookingType === "stay" ? "active" : ""} onClick={() => updateForm("bookingType", "stay")}>Overnight stay</button>
+                    <button type="button" className={form.bookingType === "event" ? "active" : ""} onClick={() => updateForm("bookingType", "event")}>Party / event</button>
+                  </div>
+                  <label>{form.bookingType === "event" ? "Event date" : "Check-in"}
+                    <input type="date" min={tomorrowValue} required value={form.startDate} onChange={(event) => updateForm("startDate", event.target.value)} />
+                  </label>
+                  <label>{form.bookingType === "event" ? "Event end date" : "Check-out"}
+                    <input type="date" min={form.bookingType === "stay" ? localDate(new Date(new Date(form.startDate).getTime() + 86400000)) : form.startDate} required value={form.endDate} onChange={(event) => updateForm("endDate", event.target.value)} />
+                  </label>
+                  <label>Number of guests
+                    <input type="number" min="1" max={villa.maxGuests} required value={form.guestCount} onChange={(event) => updateForm("guestCount", event.target.value)} />
+                  </label>
+                  <button className="villa-check-btn" type="submit" disabled={checking}>{checking ? "Checking..." : "Check availability"}</button>
+                  {quote && <div className={`villa-availability ${quote.available ? "available" : "unavailable"}`}>{quote.available ? `Available · ${quote.dayCount} ${quote.dayCount === 1 ? "day" : "days"}` : "Unavailable for these dates"}</div>}
+                  {quote?.available && <>
+                    <div className="villa-booking-estimate"><span>{quote.dayCount} × ₹{quote.rate} {form.bookingType === "event" ? "/ event day" : "/ night"}</span><strong>₹{quote.amount.toLocaleString("en-IN")}</strong></div>
+                    <button type="button" className="villa-pay-btn" disabled={submitting} onClick={payAndBook}>{submitting ? "Opening payment..." : `Pay ₹${quote.amount.toLocaleString("en-IN")} & Book`}</button>
+                    {!user && <small>Login is required to make a reservation.</small>}
+                  </>}
+                </>
+              )}
             </>
           )}
         </form>
       </div>
+      <NearbyVillas villa={villa} />
     </main>
   );
 }

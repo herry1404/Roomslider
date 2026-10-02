@@ -23,7 +23,7 @@
 - Added push subscription/configuration endpoints and a notification broadcast endpoint. Only admins and hourly managers can broadcast; broadcasts create in-app notifications for all user accounts, with browser push sent to users who subscribed.
 - Added an admin Notifications page reachable from the admin sidebar and dashboard quick actions.
 - Added an hourly-manager broadcast composer, push opt-in button, and in-dashboard notification list.
-- Replaced the navbar’s “Coming soon” bell behavior with browser push opt-in. Users can also enable push in the profile Notifications tab.
+- Replaced the navbar’s “Coming soon” bell behavior with browser push opt-in. The large opt-in button was removed from the profile Notifications tab; notification history remains there.
 - Added a service-worker push handler and notification-click navigation.
 - After successful hourly-room payment verification, save the paid timestamp and notify the guest and active hourly managers with a receipt link.
 - Added an authenticated receipt page/API. A guest can view their own paid receipt; admin and hourly-manager staff can view paid receipts. The receipt includes booking/payment details and a print action.
@@ -51,11 +51,21 @@
 
 ### Roommate profiles and private chat
 
-- Roommate Finder users can open an active roommate profile and see its preferences plus available saved rooms. The endpoint only returns curated room/profile fields; email and phone are excluded.
+- Roommate Finder users can open an active roommate profile on its own page and see its preferences plus available saved rooms. The endpoint only returns curated room/profile fields; email and phone are excluded.
 - Accepted matches can chat through RoomSlider. Chat history and sends are allowed only while an accepted connection exists and neither user has blocked the other.
-- Removed phone/email from the connections API and UI; acceptance now opens private chat instead of revealing contact details.
-- Added `backend/src/models/roommateMessage.model.js`, authenticated profile/chat endpoints in `roommate.routes.js` and `roommate.controller.js`, and the profile dialog/chat UI under `frontend/src/pages/Roommates/`.
+- Removed phone/email from the connections API and UI; accepted matches open a dedicated, full-height chat page instead of an inline panel.
+- Added `backend/src/models/roommateMessage.model.js`, authenticated profile/chat endpoints in `roommate.routes.js` and `roommate.controller.js`, and dedicated profile/chat screens under `frontend/src/pages/Roommates/`.
 - Chat currently refreshes messages by polling every five seconds; real-time socket delivery and unread push notifications are not implemented.
+
+### Property discovery and detail UI
+
+- Updated the grouped property page used by homepage Rooms, PG, Hostel, and Flat cards, along with individual room detail pages, to use a cleaner responsive layout.
+- Amenities show four items initially with an accessible control to expand or collapse the full list.
+- Reworked the owner area into a host-style profile card with verified status and a public owner profile link. Owner records do not currently provide an avatar, so the card uses the owner's initial.
+- Kept the desktop price/contact panel sticky through property details and nearby listings; smaller screens use a single-column layout and the existing bottom contact bar.
+- Added a compact floating search on the home page after scrolling; the large search stays prominent at the top and the main navigation remains sticky.
+- Simplified Explore service names and actions (for example, Food, Laundry, Cleaning, and Explore).
+- Added `UI-CHANGES.md` with a step-by-step before/after record of the interface changes.
 
 ## Important files
 
@@ -81,8 +91,9 @@
 - `frontend/src/components/home/HomeRentalSection.jsx`, `VillaCard.jsx`
 - `frontend/src/styles/laundry.css`, `villas.css`
 - `backend/src/models/roommateMessage.model.js`
-- `frontend/src/pages/Roommates/RoommateChat.jsx`, `RoommateProfileDialog.jsx`
+- `frontend/src/pages/Roommates/RoommateChat.jsx`, `RoommateChatPage.jsx`, `RoommateProfilePage.jsx`
 - `frontend/src/styles/roommate-chat.css`
+- `UI-CHANGES.md` — property/home interface before-and-after log.
 
 ### Updated files
 
@@ -128,5 +139,12 @@ Keep the private key secret. Deploy the frontend over HTTPS and users/managers m
 
 - Frontend production build: passed; Vite emitted its existing large-chunk warning.
 - Backend syntax checks for roommate controller, routes, and message model: passed.
-- Targeted ESLint for the Roommate Finder, profile dialog, and private chat UI: passed.
+- Targeted ESLint for the Roommate Finder, profile page, and private chat UI: passed.
 - Manual multi-account acceptance, block, saved-room visibility, and chat authorization tests remain outstanding.
+
+### Current property UI changes
+
+- Frontend production build: passed; Vite emitted its existing `__dirname` config and large-chunk warnings.
+- Targeted ESLint for the property detail page, grouped property page, and home search: passed.
+- `git diff --check`: passed.
+- Browser/device visual checks on desktop, tablet, and mobile remain outstanding.

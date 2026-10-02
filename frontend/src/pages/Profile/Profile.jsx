@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
-import EnablePushButton from "../../components/notifications/EnablePushButton";
 import "../../styles/profile.css";
 
 const TABS = [
@@ -46,10 +45,7 @@ function Profile() {
       navigate("/login");
       return;
     }
-    if (!isUserAccount) {
-      setLoading(false);
-      return;
-    }
+    if (!isUserAccount) return;
 
     const loadProfile = async () => {
       try {
@@ -148,7 +144,7 @@ function Profile() {
         setTabData((d) => ({ ...d, notifications: res.data.notifications || [] }));
         setUnread(res.data.unreadCount || 0);
       }
-    } catch (err) {
+    } catch {
       toast.error("Ye tab load nahi hua");
     } finally {
       setTabLoading(false);
@@ -156,7 +152,7 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (profile) loadTab(tab);
+    if (profile) Promise.resolve().then(() => loadTab(tab));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, profile]);
 
@@ -171,12 +167,12 @@ function Profile() {
         ),
       }));
       setUnread((u) => Math.max(0, u - 1));
-    } catch (err) {
+    } catch {
       // ignore, will retry on next click
     }
   };
 
-  if (loading) {
+  if (loading && isUserAccount) {
     return (
       <div className="profile-view">
         <div className="profile-empty">Loading...</div>
@@ -259,38 +255,30 @@ function Profile() {
       return (
         <div className="profile-empty">
           <p>Koi notification nahi hai.</p>
-          <EnablePushButton className="profile-edit-btn">
-            Enable push notifications
-          </EnablePushButton>
         </div>
       );
     }
     return (
-      <>
-        <EnablePushButton className="profile-edit-btn">
-          Enable push notifications
-        </EnablePushButton>
-        <div className="profile-list">
-          {tabData.notifications.map((n) => (
-            <div
-              className={"profile-item profile-item--click" + (n.read ? "" : " profile-item--unread")}
-              key={n._id}
-              onClick={() => {
-                markRead(n);
-                if (n.actionUrl) navigate(n.actionUrl);
-              }}
-            >
-              <div className="profile-item-main">
-                <strong>{n.title}</strong>
-                <span className="profile-hint">{n.message}</span>
-              </div>
-              <div className="profile-item-side">
-                <span className="profile-hint">{fmtDate(n.createdAt)}</span>
-              </div>
+      <div className="profile-list">
+        {tabData.notifications.map((n) => (
+          <div
+            className={"profile-item profile-item--click" + (n.read ? "" : " profile-item--unread")}
+            key={n._id}
+            onClick={() => {
+              markRead(n);
+              if (n.actionUrl) navigate(n.actionUrl);
+            }}
+          >
+            <div className="profile-item-main">
+              <strong>{n.title}</strong>
+              <span className="profile-hint">{n.message}</span>
             </div>
-          ))}
-        </div>
-      </>
+            <div className="profile-item-side">
+              <span className="profile-hint">{fmtDate(n.createdAt)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     );
   };
 

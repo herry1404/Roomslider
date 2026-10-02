@@ -1,0 +1,312 @@
+.hourly-detail-page {
+  padding-block: 28px 64px;
+}
+
+.hourly-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hourly-detail-heading {
+  margin: 8px 0 20px;
+}
+
+.hourly-detail-heading h1 {
+  margin: 0 0 8px;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.2;
+}
+
+.hourly-detail-heading p {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--color-text-light);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.hourly-detail-heading p svg {
+  flex: none;
+}
+
+.hourly-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, .8fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.hourly-detail-main,
+.hourly-detail-booking {
+  min-width: 0;
+  padding: clamp(16px, 3vw, 24px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+}
+
+.hourly-detail-image {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--color-surface-2);
+  border-radius: 12px;
+}
+
+.hourly-detail-image-placeholder {
+  min-height: 240px;
+}
+
+.hourly-detail-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.hourly-detail-section h2 {
+  margin-bottom: 12px;
+  font-size: 19px;
+}
+
+.hourly-detail-section > p {
+  color: var(--color-text-light);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.hourly-detail-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hourly-detail-amenities li {
+  max-width: 100%;
+  padding: 7px 10px;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.hourly-detail-booking {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.hourly-detail-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hourly-detail-price strong {
+  font-size: 24px;
+}
+
+.hourly-detail-price span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.hourly-detail-booking-note {
+  color: var(--color-text-light);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.hourly-detail-book-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  color: var(--color-surface);
+  background: var(--color-primary);
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.hourly-detail-book-button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.hourly-detail-book-button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.hourly-detail-booking-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hourly-detail-booking-heading h2,
+.hourly-detail-guest-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.hourly-detail-booking-heading > button {
+  color: var(--color-text-light);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.hourly-detail-field {
+  display: grid;
+  gap: 7px;
+  color: var(--color-text-light);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hourly-detail-field input,
+.hourly-detail-field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 10px;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.hourly-detail-field input:focus-visible,
+.hourly-detail-field select:focus-visible,
+.hourly-detail-booking-heading > button:focus-visible,
+.hourly-detail-book-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.hourly-detail-field input[type="file"] {
+  padding: 7px;
+}
+
+.hourly-detail-field small {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.hourly-detail-availability {
+  padding: 11px;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.hourly-detail-availability.available {
+  color: var(--color-success);
+}
+
+.hourly-detail-availability.unavailable {
+  color: var(--color-error);
+}
+
+.hourly-detail-estimate {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 12px;
+  border-block: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.hourly-detail-estimate strong {
+  color: var(--color-text);
+}
+
+.hourly-detail-guest-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.hourly-detail-guest-heading > svg,
+.hourly-detail-secure-note > svg {
+  flex: none;
+  color: var(--color-primary);
+}
+
+.hourly-detail-guest-heading p {
+  margin-top: 3px;
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.hourly-detail-secure-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--color-text-light);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hourly-detail-secure-note svg {
+  margin-top: 1px;
+}
+
+.hourly-detail-empty {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  min-height: 40vh;
+  align-content: center;
+}
+
+.hourly-detail-empty a {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+@media (max-width: 800px) {
+  .hourly-detail-page {
+    padding: 16px 14px 40px;
+  }
+
+  .hourly-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .hourly-detail-booking {
+    position: static;
+  }
+}

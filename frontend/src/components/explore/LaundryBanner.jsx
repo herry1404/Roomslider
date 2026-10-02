@@ -33,7 +33,7 @@ function LaundryBanner() {
         <Shirt size={30} color="var(--color-primary)" style={{ flexShrink: 0 }} />
         <div style={{ minWidth: 0 }}>
           <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>
-            Need Laundry?
+            Laundry
           </h3>
           <p style={{ fontSize: "13px", color: "var(--color-text-light)", margin: "2px 0 0" }}>
             Get your building's laundry vendor contact instantly.
@@ -62,7 +62,7 @@ function LaundryBanner() {
           border: "none",
         }}
       >
-        Explore Laundry
+        Explore
         <ArrowRight size={15} />
       </button>
     </div>

@@ -5,8 +5,6 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-import RoommateChat from "./RoommateChat";
-import RoommateProfileDialog from "./RoommateProfileDialog";
 import "../../styles/profile.css";
 import "../../styles/roommate-chat.css";
 
@@ -24,8 +22,6 @@ function RoommateFinder() {
   const [requests, setRequests] = useState([]);
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [profileUserId, setProfileUserId] = useState(null);
-  const [chatPerson, setChatPerson] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -166,7 +162,7 @@ function RoommateFinder() {
                 ) : (
                   <button className="profile-photo-btn" onClick={() => sendRequest(person.id)}>Request to connect</button>
                 )}
-                <button className="profile-photo-btn" onClick={() => setProfileUserId(person.id)}>
+                <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${person.id}`)}>
                   <UserRound size={15} /> View profile & saved rooms
                 </button>
                 <button className="profile-photo-btn" title="Block profile" onClick={() => block(person.id)}>
@@ -193,7 +189,7 @@ function RoommateFinder() {
               </div>
               {request.direction === "incoming" && (
                 <div className="profile-item-side">
-                  <button className="profile-photo-btn" onClick={() => setProfileUserId(request.person._id)}>
+                  <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${request.person._id}`)}>
                     <UserRound size={15} /> Profile & saved rooms
                   </button>
                   <button className="profile-photo-btn" onClick={() => respond(request.id, "accepted")}>Accept</button>
@@ -202,7 +198,7 @@ function RoommateFinder() {
               )}
               {request.direction === "outgoing" && (
                 <div className="profile-item-side">
-                  <button className="profile-photo-btn" onClick={() => setProfileUserId(request.person._id)}>
+                  <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${request.person._id}`)}>
                     <UserRound size={15} /> Profile & saved rooms
                   </button>
                 </div>
@@ -225,22 +221,18 @@ function RoommateFinder() {
                 {connection.username && <span className="profile-hint">@{connection.username}</span>}
               </div>
               <div className="profile-item-side">
-                <button className="profile-photo-btn" onClick={() => setProfileUserId(connection.id)}>
+                <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${connection.id}`)}>
                   <UserRound size={15} /> Profile
                 </button>
-                <button className="profile-photo-btn" onClick={() => setChatPerson(connection)}>
+                <button
+                  className="profile-photo-btn"
+                  onClick={() => navigate(`/roommates/chat/${connection.id}`, { state: { person: connection } })}
+                >
                   <MessageCircle size={15} /> Chat
                 </button>
               </div>
             </div>
           ))}
-          {chatPerson && (
-            <RoommateChat
-              person={chatPerson}
-              currentUserId={user?._id || user?.id}
-              onClose={() => setChatPerson(null)}
-            />
-          )}
         </section>
       )}
 
@@ -248,12 +240,6 @@ function RoommateFinder() {
         <ShieldAlert size={14} /> Your contact information is not shared by RoomSlider. Meet in a public place first and never send money to someone you have not met.{" "}
         <Link to="/privacy">Privacy details</Link>
       </p>
-      {profileUserId && (
-        <RoommateProfileDialog
-          userId={profileUserId}
-          onClose={() => setProfileUserId(null)}
-        />
-      )}
     </div>
   );
 }

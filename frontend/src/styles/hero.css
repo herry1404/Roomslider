@@ -260,7 +260,6 @@
   .hs-field{ padding:10px 16px; }
   .hs-field + .hs-field::before{ top:12px; bottom:12px; }
   .hs-go{ width:40px; height:40px; margin:5px; }
-
   .hs-areas{
     flex-wrap:nowrap;
     justify-content:flex-start;
