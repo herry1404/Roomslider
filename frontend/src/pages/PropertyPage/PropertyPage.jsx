@@ -17,24 +17,26 @@ function PropertyPage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const highlight = (searchParams.get("sharing") || "").toLowerCase();
+  const selectedBuilding = searchParams.get("building");
 
   const [property, setProperty] = useState(null);
   const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadedId, setLoadedId] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const loading = loadedId !== id;
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
     api
       .get(`/properties/${id}`)
       .then((res) => {
         if (!active) return;
+        setNotFound(false);
         setProperty(res.data?.property || null);
         setRooms(res.data?.rooms || []);
       })
       .catch(() => active && setNotFound(true))
-      .finally(() => active && setLoading(false));
+      .finally(() => active && setLoadedId(id));
     return () => {
       active = false;
     };
@@ -48,18 +50,29 @@ function PropertyPage() {
     return <div style={{ padding: "24px" }}>Property not found.</div>;
   }
 
-  // sharingType ke hisaab se groups
-  const groups = {};
-  rooms.forEach((r) => {
-    const key = r.sharingType || "Rooms";
-    (groups[key] = groups[key] || []).push(r);
+  const visibleRooms = selectedBuilding
+    ? rooms.filter((room) => String(room.building || "") === selectedBuilding)
+    : rooms;
+  const groups = new Map();
+  visibleRooms.forEach((room) => {
+    const sharing = room.sharingType || "Rooms";
+    const building = property?.buildings?.find(
+      (item) => String(item._id) === String(room.building)
+    );
+    const groupId = `${room.building || "legacy"}:${sharing}`;
+    if (!groups.has(groupId)) {
+      groups.set(groupId, { sharing, building, rooms: [] });
+    }
+    groups.get(groupId).rooms.push(room);
   });
   const order = ["Single", "Double", "Triple", "Other", "Rooms"];
-  const keys = Object.keys(groups).sort(
-    (a, b) => order.indexOf(a) - order.indexOf(b)
+  const sections = [...groups.values()].sort(
+    (a, b) =>
+      order.indexOf(a.sharing) - order.indexOf(b.sharing) ||
+      (a.building?.name || "").localeCompare(b.building?.name || "")
   );
 
-  const heroImage = rooms[0]?.images?.[0];
+  const heroImage = visibleRooms[0]?.images?.[0] || rooms[0]?.images?.[0];
   const title = `${property.name} - ${property.propertyType} in ${property.area} | RoomSlider`;
 
   return (
@@ -100,17 +113,20 @@ function PropertyPage() {
         )}
       </p>
 
-      {keys.length === 0 && (
-        <div style={card}>No vacant rooms right now.</div>
+      {sections.length === 0 && (
+        <div style={card}>
+          {selectedBuilding
+            ? "No vacant rooms in this building right now."
+            : "No vacant rooms right now."}
+        </div>
       )}
 
-      {keys.map((key) => {
-        const list = groups[key];
+      {sections.map(({ sharing, building, rooms: list }) => {
         const minPrice = Math.min(...list.map((r) => r.price || 0));
-        const isHi = highlight && key.toLowerCase() === highlight;
+        const isHi = highlight && sharing.toLowerCase() === highlight;
         return (
           <div
-            key={key}
+            key={`${building?._id || "legacy"}:${sharing}`}
             style={{
               ...card,
               borderColor: isHi ? "var(--color-primary, #16a34a)" : card.border,
@@ -118,7 +134,8 @@ function PropertyPage() {
             }}
           >
             <h2 style={{ margin: "0 0 4px", fontSize: "18px" }}>
-              {key === "Rooms" ? "Rooms" : `${key} sharing`}
+              {building ? `${building.name} · ` : ""}
+              {sharing === "Rooms" ? "Rooms" : `${sharing} sharing`}
             </h2>
             <p style={{ margin: "0 0 12px", opacity: 0.8 }}>
               From ₹{minPrice.toLocaleString()}/month · {list.length} vacant

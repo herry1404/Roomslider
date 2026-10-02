@@ -143,13 +143,17 @@ function OwnerDashboard() {
           </div>
         ) : (
           <div className="owner-rooms-grid">
-            {rooms.map((room) => (
-              <div
-                key={room._id}
-                className="owner-room-card"
-                onClick={() => navigate(`/owner/rooms/${room._id}`)}
-                style={{ cursor: "pointer" }}
-              >
+            {rooms.map((room) => {
+              const building = room.property?.buildings?.find(
+                (item) => String(item._id) === String(room.building)
+              );
+              return (
+                <div
+                  key={room._id}
+                  className="owner-room-card"
+                  onClick={() => navigate(`/owner/rooms/${room._id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                 <img
                   src={room.images?.[0] || "/placeholder-room.jpg"}
                   alt={room.title || "Room"}
@@ -164,6 +168,12 @@ function OwnerDashboard() {
                       {room.roomNumber && (
                         <div className="owner-room-number">
                           Room #{room.roomNumber}
+                        </div>
+                      )}
+                      {room.property && (
+                        <div className="owner-room-number">
+                          {room.property.name}
+                          {building ? ` · ${building.name}` : ""}
                         </div>
                       )}
                     </div>
@@ -201,8 +211,9 @@ function OwnerDashboard() {
                     </div>
                   )}
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

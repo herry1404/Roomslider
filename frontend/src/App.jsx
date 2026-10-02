@@ -40,6 +40,7 @@ import Profile from "./pages/Profile/Profile";
 import ProfileEdit from "./pages/Profile/ProfileEdit";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
+import RoommateFinder from "./pages/Roommates/RoommateFinder";
 
 import Rooms from "./pages/Rooms/Rooms";
 import HourlyRooms from "./pages/Rooms/HourlyRooms";
@@ -102,6 +103,7 @@ function App() {
         <Route path="/mess/login" element={<MessLogin />} />
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
+        <Route path="/roommates" element={<MainLayout><RoommateFinder /></MainLayout>} />
         <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
         <Route path="/vehicles/shop/:id" element={<MainLayout><VehicleShopDetail /></MainLayout>} />
         <Route path="/services/:category" element={<MainLayout><ServiceList /></MainLayout>} />

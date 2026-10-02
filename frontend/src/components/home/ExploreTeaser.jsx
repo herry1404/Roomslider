@@ -13,6 +13,7 @@ import {
   Sofa,
   Wifi,
   Wrench,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
@@ -58,6 +59,13 @@ function ExploreTeaser() {
       desc: "Short stays, day use, hourly rate",
       pill: "Explore Now",
       to: "/hourly-rooms",
+    },
+    {
+      icon: Users,
+      title: "Find a Roommate",
+      desc: "Meet people with similar budgets and plans",
+      pill: "Find Matches",
+      to: "/roommates",
     },
     {
       icon: Banknote,

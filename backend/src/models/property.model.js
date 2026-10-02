@@ -14,6 +14,11 @@ const propertySchema = new mongoose.Schema(
       enum: ["Room", "PG", "Hostel", "Flat"],
       default: "Room",
     },
+    buildings: [
+      {
+        name: { type: String, required: true, trim: true },
+      },
+    ],
     // Slug baad me (Phase 7) bharenge
     slug: { type: String, unique: true, sparse: true },
     oldSlugs: [{ type: String }],

@@ -13,7 +13,9 @@ function CategorySection({ title, viewAllPath, rooms }) {
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
 
   const goToDetails = (room) => {
-    const detailsPath = roomPath(room);
+    const detailsPath = room.building && room.property?._id
+      ? `/property/${room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
+      : roomPath(room);
 
     navigate(detailsPath);
   };
@@ -60,6 +62,15 @@ function CategorySection({ title, viewAllPath, rooms }) {
             const genderLabel = { Male: "Boys", Female: "Girls" }[room.gender];
             const sharingLabel = { Single: "Single Room", Double: "Double Sharing", Triple: "Triple Sharing" }[room.sharingType] || room.category;
             const typeLine = [sharingLabel, genderLabel].filter(Boolean).join(" · ");
+            const building = room.property?.buildings?.find(
+              (item) => item._id === room.building
+            );
+            const cardTitle = building
+              ? `${room.property.name} · ${building.name}`
+              : room.title;
+            const detailsPath = room.building && room.property?._id
+              ? `/property/${room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
+              : roomPath(room);
 
             return (
               <article
@@ -94,11 +105,11 @@ function CategorySection({ title, viewAllPath, rooms }) {
                 <div className="room-info">
                   <h3>
                     <Link
-                      to={roomPath(room)}
+                      to={detailsPath}
                       onClick={(e) => e.stopPropagation()}
                       style={{ color: "inherit", textDecoration: "none" }}
                     >
-                      {room.title}
+                      {cardTitle}
                     </Link>
                   </h3>
 

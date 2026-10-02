@@ -175,7 +175,14 @@ function Profile() {
   }
 
   const initial = (profile.name || "U").trim().charAt(0).toUpperCase();
-  const meta = [OCCUPATION_LABELS[profile.occupation], profile.organization]
+  const meta = [
+    OCCUPATION_LABELS[profile.occupation],
+    profile.organization,
+    profile.course,
+    profile.subject,
+    profile.studyYear,
+    profile.gender && `Gender: ${profile.gender}`,
+  ]
     .filter(Boolean)
     .join(" · ");
   const place = [profile.area, profile.city].filter(Boolean).join(", ");

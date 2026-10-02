@@ -119,6 +119,11 @@ const roomSchema = new mongoose.Schema(
       default: null,
     },
 
+    building: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+
     // Sharing label: sirf dikhane ke liye (whole-room booking, tenant logic same)
     sharingType: {
       type: String,

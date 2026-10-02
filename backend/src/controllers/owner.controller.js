@@ -137,7 +137,10 @@ const getSingleOwner = async (req, res) => {
 
     const { computeRentStatus } = require("./room.controller");
 
-    const rooms = await Room.find({ owner: owner._id });
+    const rooms = await Room.find({ owner: owner._id }).populate(
+      "property",
+      "name buildings"
+    );
 
     const roomsWithStatus = rooms.map((room) => {
       const roomObj = room.toObject();

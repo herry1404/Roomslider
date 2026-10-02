@@ -1,5 +1,33 @@
 const mongoose = require("mongoose");
 
+const roommatePreferencesSchema = new mongoose.Schema(
+  {
+    setupComplete: { type: Boolean, default: false },
+    active: { type: Boolean, default: true },
+    seeking: {
+      type: String,
+      enum: ["room", "roommate", "both"],
+      default: "both",
+    },
+    budgetMin: { type: Number, min: 0, default: 0 },
+    budgetMax: { type: Number, min: 0, default: 0 },
+    moveInDate: { type: Date, default: null },
+    sharingType: {
+      type: String,
+      enum: ["", "Single", "Double", "Triple", "Other"],
+      default: "",
+    },
+    lifestyle: {
+      cleanliness: { type: String, enum: ["", "relaxed", "moderate", "very"], default: "" },
+      sleepSchedule: { type: String, enum: ["", "early", "flexible", "late"], default: "" },
+      smoking: { type: String, enum: ["", "no", "sometimes", "yes"], default: "" },
+      guests: { type: String, enum: ["", "rarely", "sometimes", "often"], default: "" },
+    },
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -111,6 +139,27 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    course: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 100,
+    },
+
+    subject: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 100,
+    },
+
+    studyYear: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 40,
+    },
+
     gender: {
       type: String,
       default: "",
@@ -140,6 +189,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    roommatePreferences: {
+      type: roommatePreferencesSchema,
+      default: undefined,
+    },
 
   },
   {

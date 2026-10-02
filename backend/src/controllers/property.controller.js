@@ -50,6 +50,7 @@ const createProperty = async (req, res) => {
     const propertyType = TYPES.includes(req.body.propertyType)
       ? req.body.propertyType
       : "Room";
+    const buildingName = String(req.body.buildingName || "").trim().slice(0, 80);
 
     if (!name || !area) {
       return res.status(400).json({
@@ -65,8 +66,57 @@ const createProperty = async (req, res) => {
       owner = req.body.owner;
     }
 
-    const property = await Property.create({ name, area, propertyType, owner });
+    const property = await Property.create({
+      name,
+      area,
+      propertyType,
+      owner,
+      ...(buildingName ? { buildings: [{ name: buildingName }] } : {}),
+    });
     res.status(201).json({ success: true, property });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const createBuilding = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+
+    const name = String(req.body.name || "").trim().slice(0, 80);
+    if (!name) {
+      return res.status(400).json({ success: false, message: "Building name is required" });
+    }
+
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+    if (
+      req.user.role === "owner" &&
+      String(property.owner) !== String(req.user._id)
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only add buildings to your own property",
+      });
+    }
+    if (property.buildings.some((building) => building.name.toLowerCase() === name.toLowerCase())) {
+      return res.status(409).json({
+        success: false,
+        message: "A building with this name already exists in this property",
+      });
+    }
+
+    property.buildings.push({ name });
+    await property.save();
+    res.status(201).json({
+      success: true,
+      building: property.buildings[property.buildings.length - 1],
+      property,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
   }
@@ -143,6 +193,7 @@ const getPublicProperty = async (req, res) => {
 module.exports = {
   getMyProperties,
   createProperty,
+  createBuilding,
   updateProperty,
   getPublicProperty,
 };

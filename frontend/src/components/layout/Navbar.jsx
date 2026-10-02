@@ -15,6 +15,7 @@ const navLinks = [
   { name: "PG", path: "/pg" },
   { name: "Hostels", path: "/hostels" },
   { name: "Flats", path: "/flats" },
+  { name: "Roommates", path: "/roommates" },
   { name: "About", path: "/about" },
   { name: "Explore", path: "/explore" },
 ];

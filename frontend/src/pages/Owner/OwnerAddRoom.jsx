@@ -26,12 +26,16 @@ function OwnerAddRoom() {
 
     const [properties, setProperties] = useState([]);
     const [propertyId, setPropertyId] = useState("");
+    const [buildingId, setBuildingId] = useState("");
+    const [newPropertyName, setNewPropertyName] = useState("");
+    const [newBuildingName, setNewBuildingName] = useState("");
+    const selectedProperty = properties.find((property) => property._id === propertyId);
 
     useEffect(() => {
         api.get("/properties/mine")
             .then((res) => setProperties(res.data?.properties || []))
-            .catch(() => {
-                // list na aaye to form pehle jaisa chalega (nayi property banegi)
+            .catch((error) => {
+                toast.error(error.response?.data?.message || "Could not load your properties");
             });
     }, []);
 
@@ -112,9 +116,40 @@ function OwnerAddRoom() {
             }
         }
 
+        if (!propertyId && !newPropertyName.trim()) {
+            toast.error("Please enter a property name");
+            return;
+        }
+        if (!buildingId && !newBuildingName.trim()) {
+            toast.error("Please select or enter a building name");
+            return;
+        }
+
         setLoading(true);
 
         try {
+            let resolvedPropertyId = propertyId;
+            let resolvedBuildingId = buildingId;
+            if (!resolvedPropertyId) {
+                const propertyRes = await api.post("/properties", {
+                    name: newPropertyName.trim(),
+                    area: formData.location.trim(),
+                    propertyType: formData.category,
+                    buildingName: newBuildingName.trim(),
+                });
+                resolvedPropertyId = propertyRes.data.property._id;
+                resolvedBuildingId =
+                    propertyRes.data.property.buildings?.[0]?._id || "";
+            }
+
+            if (!resolvedBuildingId) {
+                const buildingRes = await api.post(
+                    `/properties/${resolvedPropertyId}/buildings`,
+                    { name: newBuildingName.trim() }
+                );
+                resolvedBuildingId = buildingRes.data.building._id;
+            }
+
             const data = new FormData();
 
             data.append("title", formData.title);
@@ -123,7 +158,8 @@ function OwnerAddRoom() {
             data.append("location", formData.location);
             data.append("category", formData.category);
             if (formData.sharingType) data.append("sharingType", formData.sharingType);
-            if (propertyId) data.append("propertyId", propertyId);
+            data.append("propertyId", resolvedPropertyId);
+            data.append("buildingId", resolvedBuildingId);
             data.append("rooms", formData.rooms);
             data.append("bathrooms", formData.bathrooms);
             data.append("furnished", formData.furnished);
@@ -199,22 +235,57 @@ function OwnerAddRoom() {
 
                 <form onSubmit={handleSubmit}>
 
-                    {properties.length > 0 && (
-                        <div className="form-section">
-                            <h2 className="section-title">Property</h2>
+                    <div className="form-section">
+                        <h2 className="section-title">Property & Building</h2>
+                        <select
+                            value={propertyId}
+                            onChange={(e) => {
+                                setPropertyId(e.target.value);
+                                setBuildingId("");
+                            }}
+                        >
+                            <option value="">Create a new property</option>
+                            {properties.map((property) => (
+                                <option key={property._id} value={property._id}>
+                                    {property.name} - {property.area}
+                                </option>
+                            ))}
+                        </select>
+
+                        {!propertyId && (
+                            <input
+                                type="text"
+                                value={newPropertyName}
+                                onChange={(e) => setNewPropertyName(e.target.value)}
+                                placeholder="Property name (e.g. Sunrise Residency)"
+                                required
+                            />
+                        )}
+
+                        {selectedProperty?.buildings?.length > 0 && (
                             <select
-                                value={propertyId}
-                                onChange={(e) => setPropertyId(e.target.value)}
+                                value={buildingId}
+                                onChange={(e) => setBuildingId(e.target.value)}
                             >
-                                <option value="">New property (created from title below)</option>
-                                {properties.map((p) => (
-                                    <option key={p._id} value={p._id}>
-                                        {p.name} - {p.area} ({p.totalRooms} rooms)
+                                <option value="">Create a new building</option>
+                                {selectedProperty.buildings.map((building) => (
+                                    <option key={building._id} value={building._id}>
+                                        {building.name}
                                     </option>
                                 ))}
                             </select>
-                        </div>
-                    )}
+                        )}
+
+                        {!buildingId && (
+                            <input
+                                type="text"
+                                value={newBuildingName}
+                                onChange={(e) => setNewBuildingName(e.target.value)}
+                                placeholder="Building name (e.g. Block A)"
+                                required
+                            />
+                        )}
+                    </div>
 
                     {mode === "multiple" && (
                         <div className="form-section">

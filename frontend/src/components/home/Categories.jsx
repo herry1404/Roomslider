@@ -60,9 +60,9 @@ function Categories() {
                 <h3>{item.title}</h3>
               </div>
 
-              <button className="category-btn" aria-label={item.title}>
+              <span className="category-btn" aria-hidden="true">
                 →
-              </button>
+              </span>
             </Link>
           ))}
         </div>

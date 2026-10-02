@@ -100,7 +100,7 @@ function Home() {
       case "hero":
         return <Hero key={s._id} />;
       case "categories":
-        return null;
+        return <Categories key={s._id} />;
       case "explore":
         return <ExploreTeaser key={s._id} />;
       case "banner":

@@ -34,6 +34,55 @@ function addOneMonth(date) {
   return d;
 }
 
+async function attachPropertyAndBuilding(req, roomData) {
+  const Property = require("../models/property.model");
+  const { propertyId, buildingId } = req.body;
+
+  if (buildingId && !propertyId) {
+    return { error: { status: 400, message: "A property is required for this building" } };
+  }
+
+  if (!propertyId) {
+    const property = await Property.create({
+      name: (roomData.title || "").trim(),
+      area: (roomData.location || "").trim(),
+      owner: roomData.owner || null,
+      propertyType: roomData.category || "Room",
+    });
+    roomData.property = property._id;
+    return { createdProperty: property };
+  }
+
+  const property = await Property.findById(propertyId);
+  if (!property) {
+    return { error: { status: 404, message: "Property not found" } };
+  }
+  if (
+    req.user.role === "owner" &&
+    String(property.owner) !== String(req.user._id)
+  ) {
+    return {
+      error: {
+        status: 403,
+        message: "You can only add rooms to your own property",
+      },
+    };
+  }
+  if (buildingId) {
+    const building = property.buildings.id(buildingId);
+    if (!building) {
+      return {
+        error: { status: 404, message: "Building not found in this property" },
+      };
+    }
+    roomData.building = building._id;
+  }
+
+  roomData.property = property._id;
+  if (!roomData.owner && property.owner) roomData.owner = property.owner;
+  return { createdProperty: null };
+}
+
 // ============================
 // Create Room (Admin or Owner)
 // ============================
@@ -103,50 +152,27 @@ const createRoom = async (req, res) => {
       roomData.whatsapp = roomData.whatsapp || req.user.phone;
     }
 
-    // ---- Property link (1 room = 1 property, unless propertyId is given) ----
-    const Property = require("../models/property.model");
-    const { propertyId, sharingType } = req.body;
+    const { sharingType } = req.body;
 
     if (["Single", "Double", "Triple", "Other"].includes(sharingType)) {
       roomData.sharingType = sharingType;
     }
 
-    let createdProperty = null;
-
-    if (propertyId) {
-      const existing = await Property.findById(propertyId).lean();
-      if (!existing) {
-        return res.status(404).json({
-          success: false,
-          message: "Property not found",
-        });
-      }
-      if (
-        req.user.role === "owner" &&
-        String(existing.owner) !== String(req.user._id)
-      ) {
-        return res.status(403).json({
-          success: false,
-          message: "You can only add rooms to your own property",
-        });
-      }
-      roomData.property = existing._id;
-      if (!roomData.owner && existing.owner) roomData.owner = existing.owner;
-    } else {
-      createdProperty = await Property.create({
-        name: (title || "").trim(),
-        area: (location || "").trim(),
-        owner: roomData.owner || null,
-        propertyType: category || "Room",
+    const linkResult = await attachPropertyAndBuilding(req, roomData);
+    if (linkResult.error) {
+      return res.status(linkResult.error.status).json({
+        success: false,
+        message: linkResult.error.message,
       });
-      roomData.property = createdProperty._id;
     }
 
     let room;
     try {
       room = await Room.create(roomData);
     } catch (err) {
-      if (createdProperty) await Property.deleteOne({ _id: createdProperty._id });
+      if (linkResult.createdProperty) {
+        await linkResult.createdProperty.deleteOne();
+      }
       throw err;
     }
 
@@ -206,7 +232,7 @@ const getRooms = async (req, res) => {
 
     let query = Room.find(filter).populate("owner", "name slug");
     if (grouped) {
-      query = query.populate("property", "name area propertyType");
+      query = query.populate("property", "name area propertyType buildings");
     }
 
     let rooms = await query.sort({
@@ -220,9 +246,10 @@ const getRooms = async (req, res) => {
       const cards = [];
       for (const r of rooms) {
         const pid = r.property && r.property._id ? String(r.property._id) : "solo-" + r._id;
+        const groupId = r.building ? `${pid}-${r.building}` : pid;
         const key = r.sharingType || "none";
-        if (!seen.has(pid)) seen.set(pid, new Set());
-        const keys = seen.get(pid);
+        if (!seen.has(groupId)) seen.set(groupId, new Set());
+        const keys = seen.get(groupId);
         if (keys.has(key) || keys.size >= 3) continue;
         keys.add(key);
         cards.push(r);
@@ -509,43 +536,19 @@ const createBulkRooms = async (req, res) => {
       baseData.whatsapp = baseData.whatsapp || req.user.phone;
     }
 
-    // ---- Property link: whole batch shares ONE property ----
-    const Property = require("../models/property.model");
-    const { propertyId, sharingType } = req.body;
+    // ---- Property and building link: whole batch shares both ----
+    const { sharingType } = req.body;
 
     if (["Single", "Double", "Triple", "Other"].includes(sharingType)) {
       baseData.sharingType = sharingType;
     }
 
-    let createdProperty = null;
-
-    if (propertyId) {
-      const existing = await Property.findById(propertyId).lean();
-      if (!existing) {
-        return res.status(404).json({
-          success: false,
-          message: "Property not found",
-        });
-      }
-      if (
-        req.user.role === "owner" &&
-        String(existing.owner) !== String(req.user._id)
-      ) {
-        return res.status(403).json({
-          success: false,
-          message: "You can only add rooms to your own property",
-        });
-      }
-      baseData.property = existing._id;
-      if (!baseData.owner && existing.owner) baseData.owner = existing.owner;
-    } else {
-      createdProperty = await Property.create({
-        name: (title || "").trim(),
-        area: (location || "").trim(),
-        owner: baseData.owner || null,
-        propertyType: category || "Room",
+    const linkResult = await attachPropertyAndBuilding(req, baseData);
+    if (linkResult.error) {
+      return res.status(linkResult.error.status).json({
+        success: false,
+        message: linkResult.error.message,
       });
-      baseData.property = createdProperty._id;
     }
 
     const roomDocs = [];
@@ -560,7 +563,9 @@ const createBulkRooms = async (req, res) => {
     try {
       createdRooms = await Room.insertMany(roomDocs);
     } catch (err) {
-      if (createdProperty) await Property.deleteOne({ _id: createdProperty._id });
+      if (linkResult.createdProperty) {
+        await linkResult.createdProperty.deleteOne();
+      }
       throw err;
     }
 

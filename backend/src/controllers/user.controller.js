@@ -1,4 +1,6 @@
 const User = require("../models/user.model");
+const { sanitizeRoommatePreferences } = require("../utils/roommatePreferences");
+const { migrateLegacyForUser } = require("../utils/migrateRoommateProfile");
 
 const USERNAME_REGEX = /^[a-z0-9_.]{3,20}$/;
 const OCCUPATIONS = ["", "student", "working", "business", "other"];
@@ -7,6 +9,9 @@ const GENDERS = ["", "male", "female", "other"];
 // free-text fields and their max lengths
 const TEXT_FIELDS = {
   organization: 80,
+  course: 100,
+  subject: 100,
+  studyYear: 40,
   city: 60,
   area: 60,
   hometown: 60,
@@ -23,10 +28,13 @@ const getMyProfile = async (req, res) => {
     if (!isUserAccount(req)) {
       return fail(res, 403, "Ye profile sirf users ke liye hai");
     }
-    const user = await User.findById(req.user._id).select("-password -wishlist");
-    if (!user) {
+    const userDocument = await migrateLegacyForUser(req.user._id);
+    if (!userDocument) {
       return fail(res, 404, "User nahi mila");
     }
+    const user = userDocument.toObject();
+    delete user.password;
+    delete user.wishlist;
     res.json({ success: true, user });
   } catch (error) {
     fail(res, 500, "Profile load nahi hua");
@@ -107,6 +115,22 @@ const updateMyProfile = async (req, res) => {
         }
         update[field] = clean;
       }
+    }
+
+    if (req.body.roommatePreferences !== undefined) {
+      if (
+        !req.body.roommatePreferences ||
+        typeof req.body.roommatePreferences !== "object" ||
+        Array.isArray(req.body.roommatePreferences)
+      ) {
+        return fail(res, 400, "Roommate preferences are invalid");
+      }
+      const { updates: roommateUpdates, error } = sanitizeRoommatePreferences(
+        req.body.roommatePreferences
+      );
+      if (error) return fail(res, 400, error);
+      Object.assign(update, roommateUpdates);
+      update["roommatePreferences.setupComplete"] = true;
     }
 
     const user = await User.findByIdAndUpdate(req.user._id, update, { new: true })
