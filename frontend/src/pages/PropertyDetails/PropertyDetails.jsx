@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { idFromParam, roomPath } from "../../utils/roomUrl";
@@ -30,7 +30,7 @@ function PropertyDetails() {
   const [roomResult, setRoomResult] = useState(null);
   const room = roomResult?.id === id ? roomResult.room : null;
   const loading = roomResult?.id !== id;
-  const wishlisted = isWishlisted(id);
+  const wishlisted = isWishlisted(room?._id);
 
   useEffect(() => {
     let active = true;
@@ -56,10 +56,10 @@ function PropertyDetails() {
 
     try {
       if (wishlisted) {
-        await removeFromWishlist(id);
+        await removeFromWishlist(room._id);
         toast.success("Removed from saved listings");
       } else {
-        await addToWishlist(id);
+        await addToWishlist(room._id);
         toast.success("Listing saved");
       }
     } catch (error) {
@@ -77,6 +77,10 @@ function PropertyDetails() {
         <Link to="/">Back to home</Link>
       </main>
     );
+  }
+
+  if (room.slug && rawId !== room.slug) {
+    return <Navigate to={roomPath(room)} replace />;
   }
 
   const ownerName = room.ownerName || room.owner?.name;

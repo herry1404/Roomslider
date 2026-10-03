@@ -14,7 +14,10 @@ const {
   deleteMess,
   getNearbyMess,
   getMessDetail,
+  getMessReviews,
+  createMessReview,
   updateTodayMenu,
+  updateMessAddOns,
   getMyMessDashboard,
   getTodayOrders,
 } = require("../controllers/mess.controller");
@@ -25,12 +28,15 @@ const {
 router.post("/login", messLogin);
 router.get("/nearby", getNearbyMess);
 router.get("/public/:id", getMessDetail);
+router.get("/public/:id/reviews", getMessReviews);
+router.post("/:id/reviews", protect, createMessReview);
 
 // ===============================
 // Mess Owner (protected)
 // ===============================
 router.get("/me", protect, getMyMessDashboard);
 router.put("/me/menu", protect, updateTodayMenu);
+router.put("/me/add-ons", protect, updateMessAddOns);
 router.get("/me/orders/today", protect, getTodayOrders);
 
 // ===============================

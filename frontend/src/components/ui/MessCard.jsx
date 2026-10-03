@@ -1,45 +1,48 @@
 import { Link } from "react-router-dom";
-import { MapPin, IndianRupee, UtensilsCrossed } from "lucide-react";
-import "../../styles/room-card.css";
+import { MapPin, IndianRupee, Star, UtensilsCrossed } from "lucide-react";
 
 function MessCard({ mess }) {
+  const rating = Number(mess.ratingAverage || 0).toFixed(1);
   const menuPreview =
     mess.todayMenu?.items?.map((i) => i.name).join(" • ") ||
     "Menu not updated yet";
 
   return (
-    <Link to={`/mess/${mess._id}`} className="room-card" style={{ textDecoration: "none", color: "inherit" }}>
-      <div className="room-image-wrapper" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-2)" }}>
+    <Link to={`/mess/${mess.slug || mess._id}`} className="mess-card">
+      <div className="mess-card-image">
         {mess.images && mess.images[0] ? (
           <img
             src={mess.images[0]}
             alt={mess.name}
-            className="room-image"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <UtensilsCrossed size={40} color="var(--color-primary)" />
         )}
-        <span className="room-category">Mess</span>
+        <span className="mess-card-tag">{mess.mealType === "tiffin" ? "Tiffin" : "Thali"}</span>
       </div>
 
-      <div className="room-content">
-        <h3>{mess.name}</h3>
+      <div className="mess-card-content">
+        <div className="mess-card-heading">
+          <h3>{mess.name}</h3>
+          <span className="mess-card-rating" aria-label={mess.ratingCount ? `${rating} from ${mess.ratingCount} reviews` : "New mess, no reviews yet"}>
+            <Star size={13} fill="currentColor" />
+            {mess.ratingCount ? `${rating} (${mess.ratingCount})` : "New"}
+          </span>
+        </div>
 
-        <div className="room-location">
-          <MapPin size={16} />
+        <div className="mess-card-location">
+          <MapPin size={14} />
           <span>{mess.address}</span>
         </div>
 
-        <div className="room-price">
-          <IndianRupee size={17} />
-          <strong>{mess.pricePerPerson?.toLocaleString()}</strong>
-          <span>/thali</span>
-        </div>
+        <p className="mess-card-menu">{menuPreview}</p>
 
-        <p style={{ fontSize: 13, color: "var(--color-text-light)" }}>
-          Today: {menuPreview}
-        </p>
+        <div className="mess-card-price">
+          <strong><IndianRupee size={15} />{mess.pricePerPerson?.toLocaleString()}</strong>
+          <span>per {mess.mealType === "tiffin" ? "tiffin" : "thali"}</span>
+        </div>
       </div>
     </Link>
   );

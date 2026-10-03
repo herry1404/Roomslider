@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const villaSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 120 },
+    slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
     description: { type: String, required: true, trim: true, maxlength: 3000 },
     address: { type: String, required: true, trim: true },
     area: { type: String, required: true, trim: true },
@@ -42,5 +43,6 @@ const villaSchema = new mongoose.Schema(
 
 villaSchema.index({ location: "2dsphere" });
 villaSchema.index({ isActive: 1, createdAt: -1 });
+villaSchema.index({ slug: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("Villa", villaSchema);

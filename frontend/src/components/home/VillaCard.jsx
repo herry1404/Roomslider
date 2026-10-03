@@ -11,7 +11,7 @@ function VillaCard({ villa, distanceKm }) {
   const location = [villa.area, villa.city].filter(Boolean).join(", ");
 
   return (
-    <Link className="villa-card" to={`/villas/${villa._id}`}>
+    <Link className="villa-card" to={`/villas/${villa.slug || villa.name}`}>
       {villa.images?.[0] ? (
         <img src={villa.images[0]} alt={villa.name} loading="lazy" decoding="async" />
       ) : (

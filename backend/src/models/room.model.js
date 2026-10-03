@@ -7,6 +7,7 @@ const roomSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
 
     price: {
       type: Number,
@@ -203,5 +204,7 @@ const roomSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+roomSchema.index({ slug: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("Room", roomSchema);

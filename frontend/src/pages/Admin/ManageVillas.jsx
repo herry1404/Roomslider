@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MapPin, Plus, Trash2, Pencil, X, Building2, CalendarCheck } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { formatLocationAddress, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/dashboard.css";
 
@@ -106,11 +107,29 @@ function ManageVillas() {
   const useLocation = () => {
     if (!navigator.geolocation) return toast.error("Location is not supported");
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setForm((current) => ({
-        ...current,
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      })),
+      async ({ coords }) => {
+        setForm((current) => ({
+          ...current,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        }));
+        try {
+          const address = await reverseGeocodeLocation(coords.latitude, coords.longitude);
+          setForm((current) => ({
+            ...current,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            area: address.area || current.area,
+            city: address.city || current.city,
+            address: formatLocationAddress(address) || address.formattedAddress || current.address,
+          }));
+          toast.success(address.postalCode
+            ? "Villa address, PIN code, and coordinates filled."
+            : "Villa address and coordinates filled; add the PIN code manually.");
+        } catch {
+          toast.error("Coordinates were captured, but the address lookup failed. Enter the address manually.");
+        }
+      },
       () => toast.error("Could not get location")
     );
   };

@@ -5,6 +5,7 @@ import { Search, ShoppingCart, X, Plus, Minus, MessageCircle, Sofa, MapPin } fro
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
+import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/furniture.css";
 
 const WA_NUMBER = "919131181848";
@@ -61,9 +62,11 @@ function FurnitureList() {
   const [d, setD] = useState({ mode: "rent", months: 6, cond: "new", qty: 1 });
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [addr, setAddr] = useState({ house: "", building: "", area: "", landmark: "", date: "", phone: "" });
+  const [addr, setAddr] = useState({ house: "", building: "", area: "", landmark: "", city: "Indore", state: "Madhya Pradesh", postalCode: "", date: "", phone: "" });
   const [loc, setLoc] = useState(null);
   const [locBusy, setLocBusy] = useState(false);
+  const [postalLookupState, setPostalLookupState] = useState("");
+  const [postalAreas, setPostalAreas] = useState([]);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(null);
 
@@ -74,6 +77,34 @@ function FurnitureList() {
       .catch((err) => console.error("Furniture fetch error:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(addr.postalCode)) return undefined;
+    let active = true;
+    const timeoutId = setTimeout(async () => {
+      setPostalLookupState("loading");
+      try {
+        const postalAddress = await lookupPostalCode(addr.postalCode);
+        if (!active) return;
+        setPostalAreas(postalAddress.areas);
+        setAddr((current) => ({
+          ...current,
+          area: postalAddress.areas[0] || current.area,
+          city: postalAddress.city || current.city,
+          state: postalAddress.state || current.state,
+        }));
+        setPostalLookupState("success");
+      } catch (error) {
+        if (!active) return;
+        setPostalAreas([]);
+        setPostalLookupState(error.message === "PIN code not found." ? "not-found" : "error");
+      }
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [addr.postalCode]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -155,10 +186,27 @@ function FurnitureList() {
     if (!navigator.geolocation) return toast.error("Location is not supported on this device");
     setLocBusy(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocBusy(false);
-        toast.success("Location added");
+      async (pos) => {
+        const latitude = pos.coords.latitude;
+        const longitude = pos.coords.longitude;
+        setLoc({ lat: latitude, lng: longitude });
+        try {
+          const locationAddress = await reverseGeocodeLocation(latitude, longitude);
+          setAddr((current) => ({
+            ...current,
+            house: locationAddress.houseNumber || current.house,
+            area: locationAddress.area || current.area,
+            landmark: locationAddress.nearby || current.landmark,
+            city: locationAddress.city || current.city,
+            state: locationAddress.state || current.state,
+            postalCode: locationAddress.postalCode || current.postalCode,
+          }));
+          toast.success("Current location and address added.");
+        } catch {
+          toast.error("Location found, but address lookup failed. Enter the address manually.");
+        } finally {
+          setLocBusy(false);
+        }
       },
       () => {
         setLocBusy(false);
@@ -186,7 +234,7 @@ function FurnitureList() {
       "",
       `Name: ${r.name}`,
       `Phone: ${r.phone}`,
-      `Address: ${[a.house, a.building, a.area, a.landmark ? "Near " + a.landmark : ""].filter(Boolean).join(", ")}, ${a.city}`,
+      `Address: ${[a.house, a.building, a.area, a.landmark ? "Near " + a.landmark : "", a.city, a.state, a.postalCode].filter(Boolean).join(", ")}`,
       ...(r.mapsLink ? [`Location: ${r.mapsLink}`] : []),
       ...(r.deliveryDate ? [`Preferred delivery date: ${r.deliveryDate}`] : []),
     ].join("\n");
@@ -200,7 +248,9 @@ function FurnitureList() {
     }
     if (cart.length === 0) return toast.error("Cart is empty");
     if (!addr.house.trim()) return toast.error("Enter your house / flat number");
-    if (!addr.area) return toast.error("Please choose your area");
+    if (!addr.area || !addr.city || !addr.state) return toast.error("Complete your area, city, and state");
+    if (!/^\d{6}$/.test(addr.postalCode)) return toast.error("Enter a valid 6-digit PIN code");
+    if (!/^\d{6}$/.test(addr.postalCode)) return toast.error("Enter a valid 6-digit PIN code");
     const phone = String((user && user.phone) || addr.phone || "").replace(/\D/g, "").slice(-10);
     if (phone.length !== 10) return toast.error("Enter a valid 10 digit phone number");
 
@@ -208,7 +258,15 @@ function FurnitureList() {
     try {
       const res = await api.post("/furniture-requests", {
         items: cart.map((l) => ({ itemId: l.itemId, mode: l.mode, months: l.months, cond: l.cond, qty: l.qty })),
-        address: { house: addr.house, building: addr.building, area: addr.area, landmark: addr.landmark },
+        address: {
+          house: addr.house,
+          building: addr.building,
+          area: addr.area,
+          landmark: addr.landmark,
+          city: addr.city,
+          state: addr.state,
+          postalCode: addr.postalCode,
+        },
         location: loc,
         deliveryDate: addr.date,
         phone,
@@ -287,13 +345,25 @@ function FurnitureList() {
                   onChange={(e) => setAddr({ ...addr, house: e.target.value })} />
                 <input className="fu-input" placeholder="Building / PG / hostel name" value={addr.building}
                   onChange={(e) => setAddr({ ...addr, building: e.target.value })} />
-                <select className="fu-input" value={addr.area}
-                  onChange={(e) => setAddr({ ...addr, area: e.target.value })}>
-                  <option value="">Choose your area in Indore *</option>
-                  {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
-                </select>
+                <input className="fu-input" placeholder="Area / locality *" list="furniture-postal-areas" value={addr.area}
+                  onChange={(e) => setAddr({ ...addr, area: e.target.value })} />
+                <datalist id="furniture-postal-areas">
+                  {[...new Set([...AREAS, ...postalAreas])].map((area) => <option key={area} value={area} />)}
+                </datalist>
                 <input className="fu-input" placeholder="Landmark (optional)" value={addr.landmark}
                   onChange={(e) => setAddr({ ...addr, landmark: e.target.value })} />
+                <input className="fu-input" placeholder="City *" value={addr.city}
+                  onChange={(e) => setAddr({ ...addr, city: e.target.value })} />
+                <input className="fu-input" placeholder="State *" value={addr.state}
+                  onChange={(e) => setAddr({ ...addr, state: e.target.value })} />
+                <input className="fu-input" placeholder="6-digit PIN code *" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={addr.postalCode}
+                  onChange={(e) => setAddr({ ...addr, postalCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
+                <span className="fu-muted" aria-live="polite">
+                  {postalLookupState === "loading" && "Looking up area, city, and state..."}
+                  {postalLookupState === "success" && "Area, city, and state filled from PIN code."}
+                  {postalLookupState === "not-found" && "PIN code not found. Enter address details manually."}
+                  {postalLookupState === "error" && "Could not look up PIN code. Enter address details manually."}
+                </span>
                 <button type="button" className={`fu-loc ${loc ? "on" : ""}`} onClick={fetchLocation} disabled={locBusy}>
                   <MapPin size={16} />
                   {locBusy ? "Getting location..." : loc ? "Location added (tap to update)" : "Use my current location"}

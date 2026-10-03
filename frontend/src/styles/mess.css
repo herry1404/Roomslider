@@ -1,0 +1,1201 @@
+.mess-page {
+  min-height: 60vh;
+  padding: 28px 0 64px;
+}
+
+.mess-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.mess-list-heading h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(23px, 3vw, 30px);
+  font-weight: 650;
+  letter-spacing: -0.6px;
+}
+
+.mess-location-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 7px 0 0;
+  color: var(--color-text-light);
+  font-size: 13px;
+}
+
+.mess-location-status svg {
+  flex: none;
+  color: var(--color-primary);
+}
+
+.mess-search {
+  display: flex;
+  align-items: center;
+  width: min(360px, 46%);
+  min-height: 46px;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-light);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mess-search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.mess-search > svg {
+  flex: none;
+}
+
+.mess-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.mess-search input::placeholder {
+  color: var(--color-text-light);
+}
+
+.mess-results-label {
+  margin-bottom: 13px;
+  color: var(--color-text-light);
+  font-size: 13px;
+}
+
+.mess-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px 18px;
+}
+
+.mess-grid > .skeleton-card {
+  width: auto;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mess-grid > .skeleton-card .room-content {
+  padding: 10px 2px 0;
+}
+
+.mess-card {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.mess-card-image {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 17px;
+  background: var(--color-surface-2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.mess-card-image::after {
+  position: absolute;
+  inset: 55% 0 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.28));
+  content: "";
+  pointer-events: none;
+}
+
+.mess-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.mess-card-tag {
+  position: absolute;
+  z-index: 1;
+  top: 11px;
+  left: 11px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #303030;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.mess-card-content {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  padding: 0 2px;
+}
+
+.mess-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 8px;
+}
+
+.mess-card-content h3 {
+  overflow: hidden;
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mess-card-rating {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.mess-card-rating svg,
+.mess-detail-rating svg,
+.mess-review-author span svg {
+  color: #f59e0b;
+}
+
+.mess-card-location {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 5px;
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-card-location svg {
+  flex: none;
+  color: var(--color-text-light);
+}
+
+.mess-card-location span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mess-card-menu {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 17px;
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 12px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.mess-card-price {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 1px;
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-card-price strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.mess-card-price strong svg {
+  margin-top: 2px;
+}
+
+.mess-empty-state {
+  display: grid;
+  justify-items: center;
+  padding: 52px 16px;
+  border: 1px dashed var(--color-border);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.mess-empty-state > span {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.mess-empty-state h2,
+.mess-empty-state h3 {
+  margin: 14px 0 4px;
+  color: var(--color-text);
+  font-size: 18px;
+}
+
+.mess-empty-state p {
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.mess-empty-state button {
+  margin-top: 16px;
+  padding: 9px 16px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  color: var(--color-primary);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mess-detail-loading {
+  max-width: 900px;
+  padding-top: 32px;
+}
+
+.mess-detail-page {
+  padding-top: 24px;
+  padding-bottom: 64px;
+}
+
+.mess-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 17px;
+  color: var(--color-text-light);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.mess-back-link:hover {
+  color: var(--color-primary);
+}
+
+.mess-detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 17px;
+}
+
+.mess-detail-heading h1 {
+  margin: 0 0 6px;
+  color: var(--color-text);
+  font-size: clamp(24px, 4vw, 32px);
+  letter-spacing: -0.7px;
+}
+
+.mess-detail-heading p {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.mess-detail-heading p svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--color-primary);
+}
+
+.mess-detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 8px;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.mess-detail-rating span {
+  color: var(--color-text-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.mess-photo-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: repeat(2, minmax(120px, 1fr));
+  gap: 8px;
+  height: clamp(230px, 34vw, 390px);
+  margin-bottom: 28px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--color-surface-2);
+}
+
+.mess-photo-gallery img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.mess-photo-gallery img:first-child {
+  grid-row: 1 / 3;
+}
+
+.mess-photo-gallery.is-single img:first-child {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
+.mess-photo-gallery img:nth-child(n + 5) {
+  display: none;
+}
+
+.mess-photo-gallery.is-empty {
+  display: grid;
+  place-items: center;
+  color: var(--color-text-light);
+}
+
+.mess-photo-gallery.is-empty > div {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.mess-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: 34px;
+}
+
+.mess-detail-main {
+  min-width: 0;
+}
+
+.mess-detail-section {
+  padding: 0 0 25px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mess-detail-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.mess-detail-section-heading > div > p {
+  margin: 0 0 3px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mess-detail-section-heading h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 21px;
+  letter-spacing: -0.35px;
+}
+
+.mess-detail-section-heading h2 span {
+  color: var(--color-text-light);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mess-detail-section-heading time {
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-meal-graphic {
+  position: relative;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+}
+
+.mess-thali-graphic {
+  background:
+    radial-gradient(ellipse at 50% 55%, color-mix(in srgb, #f59e0b 9%, var(--color-surface)) 0 52%, transparent 53%),
+    var(--color-surface);
+}
+
+.mess-tiffin-graphic {
+  border-top: 5px solid color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--color-primary) 7%, var(--color-surface)), var(--color-surface));
+}
+
+.mess-meal-graphic-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mess-meal-graphic-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-primary) 13%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.mess-meal-graphic-top > div {
+  display: grid;
+  gap: 2px;
+}
+
+.mess-meal-graphic-top > div strong {
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.mess-meal-graphic-top > div span {
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-calorie-total {
+  margin-left: auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #f59e0b 14%, var(--color-surface));
+  color: #a16207;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.mess-menu-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mess-menu-category {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  animation: messMenuAppear 300ms ease both;
+}
+
+.mess-menu-category h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 8px;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.mess-menu-category h3 > span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+  color: var(--color-primary);
+  font-size: 10px;
+}
+
+.mess-menu-category ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mess-menu-category li,
+.mess-menu-category li > span {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 5px;
+}
+
+.mess-menu-category li {
+  justify-content: space-between;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.mess-menu-category li > span {
+  overflow-wrap: anywhere;
+}
+
+.mess-menu-category li svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--color-primary);
+}
+
+.mess-menu-category li small {
+  flex: none;
+  color: var(--color-text-light);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.mess-tiffin-graphic .mess-menu-category:nth-child(1) {
+  border-color: color-mix(in srgb, #f59e0b 30%, var(--color-border));
+}
+
+.mess-tiffin-graphic .mess-menu-category:nth-child(2) {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+}
+
+.mess-tiffin-graphic .mess-menu-category:nth-child(3) {
+  border-color: color-mix(in srgb, #60a5fa 30%, var(--color-border));
+}
+
+.mess-tiffin-graphic .mess-menu-category:nth-child(4) {
+  border-color: color-mix(in srgb, #f472b6 30%, var(--color-border));
+}
+
+.mess-tiffin-graphic .mess-menu-category {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+
+.mess-calorie-note,
+.mess-muted-copy {
+  margin: 10px 0 0;
+  color: var(--color-text-light);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mess-addon-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mess-addon-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 11px;
+  padding: 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+}
+
+.mess-addon-item-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--color-surface-2);
+  color: var(--color-primary);
+}
+
+.mess-addon-item-info {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.mess-addon-item-info strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mess-addon-item-info > span {
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-addon-add-button {
+  min-width: 56px;
+  padding: 6px 12px;
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mess-addon-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.mess-addon-quantity button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.mess-addon-quantity button:hover,
+.mess-addon-add-button:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+}
+
+.mess-review-form {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--color-surface-2);
+}
+
+.mess-review-form > label {
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-review-form-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.mess-review-form-controls select,
+.mess-review-form-controls input {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.mess-review-form-controls input {
+  flex: 1;
+}
+
+.mess-review-form-controls button {
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mess-review-form-controls button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mess-reviews-list {
+  display: grid;
+  gap: 12px;
+}
+
+.mess-review-card {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mess-review-author {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mess-review-author strong {
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.mess-review-author span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.mess-review-card p {
+  margin: 7px 0;
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mess-review-card time {
+  color: var(--color-text-light);
+  font-size: 11px;
+}
+
+.mess-order-card {
+  position: sticky;
+  top: 90px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.mess-order-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mess-order-price strong {
+  color: var(--color-text);
+  font-size: 24px;
+}
+
+.mess-order-price span {
+  color: var(--color-text-light);
+  font-size: 13px;
+}
+
+.mess-delivery-form {
+  display: grid;
+  gap: 10px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mess-delivery-form h2 {
+  margin: 0 0 2px;
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.mess-delivery-form > label {
+  display: grid;
+  gap: 5px;
+  color: var(--color-text-light);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mess-delivery-form input,
+.mess-delivery-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  outline: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.mess-delivery-form input:focus,
+.mess-delivery-form textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.mess-use-location {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mess-use-location:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.mess-map-pin-confirmation {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: -3px 0 0;
+  color: var(--color-primary);
+  font-size: 11px;
+}
+
+.mess-order-count,
+.mess-order-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 0;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.mess-stepper {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.mess-stepper button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.mess-order-addons {
+  display: grid;
+  gap: 8px;
+  padding: 0 0 12px;
+}
+
+.mess-order-addons > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-text-light);
+  font-size: 12px;
+}
+
+.mess-order-addons strong {
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.mess-order-total {
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+  font-weight: 650;
+}
+
+.mess-order-total strong {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text);
+  font-size: 18px;
+}
+
+.mess-order-button,
+.mess-call-button {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mess-order-button {
+  border: 0;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.mess-order-button:hover {
+  background: var(--color-primary-hover);
+}
+
+.mess-order-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.mess-call-button {
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.mess-payment-note {
+  margin: 10px 0 0;
+  color: var(--color-text-light);
+  font-size: 11px;
+  text-align: center;
+}
+
+@keyframes messMenuAppear {
+  from {
+    opacity: 0.5;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) {
+  .mess-card:hover .mess-card-image {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .mess-card:hover .mess-card-image img {
+    transform: scale(1.04);
+  }
+}
+
+@media (max-width: 1000px) {
+  .mess-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mess-detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+    gap: 22px;
+  }
+}
+
+@media (max-width: 760px) {
+  .mess-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 13px;
+  }
+
+  .mess-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mess-order-card {
+    position: static;
+  }
+
+  .mess-photo-gallery {
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: repeat(2, minmax(90px, 1fr));
+    height: 280px;
+  }
+
+  .mess-photo-gallery img:first-child {
+    grid-row: 1 / 3;
+  }
+
+  .mess-photo-gallery img:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .mess-page {
+    padding: 19px 0 48px;
+  }
+
+  .mess-list-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mess-search {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .mess-card {
+    gap: 7px;
+  }
+
+  .mess-card-image {
+    border-radius: 14px;
+  }
+
+  .mess-card-tag {
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .mess-card-content {
+    gap: 4px;
+  }
+
+  .mess-card-content h3,
+  .mess-card-price strong {
+    font-size: 13px;
+  }
+
+  .mess-card-rating,
+  .mess-card-location,
+  .mess-card-menu,
+  .mess-card-price {
+    font-size: 11px;
+  }
+
+  .mess-detail-page {
+    padding-top: 18px;
+    padding-bottom: 44px;
+  }
+
+  .mess-detail-heading {
+    gap: 10px;
+  }
+
+  .mess-detail-heading h1 {
+    font-size: 24px;
+  }
+
+  .mess-detail-heading p {
+    font-size: 12px;
+  }
+
+  .mess-detail-rating {
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .mess-photo-gallery {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 190px 100px;
+    height: auto;
+    gap: 5px;
+    margin-bottom: 22px;
+    border-radius: 14px;
+  }
+
+  .mess-photo-gallery img:first-child {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+
+  .mess-photo-gallery img:nth-child(n + 4) {
+    display: none;
+  }
+
+  .mess-detail-section-heading h2 {
+    font-size: 19px;
+  }
+
+  .mess-meal-graphic {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .mess-menu-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .mess-menu-category {
+    padding: 10px;
+  }
+
+  .mess-calorie-total {
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+
+  .mess-review-form-controls {
+    flex-wrap: wrap;
+  }
+
+  .mess-review-form-controls select {
+    flex: 0 0 100%;
+  }
+
+  .mess-review-form-controls input {
+    flex-basis: 150px;
+  }
+
+  .mess-order-card {
+    padding: 15px;
+  }
+
+  .mess-order-price strong {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mess-card-image,
+  .mess-card-image img,
+  .mess-menu-category {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,18 +1,21 @@
 const safeMsg = require("../utils/safeMsg");
 const HourlyRoom = require("../models/HourlyRoom.model");
+const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 
 // Admin: create hourly room directly
 const createHourlyRoom = async (req, res) => {
   try {
     const images = req.files && req.files.length > 0 ? req.files.map((f) => f.path) : [];
 
-    const room = await HourlyRoom.create({
+    const roomData = {
       ...req.body,
       images,
       approvedByAdmin: req.user?._id,
       status: "approved",
       isActive: true,
-    });
+    };
+    roomData.slug = await createUniqueSlug(HourlyRoom, roomData.title);
+    const room = await HourlyRoom.create(roomData);
     res.status(201).json(room);
   } catch (err) {
     res.status(500).json({ message: "Failed to create hourly room", error: safeMsg(err) });
@@ -37,6 +40,7 @@ const getPublicHourlyRooms = async (req, res) => {
     const rooms = await HourlyRoom.find({ isActive: true, status: "approved" }).sort({
       createdAt: -1,
     });
+    await ensurePublicSlugs(HourlyRoom, rooms, (room) => room.title);
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch hourly rooms", error: safeMsg(err) });
@@ -46,14 +50,18 @@ const getPublicHourlyRooms = async (req, res) => {
 // Public: single room by id (for detail/checkout page)
 const getPublicHourlyRoomById = async (req, res) => {
   try {
+    const identity = /^[a-f\d]{24}$/i.test(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: req.params.id.toLowerCase() };
     const room = await HourlyRoom.findOne({
-      _id: req.params.id,
+      ...identity,
       isActive: true,
       status: "approved",
     });
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
+    await ensurePublicSlugs(HourlyRoom, [room], (item) => item.title);
     res.json(room);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch room", error: safeMsg(err) });
@@ -64,6 +72,9 @@ const getPublicHourlyRoomById = async (req, res) => {
 const updateHourlyRoom = async (req, res) => {
   try {
     const updateData = { ...req.body };
+    if (updateData.title) {
+      updateData.slug = await createUniqueSlug(HourlyRoom, updateData.title, req.params.id);
+    }
 
     if (req.files && req.files.length > 0) {
       updateData.images = req.files.map((f) => f.path);

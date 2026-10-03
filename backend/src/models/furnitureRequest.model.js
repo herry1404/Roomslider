@@ -35,6 +35,8 @@ const furnitureRequestSchema = new mongoose.Schema(
       area: { type: String, required: true },
       landmark: { type: String, default: '' },
       city: { type: String, default: 'Indore' },
+      state: { type: String, default: 'Madhya Pradesh' },
+      postalCode: { type: String, default: '', trim: true, maxlength: 6 },
     },
     location: {
       lat: { type: Number, default: null },

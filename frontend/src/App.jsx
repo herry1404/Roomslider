@@ -114,9 +114,9 @@ function App() {
         <Route path="/villas" element={<MainLayout><VillaList /></MainLayout>} />
         <Route path="/villas/:id" element={<MainLayout><VillaDetail /></MainLayout>} />
         <Route path="/mess" element={<MainLayout><MessList /></MainLayout>} />
-        <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/mess/login" element={<MessLogin />} />
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
+        <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/roommates/chat/:userId" element={<MainLayout><RoommateChatPage /></MainLayout>} />
         <Route path="/roommates/profile/:userId" element={<MainLayout><RoommateProfilePage /></MainLayout>} />

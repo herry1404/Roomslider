@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/furniture-admin.css";
+import "../../styles/vehicles.css";
 
 const emptyVehicle = {
   name: "", brand: "", type: "Scooty", fuel: "Petrol", transmission: "Automatic", seats: "2",
@@ -62,7 +63,7 @@ function AddVehicle() {
   if (loading) return <div className="admin-page"><p>Loading vehicle...</p></div>;
 
   return (
-    <div className="admin-page">
+    <div className="admin-page vehicle-admin-page">
       <div className="admin-page-header">
         <div><h1>{editing ? "Edit Vehicle" : "Add Vehicle"}</h1><p>Vehicle catalog details, rental prices and requirements.</p></div>
         <Link to="/admin/vehicles" className="admin-btn secondary"><ArrowLeft size={16} /> Back</Link>

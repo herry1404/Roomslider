@@ -19,8 +19,7 @@ const propertySchema = new mongoose.Schema(
         name: { type: String, required: true, trim: true },
       },
     ],
-    // Slug baad me (Phase 7) bharenge
-    slug: { type: String, unique: true, sparse: true },
+    slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
     oldSlugs: [{ type: String }],
   },
   { timestamps: true }

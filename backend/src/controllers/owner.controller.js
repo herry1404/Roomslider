@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Owner = require("../models/Owner");
 const Room = require("../models/room.model");
+const { createUniqueSlug } = require("../utils/publicSlug");
 
 const createOwnerToken = (owner) => {
   if (!process.env.JWT_SECRET) {
@@ -225,6 +226,10 @@ const getPublicOwnerProfile = async (req, res) => {
       "name propertyName slug instagram facebook youtube createdAt"
     );
     if (!owner) return res.status(404).json({ message: "Owner not found" });
+    if (!owner.slug) {
+      owner.slug = await createUniqueSlug(Owner, `${owner.name} ${owner.propertyName || ""}`, owner._id);
+      await Owner.updateOne({ _id: owner._id, $or: [{ slug: { $exists: false } }, { slug: "" }] }, { $set: { slug: owner.slug } });
+    }
 
     const totalListings = await Room.countDocuments({ owner: owner._id, status: "vacant" });
 

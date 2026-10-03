@@ -82,6 +82,11 @@ exports.createRequest = async (req, res) => {
         building: String(address.building || '').trim(),
         area: String(address.area).trim(),
         landmark: String(address.landmark || '').trim(),
+        city: String(address.city || 'Indore').trim(),
+        state: String(address.state || 'Madhya Pradesh').trim(),
+        postalCode: /^\d{6}$/.test(String(address.postalCode || ''))
+          ? String(address.postalCode)
+          : '',
       },
       location: cleanLocation(location),
       totalPrice: getTotal(vehicle, durationType, pickupDate, returnDate),

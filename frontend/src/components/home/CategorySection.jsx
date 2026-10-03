@@ -19,7 +19,7 @@ function CategorySection({ title, viewAllPath, rooms }) {
 
   const goToDetails = (room) => {
     const detailsPath = room.building && room.property?._id
-      ? `/property/${room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
+      ? `/property/${room.property.slug || room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
       : roomPath(room);
 
     navigate(detailsPath);
@@ -74,7 +74,7 @@ function CategorySection({ title, viewAllPath, rooms }) {
               ? `${room.property.name} · ${building.name}`
               : room.title;
             const detailsPath = room.building && room.property?._id
-              ? `/property/${room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
+              ? `/property/${room.property.slug || room.property._id}?building=${room.building}&sharing=${encodeURIComponent((room.sharingType || "").toLowerCase())}`
               : roomPath(room);
 
             return (

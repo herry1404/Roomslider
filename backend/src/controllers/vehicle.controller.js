@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Vehicle = require('../models/vehicle.model');
+const { createUniqueSlug, ensurePublicSlugs } = require('../utils/publicSlug');
 
 const TYPES = ['Scooty', 'Bike', 'Car', 'SUV', 'Van'];
 const FUELS = ['Petrol', 'Diesel', 'Electric'];
@@ -74,13 +75,14 @@ exports.getVehicles = async (req, res) => {
     }
     const [vehicles, total] = await Promise.all([
       Vehicle.find(filter)
-        .select('name brand type fuel transmission seats photos pricePerDay pricePerWeek pricePerMonth pricePerHour securityDeposit isAvailable')
+        .select('name brand slug type fuel transmission seats photos pricePerDay pricePerWeek pricePerMonth pricePerHour securityDeposit isAvailable')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),
       Vehicle.countDocuments(filter),
     ]);
+    await ensurePublicSlugs(Vehicle, vehicles, (vehicle) => `${vehicle.brand} ${vehicle.name}`);
     res.json({ vehicles, page, limit, total, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error('getVehicles error:', error);
@@ -100,9 +102,12 @@ exports.getAllVehicles = async (req, res) => {
 
 exports.getVehicleById = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Vehicle not found' });
-    const vehicle = await Vehicle.findOne({ _id: req.params.id, brand: { $exists: true }, isVisible: true }).lean();
+    const identity = mongoose.isValidObjectId(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: req.params.id.toLowerCase() };
+    const vehicle = await Vehicle.findOne({ ...identity, brand: { $exists: true }, isVisible: true }).lean();
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+    await ensurePublicSlugs(Vehicle, [vehicle], (item) => `${item.brand} ${item.name}`);
     res.json(vehicle);
   } catch (error) {
     console.error('getVehicleById error:', error);
@@ -126,7 +131,9 @@ exports.createVehicle = async (req, res) => {
   try {
     const errors = validVehicleData(req.body);
     if (errors.length) return res.status(400).json({ message: errors.join('. ') });
-    const vehicle = await Vehicle.create(buildVehicle(req.body, uploadedPhotos(req.files)));
+    const vehicleData = buildVehicle(req.body, uploadedPhotos(req.files));
+    vehicleData.slug = await createUniqueSlug(Vehicle, `${vehicleData.brand} ${vehicleData.name}`);
+    const vehicle = await Vehicle.create(vehicleData);
     res.status(201).json(vehicle);
   } catch (error) {
     console.error('createVehicle error:', error);
@@ -145,7 +152,11 @@ exports.updateVehicle = async (req, res) => {
 
     const existingPhotos = parsePhotos(req.body.existingPhotos, vehicle.photos);
     const photoSet = new Set([...existingPhotos, ...uploadedPhotos(req.files)]);
-    Object.assign(vehicle, buildVehicle(data, [...photoSet]));
+    const vehicleData = buildVehicle(data, [...photoSet]);
+    if (data.name !== vehicle.name || data.brand !== vehicle.brand) {
+      vehicleData.slug = await createUniqueSlug(Vehicle, `${vehicleData.brand} ${vehicleData.name}`, vehicle._id);
+    }
+    Object.assign(vehicle, vehicleData);
     await vehicle.save();
     res.json(vehicle);
   } catch (error) {

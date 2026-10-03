@@ -28,7 +28,7 @@ function RoomCard({ room, onWishlistChange }) {
 
   // Grouped homepage cards -> property page; otherwise old room page
   const cardPath = room.property?._id
-    ? `/property/${room.property._id}${
+    ? `/property/${room.property.slug || room.property._id}${
         room.sharingType && room.sharingType !== "Other"
           ? `?sharing=${room.sharingType.toLowerCase()}`
           : ""

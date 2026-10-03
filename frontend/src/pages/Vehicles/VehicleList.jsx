@@ -68,7 +68,7 @@ function VehicleList() {
         {loading ? <div className="vehicle-grid">{Array.from({ length: 8 }, (_, index) => <SkeletonRoomCard key={index} />)}</div> : visibleVehicles.length === 0 ? <div className="vehicle-empty"><Bike size={32} /><h2>No vehicles found</h2><p>Try another name or vehicle type.</p></div> : (
           <div className="vehicle-grid">
             {visibleVehicles.map((vehicle) => (
-              <Link key={vehicle._id} to={`/vehicles/${vehicle._id}`} className="vehicle-card">
+              <Link key={vehicle._id} to={`/vehicles/${vehicle.slug || vehicle.name}`} className="vehicle-card">
                 <div className="vehicle-card-media">
                   {vehicle.photos?.[0] ? <img src={vehicle.photos[0]} alt={`${vehicle.brand} ${vehicle.name}`} loading="lazy" /> : <div className="vehicle-photo-placeholder"><Bike size={42} strokeWidth={1.5} /></div>}
                   <span className={`vehicle-availability ${vehicle.isAvailable ? "available" : "unavailable"}`}>{vehicle.isAvailable ? "Available" : "Currently unavailable"}</span>

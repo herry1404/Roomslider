@@ -19,7 +19,7 @@ function HourlyRoomCard({ room }) {
 
   return (
     <Link
-      to={`/hourly-rooms/${room._id}`}
+      to={`/hourly-rooms/${room.slug || room.title}`}
       className="room-card hourly-air-card"
       aria-label={`View ${room.title}`}
     >

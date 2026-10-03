@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, MessageCircle, Minus, Plus, Shirt } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
@@ -56,6 +56,7 @@ function LaundryDetail() {
 
   if (loading) return <main className="container laundry-page"><p>Loading laundry profile...</p></main>;
   if (!vendor) return <main className="container laundry-page"><p>Laundry profile nahi mili.</p></main>;
+  if (vendor.slug && id !== vendor.slug) return <Navigate to={`/laundry/${vendor.slug}`} replace />;
 
   return (
     <main className="container laundry-page laundry-detail-page">

@@ -14,11 +14,10 @@ export const slugify = (text = "") =>
     .slice(0, 60)
     .replace(/-+$/, "");
 
-// Example: /hostels/om-swastika-girls-hostel-6a7a8e7ecdae90db84d04181
+// Public listing URLs use the listing name; object IDs stay in API requests.
 export const roomPath = (room) => {
   const base = categoryPathMap[room.category] || "rooms";
-  const slug = slugify(room.title);
-  return slug ? `/${base}/${slug}-${room._id}` : `/${base}/${room._id}`;
+  return `/${base}/${room.slug || slugify(room.title) || "listing"}`;
 };
 
 // Works for both new slug URLs and old plain-ID URLs

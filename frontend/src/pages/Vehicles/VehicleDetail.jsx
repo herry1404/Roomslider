@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Bike, CalendarDays, Fuel, MapPin, ShieldCheck, UsersRound } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/vehicles.css";
 
 const formatPrice = (price) => `₹${Number(price || 0).toLocaleString("en-IN")}`;
@@ -31,6 +32,8 @@ function VehicleDetail() {
   const [photoIndex, setPhotoIndex] = useState(0);
   const [location, setLocation] = useState(null);
   const [locationBusy, setLocationBusy] = useState(false);
+  const [postalLookup, setPostalLookup] = useState("");
+  const [postalAreas, setPostalAreas] = useState([]);
   const [form, setForm] = useState({
     pickupDate: toLocalDate(tomorrow),
     returnDate: toLocalDate(addDays(tomorrow, 1)),
@@ -40,6 +43,9 @@ function VehicleDetail() {
     building: "",
     area: "",
     landmark: "",
+    city: "Indore",
+    state: "Madhya Pradesh",
+    postalCode: "",
   });
 
   useEffect(() => {
@@ -54,6 +60,34 @@ function VehicleDetail() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [id]);
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(form.postalCode)) return undefined;
+    let active = true;
+    const timeoutId = setTimeout(async () => {
+      setPostalLookup("loading");
+      try {
+        const postalAddress = await lookupPostalCode(form.postalCode);
+        if (!active) return;
+        setPostalAreas(postalAddress.areas);
+        setForm((current) => ({
+          ...current,
+          area: postalAddress.areas[0] || current.area,
+          city: postalAddress.city || current.city,
+          state: postalAddress.state || current.state,
+        }));
+        setPostalLookup("success");
+      } catch (error) {
+        if (!active) return;
+        setPostalAreas([]);
+        setPostalLookup(error.message === "PIN code not found." ? "not-found" : "error");
+      }
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [form.postalCode]);
 
   const days = Math.max(0, Math.ceil((new Date(`${form.returnDate}T00:00:00`) - new Date(`${form.pickupDate}T00:00:00`)) / 86400000));
   const periods = durationFromDays(days, form.durationType);
@@ -75,6 +109,11 @@ function VehicleDetail() {
     });
   };
 
+  const updatePostalCode = (event) => {
+    const postalCode = event.target.value.replace(/\D/g, "").slice(0, 6);
+    setForm((current) => ({ ...current, postalCode }));
+  };
+
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast.error("Location is not supported on this device");
@@ -82,14 +121,32 @@ function VehicleDetail() {
     }
     setLocationBusy(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
-        setLocationBusy(false);
-        toast.success("Location added");
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setLocation({ lat: latitude, lng: longitude });
+        try {
+          const address = await reverseGeocodeLocation(latitude, longitude);
+          setForm((current) => ({
+            ...current,
+            house: address.houseNumber || current.house,
+            building: current.building,
+            area: address.area || current.area,
+            landmark: address.nearby || current.landmark,
+            city: address.city || current.city,
+            state: address.state || current.state,
+            postalCode: address.postalCode || current.postalCode,
+          }));
+          toast.success("Current location and address added.");
+        } catch {
+          toast.error("Location found, but address lookup failed. Enter the address manually.");
+        } finally {
+          setLocationBusy(false);
+        }
       },
       () => {
         setLocationBusy(false);
-        toast.error("Location permission nahi mili; address manually bhar sakte hain");
+        toast.error("Location permission is unavailable. Enter the address manually.");
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -106,8 +163,8 @@ function VehicleDetail() {
       navigate("/profile/edit");
       return;
     }
-    if (!form.house.trim() || !form.area.trim()) {
-      toast.error("House/flat number aur area required hain");
+    if (!form.house.trim() || !form.area.trim() || !form.city.trim() || !form.state.trim() || !/^\d{6}$/.test(form.postalCode)) {
+      toast.error("Enter house number, area, city, state, and a valid 6-digit PIN code.");
       return;
     }
     if (!days || !total) {
@@ -123,11 +180,27 @@ function VehicleDetail() {
         returnDate: new Date(`${form.returnDate}T00:00:00`).toISOString(),
         durationType: form.durationType,
         pickupOption: form.pickupOption,
-        address: { house: form.house, building: form.building, area: form.area, landmark: form.landmark },
+        address: {
+          house: form.house,
+          building: form.building,
+          area: form.area,
+          landmark: form.landmark,
+          city: form.city,
+          state: form.state,
+          postalCode: form.postalCode,
+        },
         location,
       });
       const rental = response.data;
-      const address = [form.house, form.building, form.area, form.landmark].filter(Boolean).join(", ");
+      const address = [
+        form.house,
+        form.building,
+        form.area,
+        form.landmark ? `Near ${form.landmark}` : "",
+        form.city,
+        form.state,
+        form.postalCode,
+      ].filter(Boolean).join(", ");
       const mapsLink = location
         ? `https://www.google.com/maps?q=${location.lat},${location.lng}`
         : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address}, Indore`)}`;
@@ -143,7 +216,7 @@ function VehicleDetail() {
         `Security deposit: ${formatPrice(vehicle.securityDeposit)}`,
         `Name: ${user.name || rental.name}`,
         `Phone: ${user.phone || rental.phone}`,
-        `Address: ${address}, Indore`,
+        `Address: ${address}`,
         ...(mapsLink ? [`Google Maps: ${mapsLink}`] : []),
       ].join("\n");
       const whatsappUrl = `https://wa.me/919131181848?text=${encodeURIComponent(message)}`;
@@ -160,6 +233,7 @@ function VehicleDetail() {
 
   if (loading) return <main className="container vehicle-page"><div className="vehicle-detail-skeleton" /></main>;
   if (!vehicle) return <main className="container vehicle-page"><div className="vehicle-empty"><h1>Vehicle not found</h1><Link to="/vehicles">Browse vehicles</Link></div></main>;
+  if (vehicle.slug && id !== vehicle.slug) return <Navigate to={`/vehicles/${vehicle.slug}`} replace />;
 
   return (
     <>
@@ -178,9 +252,9 @@ function VehicleDetail() {
               <p><Fuel size={17} /><span>Fuel & transmission</span><strong>{vehicle.fuel} · {vehicle.transmission}</strong></p>
               <p><UsersRound size={17} /><span>Seats</span><strong>{vehicle.seats}</strong></p>
               <p><MapPin size={17} /><span>Included distance</span><strong>{vehicle.freeKmPerDay} km/day</strong></p>
-              <p><span>Extra distance</span><strong>{formatPrice(vehicle.extraKmCharge)} / km</strong></p>
+              <p className="vehicle-spec-extra-distance"><span>Extra distance</span><strong>{formatPrice(vehicle.extraKmCharge)} <span>/ km</span></strong></p>
               <p><ShieldCheck size={17} /><span>Security deposit</span><strong>{formatPrice(vehicle.securityDeposit)}</strong></p>
-              <p><span>Helmet</span><strong>{vehicle.helmetIncluded ? "Included" : "Not included"}</strong></p>
+              <p className="vehicle-spec-no-icon"><span>Helmet</span><strong>{vehicle.helmetIncluded ? "Included" : "Not included"}</strong></p>
             </div></section>
             {vehicle.fuelPolicy && <section className="vehicle-detail-section"><h2>Fuel policy</h2><p>{vehicle.fuelPolicy}</p></section>}
             {vehicle.documentsRequired && <section className="vehicle-detail-section"><h2>Documents required</h2><p>{vehicle.documentsRequired}</p></section>}
@@ -196,12 +270,26 @@ function VehicleDetail() {
               <label>Pickup date<input type="date" min={toLocalDate(new Date())} required value={form.pickupDate} onChange={updateForm("pickupDate")} /></label>
               <label>Return date<input type="date" min={form.pickupDate} required value={form.returnDate} onChange={updateForm("returnDate")} /></label>
               <label>Price period<select value={form.durationType} onChange={updateForm("durationType")}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label>
-              <div className="vehicle-pickup-options"><span>Pickup option</span><label><input type="radio" name="pickupOption" value="self pickup" checked={form.pickupOption === "self pickup"} onChange={updateForm("pickupOption")} />Self pickup</label><label><input type="radio" name="pickupOption" value="delivery" checked={form.pickupOption === "delivery"} onChange={updateForm("pickupOption")} />Delivery</label></div>
+              <fieldset className="vehicle-pickup-options">
+                <legend>Pickup option</legend>
+                <label><input type="radio" name="pickupOption" value="self pickup" checked={form.pickupOption === "self pickup"} onChange={updateForm("pickupOption")} /><span>Self pickup</span></label>
+                <label><input type="radio" name="pickupOption" value="delivery" checked={form.pickupOption === "delivery"} onChange={updateForm("pickupOption")} /><span>Delivery</span></label>
+              </fieldset>
               <div className="vehicle-address-title"><CalendarDays size={17} /> Pickup / delivery address</div>
               <label>Flat / house no.<input required value={form.house} onChange={updateForm("house")} placeholder="House or flat number" /></label>
               <label>Building / PG<input value={form.building} onChange={updateForm("building")} placeholder="Building or PG name" /></label>
-              <label>Area<input required value={form.area} onChange={updateForm("area")} placeholder="Area in Indore" /></label>
-              <label>Landmark<input value={form.landmark} onChange={updateForm("landmark")} placeholder="Nearby landmark (optional)" /></label>
+              <label>Area / locality<input required list="vehicle-postal-areas" value={form.area} onChange={updateForm("area")} placeholder="Area or locality" /></label>
+              <datalist id="vehicle-postal-areas">{postalAreas.map((area) => <option key={area} value={area} />)}</datalist>
+              <label>Nearby landmark<input value={form.landmark} onChange={updateForm("landmark")} placeholder="Nearby landmark (optional)" /></label>
+              <label>City<input required value={form.city} onChange={updateForm("city")} placeholder="City" /></label>
+              <label>State<input required value={form.state} onChange={updateForm("state")} placeholder="State" /></label>
+              <label>PIN code<input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} required value={form.postalCode} onChange={updatePostalCode} placeholder="6-digit PIN code" /></label>
+              <span className="vehicle-postal-status" aria-live="polite">
+                {postalLookup === "loading" && "Looking up area, city, and state..."}
+                {postalLookup === "success" && "Area, city, and state filled from PIN code."}
+                {postalLookup === "not-found" && "PIN code not found. Enter address details manually."}
+                {postalLookup === "error" && "Could not look up PIN code. Enter address details manually."}
+              </span>
               <button className="vehicle-location-btn" type="button" onClick={useCurrentLocation} disabled={locationBusy}><MapPin size={16} />{locationBusy ? "Getting location..." : location ? "Current location added" : "Use my current location"}</button>
               <div className="vehicle-total"><span>{days ? `${periods} ${form.durationType}${periods === 1 ? "" : "s"} · ${days} day(s)` : "Choose rental dates"}</span><strong>{formatPrice(total)}</strong></div>
               <p className="vehicle-deposit-note">Security deposit: {formatPrice(vehicle.securityDeposit)} (payable separately, if applicable).</p>

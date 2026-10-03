@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, ArrowUpRight, Bath, BedDouble, Building2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -89,6 +89,10 @@ function PropertyPage() {
     () => [...new Set(visibleRooms.flatMap((room) => room.amenities || []).filter(Boolean))],
     [visibleRooms]
   );
+
+  if (property?.slug && id !== property.slug) {
+    return <Navigate to={`/property/${property.slug}${window.location.search}`} replace />;
+  }
 
   if (loading) return <PropertyDetailsSkeleton />;
 

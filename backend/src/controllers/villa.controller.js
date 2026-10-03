@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const Villa = require("../models/Villa");
 const VillaBooking = require("../models/VillaBooking");
+const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 
 const parseArray = (input) => {
   if (Array.isArray(input)) return input;
@@ -57,7 +58,9 @@ const getVillaFields = (body, files, current = {}) => {
 
 exports.createVilla = async (req, res) => {
   try {
-    const villa = await Villa.create(getVillaFields(req.body || {}, req.files));
+    const fields = getVillaFields(req.body || {}, req.files);
+    fields.slug = await createUniqueSlug(Villa, fields.name);
+    const villa = await Villa.create(fields);
     res.status(201).json({ success: true, villa });
   } catch (error) {
     console.error("CREATE VILLA ERROR:", error);
@@ -84,6 +87,7 @@ exports.getPublicVillas = async (req, res) => {
     const villaQuery = Villa.find(query);
     if (lat === undefined && lng === undefined) villaQuery.sort({ createdAt: -1 });
     const villas = await villaQuery.lean();
+    await ensurePublicSlugs(Villa, villas, (villa) => villa.name);
     res.status(200).json({ success: true, villas });
   } catch (error) {
     console.error("GET PUBLIC VILLAS ERROR:", error);
@@ -93,11 +97,12 @@ exports.getPublicVillas = async (req, res) => {
 
 exports.getPublicVilla = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({ success: false, message: "Invalid villa id" });
-    }
-    const villa = await Villa.findOne({ _id: req.params.id, isActive: true }).lean();
+    const identity = mongoose.isValidObjectId(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: req.params.id.toLowerCase() };
+    const villa = await Villa.findOne({ ...identity, isActive: true }).lean();
     if (!villa) return res.status(404).json({ success: false, message: "Villa not found" });
+    await ensurePublicSlugs(Villa, [villa], (item) => item.name);
     res.status(200).json({ success: true, villa });
   } catch (error) {
     console.error("GET PUBLIC VILLA ERROR:", error);
@@ -123,6 +128,9 @@ exports.updateVilla = async (req, res) => {
     const current = await Villa.findById(req.params.id).select("+bookingLockToken +bookingLockUntil");
     if (!current) return res.status(404).json({ success: false, message: "Villa not found" });
     const fields = getVillaFields(req.body || {}, req.files, current);
+    if (fields.name !== current.name) {
+      fields.slug = await createUniqueSlug(Villa, fields.name, current._id);
+    }
     const villa = await Villa.findByIdAndUpdate(req.params.id, fields, {
       new: true,
       runValidators: true,

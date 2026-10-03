@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MapPin, CheckCircle2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
@@ -78,7 +78,7 @@ function VillaDetail() {
       setQuote(null);
       const response = await api.get("/villa-bookings/check-availability", {
         params: {
-          villaId: id,
+          villaId: villa._id,
           bookingType: form.bookingType,
           startDate: form.startDate,
           endDate: form.endDate,
@@ -104,7 +104,7 @@ function VillaDetail() {
     try {
       setSubmitting(true);
       const orderResponse = await api.post("/villa-bookings/create-order", {
-        villaId: id,
+        villaId: villa._id,
         bookingType: form.bookingType,
         startDate: form.startDate,
         endDate: form.endDate,
@@ -152,6 +152,7 @@ function VillaDetail() {
 
   if (loading) return <main className="container villa-detail-page">Loading villa...</main>;
   if (!villa) return <main className="container villa-detail-page"><div className="villa-empty">Villa nahi mili.</div></main>;
+  if (villa.slug && id !== villa.slug) return <Navigate to={`/villas/${villa.slug}`} replace />;
 
   const images = (villa.images || []).filter(Boolean);
   const coordinates = villa.location?.coordinates || [];

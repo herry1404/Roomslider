@@ -4,6 +4,7 @@ const vehicleSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     brand: { type: String, required: true, trim: true },
+    slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
     type: { type: String, enum: ['Scooty', 'Bike', 'Car', 'SUV', 'Van'], required: true },
     fuel: { type: String, enum: ['Petrol', 'Diesel', 'Electric'], required: true },
     transmission: { type: String, enum: ['Manual', 'Automatic'], required: true },
@@ -27,5 +28,6 @@ const vehicleSchema = new mongoose.Schema(
 
 vehicleSchema.index({ isVisible: 1, isAvailable: 1, type: 1, createdAt: -1 });
 vehicleSchema.index({ name: 'text', brand: 'text' });
+vehicleSchema.index({ slug: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Shirt, Trash2, Plus, X, Pencil, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { formatLocationAddress, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/admin/theme.css";
 
 const emptyForm = () => ({
@@ -90,13 +91,31 @@ function ManageLaundryVendors() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        setForm((current) => ({
-          ...current,
+      async ({ coords }) => {
+        const coordinates = {
           latitude: coords.latitude,
           longitude: coords.longitude,
+        };
+        setForm((current) => ({
+          ...current,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
         }));
-        toast.success("Vendor location captured");
+        try {
+          const address = await reverseGeocodeLocation(coordinates.latitude, coordinates.longitude);
+          setForm((current) => ({
+            ...current,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+            area: address.area || current.area,
+            address: formatLocationAddress(address) || address.formattedAddress || current.address,
+          }));
+          toast.success(address.postalCode
+            ? "Vendor address, PIN code, and coordinates filled."
+            : "Vendor address and coordinates filled; add the PIN code manually.");
+        } catch {
+          toast.error("Coordinates were captured, but the address lookup failed. Enter the address manually.");
+        }
       },
       () => toast.error("Could not get location; enter the vendor coordinates")
     );

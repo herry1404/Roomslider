@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Clock3, MapPin, ShieldCheck, UserRound } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
@@ -165,6 +165,7 @@ function HourlyRoomDetail() {
       </main>
     );
   }
+  if (room.slug && id !== room.slug) return <Navigate to={`/hourly-rooms/${room.slug}`} replace />;
 
   const location = [room.location?.address, room.location?.city].filter(Boolean).join(", ");
   const price = Number(room.pricePerHour);

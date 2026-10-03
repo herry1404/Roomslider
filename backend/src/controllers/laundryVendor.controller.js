@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const LaundryVendor = require("../models/laundryVendor.model");
+const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 
 const cleanCatalog = (input) => {
   if (!Array.isArray(input)) return [];
@@ -54,6 +55,7 @@ const createVendor = async (req, res) => {
     }
     if (!fields.whatsapp) fields.whatsapp = fields.phone;
 
+    fields.slug = await createUniqueSlug(LaundryVendor, fields.vendorName);
     const vendor = await LaundryVendor.create(fields);
     res.status(201).json({ success: true, vendor });
   } catch (error) {
@@ -83,6 +85,11 @@ const updateVendor = async (req, res) => {
     }
     if (!fields.whatsapp) fields.whatsapp = fields.phone;
 
+    const current = await LaundryVendor.findById(req.params.id);
+    if (!current) return res.status(404).json({ success: false, message: "Vendor not found" });
+    if (fields.vendorName !== current.vendorName) {
+      fields.slug = await createUniqueSlug(LaundryVendor, fields.vendorName, current._id);
+    }
     const vendor = await LaundryVendor.findByIdAndUpdate(req.params.id, fields, {
       new: true,
       runValidators: true,
@@ -129,6 +136,7 @@ const getPublicVendors = async (req, res) => {
         .sort({ area: 1, vendorName: 1 })
         .lean();
     }
+    await ensurePublicSlugs(LaundryVendor, vendors, (vendor) => vendor.vendorName);
     res.status(200).json({ success: true, vendors });
   } catch (error) {
     console.error("GET PUBLIC LAUNDRY VENDORS ERROR:", error);
@@ -138,14 +146,15 @@ const getPublicVendors = async (req, res) => {
 
 const getPublicVendor = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({ success: false, message: "Invalid vendor id" });
-    }
+    const identity = mongoose.isValidObjectId(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: req.params.id.toLowerCase() };
     const vendor = await LaundryVendor.findOne({
-      _id: req.params.id,
+      ...identity,
       isActive: true,
     }).lean();
     if (!vendor) return res.status(404).json({ success: false, message: "Laundry vendor not found" });
+    await ensurePublicSlugs(LaundryVendor, [vendor], (item) => item.vendorName);
     res.status(200).json({ success: true, vendor });
   } catch (error) {
     console.error("GET PUBLIC LAUNDRY VENDOR ERROR:", error);

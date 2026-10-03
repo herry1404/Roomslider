@@ -29,7 +29,7 @@ function ManageFurnitureRequests() {
   };
 
   useEffect(() => {
-    load();
+    Promise.resolve().then(load);
   }, []);
 
   const setStatus = async (id, status) => {
@@ -135,7 +135,15 @@ function ManageFurnitureRequests() {
                     </div>
                   </td>
                   <td style={{ color: "var(--admin-muted)", maxWidth: 220 }}>
-                    {[r.address.house, r.address.building, r.address.area, r.address.landmark ? "Near " + r.address.landmark : ""]
+                    {[
+                      r.address.house,
+                      r.address.building,
+                      r.address.area,
+                      r.address.landmark ? "Near " + r.address.landmark : "",
+                      r.address.city,
+                      r.address.state,
+                      r.address.postalCode,
+                    ]
                       .filter(Boolean)
                       .join(", ")}
                     {r.mapsLink && (

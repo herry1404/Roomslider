@@ -5,6 +5,12 @@ const Room = require("../models/room.model");
 const Mess = require("../models/Mess");
 const Owner = require("../models/Owner");
 const Vehicle = require("../models/vehicle.model");
+const Villa = require("../models/Villa");
+const LaundryVendor = require("../models/laundryVendor.model");
+const HourlyRoom = require("../models/HourlyRoom.model");
+const Property = require("../models/property.model");
+const { ensureMessSlugs } = require("../utils/messSlug");
+const { ensurePublicSlugs } = require("../utils/publicSlug");
 
 const SITE_URL = "https://www.roomslider.in";
 
@@ -26,11 +32,25 @@ const categoryPathMap = {
 
 router.get("/", async (req, res) => {
   try {
-    const [rooms, messes, owners, vehicles] = await Promise.all([
-      Room.find({}, "_id title category updatedAt"),
-      Mess.find({}, "_id updatedAt"),
-      Owner.find({}, "_id updatedAt"),
-      Vehicle.find({ isVisible: true, brand: { $exists: true } }, "_id updatedAt"),
+    const [rooms, messes, owners, vehicles, villas, vendors, hourlyRooms, properties] = await Promise.all([
+      Room.find({ status: "vacant" }, "_id title slug category property updatedAt"),
+      Mess.find({}, "_id name slug updatedAt"),
+      Owner.find({}, "_id name propertyName slug updatedAt"),
+      Vehicle.find({ isVisible: true, brand: { $exists: true } }, "_id name brand slug updatedAt"),
+      Villa.find({ isActive: true }, "_id name slug updatedAt"),
+      LaundryVendor.find({ isActive: true }, "_id vendorName slug updatedAt"),
+      HourlyRoom.find({ isActive: true, status: "approved" }, "_id title slug updatedAt"),
+      Property.find({}, "_id name slug propertyType updatedAt"),
+    ]);
+    await ensureMessSlugs(Mess, messes);
+    await Promise.all([
+      ensurePublicSlugs(Room, rooms, (room) => room.title),
+      ensurePublicSlugs(Owner, owners, (owner) => `${owner.name} ${owner.propertyName || ""}`),
+      ensurePublicSlugs(Vehicle, vehicles, (vehicle) => `${vehicle.brand} ${vehicle.name}`),
+      ensurePublicSlugs(Villa, villas, (villa) => villa.name),
+      ensurePublicSlugs(LaundryVendor, vendors, (vendor) => vendor.vendorName),
+      ensurePublicSlugs(HourlyRoom, hourlyRooms, (room) => room.title),
+      ensurePublicSlugs(Property, properties, (property) => property.name),
     ]);
 
     const staticUrls = [
@@ -59,34 +79,71 @@ router.get("/", async (req, res) => {
     const roomUrls = rooms
       .filter((r) => categoryPathMap[r.category])
       .map((r) => ({
-        loc: `/${categoryPathMap[r.category]}/${slugify(r.title) ? slugify(r.title) + "-" : ""}${r._id}`,
+        loc: `/${categoryPathMap[r.category]}/${r.slug}`,
         priority: "0.8",
         changefreq: "weekly",
         lastmod: r.updatedAt,
       }));
 
     const messUrls = messes.map((m) => ({
-      loc: `/mess/${m._id}`,
+      loc: `/mess/${m.slug}`,
       priority: "0.6",
       changefreq: "weekly",
       lastmod: m.updatedAt,
     }));
 
     const ownerUrls = owners.map((o) => ({
-      loc: `/owners/${o._id}`,
+      loc: `/owners/${o.slug}`,
       priority: "0.5",
       changefreq: "monthly",
       lastmod: o.updatedAt,
     }));
 
     const vehicleUrls = vehicles.map((vehicle) => ({
-      loc: `/vehicles/${vehicle._id}`,
+      loc: `/vehicles/${vehicle.slug}`,
       priority: "0.6",
       changefreq: "weekly",
       lastmod: vehicle.updatedAt,
     }));
 
-    const allUrls = [...staticUrls, ...roomUrls, ...messUrls, ...ownerUrls, ...vehicleUrls];
+    const villaUrls = villas.map((villa) => ({
+      loc: `/villas/${villa.slug}`,
+      priority: "0.7",
+      changefreq: "weekly",
+      lastmod: villa.updatedAt,
+    }));
+    const laundryUrls = vendors.map((vendor) => ({
+      loc: `/laundry/${vendor.slug}`,
+      priority: "0.6",
+      changefreq: "weekly",
+      lastmod: vendor.updatedAt,
+    }));
+    const hourlyRoomUrls = hourlyRooms.map((room) => ({
+      loc: `/hourly-rooms/${room.slug}`,
+      priority: "0.7",
+      changefreq: "weekly",
+      lastmod: room.updatedAt,
+    }));
+    const propertyUrls = properties
+      .filter((property) => categoryPathMap[property.propertyType])
+      .map((property) => ({
+        loc: `/property/${property.slug}`,
+        priority: "0.8",
+        changefreq: "weekly",
+        lastmod: property.updatedAt,
+      }));
+
+    const allUrls = [
+      ...staticUrls,
+      ...roomUrls,
+      ...messUrls,
+      ...ownerUrls,
+      ...vehicleUrls,
+      ...villaUrls,
+      ...laundryUrls,
+      ...hourlyRoomUrls,
+      ...propertyUrls,
+    ];
 
     const xmlEntries = allUrls
       .map((u) => {

@@ -68,7 +68,7 @@ function LaundryList() {
                 <p><MapPin size={14} />{[vendor.area, vendor.address].filter(Boolean).join(", ")}</p>
                 <span>{vendor.catalog?.length || 0} priced services</span>
               </div>
-              <Link to={`/laundry/${vendor._id}`} aria-label={`View ${vendor.vendorName}`} className="laundry-card-link">
+              <Link to={`/laundry/${vendor.slug || vendor.vendorName}`} aria-label={`View ${vendor.vendorName}`} className="laundry-card-link">
                 <ArrowRight size={18} />
               </Link>
             </article>

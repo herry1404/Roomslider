@@ -3,6 +3,7 @@ import { Banknote, CheckCircle2, Clock3, MapPin, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/loan-modal.css";
 
 const EMPTY_FORM = {
@@ -62,6 +63,28 @@ const getAdultDateCutoff = () => {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
+const getMyLoanApplication = async (userId) => {
+  let response;
+  try {
+    response = await api.get("/loans/mine");
+  } catch (error) {
+    if (error.response?.status !== 404) throw error;
+    response = await api.get("/loans");
+  }
+
+  if (response.data.loan !== undefined) return response.data.loan;
+  if (Array.isArray(response.data.loans)) {
+    const currentUserId = String(
+      userId || response.data.user?._id || response.data.user?.id || ""
+    );
+    return response.data.loans.find((loan) => {
+      const applicantId = loan.user?._id || loan.user?.id || loan.user;
+      return currentUserId && String(applicantId) === currentUserId;
+    }) || null;
+  }
+  throw new Error("The loan status response was invalid.");
+};
+
 function LoanModal({ onClose }) {
   const { user } = useAuth();
   const panInputRefs = useRef([]);
@@ -69,6 +92,8 @@ function LoanModal({ onClose }) {
   const [idPhoto, setIdPhoto] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [application, setApplication] = useState(null);
+  const [applicationStatus, setApplicationStatus] = useState("loading");
+  const [applicationStatusError, setApplicationStatusError] = useState("");
   const [profile, setProfile] = useState(null);
   const [consentGiven, setConsentGiven] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -79,17 +104,37 @@ function LoanModal({ onClose }) {
 
   useEffect(() => {
     let active = true;
-    const loadFormData = async () => {
+    const loadApplicationStatus = async () => {
+      setApplicationStatus("loading");
+      setApplicationStatusError("");
       try {
-        const [profileResponse, loanResponse] = await Promise.all([
-          api.get("/users/me"),
-          api.get("/loans"),
-        ]);
-        if (!active) return;
+        const loan = await getMyLoanApplication(user?._id || user?.id);
+        if (!active) return loan;
+        setApplication(loan);
+        setApplicationStatus("ready");
+        return loan;
+      } catch (error) {
+        if (active) {
+          setApplication(null);
+          setApplicationStatus("error");
+          setApplicationStatusError(
+            error.response?.data?.message || "Could not confirm your application status."
+          );
+        }
+        throw error;
+      }
+    };
 
-        const currentProfile = profileResponse.data.user;
+    const loadFormData = async () => {
+      const [profileResult, loanResult] = await Promise.allSettled([
+        api.get("/users/me"),
+        loadApplicationStatus(),
+      ]);
+      if (!active) return;
+
+      if (profileResult.status === "fulfilled") {
+        const currentProfile = profileResult.value.data.user;
         setProfile(currentProfile);
-        setApplication(loanResponse.data.loan || null);
         setForm((current) => ({
           ...current,
           name: currentProfile.name || user?.name || "",
@@ -101,20 +146,38 @@ function LoanModal({ onClose }) {
           college: currentProfile.organization || currentProfile.preferredCollege || "",
           course: currentProfile.course || "",
         }));
-      } catch (error) {
-        if (active) {
-          toast.error(error.response?.data?.message || "Could not load your profile details.");
-        }
-      } finally {
-        if (active) setLoading(false);
+      } else {
+        toast.error(profileResult.reason?.response?.data?.message || "Could not load your profile details.");
       }
+      if (loanResult.status === "rejected") {
+        toast.error(loanResult.reason?.response?.data?.message || "Could not confirm your application status. The form is locked until status can be checked.");
+      }
+      setLoading(false);
     };
 
     loadFormData();
     return () => {
       active = false;
     };
-  }, [user?.email, user?.name, user?.phone]);
+  }, [user?._id, user?.id, user?.email, user?.name, user?.phone]);
+
+  const refreshApplicationStatus = async () => {
+    setApplicationStatus("loading");
+    setApplicationStatusError("");
+    try {
+      const loan = await getMyLoanApplication(user?._id || user?.id);
+      setApplication(loan);
+      setApplicationStatus("ready");
+      return loan;
+    } catch (error) {
+      setApplication(null);
+      setApplicationStatus("error");
+      setApplicationStatusError(
+        error.response?.data?.message || "Could not confirm your application status."
+      );
+      return null;
+    }
+  };
 
   useEffect(() => {
     const postalCode = form.postalCode;
@@ -126,38 +189,23 @@ function LoanModal({ onClose }) {
     const timeoutId = setTimeout(async () => {
       setPostalLookup("loading");
       try {
-        const response = await fetch(
-          `https://api.postalpincode.in/pincode/${postalCode}`
-        );
-        if (!response.ok) throw new Error("PIN code lookup failed");
-
-        const [result] = await response.json();
-        const offices = result?.Status === "Success" && Array.isArray(result.PostOffice)
-          ? result.PostOffice
-          : [];
-        if (!offices.length) {
-          if (active) {
-            setPostalAreas([]);
-            setPostalLookup("not-found");
-          }
-          return;
-        }
+        const postalAddress = await lookupPostalCode(postalCode);
 
         if (!active) return;
-        const areas = [...new Set(offices.map((office) => office.Name).filter(Boolean))];
-        const office = offices[0];
-        setPostalAreas(areas);
+        setPostalAreas(postalAddress.areas);
         setForm((previous) => ({
           ...previous,
-          area: areas[0] || previous.area,
-          city: office.District || office.Block || previous.city,
-          state: office.State || previous.state,
+          area: currentLocation
+            ? previous.area || postalAddress.areas[0]
+            : postalAddress.areas[0] || previous.area,
+          city: postalAddress.city || previous.city,
+          state: postalAddress.state || previous.state,
         }));
         setPostalLookup("success");
-      } catch {
+      } catch (error) {
         if (active) {
           setPostalAreas([]);
-          setPostalLookup("error");
+          setPostalLookup(error.message === "PIN code not found." ? "not-found" : "error");
         }
       }
     }, 400);
@@ -166,7 +214,7 @@ function LoanModal({ onClose }) {
       active = false;
       clearTimeout(timeoutId);
     };
-  }, [form.postalCode]);
+  }, [form.postalCode, currentLocation]);
 
   const update = (key) => (event) =>
     setForm((previous) => ({ ...previous, [key]: event.target.value }));
@@ -236,42 +284,15 @@ function LoanModal({ onClose }) {
         };
         setCurrentLocation(location);
         try {
-          const query = new URLSearchParams({
-            format: "jsonv2",
-            addressdetails: "1",
-            lat: String(location.latitude),
-            lon: String(location.longitude),
-          });
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?${query.toString()}`,
-            { headers: { "Accept-Language": "en" } }
-          );
-          if (!response.ok) throw new Error("Address lookup failed");
-
-          const result = await response.json();
-          const address = result.address || {};
+          const address = await reverseGeocodeLocation(location.latitude, location.longitude);
           setForm((previous) => ({
             ...previous,
-            houseNumber: address.house_number || previous.houseNumber,
-            area:
-              address.neighbourhood ||
-              address.suburb ||
-              address.quarter ||
-              address.residential ||
-              address.city_district ||
-              address.county ||
-              previous.area,
-            nearby: address.road || previous.nearby,
-            city:
-              address.city ||
-              address.town ||
-              address.village ||
-              address.municipality ||
-              previous.city,
+            houseNumber: address.houseNumber || previous.houseNumber,
+            area: address.area || previous.area,
+            nearby: address.nearby || previous.nearby,
+            city: address.city || previous.city,
             state: address.state || previous.state,
-            postalCode:             /^\d{6}$/.test(address.postcode?.replace(/\D/g, "") || "")
-              ? address.postcode.replace(/\D/g, "")
-              : previous.postalCode,
+            postalCode: address.postalCode || previous.postalCode,
           }));
           toast.success("Current location added to the address fields.");
         } catch {
@@ -386,19 +407,19 @@ function LoanModal({ onClose }) {
       }
 
       const response = await api.post("/loans", data);
-      setApplication(response.data.loan);
-      toast.success("Application submitted. You can track its status here.");
+      if (response.data.loan) {
+        setApplication(response.data.loan);
+        setApplicationStatus("ready");
+        setApplicationStatusError("");
+        toast.success("Application submitted. You can track its status here.");
+      } else {
+        toast.error("Application submitted. Checking its current status...");
+        await refreshApplicationStatus();
+      }
     } catch (error) {
       const responseMessage = error.response?.data?.message || "Could not submit your application.";
       toast.error(responseMessage);
-      if (error.response?.data?.loanSubmitted || error.response?.status === 409) {
-        try {
-          const response = await api.get("/loans");
-          setApplication(response.data.loan || null);
-        } catch (loadError) {
-          toast.error(loadError.response?.data?.message || "Could not load your application status.");
-        }
-      }
+      await refreshApplicationStatus();
     } finally {
       setSaving(false);
     }
@@ -471,10 +492,22 @@ function LoanModal({ onClose }) {
           <p>Apply once and track every update from your profile.</p>
         </div>
 
-        {loading ? (
-          <div className="loan-loading" role="status">Loading your profile...</div>
+        {loading || applicationStatus === "loading" ? (
+          <div className="loan-loading" role="status">Checking your application status...</div>
         ) : application ? (
           renderApplication()
+        ) : applicationStatus === "error" ? (
+          <div className="loan-status-error" role="alert">
+            <p>{applicationStatusError}</p>
+            <p>To prevent a duplicate application, the application form is locked until we can confirm your status.</p>
+            <button
+              type="button"
+              className="loan-submit"
+              onClick={refreshApplicationStatus}
+            >
+              Check application status
+            </button>
+          </div>
         ) : (
           <form className="loan-body" onSubmit={handleSubmit}>
             <div className="loan-profile-note">

@@ -775,7 +775,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                   <br />
                   ₹{mess.pricePerPerson}/thali
                   <br />
-                  <Link to={`/mess/${mess._id}`}>View details</Link>
+                  <Link to={`/mess/${mess.slug || mess._id}`}>View details</Link>
                 </Popup>
               </Marker>
             ))}

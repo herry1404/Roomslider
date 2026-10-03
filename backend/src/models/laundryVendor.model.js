@@ -12,6 +12,7 @@ const laundryVendorSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
     phone: {
       type: String,
       required: true,
@@ -58,5 +59,6 @@ const laundryVendorSchema = new mongoose.Schema(
 );
 
 laundryVendorSchema.index({ location: "2dsphere" });
+laundryVendorSchema.index({ slug: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("LaundryVendor", laundryVendorSchema);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { BadgeCheck, Home, Link2 } from "lucide-react";
 import api from "../../api/axios";
@@ -52,6 +52,7 @@ function OwnerProfile() {
       </div>
     );
   }
+  if (owner.slug && id !== owner.slug) return <Navigate to={`/owners/${owner.slug}`} replace />;
 
   const memberSince = new Date(owner.createdAt).toLocaleDateString("en-IN", {
     month: "long",

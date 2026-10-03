@@ -74,10 +74,91 @@
   margin: 0 0 16px;
 }
 
+.mess-menu-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mess-menu-section-heading h3 {
+  margin-bottom: 7px;
+}
+
+.mess-menu-section-heading p {
+  max-width: 480px;
+  margin: 0;
+  color: var(--color-text-muted, #888);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mess-meal-type {
+  display: grid;
+  flex: none;
+  gap: 5px;
+  color: var(--color-text-muted, #888);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mess-meal-type select,
+.mess-menu-item-row > select {
+  min-width: 130px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.mess-menu-section > p {
+  margin: -8px 0 18px;
+  color: var(--color-text-muted, #888);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .mess-menu-row {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.mess-menu-item-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.5fr) minmax(125px, 1fr) 110px 44px;
+  align-items: center;
+}
+
+.mess-menu-item-row > input[type="text"] {
+  min-width: 0;
+}
+
+.mess-calorie-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 8px;
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted, #888);
+  font-size: 11px;
+}
+
+.mess-calorie-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mess-calorie-input span {
+  flex: none;
 }
 
 .mess-menu-row input {
@@ -101,6 +182,48 @@
 .mess-remove-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.mess-addon-row {
+  align-items: center;
+}
+
+.mess-addon-row > input[type="text"] {
+  min-width: 140px;
+}
+
+.mess-addon-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 12px;
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted, #888);
+}
+
+.mess-addon-price input[type="number"] {
+  width: 86px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mess-addon-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.mess-addon-availability input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-primary);
 }
 
 .mess-add-btn {
@@ -157,14 +280,40 @@
 }
 
 .mess-order-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(180px, 1fr) minmax(180px, 0.8fr);
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
   gap: 12px;
   padding: 14px 16px;
   background: var(--color-surface-2);
   border-radius: 14px;
-  flex-wrap: wrap;
+}
+
+.mess-order-customer {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.mess-order-customer > img,
+.mess-order-avatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 15%, var(--color-surface));
+  color: var(--color-primary);
+  font-weight: 700;
+  object-fit: cover;
+}
+
+.mess-order-customer > div {
+  min-width: 0;
 }
 
 .mess-order-row strong {
@@ -179,11 +328,50 @@
 }
 
 .mess-order-meta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  justify-items: end;
+  gap: 6px;
   color: var(--color-text);
   font-size: 14px;
+  text-align: right;
+}
+
+.mess-order-details {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.mess-order-details p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mess-order-details .mess-order-delivery-address {
+  color: var(--color-text-muted, #888);
+}
+
+.mess-order-details a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mess-order-details a:hover {
+  text-decoration: underline;
+}
+
+.mess-payment-paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 .mess-order-badge {
@@ -198,4 +386,61 @@
 
 .mess-order-badge.cancelled {
   background: #ef4444;
+}
+
+@media (max-width: 760px) {
+  .mess-menu-section-heading {
+    flex-direction: column;
+  }
+
+  .mess-menu-item-row {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+
+  .mess-menu-item-row > input[type="text"],
+  .mess-menu-item-row > select,
+  .mess-menu-item-row .mess-calorie-input {
+    grid-column: 1;
+  }
+
+  .mess-menu-item-row > .mess-remove-btn {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    height: 100%;
+  }
+
+  .mess-order-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .mess-order-details {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .mess-order-meta {
+    justify-items: end;
+  }
+}
+
+@media (max-width: 480px) {
+  .mess-dashboard {
+    padding-inline: 14px;
+  }
+
+  .mess-menu-section,
+  .mess-orders-section {
+    padding: 17px;
+  }
+
+  .mess-order-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mess-order-meta {
+    grid-column: 1;
+    grid-row: auto;
+    justify-items: start;
+    text-align: left;
+  }
 }

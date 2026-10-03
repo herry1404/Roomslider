@@ -66,6 +66,18 @@
   font-size: 14px;
 }
 
+.loan-status-error {
+  overflow-y: auto;
+  padding: 8px 2px 2px;
+  color: var(--color-text);
+}
+
+.loan-status-error p {
+  color: var(--color-text-light);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .loan-profile-note,
 .loan-applicant {
   display: flex;

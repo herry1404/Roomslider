@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { UtensilsCrossed, Phone, MapPin, Trash2, Plus, X, Pencil } from "lucide-react";
+import { UtensilsCrossed, Trash2, Plus, X, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { formatLocationAddress, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/admin/theme.css";
 
 function ManageMess() {
@@ -40,7 +41,7 @@ function ManageMess() {
   };
 
   useEffect(() => {
-    fetchData();
+    Promise.resolve().then(fetchData);
   }, []);
 
   const openAddModal = () => {
@@ -118,9 +119,26 @@ function ManageMess() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setForm((f) => ({ ...f, latitude: pos.coords.latitude, longitude: pos.coords.longitude }));
-        toast.success("Location captured");
+      async (pos) => {
+        setForm((current) => ({
+          ...current,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        }));
+        try {
+          const address = await reverseGeocodeLocation(pos.coords.latitude, pos.coords.longitude);
+          setForm((current) => ({
+            ...current,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            address: formatLocationAddress(address) || address.formattedAddress || current.address,
+          }));
+          toast.success(address.postalCode
+            ? "Mess address, PIN code, and coordinates filled."
+            : "Mess address and coordinates filled; add the PIN code manually.");
+        } catch {
+          toast.error("Coordinates were captured, but the address lookup failed. Enter the address manually.");
+        }
       },
       () => toast.error("Could not get location")
     );

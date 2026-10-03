@@ -5,6 +5,7 @@ import { Bike, Plus, Trash2, Pencil, Search } from "lucide-react";
 import api from "../../api/axios";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/furniture-admin.css";
+import "../../styles/vehicles.css";
 
 const fmt = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
@@ -55,7 +56,7 @@ function ManageVehicles() {
   if (loading) return <div className="admin-page"><p>Loading vehicles...</p></div>;
 
   return (
-    <div className="admin-page">
+    <div className="admin-page vehicle-admin-page">
       <div className="admin-page-header">
         <div><h1>Manage Vehicles</h1><p>Manage the vehicle catalog, pricing, visibility and availability.</p></div>
         <Link to="/admin/vehicles/add" className="admin-btn"><Plus size={17} /> Add Vehicle</Link>

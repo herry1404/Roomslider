@@ -360,6 +360,7 @@
   grid-template-columns: 20px minmax(0, 1fr);
   gap: 3px 8px;
   align-items: center;
+  min-width: 0;
   margin: 0;
 }
 
@@ -376,6 +377,25 @@
 .vehicle-spec-grid strong {
   font-size: 13px;
   overflow-wrap: anywhere;
+}
+
+.vehicle-spec-extra-distance strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.vehicle-spec-grid .vehicle-spec-extra-distance,
+.vehicle-spec-grid .vehicle-spec-no-icon {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.vehicle-spec-extra-distance strong span {
+  color: var(--color-text-light);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .vehicle-price-list p,
@@ -435,6 +455,7 @@
 .vehicle-request-card form > label {
   display: grid;
   gap: 6px;
+  min-width: 0;
   color: var(--color-text);
   font-size: 13px;
   font-weight: 600;
@@ -477,25 +498,45 @@
 
 .vehicle-pickup-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   color: var(--color-text);
   font-size: 13px;
 }
 
-.vehicle-pickup-options > span {
+.vehicle-pickup-options legend {
   grid-column: 1 / -1;
+  margin-bottom: 2px;
   color: var(--color-text-light);
+  font-size: 13px;
 }
 
 .vehicle-pickup-options label {
   display: flex;
   min-height: 40px;
+  min-width: 0;
   align-items: center;
   gap: 7px;
-  padding: 0 8px;
+  padding: 6px 8px;
   border: 1px solid var(--color-border);
   border-radius: 9px;
+}
+
+.vehicle-pickup-options input[type="radio"] {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+}
+
+.vehicle-pickup-options label span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .vehicle-address-title {
@@ -549,6 +590,17 @@
   font-size: 19px;
 }
 
+.vehicle-postal-status {
+  margin-top: -8px;
+  color: var(--color-text-light);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.vehicle-postal-status:empty {
+  display: none;
+}
+
 .vehicle-request-button {
   color: var(--color-surface);
   background: var(--color-primary);
@@ -573,6 +625,24 @@
 .vehicle-page select:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+.vehicle-admin-page {
+  min-width: 0;
+}
+
+.vehicle-admin-page .admin-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.vehicle-admin-page .admin-table {
+  min-width: 720px;
+}
+
+.vehicle-admin-page .admin-table td {
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 768px) {

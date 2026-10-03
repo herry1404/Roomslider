@@ -15,6 +15,9 @@ const vehicleRequestSchema = new mongoose.Schema(
       building: { type: String, default: '', trim: true },
       area: { type: String, required: true, trim: true },
       landmark: { type: String, default: '', trim: true },
+      city: { type: String, default: 'Indore', trim: true },
+      state: { type: String, default: 'Madhya Pradesh', trim: true },
+      postalCode: { type: String, default: '', trim: true, maxlength: 6 },
     },
     location: {
       lat: { type: Number, default: null },

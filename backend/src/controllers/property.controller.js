@@ -4,6 +4,7 @@ const Room = require("../models/room.model");
 require("../models/Owner");
 
 const TYPES = ["Room", "PG", "Hostel", "Flat"];
+const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 const safeMsg = (e) =>
   process.env.NODE_ENV === "production" ? "Something went wrong" : e.message;
 
@@ -68,6 +69,7 @@ const createProperty = async (req, res) => {
 
     const property = await Property.create({
       name,
+      slug: await createUniqueSlug(Property, name),
       area,
       propertyType,
       owner,
@@ -146,6 +148,7 @@ const updateProperty = async (req, res) => {
       if (!n) {
         return res.status(400).json({ success: false, message: "Name cannot be empty" });
       }
+      if (n !== property.name) property.slug = await createUniqueSlug(Property, n, property._id);
       property.name = n;
     }
     if (req.body.area !== undefined) {
@@ -169,20 +172,21 @@ const updateProperty = async (req, res) => {
 // Public: property page ka data (tenant/payment fields nahi jate)
 const getPublicProperty = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(404).json({ success: false, message: "Property not found" });
-    }
-    const property = await Property.findById(req.params.id)
+    const identity = mongoose.isValidObjectId(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: req.params.id.toLowerCase() };
+    const property = await Property.findOne(identity)
       .populate("owner", "name slug")
-      .lean();
+      ;
     if (!property) {
       return res.status(404).json({ success: false, message: "Property not found" });
     }
-
-    const rooms = await Room.find({ property: property._id, status: "vacant" })
+    await ensurePublicSlugs(Property, [property], (item) => item.name);
+    const relatedRooms = await Room.find({ property: property._id, status: "vacant" })
       .select("-currentTenant -currentTenantUser -occupancyHistory -paymentStatus")
-      .sort({ priority: 1, roomNumber: 1 })
-      .lean();
+      .sort({ priority: 1, roomNumber: 1 });
+    await ensurePublicSlugs(Room, relatedRooms, (room) => room.title);
+    const rooms = relatedRooms.map((room) => room.toObject());
 
     res.status(200).json({ success: true, property, rooms });
   } catch (error) {

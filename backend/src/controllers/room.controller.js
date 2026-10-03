@@ -3,6 +3,8 @@ const Room = require("../models/room.model");
 const { findNearestPlace, findPlaceByLocationText } = require("../data/nearbyPlaces");
 require("../models/property.model"); // register model so populate("property") works
 const User = require("../models/user.model");
+const Property = require("../models/property.model");
+const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -158,6 +160,7 @@ const createRoom = async (req, res) => {
       roomData.sharingType = sharingType;
     }
 
+    roomData.slug = await createUniqueSlug(Room, roomData.title);
     const linkResult = await attachPropertyAndBuilding(req, roomData);
     if (linkResult.error) {
       return res.status(linkResult.error.status).json({
@@ -232,13 +235,19 @@ const getRooms = async (req, res) => {
 
     let query = Room.find(filter).populate("owner", "name slug");
     if (grouped) {
-      query = query.populate("property", "name area propertyType buildings");
+      query = query.populate("property", "name slug area propertyType buildings");
     }
 
     let rooms = await query.sort({
       priority: 1,
       createdAt: -1,
     });
+    await ensurePublicSlugs(Room, rooms, (room) => room.title);
+    const populatedProperties = [...new Map(
+      rooms.map((room) => room.property).filter(Boolean)
+        .map((property) => [String(property._id), property])
+    ).values()];
+    await ensurePublicSlugs(Property, populatedProperties, (property) => property.name);
 
     // Grouped mode (homepage): one card per distinct sharingType per property, max 3
     if (grouped) {
@@ -278,7 +287,11 @@ const getRooms = async (req, res) => {
 
 const getSingleRoom = async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id).populate("owner", "name slug");
+    const identifier = req.params.id;
+    const identity = /^[a-f\d]{24}$/i.test(identifier)
+      ? { _id: identifier }
+      : { slug: identifier.toLowerCase() };
+    const room = await Room.findOne(identity).populate("owner", "name slug");
 
     if (!room) {
       return res.status(404).json({
@@ -288,7 +301,8 @@ const getSingleRoom = async (req, res) => {
     }
 
     // Fire-and-forget view counter increment (does not block or fail the response)
-    Room.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } }).catch(() => {});
+    Room.findByIdAndUpdate(room._id, { $inc: { views: 1 } }).catch(() => {});
+    await ensurePublicSlugs(Room, [room], (item) => item.title);
 
     const roomObj = room.toObject();
     if (room.status === "occupied") {
@@ -354,7 +368,10 @@ const updateRoom = async (req, res) => {
       longitude,
     } = req.body;
 
-    if (title !== undefined) room.title = title;
+    if (title !== undefined) {
+      if (title !== room.title) room.slug = await createUniqueSlug(Room, title, room._id);
+      room.title = title;
+    }
     if (price !== undefined) room.price = price;
     if (deposit !== undefined) room.deposit = deposit;
     if (location !== undefined) room.location = location;
@@ -553,10 +570,12 @@ const createBulkRooms = async (req, res) => {
 
     const roomDocs = [];
     for (let num = start; num <= end; num++) {
-      roomDocs.push({
+      const roomData = {
         ...baseData,
         roomNumber: String(num),
-      });
+      };
+      roomData.slug = await createUniqueSlug(Room, roomData.title);
+      roomDocs.push(roomData);
     }
 
     let createdRooms;
@@ -984,7 +1003,11 @@ const uploadLeaseDocument = async (req, res) => {
 
 const getNearbyRooms = async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id);
+    const identifier = req.params.id;
+    const identity = /^[a-f\d]{24}$/i.test(identifier)
+      ? { _id: identifier }
+      : { slug: identifier.toLowerCase() };
+    const room = await Room.findOne(identity);
 
     if (!room) {
       return res.status(404).json({ success: false, message: "Room not found" });
