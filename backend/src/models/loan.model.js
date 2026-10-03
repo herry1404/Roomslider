@@ -6,7 +6,7 @@ const loanSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
+      unique: true,
     },
 
     // Student details
@@ -14,7 +14,19 @@ const loanSchema = new mongoose.Schema(
     phone: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true },
     dob: { type: Date },
-    address: { type: String, trim: true, maxlength: 300 },
+    address: { type: String, trim: true, maxlength: 500 },
+    addressDetails: {
+      houseNumber: { type: String, trim: true, maxlength: 100 },
+      area: { type: String, trim: true, maxlength: 100 },
+      nearby: { type: String, trim: true, maxlength: 100 },
+      city: { type: String, trim: true, maxlength: 80 },
+      state: { type: String, trim: true, maxlength: 80 },
+      postalCode: { type: String, trim: true, maxlength: 10 },
+    },
+    currentLocation: {
+      latitude: { type: Number, min: -90, max: 90 },
+      longitude: { type: Number, min: -180, max: 180 },
+    },
 
     // Loan details
     amount: { type: Number, required: true, min: 0 },
@@ -48,10 +60,21 @@ const loanSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["new", "contacted", "approved", "rejected"],
-      default: "new",
+      enum: ["new", "submitted", "under_review", "contacted", "approved", "rejected"],
+      default: "submitted",
       index: true,
     },
+    statusHistory: [
+      {
+        status: {
+          type: String,
+          enum: ["new", "submitted", "under_review", "contacted", "approved", "rejected"],
+          required: true,
+        },
+        message: { type: String, trim: true, maxlength: 300 },
+        changedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

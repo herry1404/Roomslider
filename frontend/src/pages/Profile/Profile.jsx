@@ -21,19 +21,27 @@ const OCCUPATION_LABELS = {
   other: "Other",
 };
 
+const STATUS_LABELS = {
+  new: "received",
+  submitted: "received",
+  under_review: "under review",
+  contacted: "contacted",
+  approved: "approved",
+  rejected: "not approved",
+};
+
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "";
 
 function Profile() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const requestedTab = searchParams.get("tab");
+  const tab = TABS.some((item) => item.key === requestedTab) ? requestedTab : "saved";
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState(() =>
-    searchParams.get("tab") === "notifications" ? "notifications" : "saved"
-  );
   const [tabLoading, setTabLoading] = useState(false);
   const [tabData, setTabData] = useState({ saved: null, activity: null, notifications: null });
   const [unread, setUnread] = useState(0);
@@ -74,11 +82,12 @@ function Profile() {
       }
 
       if (key === "activity") {
-        const [f, s, vehicles, villas] = await Promise.allSettled([
+        const [f, s, vehicles, villas, loan] = await Promise.allSettled([
           api.get("/furniture-requests/mine"),
           api.get("/service-bookings/my"),
           api.get("/vehicle-requests/mine"),
           api.get("/villa-bookings/mine"),
+          api.get("/loans"),
         ]);
 
         const list = [];
@@ -135,6 +144,18 @@ function Profile() {
           );
         }
 
+        if (loan.status === "fulfilled" && loan.value.data.loan) {
+          const application = loan.value.data.loan;
+          list.push({
+            id: "loan" + application._id,
+            type: "Student loan",
+            title: "Loan application",
+            sub: `₹${Number(application.amount).toLocaleString("en-IN")} · ${application.purpose || "other"}`,
+            status: application.status,
+            createdAt: application.createdAt,
+          });
+        }
+
         list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setTabData((d) => ({ ...d, activity: list }));
       }
@@ -154,7 +175,7 @@ function Profile() {
   useEffect(() => {
     if (profile) Promise.resolve().then(() => loadTab(tab));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, profile]);
+  }, [tab, profile, tabData[tab]]);
 
   const markRead = async (n) => {
     if (n.read) return;
@@ -242,7 +263,9 @@ function Profile() {
                 {a.sub && <span className="profile-hint">{a.sub}</span>}
               </div>
               <div className="profile-item-side">
-                <span className={"profile-status profile-status--" + a.status}>{a.status}</span>
+                <span className={"profile-status profile-status--" + a.status}>
+                  {STATUS_LABELS[a.status] || a.status}
+                </span>
                 <span className="profile-hint">{fmtDate(a.createdAt)}</span>
               </div>
             </div>
@@ -266,7 +289,12 @@ function Profile() {
             key={n._id}
             onClick={() => {
               markRead(n);
-              if (n.actionUrl) navigate(n.actionUrl);
+              if (n.actionUrl) {
+                if (n.actionUrl.includes("tab=activity")) {
+                  setTabData((current) => ({ ...current, activity: null }));
+                }
+                navigate(n.actionUrl);
+              }
             }}
           >
             <div className="profile-item-main">
@@ -318,7 +346,12 @@ function Profile() {
             key={t.key}
             type="button"
             className={"profile-tab" + (tab === t.key ? " profile-tab--active" : "")}
-            onClick={() => setTab(t.key)}
+            onClick={() => {
+              if (t.key === "activity") {
+                setTabData((current) => ({ ...current, activity: null }));
+              }
+              setSearchParams({ tab: t.key });
+            }}
           >
             {t.label}
             {t.key === "notifications" && unread > 0 && (

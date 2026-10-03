@@ -359,9 +359,17 @@
 
 .profile-status--confirmed,
 .profile-status--delivered,
-.profile-status--completed {
+.profile-status--completed,
+.profile-status--approved {
   color: #16a34a;
   background: rgba(22, 163, 74, 0.15);
+}
+
+.profile-status--submitted,
+.profile-status--under_review,
+.profile-status--contacted {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.15);
 }
 
 .profile-status--rejected,
