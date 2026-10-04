@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Bell, CheckCheck, CreditCard, MessageCircle, Package, Users } from "lucide-react";
 
 import { useNotifications } from "../../context/useNotifications";
+import roommateNotificationLink from "../../utils/roommateNotificationLink";
 
 const relativeTime = (value) => {
   const elapsed = Math.max(0, Date.now() - new Date(value).getTime());
@@ -36,7 +37,7 @@ function NotificationBell({ mobile = false }) {
   const openItem = (item) => {
     setOpen(false);
     markRead(item);
-    navigate(item.link || "/notifications");
+    navigate(roommateNotificationLink(item) || "/notifications");
   };
 
   return (

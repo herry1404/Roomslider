@@ -14,6 +14,7 @@ const roommateMessageSchema = new mongoose.Schema(
     },
     body: { type: String, required: true, trim: true, maxlength: 2000 },
     readAt: { type: Date, default: null },
+    isRead: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

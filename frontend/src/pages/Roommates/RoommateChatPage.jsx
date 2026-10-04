@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/useNotifications";
 import RoommateChat from "./RoommateChat";
 import "../../styles/profile.css";
 import "../../styles/roommate-chat.css";
@@ -12,6 +13,7 @@ function RoommateChatPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshRoommateBadges, loadLatest } = useNotifications();
   const routePerson = location.state?.person;
   const hasRoutePerson = routePerson?.id === userId;
   const [connectionResult, setConnectionResult] = useState(null);
@@ -38,6 +40,20 @@ function RoommateChatPage() {
     return () => { active = false; };
   }, [hasRoutePerson, user, userId]);
 
+  useEffect(() => {
+    if (!user || !person) return undefined;
+    let active = true;
+    api.put(`/roommates/conversations/${userId}/read`)
+      .then(() => {
+        if (active) return Promise.all([refreshRoommateBadges(), loadLatest()]);
+        return undefined;
+      })
+      .catch((error) => {
+        if (active) toast.error(error.response?.data?.message || "Unread messages could not be marked as read");
+      });
+    return () => { active = false; };
+  }, [loadLatest, person, refreshRoommateBadges, user, userId]);
+
   if (!user) {
     return (
       <main className="roommate-chat-page">
@@ -58,8 +74,8 @@ function RoommateChatPage() {
       <main className="roommate-chat-page">
         <div className="roommate-chat-message-state">
           <p>This roommate connection is not available.</p>
-          <button className="roommate-profile-chat-link" onClick={() => navigate("/roommates")}>
-            Back to roommate matches
+          <button className="roommate-profile-chat-link" onClick={() => navigate("/roommates/messages")}>
+            Back to messages
           </button>
         </div>
       </main>
@@ -70,7 +86,7 @@ function RoommateChatPage() {
     <RoommateChat
       person={person}
       currentUserId={user?._id || user?.id}
-      onClose={() => navigate("/roommates")}
+      onClose={() => navigate("/roommates/messages")}
     />
   );
 }

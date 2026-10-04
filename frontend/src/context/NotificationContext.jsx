@@ -13,6 +13,7 @@ export function NotificationProvider({ children }) {
   const [initialLoading, setInitialLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [nextCursor, setNextCursor] = useState(null);
+  const [roommateBadges, setRoommateBadges] = useState({ pendingRequests: 0, unreadMessages: 0 });
   const seenIds = useRef(new Set());
   const streamConnected = useRef(false);
 
@@ -37,6 +38,19 @@ export function NotificationProvider({ children }) {
       setInitialLoading(false);
     }
   }, [identity]);
+
+  const refreshRoommateBadges = useCallback(async () => {
+    if (!identity || user?.role && user.role !== "user") return;
+    try {
+      const response = await api.get("/roommates/badges");
+      setRoommateBadges({
+        pendingRequests: Number(response.data.pendingRequests) || 0,
+        unreadMessages: Number(response.data.unreadMessages) || 0,
+      });
+    } catch (error) {
+      console.error("ROOMMATE BADGE REFRESH ERROR:", error);
+    }
+  }, [identity, user]);
 
   const loadMore = useCallback(async () => {
     if (!identity || !hasMore || !nextCursor) return;
@@ -106,7 +120,10 @@ export function NotificationProvider({ children }) {
     let reconnectDelay = 1000;
     streamConnected.current = false;
     Promise.resolve().then(() => {
-      if (active) loadLatest();
+      if (active) {
+        loadLatest();
+        refreshRoommateBadges();
+      }
     });
 
     const connect = async () => {
@@ -129,6 +146,7 @@ export function NotificationProvider({ children }) {
               ...current.filter((existing) => existing._id !== item._id),
             ].slice(0, 200));
             if (isNew && !item.isRead) setUnreadCount((count) => count + 1);
+            if (item.type?.startsWith("roommate_")) refreshRoommateBadges();
             if (isNew) toast(item.title || "New notification", { icon: "🔔" });
           } catch (error) {
             console.error("INVALID NOTIFICATION STREAM EVENT:", error);
@@ -160,6 +178,7 @@ export function NotificationProvider({ children }) {
 
     connect();
     const poll = window.setInterval(async () => {
+      refreshRoommateBadges();
       if (streamConnected.current) return;
       try {
         const response = await api.get("/notifications/unread-count");
@@ -176,7 +195,7 @@ export function NotificationProvider({ children }) {
       window.clearInterval(poll);
       window.clearTimeout(reconnectTimer);
     };
-  }, [identity, loadLatest]);
+  }, [identity, loadLatest, refreshRoommateBadges]);
 
   useEffect(() => {
     if (identity) return undefined;
@@ -185,6 +204,7 @@ export function NotificationProvider({ children }) {
       setUnreadCount(0);
       setHasMore(false);
       setNextCursor(null);
+      setRoommateBadges({ pendingRequests: 0, unreadMessages: 0 });
       seenIds.current.clear();
     }, 0);
     return () => window.clearTimeout(reset);
@@ -197,6 +217,8 @@ export function NotificationProvider({ children }) {
         unreadCount: identity ? unreadCount : 0,
         initialLoading: Boolean(identity && initialLoading),
         hasMore: Boolean(identity && hasMore),
+        roommateBadges: identity ? roommateBadges : { pendingRequests: 0, unreadMessages: 0 },
+        refreshRoommateBadges,
         loadMore,
         loadLatest,
         markRead,

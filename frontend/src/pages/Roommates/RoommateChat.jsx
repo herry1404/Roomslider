@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { useNotifications } from "../../context/useNotifications";
 
 const formatTime = (value) => {
   const date = new Date(value);
@@ -19,6 +20,7 @@ function RoommateChat({ person, currentUserId, onClose }) {
   const [sending, setSending] = useState(false);
   const [chatError, setChatError] = useState("");
   const endRef = useRef(null);
+  const { refreshRoommateBadges, loadLatest } = useNotifications();
 
   useEffect(() => {
     let active = true;
@@ -26,7 +28,11 @@ function RoommateChat({ person, currentUserId, onClose }) {
       try {
         const response = await api.get(`/roommates/chat/${person.id}`);
         if (active) {
-          setMessages(response.data.messages || []);
+          const rows = response.data.messages || [];
+          setMessages(rows);
+          if (rows.some((message) => message.from !== String(currentUserId) && !message.readAt)) {
+            await Promise.all([refreshRoommateBadges(), loadLatest()]);
+          }
           setChatError("");
         }
       } catch (error) {
@@ -45,7 +51,7 @@ function RoommateChat({ person, currentUserId, onClose }) {
       active = false;
       window.clearInterval(interval);
     };
-  }, [person.id]);
+  }, [currentUserId, loadLatest, person.id, refreshRoommateBadges]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -72,7 +78,7 @@ function RoommateChat({ person, currentUserId, onClose }) {
     <main className="roommate-chat-page">
       <section className="roommate-chat" aria-label={`Chat with ${person.name}`}>
         <header className="roommate-chat-header">
-          <button type="button" className="roommate-chat-back" onClick={onClose} aria-label="Back to roommate matches">
+          <button type="button" className="roommate-chat-back" onClick={onClose} aria-label="Back to roommate messages">
             <ArrowLeft size={20} />
           </button>
           {person.avatar ? (

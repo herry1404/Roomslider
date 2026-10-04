@@ -42,6 +42,9 @@ import ProfileEdit from "./pages/Profile/ProfileEdit";
 import Terms from "./pages/Terms/Terms";
 import Privacy from "./pages/Privacy/Privacy";
 import RoommateFinder from "./pages/Roommates/RoommateFinder";
+import MyRoommateProfile from "./pages/Roommates/MyRoommateProfile";
+import RoommateRequests from "./pages/Roommates/RoommateRequests";
+import RoommateMessages from "./pages/Roommates/RoommateMessages";
 import RoommateProfilePage from "./pages/Roommates/RoommateProfilePage";
 import RoommateChatPage from "./pages/Roommates/RoommateChatPage";
 import Notifications from "./pages/Notifications/Notifications";
@@ -122,6 +125,9 @@ function App() {
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
         <Route path="/roommates/chat/:userId" element={<MainLayout><RoommateChatPage /></MainLayout>} />
         <Route path="/roommates/profile/:userId" element={<MainLayout><RoommateProfilePage /></MainLayout>} />
+        <Route path="/roommates/profile" element={<MainLayout><MyRoommateProfile /></MainLayout>} />
+        <Route path="/roommates/requests" element={<MainLayout><RoommateRequests /></MainLayout>} />
+        <Route path="/roommates/messages" element={<MainLayout><RoommateMessages /></MainLayout>} />
         <Route path="/roommates" element={<MainLayout><RoommateFinder /></MainLayout>} />
         <Route path="/vehicles" element={<MainLayout><VehicleList /></MainLayout>} />
         <Route path="/vehicles/:id" element={<MainLayout><VehicleDetail /></MainLayout>} />

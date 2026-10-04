@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, MapPin, ShieldAlert, Ban, MessageCircle, UserRound } from "lucide-react";
+import { Ban, Heart, MapPin, ShieldAlert, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-import "../../styles/profile.css";
+import { useNotifications } from "../../context/useNotifications";
+import RoommateSubnav from "./RoommateSubnav";
 import "../../styles/roommate-chat.css";
 
 const formatSeeking = (value) => ({
@@ -17,24 +18,20 @@ const formatSeeking = (value) => ({
 function RoommateFinder() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { refreshRoommateBadges } = useNotifications();
   const [profile, setProfile] = useState(null);
   const [profiles, setProfiles] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({ city: "", area: "", budget: "", sharingType: "" });
 
   const loadData = useCallback(async () => {
     try {
-      const [mine, discover, requestList, connectionList] = await Promise.all([
+      const [mine, discover] = await Promise.all([
         api.get("/roommates/me"),
         api.get("/roommates/discover"),
-        api.get("/roommates/requests"),
-        api.get("/roommates/connections"),
       ]);
       setProfile(mine.data.profile);
       setProfiles(discover.data.profiles || []);
-      setRequests(requestList.data.requests || []);
-      setConnections(connectionList.data.connections || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not load roommate suggestions");
     } finally {
@@ -46,23 +43,24 @@ function RoommateFinder() {
     if (user) Promise.resolve().then(loadData);
   }, [user, loadData]);
 
+  const matches = useMemo(() => profiles.filter((person) => {
+    const cityMatches = !filters.city || person.city?.toLowerCase().includes(filters.city.trim().toLowerCase());
+    const areaMatches = !filters.area || person.area?.toLowerCase().includes(filters.area.trim().toLowerCase());
+    const budget = Number(filters.budget) || 0;
+    const budgetMatches = !budget || !person.budgetMin && !person.budgetMax ||
+      ((!person.budgetMin || person.budgetMin <= budget) && (!person.budgetMax || person.budgetMax >= budget));
+    const sharingMatches = !filters.sharingType || !person.sharingType || person.sharingType === filters.sharingType;
+    return cityMatches && areaMatches && budgetMatches && sharingMatches;
+  }), [filters, profiles]);
+
   const sendRequest = async (personId) => {
     try {
       const response = await api.post(`/roommates/requests/${personId}`);
-      toast.success(response.data.message || "Request sent");
-      await loadData();
+      toast.success(response.data.message || "Interest sent");
+      if (response.data.status === "accepted") navigate("/roommates/messages");
+      await Promise.all([loadData(), refreshRoommateBadges()]);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Could not send request");
-    }
-  };
-
-  const respond = async (requestId, status) => {
-    try {
-      await api.put(`/roommates/requests/${requestId}`, { status });
-      toast.success(status === "accepted" ? "It's a match!" : "Request declined");
-      await loadData();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Could not update request");
+      toast.error(error.response?.data?.message || "Could not send interest");
     }
   };
 
@@ -71,7 +69,7 @@ function RoommateFinder() {
     try {
       await api.post(`/roommates/block/${personId}`);
       toast.success("Profile blocked");
-      await loadData();
+      await Promise.all([loadData(), refreshRoommateBadges()]);
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not block profile");
     }
@@ -90,157 +88,128 @@ function RoommateFinder() {
 
   if (!user) {
     return (
-      <div className="profile-view">
-        <div className="profile-empty">
-          <h1>Find a roommate</h1>
-          <p>Sign in to see roommate suggestions that match your RoomSlider profile.</p>
-          <button className="profile-save" onClick={() => navigate("/login")}>Log in</button>
+      <main className="roommate-hub-page">
+        <RoommateSubnav active="discover" />
+        <div className="roommate-hub-empty">
+          <h1>Discover roommates</h1>
+          <p>Log in to see roommate suggestions that match your preferences.</p>
+          <button className="roommate-primary-action" type="button" onClick={() => navigate("/login")}>Log in</button>
         </div>
-      </div>
+      </main>
     );
   }
 
-  if (loading) {
-    return <div className="profile-view"><div className="profile-empty">Loading suggestions...</div></div>;
-  }
-
   const profileReady = Boolean(profile?.setupComplete);
-  const incoming = requests.filter((request) => request.direction === "incoming" && request.status === "pending");
-  const outgoing = requests.filter((request) => request.direction === "outgoing" && request.status === "pending");
 
   return (
-    <div className="profile-view roommate-finder">
-      <h1 className="profile-head-name">Roommate suggestions</h1>
-      <p className="profile-head-line">
-        View roommate profiles and saved rooms. Contact details are never revealed; chat opens only after a request is accepted.
-      </p>
+    <main className="roommate-hub-page">
+      <RoommateSubnav active="discover" />
+      <header className="roommate-hub-heading">
+        <p className="roommate-hub-eyebrow">Roommate Finder</p>
+        <h1>Discover</h1>
+        <p>Explore compatible roommate profiles. Your contact details stay private.</p>
+      </header>
 
-      {!profileReady ? (
-        <div className="profile-empty">
-          <p>Complete your RoomSlider profile and roommate preferences to get suggestions.</p>
-          <p>Set them in your main profile&apos;s Edit Profile page. Your contact details stay private.</p>
+      {!loading && !profileReady && (
+        <aside className="roommate-profile-banner">
+          <span><strong>Create your roommate profile</strong><small>Add your preferences to unlock compatible matches.</small></span>
+          <Link to="/roommates/profile">Create profile</Link>
+        </aside>
+      )}
+      {!loading && profileReady && !profile.active && (
+        <aside className="roommate-profile-banner">
+          <span><strong>Discovery is paused</strong><small>Turn it on from your roommate profile to appear in matches.</small></span>
+          <Link to="/roommates/profile">Update profile</Link>
+        </aside>
+      )}
+
+      <section className="roommate-discovery-filters" aria-label="Filter roommate matches">
+        <label>
+          <span>City</span>
+          <input value={filters.city} onChange={(event) => setFilters((current) => ({ ...current, city: event.target.value }))} placeholder="Any city" />
+        </label>
+        <label>
+          <span>Area</span>
+          <input value={filters.area} onChange={(event) => setFilters((current) => ({ ...current, area: event.target.value }))} placeholder="Any area" />
+        </label>
+        <label>
+          <span>Budget per month</span>
+          <input type="number" min="0" value={filters.budget} onChange={(event) => setFilters((current) => ({ ...current, budget: event.target.value }))} placeholder="Any budget" />
+        </label>
+        <label>
+          <span>Sharing</span>
+          <select value={filters.sharingType} onChange={(event) => setFilters((current) => ({ ...current, sharingType: event.target.value }))}>
+            <option value="">Any sharing</option>
+            <option value="Single">Single</option>
+            <option value="Double">Double</option>
+            <option value="Triple">Triple</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+      </section>
+
+      {loading ? (
+        <div className="roommate-discovery-cards" aria-label="Loading matches">
+          {[1, 2, 3].map((item) => <div className="roommate-discovery-skeleton" key={item} />)}
+        </div>
+      ) : !profileReady ? (
+        <div className="roommate-hub-empty">
+          <h2>Set up your roommate profile first</h2>
+          <p>Your preferences help us show relevant roommate matches.</p>
         </div>
       ) : !profile.active ? (
-        <div className="profile-empty">Roommate suggestions are paused. Turn them on in your RoomSlider profile to see matches.</div>
-      ) : profiles.length === 0 ? (
-        <div className="profile-empty">No compatible roommates yet. Suggestions will appear here as profiles become available.</div>
+        <div className="roommate-hub-empty">
+          <h2>Your profile is hidden</h2>
+          <p>Turn discovery on when you are ready to find a roommate.</p>
+        </div>
+      ) : matches.length === 0 ? (
+        <div className="roommate-hub-empty">
+          <h2>{profiles.length ? "No profiles match these filters" : "No compatible roommates yet"}</h2>
+          <p>{profiles.length ? "Try changing or clearing a filter." : "New compatible profiles will appear here."}</p>
+        </div>
       ) : (
-        <section className="profile-list" aria-label="Roommate suggestions">
-          {profiles.map((person) => (
-            <article className="profile-item" key={person.id}>
-              <div className="profile-item-main">
-                <strong>{person.name}</strong>
-                {person.username && <span className="profile-hint">@{person.username}</span>}
-                <span className="profile-item-type">{formatSeeking(person.seeking)}</span>
-                {person.gender && <span className="profile-hint">Gender: {person.gender}</span>}
-                {person.occupation && (
-                  <span className="profile-hint">
-                    {person.occupation === "student" ? "Student" : person.occupation}
-                  </span>
-                )}
-                {person.organization && <span className="profile-hint">{person.organization}</span>}
-                {person.course && <span className="profile-hint">{person.course}</span>}
-                {person.subject && <span className="profile-hint">{person.subject}</span>}
-                {person.studyYear && <span className="profile-hint">{person.studyYear}</span>}
-                {person.bio && <span className="profile-hint">{person.bio}</span>}
-                {(person.area || person.city) && (
-                  <span className="profile-hint">
-                    <MapPin size={13} /> {[person.area, person.city].filter(Boolean).join(", ")}
-                  </span>
-                )}
-              </div>
-              <div className="profile-item-side">
-                <span className="profile-status profile-status--confirmed">
-                  <Heart size={13} /> {person.compatibility}% match
+        <section className="roommate-discovery-cards" aria-label="Roommate matches">
+          {matches.map((person) => (
+            <article className="roommate-discovery-card" key={person.id}>
+              <Link to={`/roommates/profile/${person.id}`} className="roommate-discovery-person">
+                {person.avatar
+                  ? <img src={person.avatar} alt="" />
+                  : <span className="roommate-hub-avatar">{person.name?.charAt(0)?.toUpperCase() || "R"}</span>}
+                <span>
+                  <strong>{person.name}</strong>
+                  <small>{formatSeeking(person.seeking)}</small>
                 </span>
-                {person.incomingStatus === "pending" ? (
-                  <span className="profile-hint">They sent you a request — respond below.</span>
-                ) : person.outgoingStatus === "accepted" || person.incomingStatus === "accepted" ? (
-                  <span className="profile-hint">Connected — open a private chat in Matches.</span>
-                ) : person.outgoingStatus === "pending" ? (
-                  <span className="profile-hint">Request sent</span>
-                ) : (
-                  <button className="profile-photo-btn" onClick={() => sendRequest(person.id)}>Request to connect</button>
+              </Link>
+              <span className="roommate-match-score"><Heart size={14} /> {person.compatibility}% match</span>
+              <div className="roommate-match-facts">
+                {(person.area || person.city) && <span><MapPin size={14} />{[person.area, person.city].filter(Boolean).join(", ")}</span>}
+                {(person.budgetMin || person.budgetMax) && (
+                  <span>₹{Number(person.budgetMin || 0).toLocaleString("en-IN")} – ₹{Number(person.budgetMax || 0).toLocaleString("en-IN")} / month</span>
                 )}
-                <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${person.id}`)}>
-                  <UserRound size={15} /> View profile & saved rooms
-                </button>
-                <button className="profile-photo-btn" title="Block profile" onClick={() => block(person.id)}>
-                  <Ban size={15} /> Block
-                </button>
-                <button className="profile-photo-btn" title="Report profile" onClick={() => report(person.id)}>
-                  <ShieldAlert size={15} /> Report
-                </button>
+                {person.sharingType && <span>{person.sharingType} sharing</span>}
+                {person.moveInDate && <span>Move-in {new Date(person.moveInDate).toLocaleDateString("en-IN")}</span>}
+              </div>
+              {person.bio && <p className="roommate-match-bio">{person.bio}</p>}
+              <div className="roommate-discovery-actions">
+                {person.outgoingStatus === "accepted" || person.incomingStatus === "accepted" ? (
+                  <Link className="roommate-primary-action" to="/roommates/messages">Open messages</Link>
+                ) : person.outgoingStatus === "pending" ? (
+                  <span className="roommate-request-status is-pending">Interest sent</span>
+                ) : person.incomingStatus === "pending" ? (
+                  <Link className="roommate-primary-action" to="/roommates/requests">View received interest</Link>
+                ) : (
+                  <button className="roommate-primary-action" type="button" onClick={() => sendRequest(person.id)}>Send interest</button>
+                )}
+                <Link className="roommate-icon-action" to={`/roommates/profile/${person.id}`} aria-label={`View ${person.name}'s profile`} title="View profile"><UserRound size={17} /></Link>
+                <button className="roommate-icon-action" type="button" title="Block profile" aria-label="Block profile" onClick={() => block(person.id)}><Ban size={17} /></button>
+                <button className="roommate-icon-action" type="button" title="Report profile" aria-label="Report profile" onClick={() => report(person.id)}><ShieldAlert size={17} /></button>
               </div>
             </article>
           ))}
         </section>
       )}
-
-      {profileReady && (incoming.length > 0 || outgoing.length > 0) && (
-        <section className="profile-list">
-          <h2 className="profile-section">Roommate requests</h2>
-          {[...incoming, ...outgoing].map((request) => (
-            <div className="profile-item" key={request.id}>
-              <div className="profile-item-main">
-                <strong>{request.person.name}</strong>
-                {request.person.username && <span className="profile-hint">@{request.person.username}</span>}
-                <span className="profile-hint">{request.direction === "incoming" ? "Wants to connect" : "Request sent"}</span>
-              </div>
-              {request.direction === "incoming" && (
-                <div className="profile-item-side">
-                  <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${request.person._id}`)}>
-                    <UserRound size={15} /> Profile & saved rooms
-                  </button>
-                  <button className="profile-photo-btn" onClick={() => respond(request.id, "accepted")}>Accept</button>
-                  <button className="profile-photo-btn" onClick={() => respond(request.id, "declined")}>Decline</button>
-                </div>
-              )}
-              {request.direction === "outgoing" && (
-                <div className="profile-item-side">
-                  <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${request.person._id}`)}>
-                    <UserRound size={15} /> Profile & saved rooms
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
-      )}
-
-      {profileReady && (
-        <section className="profile-list">
-          <h2 className="profile-section">Connected roommates</h2>
-          <p className="profile-hint">Phone and email stay private. Use RoomSlider chat to share details only when you choose.</p>
-          {connections.length === 0 ? (
-            <div className="profile-empty">Accepted connections will appear here.</div>
-          ) : connections.map((connection) => (
-            <div className="profile-item" key={connection.id}>
-              <div className="profile-item-main">
-                <strong>{connection.name}</strong>
-                {connection.username && <span className="profile-hint">@{connection.username}</span>}
-              </div>
-              <div className="profile-item-side">
-                <button className="profile-photo-btn" onClick={() => navigate(`/roommates/profile/${connection.id}`)}>
-                  <UserRound size={15} /> Profile
-                </button>
-                <button
-                  className="profile-photo-btn"
-                  onClick={() => navigate(`/roommates/chat/${connection.id}`, { state: { person: connection } })}
-                >
-                  <MessageCircle size={15} /> Chat
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-      )}
-
-      <p className="profile-hint">
-        <ShieldAlert size={14} /> Your contact information is not shared by RoomSlider. Meet in a public place first and never send money to someone you have not met.{" "}
-        <Link to="/privacy">Privacy details</Link>
-      </p>
-    </div>
+      <p className="roommate-private-note"><ShieldAlert size={14} /> Contact details are not shared. <Link to="/privacy">Privacy details</Link></p>
+    </main>
   );
 }
 

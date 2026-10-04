@@ -6,6 +6,7 @@ import {
 
 import { useNotifications } from "../../context/useNotifications";
 import EnablePushButton from "../../components/notifications/EnablePushButton";
+import roommateNotificationLink from "../../utils/roommateNotificationLink";
 import "../../styles/notifications.css";
 
 const FILTERS = ["All", "Unread", "Requests", "Messages", "Payments"];
@@ -52,7 +53,8 @@ function Notifications() {
 
   const openNotification = (item) => {
     markRead(item);
-    if (item.link) navigate(item.link);
+    const target = roommateNotificationLink(item);
+    if (target) navigate(target);
   };
 
   return (

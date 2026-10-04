@@ -6,6 +6,7 @@ import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
 import { useNotifications } from "../../context/useNotifications";
+import roommateNotificationLink from "../../utils/roommateNotificationLink";
 import "../../styles/profile.css";
 
 const TABS = [
@@ -286,11 +287,12 @@ function Profile() {
               key={n._id}
               onClick={() => {
                 markRead(n);
-                if (n.link) {
-                  if (n.link.includes("tab=activity")) {
+                const link = roommateNotificationLink(n);
+                if (link) {
+                  if (link.includes("tab=activity")) {
                     setTabData((current) => ({ ...current, activity: null }));
                   }
-                  navigate(n.link);
+                  navigate(link);
                 }
               }}
             >
@@ -331,6 +333,9 @@ function Profile() {
 
       <Link className="profile-edit-btn" to="/profile/edit">
         Edit Profile
+      </Link>
+      <Link className="profile-complete-hint" to="/roommates/profile">
+        Roommate profile
       </Link>
 
       {incomplete && (

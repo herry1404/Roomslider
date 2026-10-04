@@ -3,9 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- HEAD: `ea136a4` (`Services: one card per worker, price list with quantity, service requests, study support and rent agreement categories, seed scripts`), tracking `origin/main`.
-- Recent history: `4fd3da3` (public slug URLs, mess reviews, address helper), `2613f46` (student loan workflow).
-- The worktree has uncommitted notification-center changes across backend and frontend, including pre-existing notification API/schema/SSE work. No commit was created.
+- HEAD: `2e99c8c` (`Notifications: bell, live SSE updates, notification center, event hooks across roommate, services, payments, loans, maintenance`), tracking `origin/main`.
+- Recent history: `ea136a4` (service catalogue and requests), `4fd3da3` (public slug URLs, mess reviews, address helper).
+- The worktree has uncommitted notification-center and Roommate Finder restructuring changes across backend and frontend. No commit was created.
 
 ## Completed work
 
@@ -206,3 +206,21 @@ npm run seed:study
 - Manual browser/API acceptance for notifications, read/delete/pagination, SSE reconnect/logout, 30-second fallback, mobile layout/dark mode, and browser push.
 - Multi-account event tests for roommate, request/status, vacate, payment, loan, and maintenance notifications; live Razorpay/database delivery is not verified.
 - Vacate notice delivery requires the legacy room record to have `owner` and `currentTenantUser` references. If either is absent, that recipient cannot be notified.
+
+### 4 Oct 2026 — Roommate Finder restructure
+
+- Split roommate discovery, own profile, requests, and accepted-connection messages into `/roommates`, `/roommates/profile`, `/roommates/requests`, and `/roommates/messages`, with shared mobile-first tabs and live pending/unread badges. Public profiles remain at `/roommates/profile/:userId`; private chat keeps its existing polling page.
+- Discovery now keeps matching/scoring server-side and provides city, area, budget, and sharing filters. Moved roommate preferences out of the general Edit Profile form; added a compact private profile summary, edit form, and discovery visibility toggle.
+- Added authenticated request filtering/cancellation, accepted non-blocked conversation summaries, conversation read, and roommate badge APIs. Message `isRead` is backward-compatible with `readAt`; chat entry marks both messages and matching unread message notifications read. Accept/decline marks the associated interest notification read.
+- Aligned roommate notification links with Requests, Messages, and the sender's chat. The existing notification stream/polling context refreshes roommate badges and routes older roommate notifications to the new destinations. Account phone/email are not included in roommate endpoint projections.
+
+**Tested**
+
+- `cd frontend && npm run build` passed; existing Vite `__dirname` and large-chunk warnings remain.
+- Targeted ESLint passed for the changed roommate, profile, notification, and routing frontend files.
+- `node --check` passed for the changed roommate controller, routes, and message model; `git diff --check` passed.
+
+**Pending**
+
+- Manual two-account flow: create profiles; send interest and verify notification/request badge; accept; message; verify inbox unread count; open chat and verify read state; block and confirm requests/conversations disappear.
+- Manual responsive visual check at 360px and dark mode; live SSE/polling behavior against an authenticated backend/database was not exercised.

@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-import RoommatePreferencesFields from "../../components/profile/RoommatePreferencesFields";
 import "../../styles/profile.css";
 
 const BIO_MAX = 150;
@@ -26,21 +25,6 @@ const EMPTY = {
   hometown: "",
 };
 
-const EMPTY_ROOMMATE_PREFERENCES = {
-  active: true,
-  seeking: "both",
-  budgetMin: "",
-  budgetMax: "",
-  moveInDate: "",
-  sharingType: "",
-  lifestyle: {
-    cleanliness: "",
-    sleepSchedule: "",
-    smoking: "",
-    guests: "",
-  },
-};
-
 function ProfileEdit() {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -49,8 +33,6 @@ function ProfileEdit() {
   const galleryRef = useRef(null);
 
   const [form, setForm] = useState(EMPTY);
-  const [roommatePreferences, setRoommatePreferences] = useState(EMPTY_ROOMMATE_PREFERENCES);
-  const [roommatePreferencesTouched, setRoommatePreferencesTouched] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,7 +55,6 @@ function ProfileEdit() {
       course: u.course,
       subject: u.subject,
       studyYear: u.studyYear,
-      roommatePreferences: u.roommatePreferences,
     };
     localStorage.setItem("user", JSON.stringify(merged));
     setUser(merged);
@@ -107,16 +88,6 @@ function ProfileEdit() {
           area: u.area || "",
           hometown: u.hometown || "",
         });
-        if (u.roommatePreferences) {
-          setRoommatePreferences({
-            ...EMPTY_ROOMMATE_PREFERENCES,
-            ...u.roommatePreferences,
-            lifestyle: {
-              ...EMPTY_ROOMMATE_PREFERENCES.lifestyle,
-              ...(u.roommatePreferences.lifestyle || {}),
-            },
-          });
-        }
         setAvatar(u.avatar || null);
       } catch (err) {
         toast.error(err.response?.data?.message || "Profile load nahi hua");
@@ -138,19 +109,6 @@ function ProfileEdit() {
         ? { course: "", subject: "", studyYear: "" }
         : {}),
     }));
-  };
-
-  const changeRoommatePreference = (key, value) => {
-    setRoommatePreferences((current) => ({ ...current, [key]: value }));
-    setRoommatePreferencesTouched(true);
-  };
-
-  const changeRoommateLifestyle = (key, value) => {
-    setRoommatePreferences((current) => ({
-      ...current,
-      lifestyle: { ...current.lifestyle, [key]: value },
-    }));
-    setRoommatePreferencesTouched(true);
   };
 
   const handlePhoto = async (e) => {
@@ -192,14 +150,6 @@ function ProfileEdit() {
 
     try {
       setSaving(true);
-      if (roommatePreferencesTouched) {
-        payload.roommatePreferences = {
-          ...roommatePreferences,
-          budgetMin: Number(roommatePreferences.budgetMin) || 0,
-          budgetMax: Number(roommatePreferences.budgetMax) || 0,
-          moveInDate: roommatePreferences.moveInDate || null,
-        };
-      }
       const res = await api.put("/users/me", payload);
       syncLocalUser(res.data.user);
       toast.success("Profile save ho gayi");
@@ -432,11 +382,6 @@ function ProfileEdit() {
           <span className="profile-hint">
             Roommate suggestions may show your gender, education and basic profile info. DOB and hometown remain private.
           </span>
-          <RoommatePreferencesFields
-            value={roommatePreferences}
-            onChange={changeRoommatePreference}
-            onLifestyleChange={changeRoommateLifestyle}
-          />
         </div>
 
         <div className="profile-save-bar">

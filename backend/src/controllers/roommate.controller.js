@@ -13,6 +13,15 @@ const {
 const safeMsg = (error) =>
   process.env.NODE_ENV === "production" ? "Something went wrong" : error.message;
 
+const markRoommateNotificationsRead = async (userId, { type, senderId, requestId } = {}) => {
+  const filter = { user: userId, type, isRead: false, read: false };
+  if (senderId) filter["data.senderId"] = String(senderId);
+  if (requestId) filter["data.requestId"] = String(requestId);
+  await require("../models/Notification").updateMany(filter, {
+    $set: { isRead: true, read: true, readAt: new Date() },
+  });
+};
+
 const isRegularUser = (req, res) => {
   if (req.user.role === "user") return true;
   res.status(403).json({ success: false, message: "Roommate Finder is for tenant accounts" });
@@ -155,9 +164,14 @@ const getChatMessages = async (req, res) => {
       .limit(100)
       .lean();
     await RoommateMessage.updateMany(
-      { from: otherUserId, to: req.user._id, readAt: null },
-      { $set: { readAt: new Date() } }
+      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true } },
+      { $set: { readAt: new Date(), isRead: true } }
     );
+    try {
+      await markRoommateNotificationsRead(req.user._id, { type: "roommate_message", senderId: otherUserId });
+    } catch (error) {
+      console.error("ROOMMATE MESSAGE NOTIFICATION READ ERROR:", error);
+    }
     res.json({
       success: true,
       messages: messages.reverse().map((message) => ({
@@ -166,6 +180,7 @@ const getChatMessages = async (req, res) => {
         body: message.body,
         createdAt: message.createdAt,
         readAt: message.readAt,
+        isRead: Boolean(message.isRead || message.readAt),
       })),
     });
   } catch (error) {
@@ -199,7 +214,7 @@ const sendChatMessage = async (req, res) => {
         title: "New roommate message",
         body: "You received a new message.",
         link: `/roommates/chat/${req.user._id}`,
-        data: { senderId: String(req.user._id) },
+        data: { senderId: String(req.user._id), count: 1 },
       });
     } catch (error) {
       console.error("ROOMMATE MESSAGE NOTIFICATION ERROR:", error);
@@ -226,6 +241,9 @@ const updateMyProfile = async (req, res) => {
     delete input.blockedUsers;
     const { updates, error } = sanitizeRoommatePreferences(input);
     if (error) return res.status(400).json({ success: false, message: error });
+    if (input.seeking !== undefined && input.city !== undefined && input.area !== undefined) {
+      updates["roommatePreferences.setupComplete"] = true;
+    }
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { $set: updates },
@@ -319,6 +337,10 @@ const getDiscover = async (req, res) => {
         city: profile.city,
         area: profile.area,
         compatibility: scoreMatch(mineProfile, profile),
+        budgetMin: profile.budgetMin || 0,
+        budgetMax: profile.budgetMax || 0,
+        sharingType: profile.sharingType || "",
+        moveInDate: profile.moveInDate || null,
         outgoingStatus: outgoingMap.get(String(profile.user._id)) || null,
         incomingStatus: incomingMap.get(String(profile.user._id)) || null,
       }))
@@ -366,15 +388,19 @@ const sendRequest = async (req, res) => {
             type: "roommate_accepted",
             title: "Roommate interest accepted",
             body: "Your roommate interest was accepted.",
-            link: `/roommates/chat/${targetId}`,
+            link: "/roommates/messages",
           }),
           notifyUser(targetId, {
             type: "roommate_accepted",
             title: "It's a roommate match",
             body: "Your roommate connection is now accepted.",
-            link: `/roommates/chat/${req.user._id}`,
+            link: "/roommates/messages",
           }),
         ]);
+        await markRoommateNotificationsRead(req.user._id, {
+          type: "roommate_request",
+          senderId: targetId,
+        });
       } catch (error) {
         console.error("ROOMMATE ACCEPTANCE NOTIFICATION ERROR:", error);
       }
@@ -396,7 +422,8 @@ const sendRequest = async (req, res) => {
         type: "roommate_request",
         title: "New roommate interest",
         body: "Someone is interested in connecting as roommates.",
-        link: "/roommates",
+        link: "/roommates/requests",
+        data: { senderId: String(req.user._id), requestId: String(request._id) },
       });
     } catch (error) {
       console.error("ROOMMATE REQUEST NOTIFICATION ERROR:", error);
@@ -413,22 +440,42 @@ const sendRequest = async (req, res) => {
 const getRequests = async (req, res) => {
   try {
     if (!isRegularUser(req, res)) return;
+    const type = req.query.type;
+    if (type && !["received", "sent"].includes(type)) {
+      return res.status(400).json({ success: false, message: "Request type must be received or sent" });
+    }
+    const currentUser = await User.findById(req.user._id).select("roommatePreferences.blockedUsers").lean();
+    const blockedIds = (currentUser?.roommatePreferences?.blockedUsers || []).map(String);
+    const requestFilter = type === "received"
+      ? { to: req.user._id }
+      : type === "sent"
+        ? { from: req.user._id }
+        : { $or: [{ from: req.user._id }, { to: req.user._id }] };
     const requests = await RoommateRequest.find({
-      $or: [{ from: req.user._id }, { to: req.user._id }],
+      ...requestFilter,
     })
       .sort({ updatedAt: -1 })
-      .populate("from", "name username avatar")
-      .populate("to", "name username avatar")
+      .populate("from", "name username avatar roommatePreferences.blockedUsers")
+      .populate("to", "name username avatar roommatePreferences.blockedUsers")
       .lean();
+    const visible = requests.filter((request) => {
+      const person = String(request.from?._id) === String(req.user._id) ? request.to : request.from;
+      return person &&
+        !blockedIds.includes(String(person._id)) &&
+        !(person.roommatePreferences?.blockedUsers || []).some((id) => String(id) === String(req.user._id));
+    });
     res.json({
       success: true,
-      requests: requests.map((request) => ({
+      requests: visible.map((request) => ({
         id: String(request._id),
         status: request.status,
         direction: String(request.from?._id) === String(req.user._id) ? "outgoing" : "incoming",
-        person: String(request.from?._id) === String(req.user._id) ? request.to : request.from,
+        person: (() => {
+          const person = String(request.from?._id) === String(req.user._id) ? request.to : request.from;
+          return { _id: String(person._id), name: person.name, username: person.username, avatar: person.avatar };
+        })(),
         updatedAt: request.updatedAt,
-      })).filter((request) => request.person),
+      })),
     });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
@@ -451,13 +498,22 @@ const respondToRequest = async (req, res) => {
     }
     request.status = req.body.status;
     await request.save();
+    try {
+      await markRoommateNotificationsRead(req.user._id, {
+        type: "roommate_request",
+        senderId: request.from,
+        requestId: request._id,
+      });
+    } catch (error) {
+      console.error("ROOMMATE REQUEST NOTIFICATION READ ERROR:", error);
+    }
     if (request.status === "accepted") {
       try {
         await notifyUser(request.from, {
           type: "roommate_accepted",
           title: "Roommate interest accepted",
           body: "Your roommate interest was accepted.",
-          link: `/roommates/chat/${req.user._id}`,
+          link: "/roommates/messages",
         });
       } catch (error) {
         console.error("ROOMMATE ACCEPTANCE NOTIFICATION ERROR:", error);
@@ -479,14 +535,22 @@ const respondToRequest = async (req, res) => {
 const getConnections = async (req, res) => {
   try {
     if (!isRegularUser(req, res)) return;
+    const currentUser = await User.findById(req.user._id).select("roommatePreferences.blockedUsers").lean();
+    const blockedIds = currentUser?.roommatePreferences?.blockedUsers || [];
     const requests = await RoommateRequest.find({
       status: "accepted",
+      from: { $nin: blockedIds },
+      to: { $nin: blockedIds },
       $or: [{ from: req.user._id }, { to: req.user._id }],
     }).lean();
     const otherIds = requests.map((request) =>
       String(request.from) === String(req.user._id) ? request.to : request.from
     );
-    const users = await User.find({ _id: { $in: otherIds }, role: "user" })
+    const users = await User.find({
+      _id: { $in: otherIds, $nin: blockedIds },
+      role: "user",
+      "roommatePreferences.blockedUsers": { $ne: req.user._id },
+    })
       .select("name username avatar")
       .lean();
     const userMap = new Map(users.map((user) => [String(user._id), user]));
@@ -502,6 +566,159 @@ const getConnections = async (req, res) => {
           avatar: user.avatar,
         })),
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const getConversations = async (req, res) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const currentUser = await User.findById(req.user._id).select("roommatePreferences.blockedUsers").lean();
+    const blockedIds = currentUser?.roommatePreferences?.blockedUsers || [];
+    const accepted = await RoommateRequest.find({
+      status: "accepted",
+      from: { $nin: blockedIds },
+      to: { $nin: blockedIds },
+      $or: [{ from: req.user._id }, { to: req.user._id }],
+    }).select("from to").lean();
+    const otherIds = [...new Set(accepted.map((request) =>
+      String(request.from) === String(req.user._id) ? String(request.to) : String(request.from)
+    ))];
+    const users = await User.find({
+      _id: { $in: otherIds, $nin: blockedIds },
+      role: "user",
+      "roommatePreferences.blockedUsers": { $ne: req.user._id },
+    }).select("name username avatar").lean();
+    const conversations = await Promise.all(users.map(async (person) => {
+      const filter = {
+        $or: [
+          { from: req.user._id, to: person._id },
+          { from: person._id, to: req.user._id },
+        ],
+      };
+      const [last, unreadCount] = await Promise.all([
+        RoommateMessage.findOne(filter).sort({ createdAt: -1 }).select("body createdAt").lean(),
+        RoommateMessage.countDocuments({
+          from: person._id,
+          to: req.user._id,
+          readAt: null,
+          isRead: { $ne: true },
+        }),
+      ]);
+      return {
+        id: String(person._id),
+        name: person.name,
+        username: person.username,
+        avatar: person.avatar,
+        lastMessage: last?.body || "",
+        lastMessageAt: last?.createdAt || null,
+        unreadCount,
+      };
+    }));
+    conversations.sort((a, b) => new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0));
+    res.json({ success: true, conversations });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const markConversationRead = async (req, res) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const otherUserId = req.params.id;
+    if (!mongoose.isValidObjectId(otherUserId) || String(otherUserId) === String(req.user._id)) {
+      return res.status(400).json({ success: false, message: "Invalid roommate connection" });
+    }
+    if (!(await getAcceptedConnection(req.user._id, otherUserId))) {
+      return res.status(403).json({ success: false, message: "This roommate connection is not available" });
+    }
+    const readAt = new Date();
+    const result = await RoommateMessage.updateMany(
+      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true } },
+      { $set: { readAt, isRead: true } }
+    );
+    try {
+      await markRoommateNotificationsRead(req.user._id, { type: "roommate_message", senderId: otherUserId });
+    } catch (error) {
+      console.error("ROOMMATE MESSAGE NOTIFICATION READ ERROR:", error);
+    }
+    res.json({ success: true, modifiedCount: result.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const getRoommateBadges = async (req, res) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const currentUser = await User.findById(req.user._id).select("roommatePreferences.blockedUsers").lean();
+    const blockedIds = currentUser?.roommatePreferences?.blockedUsers || [];
+    const pending = await RoommateRequest.find({
+      to: req.user._id,
+      from: { $nin: blockedIds },
+      status: "pending",
+    }).populate("from", "roommatePreferences.blockedUsers").lean();
+    const pendingRequests = pending.filter((request) =>
+      !(request.from?.roommatePreferences?.blockedUsers || []).some((id) => String(id) === String(req.user._id))
+    ).length;
+    const unreadMessages = (await getConversationsForUser(req.user._id))
+      .reduce((count, conversation) => count + conversation.unreadCount, 0);
+    res.json({
+      pendingRequests,
+      unreadMessages,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const getConversationsForUser = async (userId) => {
+  const currentUser = await User.findById(userId).select("roommatePreferences.blockedUsers").lean();
+  const blockedIds = currentUser?.roommatePreferences?.blockedUsers || [];
+  const accepted = await RoommateRequest.find({
+    status: "accepted",
+    from: { $nin: blockedIds },
+    to: { $nin: blockedIds },
+    $or: [{ from: userId }, { to: userId }],
+  }).select("from to").lean();
+  const otherIds = [...new Set(accepted.map((request) =>
+    String(request.from) === String(userId) ? String(request.to) : String(request.from)
+  ))];
+  const users = await User.find({
+    _id: { $in: otherIds, $nin: blockedIds },
+    role: "user",
+    "roommatePreferences.blockedUsers": { $ne: userId },
+  }).select("_id").lean();
+  const counts = await Promise.all(users.map((person) => RoommateMessage.countDocuments({
+    from: person._id,
+    to: userId,
+    readAt: null,
+    isRead: { $ne: true },
+  })));
+  return counts.map((unreadCount) => ({ unreadCount }));
+};
+
+const cancelRequest = async (req, res) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const request = await RoommateRequest.findOne({
+      _id: mongoose.isValidObjectId(req.params.id) ? req.params.id : null,
+      from: req.user._id,
+      status: "pending",
+    });
+    if (!request) return res.status(404).json({ success: false, message: "Pending sent request not found" });
+    await request.deleteOne();
+    try {
+      await markRoommateNotificationsRead(request.to, {
+        type: "roommate_request",
+        senderId: req.user._id,
+        requestId: request._id,
+      });
+    } catch (error) {
+      console.error("ROOMMATE REQUEST NOTIFICATION READ ERROR:", error);
+    }
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
   }
@@ -565,8 +782,12 @@ module.exports = {
   getRequests,
   respondToRequest,
   getConnections,
+  getConversations,
+  markConversationRead,
+  getRoommateBadges,
   getChatMessages,
   sendChatMessage,
+  cancelRequest,
   blockUser,
   reportUser,
 };
