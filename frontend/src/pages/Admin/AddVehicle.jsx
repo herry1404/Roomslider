@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -96,7 +97,7 @@ function AddVehicle() {
           <div className="fa-field"><label>Documents required</label><textarea rows="3" value={form.documentsRequired} onChange={setField("documentsRequired")} /></div>
         </div>
         <div className="fa-section">Photos</div>
-        {oldPhotos.length > 0 && <div className="fa-imgs">{oldPhotos.map((photo) => <div className="fa-img" key={photo}><img src={photo} alt="" loading="lazy" /><button type="button" aria-label="Remove photo" onClick={() => setOldPhotos((current) => current.filter((item) => item !== photo))}>×</button></div>)}</div>}
+        {oldPhotos.length > 0 && <div className="fa-imgs">{oldPhotos.map((photo) => <div className="fa-img" key={photo}><img src={optimizeCloudinaryImage(photo, 640)} alt="" loading="lazy" /><button type="button" aria-label="Remove photo" onClick={() => setOldPhotos((current) => current.filter((item) => item !== photo))}>×</button></div>)}</div>}
         <div className="fa-field"><label>Upload photos</label><input type="file" accept="image/*" multiple onChange={(event) => setFiles(Array.from(event.target.files || []))} /></div>
         <div className="fa-checks">
           <label><input type="checkbox" checked={Boolean(form.helmetIncluded)} onChange={setField("helmetIncluded")} /> Helmet included</label>

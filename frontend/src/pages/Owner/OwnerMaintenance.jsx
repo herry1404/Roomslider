@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -90,7 +91,7 @@ function OwnerMaintenance() {
               {r.photoUrl && (
                 <a href={r.photoUrl} target="_blank" rel="noopener noreferrer">
                   <img
-                    src={r.photoUrl}
+                    src={optimizeCloudinaryImage(r.photoUrl, 640)}
                     alt="issue"
                     loading="lazy"
                     style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, marginTop: 6 }}

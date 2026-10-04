@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -316,7 +317,7 @@ function MessOwnerDashboard() {
               <div className="mess-order-row" key={order._id}>
                 <div className="mess-order-customer">
                   {order.user?.avatar
-                    ? <img src={order.user.avatar} alt="" />
+                    ? <img src={optimizeCloudinaryImage(order.user.avatar, 256)} alt="" loading="lazy" />
                     : <span className="mess-order-avatar">{(order.deliveryAddress?.recipientName || order.user?.name || "C").charAt(0).toUpperCase()}</span>}
                   <div>
                     <strong>{order.deliveryAddress?.recipientName || order.user?.name || "Customer"}</strong>

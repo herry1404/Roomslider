@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Link } from "react-router-dom";
 import { Clock3, MapPin, Star } from "lucide-react";
 import "../../styles/room-card.css";
@@ -26,7 +27,7 @@ function HourlyRoomCard({ room }) {
       <span className="hourly-air-image-link" aria-hidden="true">
         {firstImage ? (
           <img
-            src={firstImage}
+            src={optimizeCloudinaryImage(firstImage, 640)}
             alt={room.title}
             className="hourly-air-image"
             loading="lazy"

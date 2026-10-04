@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -223,7 +224,7 @@ function ProfileEdit() {
         <div className="profile-form-fields">
           <div className="profile-avatar-wrap">
             {avatar ? (
-              <img className="profile-avatar-img" src={avatar} alt="Profile" />
+              <img className="profile-avatar-img" src={optimizeCloudinaryImage(avatar, 256)} alt="Profile" loading="lazy" />
             ) : (
               <div className="profile-avatar">{initial}</div>
             )}

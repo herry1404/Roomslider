@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { UtensilsCrossed, Trash2, Plus, X, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
@@ -200,7 +201,7 @@ function ManageMess() {
                   <td>
                     <div className="admin-row-thumb">
                       {m.images?.[0] ? (
-                        <img src={m.images[0]} alt={m.name} />
+                        <img src={optimizeCloudinaryImage(m.images[0], 640)} alt={m.name} loading="lazy" />
                       ) : (
                         <div
                           style={{
@@ -372,6 +373,7 @@ function ManageMess() {
                       <img
                         src={URL.createObjectURL(img)}
                         alt="preview"
+                        loading="lazy"
                         style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
                       />
                       <button

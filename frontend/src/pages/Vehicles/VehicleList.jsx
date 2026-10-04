@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -70,7 +71,7 @@ function VehicleList() {
             {visibleVehicles.map((vehicle) => (
               <Link key={vehicle._id} to={`/vehicles/${vehicle.slug || vehicle.name}`} className="vehicle-card">
                 <div className="vehicle-card-media">
-                  {vehicle.photos?.[0] ? <img src={vehicle.photos[0]} alt={`${vehicle.brand} ${vehicle.name}`} loading="lazy" /> : <div className="vehicle-photo-placeholder"><Bike size={42} strokeWidth={1.5} /></div>}
+                  {vehicle.photos?.[0] ? <img src={optimizeCloudinaryImage(vehicle.photos[0], 640)} alt={`${vehicle.brand} ${vehicle.name}`} loading="lazy" /> : <div className="vehicle-photo-placeholder"><Bike size={42} strokeWidth={1.5} /></div>}
                   <span className={`vehicle-availability ${vehicle.isAvailable ? "available" : "unavailable"}`}>{vehicle.isAvailable ? "Available" : "Currently unavailable"}</span>
                 </div>
                 <div className="vehicle-card-body">

@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Link } from "react-router-dom";
 
 import rooms from "../../assets/categories/rooms.webp";
@@ -53,7 +54,7 @@ function Categories() {
               }}
             >
               <div className="category-image">
-                <img src={item.image} alt={item.title} />
+                <img src={optimizeCloudinaryImage(item.image, 960)} alt={item.title} loading="lazy" />
               </div>
 
               <div className="category-info">

@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { MapPin, Plus, Trash2, Pencil, X, Building2, CalendarCheck } from "lucide-react";
 import toast from "react-hot-toast";
@@ -204,7 +205,7 @@ function ManageVillas() {
             <thead><tr><th>Villa</th><th>Location</th><th>Stay / night</th><th>Event / day</th><th>Capacity</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>{villas.map((villa) => (
               <tr key={villa._id}>
-                <td><div className="admin-row-thumb">{villa.images?.[0] && <img src={villa.images[0]} alt={villa.name} />}<span>{villa.name}</span></div></td>
+                <td><div className="admin-row-thumb">{villa.images?.[0] && <img src={optimizeCloudinaryImage(villa.images[0], 640)} alt={villa.name} loading="lazy" />}<span>{villa.name}</span></div></td>
                 <td>{villa.area}, {villa.city}</td><td>₹{villa.nightlyRate}</td><td>₹{villa.eventRate}</td><td>{villa.maxGuests}</td>
                 <td><span className={`admin-badge ${villa.isActive ? "green" : ""}`}>{villa.isActive ? "Public" : "Hidden"}</span></td>
                 <td><div className="admin-row-actions"><button className="admin-icon-btn accent" title="Edit" onClick={() => openEdit(villa)}><Pencil size={16} /></button><button className="admin-icon-btn danger" title="Delete" onClick={() => remove(villa)}><Trash2 size={16} /></button></div></td>

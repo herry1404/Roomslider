@@ -26,6 +26,10 @@ import "./styles/preferences-modal.css";
 
 import App from "./App";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import * as Sentry from "@sentry/react";
+import { initializeSentry } from "./utils/sentry";
+
+const sentryEnabled = initializeSentry();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -37,7 +41,13 @@ createRoot(document.getElementById("root")).render(
               <ThemeProvider>
                 <NotificationProvider>
                   <GoogleOneTap />
-                  <App />
+                  {sentryEnabled ? (
+                    <Sentry.ErrorBoundary fallback={<p role="alert">Something went wrong. Please reload the page.</p>}>
+                      <App />
+                    </Sentry.ErrorBoundary>
+                  ) : (
+                    <App />
+                  )}
                   <ConfirmModalHost />
                   <Toaster
                     position="top-center"

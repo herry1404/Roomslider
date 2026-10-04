@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const Sentry = require("./config/sentry");
 
 
 const authRoutes = require("./routes/auth.routes");
@@ -187,6 +188,14 @@ app.use(
   cookieParser()
 );
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 
 
@@ -392,6 +401,9 @@ app.get("/",(req,res)=>{
 // Error Handling
 // =====================
 
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 app.use(notFound);
 

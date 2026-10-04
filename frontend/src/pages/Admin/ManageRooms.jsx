@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -222,7 +223,7 @@ function ManageRooms() {
                 <tr key={room._id}>
                   <td>
                     <div className="admin-row-thumb">
-                      <img src={room.images?.[0]} alt={room.title} />
+                      <img src={optimizeCloudinaryImage(room.images?.[0], 960)} alt={room.title} loading="lazy" />
                       <span>{room.title}</span>
                     </div>
                   </td>

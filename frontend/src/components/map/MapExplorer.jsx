@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { roomPath } from "../../utils/roomUrl";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -299,7 +300,7 @@ function SelectedRoomCard({ room, onView }) {
       onClick={(e) => e.stopPropagation()}
     >
       <div className="rs-map-detail-thumb">
-        {img ? <img src={img} alt="" /> : <MapPin size={20} />}
+        {img ? <img src={optimizeCloudinaryImage(img, 640)} alt="" loading="lazy" /> : <MapPin size={20} />}
       </div>
       <div className="rs-map-detail-title">{room.title}</div>
       <div className="rs-map-detail-meta">
@@ -821,7 +822,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                   onClick={() => handleCardClick(room)}
                 >
                   <div className="rs-thumb">
-                    {img ? <img src={img} alt="" loading="lazy" /> : <MapPin size={22} />}
+                    {img ? <img src={optimizeCloudinaryImage(img, 640)} alt="" loading="lazy" /> : <MapPin size={22} />}
                   </div>
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div className="rs-card-title">{room.title}</div>

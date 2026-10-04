@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Link } from "react-router-dom";
 import { MapPin, IndianRupee, Star, UtensilsCrossed } from "lucide-react";
 
@@ -12,7 +13,7 @@ function MessCard({ mess }) {
       <div className="mess-card-image">
         {mess.images && mess.images[0] ? (
           <img
-            src={mess.images[0]}
+            src={optimizeCloudinaryImage(mess.images[0], 640)}
             alt={mess.name}
             loading="lazy"
             decoding="async"

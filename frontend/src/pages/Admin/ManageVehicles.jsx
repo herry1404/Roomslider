@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -81,7 +82,7 @@ function ManageVehicles() {
             <thead><tr><th>Vehicle</th><th>Type</th><th>Price / day</th><th>Available</th><th>Visible</th><th>Actions</th></tr></thead>
             <tbody>{filtered.map((vehicle) => (
               <tr key={vehicle._id}>
-                <td><div className="admin-row-thumb"><div className="fa-thumb">{vehicle.photos?.[0] ? <img src={vehicle.photos[0]} alt="" loading="lazy" /> : <Bike size={18} />}</div><span>{vehicle.brand} {vehicle.name}</span></div></td>
+                <td><div className="admin-row-thumb"><div className="fa-thumb">{vehicle.photos?.[0] ? <img src={optimizeCloudinaryImage(vehicle.photos[0], 640)} alt="" loading="lazy" /> : <Bike size={18} />}</div><span>{vehicle.brand} {vehicle.name}</span></div></td>
                 <td>{vehicle.type}</td>
                 <td>{fmt(vehicle.pricePerDay)}</td>
                 <td><button type="button" aria-label={`Toggle availability for ${vehicle.name}`} className={`fa-switch ${vehicle.isAvailable ? "on" : ""}`} onClick={() => updateVehicle(vehicle, { isAvailable: !vehicle.isAvailable }, vehicle.isAvailable ? "Marked unavailable" : "Marked available")} /></td>

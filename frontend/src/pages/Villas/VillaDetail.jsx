@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MapPin, CheckCircle2 } from "lucide-react";
@@ -178,7 +179,7 @@ function VillaDetail() {
         {images.length ? (
           <>
             <div className="villa-detail-gallery-main">
-              <img src={images[activeImage]} alt={`${villa.name}, photo ${activeImage + 1}`} loading="eager" />
+              <img src={optimizeCloudinaryImage(images[activeImage], 1600)} alt={`${villa.name}, photo ${activeImage + 1}`} loading="eager" />
             </div>
             {images.length > 1 && (
               <div className="villa-detail-gallery-thumbnails">
@@ -191,7 +192,7 @@ function VillaDetail() {
                     aria-label={`Show villa photo ${index + 1}`}
                     aria-pressed={activeImage === index}
                   >
-                    <img src={image} alt="" loading="lazy" />
+                    <img src={optimizeCloudinaryImage(image, 640)} alt="" loading="lazy" />
                   </button>
                 ))}
               </div>

@@ -448,6 +448,7 @@ function AddRoom() {
                     <img
                         src={URL.createObjectURL(image)}
                         alt=""
+                        loading="lazy"
                     />
 
                     <button

@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -45,7 +46,7 @@ const readUser = () => {
 };
 
 function Thumb({ src }) {
-  return src ? <img src={src} alt="" loading="lazy" /> : <Sofa size={26} />;
+  return src ? <img src={optimizeCloudinaryImage(src, 640)} alt="" loading="lazy" /> : <Sofa size={26} />;
 }
 
 function FurnitureList() {

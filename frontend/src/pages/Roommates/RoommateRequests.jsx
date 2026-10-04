@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -102,7 +103,7 @@ function RoommateRequests() {
             <article className="roommate-hub-row" key={request.id}>
               <Link className="roommate-hub-person" to={`/roommates/profile/${request.person._id}`}>
                 {request.person.avatar
-                  ? <img src={request.person.avatar} alt="" />
+                  ? <img src={optimizeCloudinaryImage(request.person.avatar, 256)} alt="" loading="lazy" />
                   : <span className="roommate-hub-avatar">{request.person.name?.charAt(0)?.toUpperCase() || "R"}</span>}
                 <span>
                   <strong>{request.person.name}</strong>

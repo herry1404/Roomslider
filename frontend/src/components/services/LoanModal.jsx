@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useRef, useState } from "react";
 import { Banknote, CheckCircle2, Clock3, MapPin, X } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -436,7 +437,7 @@ function LoanModal({ onClose }) {
       <div className="loan-application">
         <div className="loan-applicant">
           {profile?.avatar ? (
-            <img src={profile.avatar} alt="" className="loan-applicant-avatar" />
+            <img src={optimizeCloudinaryImage(profile.avatar, 256)} alt="" className="loan-applicant-avatar" loading="lazy" />
           ) : (
             <div className="loan-applicant-avatar loan-applicant-initial">{initial}</div>
           )}
@@ -512,7 +513,7 @@ function LoanModal({ onClose }) {
           <form className="loan-body" onSubmit={handleSubmit}>
             <div className="loan-profile-note">
               {profile?.avatar ? (
-                <img src={profile.avatar} alt="" className="loan-applicant-avatar" />
+                <img src={optimizeCloudinaryImage(profile.avatar, 256)} alt="" className="loan-applicant-avatar" loading="lazy" />
               ) : (
                 <div className="loan-applicant-avatar loan-applicant-initial">
                   {(profile?.name || "U").trim().charAt(0).toUpperCase()}

@@ -386,7 +386,7 @@ function OwnerAddRoom() {
                         <div className="preview-grid">
                             {images.map((image, index) => (
                                 <div className="preview-card" key={index}>
-                                    <img src={URL.createObjectURL(image)} alt="" />
+                                    <img src={URL.createObjectURL(image)} alt="" loading="lazy" />
                                     <button type="button" onClick={() => removeImage(index)}>
                                         Remove
                                     </button>

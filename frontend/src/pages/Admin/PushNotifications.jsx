@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { BellRing, Send } from "lucide-react";
 import toast from "react-hot-toast";
@@ -82,7 +83,7 @@ function PushNotifications() {
             </select></label>
           </div>
           <label>Image (optional, max 5 MB)<input type="file" accept="image/*" onChange={updateImage} /></label>
-          {preview && <img className="push-admin-preview" src={preview} alt="Notification preview" />}
+          {preview && <img className="push-admin-preview" src={optimizeCloudinaryImage(preview, 960)} alt="Notification preview" loading="lazy" />}
           <button type="submit" disabled={sending}><Send size={17} />{sending ? "Sending…" : "Send push"}</button>
         </form>
       </section>

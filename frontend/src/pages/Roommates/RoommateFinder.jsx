@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Ban, Heart, MapPin, ShieldAlert, UserRound, X } from "lucide-react";
@@ -178,7 +179,7 @@ function RoommateFinder() {
             <article className="roommate-discovery-card" key={person.id}>
               <Link to={`/roommates/profile/${person.id}`} className="roommate-discovery-person">
                 {person.avatar
-                  ? <img src={person.avatar} alt="" />
+                  ? <img src={optimizeCloudinaryImage(person.avatar, 256)} alt="" loading="lazy" />
                   : <span className="roommate-hub-avatar">{person.name?.charAt(0)?.toUpperCase() || "R"}</span>}
                 <span>
                   <strong>{person.name}</strong>

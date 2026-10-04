@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { roomPath } from "../../utils/roomUrl";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, MapPin, ArrowRight } from "lucide-react";
@@ -86,7 +87,7 @@ function CategorySection({ title, viewAllPath, rooms }) {
               >
                 <div className="room-image-wrap">
                   <img
-                    src={thumb(room.images?.[0])}
+                    src={optimizeCloudinaryImage(thumb(room.images?.[0]), 640)}
                     loading="lazy"
                     decoding="async"
                     alt={room.title}

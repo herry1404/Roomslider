@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
 import { MapPin, Heart, BadgeCheck } from "lucide-react";
@@ -84,7 +85,7 @@ function RoomCard({ room, onWishlistChange }) {
     <div className="room-card rc-air" onClick={handleDetails} style={{ cursor: "pointer" }}>
       <div className="room-image-wrapper">
         <img
-          src={firstImage || "data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27600%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23e5e7eb%27/></svg>"}
+          src={optimizeCloudinaryImage(firstImage || "data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27600%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23e5e7eb%27/></svg>", 640)}
           alt={room.title}
           className="room-image"
           loading="lazy"

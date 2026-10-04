@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -254,9 +255,8 @@ function TenantDashboard() {
       <div className="tenant-header">
         <img
           className="tenant-header-photo"
-          src={room.images?.[0] || "/placeholder-room.jpg"}
-          alt={room.title}
-        />
+          src={optimizeCloudinaryImage(room.images?.[0] || "/placeholder-room.jpg", 960)}
+          alt={room.title} loading="lazy" />
         <div className="tenant-header-info">
           <div className="tenant-eyebrow">Your Place</div>
           <h1>

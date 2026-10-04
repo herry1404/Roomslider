@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Pencil, ShieldCheck } from "lucide-react";
@@ -160,7 +161,7 @@ function MyRoommateProfile() {
         <section className="roommate-my-profile-card">
           <div className="roommate-my-profile-heading">
             {account.avatar
-              ? <img src={account.avatar} alt="" />
+              ? <img src={optimizeCloudinaryImage(account.avatar, 256)} alt="" loading="lazy" />
               : <span className="roommate-hub-avatar">{account.name?.charAt(0)?.toUpperCase() || "R"}</span>}
             <div>
               <h2>{account.name || "Your roommate profile"}</h2>

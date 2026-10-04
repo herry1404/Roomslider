@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -117,7 +118,7 @@ function OwnerDetail() {
                 >
                   <td>
                     <div className="admin-row-thumb">
-                      <img src={room.images?.[0] || "/placeholder-room.jpg"} alt={room.title} />
+                      <img src={optimizeCloudinaryImage(room.images?.[0] || "/placeholder-room.jpg", 640)} alt={room.title} loading="lazy" />
                       <div>
                         <div>{room.title || "Untitled Room"}</div>
                         {room.roomNumber && (

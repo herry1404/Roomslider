@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -162,7 +163,7 @@ function AddFurniture() {
           <div className="fa-imgs">
             {oldImages.map((src) => (
               <div className="fa-img" key={src}>
-                <img src={src} alt="" />
+                <img src={optimizeCloudinaryImage(src, 640)} alt="" loading="lazy" />
                 <button type="button" aria-label={`Remove ${src}`} onClick={() => setOldImages((current) => current.filter((image) => image !== src))}>×</button>
               </div>
             ))}

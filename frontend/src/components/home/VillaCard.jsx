@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Link } from "react-router-dom";
 import { BedDouble, MapPin, Star, Users } from "lucide-react";
 
@@ -13,7 +14,7 @@ function VillaCard({ villa, distanceKm }) {
   return (
     <Link className="villa-card" to={`/villas/${villa.slug || villa.name}`}>
       {villa.images?.[0] ? (
-        <img src={villa.images[0]} alt={villa.name} loading="lazy" decoding="async" />
+        <img src={optimizeCloudinaryImage(villa.images[0], 640)} alt={villa.name} loading="lazy" decoding="async" />
       ) : (
         <div className="villa-card-placeholder" role="img" aria-label="No villa photo available">Villa</div>
       )}

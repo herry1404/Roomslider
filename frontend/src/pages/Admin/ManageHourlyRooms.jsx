@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { DoorOpen, MapPin, Trash2, Plus, X, Pencil, Check, Ban } from "lucide-react";
 import toast from "react-hot-toast";
@@ -212,7 +213,7 @@ function ManageHourlyRooms() {
                   <td>
                     <div className="admin-row-thumb">
                       {r.images?.[0] ? (
-                        <img src={r.images[0]} alt={r.title} />
+                        <img src={optimizeCloudinaryImage(r.images[0], 960)} alt={r.title} loading="lazy" />
                       ) : (
                         <div
                           style={{
@@ -323,7 +324,7 @@ function ManageHourlyRooms() {
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {images.map((img, idx) => (
                     <div key={idx} style={{ position: "relative" }}>
-                      <img src={URL.createObjectURL(img)} alt="preview" style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }} />
+                      <img src={URL.createObjectURL(img)} alt="preview" loading="lazy" style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }} />
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}

@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Helmet } from "react-helmet-async";
 
 import "../../styles/team.css";
@@ -33,12 +34,11 @@ function Team() {
             <div className="team-card" key={member.name}>
               <div className="team-avatar">
                 <img
-                  src={member.image}
+                  src={optimizeCloudinaryImage(member.image, 960)}
                   alt={member.name}
                   onError={(e) => {
                     e.target.style.display = "none";
-                  }}
-                />
+                  }} loading="lazy" />
               </div>
               <h3>{member.name}</h3>
               <span className="team-role">{member.role}</span>

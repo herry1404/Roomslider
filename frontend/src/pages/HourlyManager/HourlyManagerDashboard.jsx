@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Phone, LogOut, BedDouble, KeyRound, Users, Clock, Search } from "lucide-react";
@@ -237,7 +238,7 @@ function HourlyManagerDashboard() {
             {visibleRooms.map((room) => (
               <div className="hm-room" key={room._id}>
                 <div className="hm-room-top">
-                  <img src={room.images?.[0]} alt={room.title} />
+                  <img src={optimizeCloudinaryImage(room.images?.[0], 960)} alt={room.title} loading="lazy" />
                   <div>
                     <h3>{room.title}</h3>
                     <p className="hm-muted">₹{room.pricePerHour}/hr</p>

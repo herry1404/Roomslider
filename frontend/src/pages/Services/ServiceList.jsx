@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -150,7 +151,7 @@ function ServiceList() {
         const services = (provider.priceList || []).map((item) => item.name);
         const legacy = legacyText(provider);
         return <article key={provider._id} className="service-card" tabIndex="0" role="button" onClick={() => setRatesProvider(provider)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setRatesProvider(provider); }}>
-          {provider.images?.[0] ? <img className="service-worker-photo" src={provider.images[0]} alt="" loading="lazy" /> : <div className="service-worker-photo service-worker-icon"><WorkerIcon category={category} /></div>}
+          {provider.images?.[0] ? <img className="service-worker-photo" src={optimizeCloudinaryImage(provider.images[0], 640)} alt="" loading="lazy" /> : <div className="service-worker-photo service-worker-icon"><WorkerIcon category={category} /></div>}
           <div className="service-worker-title"><h3>{provider.name}</h3>{provider.isVerified && <span className="service-verified"><BadgeCheck size={16} /> Verified</span>}</div>
           <div className="service-meta"><MapPin size={14} /> {provider.area}{provider.city ? `, ${provider.city}` : ""}</div>
           {Number(provider.experienceYears) > 0 && <p className="service-worker-line">{provider.experienceYears} yrs experience</p>}

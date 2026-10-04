@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -69,7 +70,7 @@ function ProfileMenu({ variant }) {
 
   const renderIcon = (size) =>
     user && user.avatar ? (
-      <img className="profile-btn-avatar" src={user.avatar} alt="" />
+      <img className="profile-btn-avatar" src={optimizeCloudinaryImage(user.avatar, 256)} alt="" loading="lazy" />
     ) : (
       <UserCircle size={size} />
     );

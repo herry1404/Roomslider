@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MapPin, IndianRupee, Trash2 } from "lucide-react";
@@ -186,9 +187,8 @@ function Wishlist() {
 
 
                     <img
-                      src={room.images?.[0] || "https://via.placeholder.com/400x250"}
-                      alt={room.title}
-                    />
+                      src={optimizeCloudinaryImage(room.images?.[0] || "https://via.placeholder.com/400x250", 640)}
+                      alt={room.title} loading="lazy" />
 
 
 

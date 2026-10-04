@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Ban, Check, CheckCheck, ImagePlus, MapPin, Send, ShieldAlert, X } from "lucide-react";
 import { io } from "socket.io-client";
@@ -201,7 +202,7 @@ function RoommateChat({ person, currentUserId, onClose, compact = false }) {
       <header className="roommate-chat-header">
         {onClose && <button type="button" className="roommate-chat-back" onClick={onClose} aria-label="Back to roommate messages"><ArrowLeft size={20} /></button>}
         {person.avatar
-          ? <img className="roommate-chat-avatar" src={person.avatar} alt="" />
+          ? <img className="roommate-chat-avatar" src={optimizeCloudinaryImage(person.avatar, 256)} alt="" loading="lazy" />
           : <span className="roommate-chat-avatar roommate-chat-avatar--initial">{person.name?.trim().charAt(0).toUpperCase() || "R"}</span>}
         <div className="roommate-chat-person">
           <h3>{person.name}</h3>
@@ -213,7 +214,7 @@ function RoommateChat({ person, currentUserId, onClose, compact = false }) {
         </div>
       </header>
       {relatedRoom && <a className="roommate-related-room" href={`/rooms/${relatedRoom.slug || relatedRoom.id}`}>
-        {relatedRoom.image ? <img src={relatedRoom.image} alt="" loading="lazy" /> : <span className="roommate-related-room-icon"><MapPin size={17} /></span>}
+        {relatedRoom.image ? <img src={optimizeCloudinaryImage(relatedRoom.image, 640)} alt="" loading="lazy" /> : <span className="roommate-related-room-icon"><MapPin size={17} /></span>}
         <span><small>Room near their area</small><strong>{relatedRoom.title}</strong><small>{relatedRoom.location} · ₹{Number(relatedRoom.price).toLocaleString("en-IN")}/month</small></span>
         <span className="roommate-related-room-tag">{relatedRoom.category}</span>
       </a>}
@@ -229,7 +230,7 @@ function RoommateChat({ person, currentUserId, onClose, compact = false }) {
             <div key={message.id}>
               {showDate && <div className="roommate-chat-date"><span>{day}</span></div>}
               <article className={`roommate-chat-message${mine ? " is-mine" : ""}${message.failed ? " is-failed" : ""}`} onClick={message.failed ? () => sendText(message.body) : undefined}>
-                {message.imageUrl && <a href={message.imageUrl} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}><img className="roommate-chat-image" src={message.imageUrl} alt="Shared image" loading="lazy" /></a>}
+                {message.imageUrl && <a href={message.imageUrl} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}><img className="roommate-chat-image" src={optimizeCloudinaryImage(message.imageUrl, 640)} alt="Shared image" loading="lazy" /></a>}
                 {message.body && <p>{message.body}</p>}
                 <time dateTime={message.createdAt}>{formatTime(message.createdAt)}{mine && <span className="roommate-message-status" aria-label={message.failed ? "Failed to send" : message.isRead || message.readAt ? "Seen" : "Sent"}>{message.failed ? "Failed · Retry" : message.sending ? "Sending…" : message.isRead || message.readAt ? <CheckCheck size={14} /> : <Check size={14} />}</span>}</time>
               </article>

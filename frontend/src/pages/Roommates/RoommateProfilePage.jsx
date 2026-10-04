@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin } from "lucide-react";
@@ -47,7 +48,7 @@ function RoommateProfilePage() {
         ) : (
           <>
             <header className="roommate-dialog-profile-head">
-              {profile.avatar ? <img src={profile.avatar} alt="" /> : <span>{profile.name?.charAt(0)?.toUpperCase() || "R"}</span>}
+              {profile.avatar ? <img src={optimizeCloudinaryImage(profile.avatar, 256)} alt="" loading="lazy" /> : <span>{profile.name?.charAt(0)?.toUpperCase() || "R"}</span>}
               <div>
                 <h2>{profile.name}</h2>
                 {profile.username && <p>@{profile.username}</p>}
@@ -79,7 +80,7 @@ function RoommateProfilePage() {
               <div className="roommate-saved-rooms">
                 {data.savedRooms.map((room) => (
                   <Link className="roommate-saved-room" to={`/rooms/${room._id}`} key={room._id}>
-                    {room.images?.[0] && <img src={room.images[0]} alt="" loading="lazy" />}
+                    {room.images?.[0] && <img src={optimizeCloudinaryImage(room.images[0], 256)} alt="" loading="lazy" />}
                     <span className="roommate-saved-room-copy">
                       <strong>{room.title}</strong>
                       <span>{room.location}</span>

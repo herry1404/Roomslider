@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Clock3, MapPin, ShieldCheck, UserRound } from "lucide-react";
@@ -192,7 +193,7 @@ function HourlyRoomDetail() {
       <div className="hourly-detail-layout">
         <article className="hourly-detail-main">
           {room.images?.[0] ? (
-            <img className="hourly-detail-image" src={room.images[0]} alt={room.title} />
+            <img className="hourly-detail-image" src={optimizeCloudinaryImage(room.images[0], 1600)} alt={room.title} loading="eager" />
           ) : (
             <div className="hourly-detail-image hourly-detail-image-placeholder" role="img" aria-label="No room photo available" />
           )}

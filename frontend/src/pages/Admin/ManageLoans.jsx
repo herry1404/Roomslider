@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import axios from "../../api/axios";
 import confirmAction from "../../utils/confirmAction";
@@ -190,10 +191,9 @@ function ManageLoans() {
                         <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600 }}>
                           {loan.user?.avatar ? (
                             <img
-                              src={loan.user.avatar}
+                              src={optimizeCloudinaryImage(loan.user.avatar, 256)}
                               alt=""
-                              style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }}
-                            />
+                              style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} loading="lazy" />
                           ) : (
                             <span
                               aria-hidden="true"

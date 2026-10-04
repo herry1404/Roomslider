@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { Link } from "react-router-dom";
 
 function HomeBanner({ section }) {
@@ -30,7 +31,7 @@ function HomeBanner({ section }) {
         >
           {c.imageUrl && (
             <img
-              src={c.imageUrl}
+              src={optimizeCloudinaryImage(c.imageUrl, 960)}
               alt={section.title || "Offer"}
               loading="lazy"
               style={{

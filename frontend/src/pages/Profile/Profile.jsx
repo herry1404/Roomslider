@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -320,7 +321,7 @@ function Profile() {
     <div className="profile-view">
       <div className="profile-head">
         {profile.avatar ? (
-          <img className="profile-head-img" src={profile.avatar} alt="Profile" />
+          <img className="profile-head-img" src={optimizeCloudinaryImage(profile.avatar, 256)} alt="Profile" loading="lazy" />
         ) : (
           <div className="profile-head-img profile-head-initial">{initial}</div>
         )}

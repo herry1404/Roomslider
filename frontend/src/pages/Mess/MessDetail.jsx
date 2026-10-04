@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -289,7 +290,7 @@ function MessDetail() {
 
         <div className={`mess-photo-gallery ${mess.images?.length ? "" : "is-empty"} ${mess.images?.length === 1 ? "is-single" : ""}`}>
           {mess.images?.length ? mess.images.slice(0, 5).map((image, index) => (
-            <img key={`${image}-${index}`} src={image} alt={`${mess.name} meal ${index + 1}`} />
+            <img key={`${image}-${index}`} src={optimizeCloudinaryImage(image, 640)} alt={`${mess.name} meal ${index + 1}`} loading="lazy" />
           )) : (
             <div><UtensilsCrossed size={42} /><span>Photos coming soon</span></div>
           )}

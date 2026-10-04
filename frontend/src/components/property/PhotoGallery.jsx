@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Grid2X2, Heart, Share2, X } from "lucide-react";
@@ -12,7 +13,7 @@ function Photo({ src, alt, className = "", loading = "lazy" }) {
   return (
     <img
       className={className}
-      src={src}
+      src={optimizeCloudinaryImage(src, 1600)}
       alt={alt}
       draggable={false}
       loading={loading}

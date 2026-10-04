@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MessageCircle, Search, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -117,7 +118,7 @@ function RoommateMessages() {
                 aria-pressed={activeId === person.id}
               >
                 {person.avatar
-                  ? <img src={person.avatar} alt="" loading="lazy" />
+                  ? <img src={optimizeCloudinaryImage(person.avatar, 256)} alt="" loading="lazy" />
                   : <span className="roommate-hub-avatar">{person.name?.charAt(0)?.toUpperCase() || "R"}</span>}
                 <span className="roommate-conversation-copy">
                   <strong>{person.name}</strong>

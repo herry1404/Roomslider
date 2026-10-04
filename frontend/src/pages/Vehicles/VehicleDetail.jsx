@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -244,8 +245,8 @@ function VehicleDetail() {
         <div className="vehicle-detail-layout">
           <article className="vehicle-detail-info">
             <div className="vehicle-gallery">
-              {photos.length ? <img className="vehicle-gallery-main" src={photos[photoIndex]} alt={`${vehicle.brand} ${vehicle.name}`} /> : <div className="vehicle-gallery-main vehicle-photo-placeholder"><Bike size={54} strokeWidth={1.5} /></div>}
-              {photos.length > 1 && <div className="vehicle-gallery-thumbnails">{photos.map((photo, index) => <button type="button" key={`${photo}-${index}`} className={photoIndex === index ? "active" : ""} onClick={() => setPhotoIndex(index)} aria-label={`Show vehicle photo ${index + 1}`}><img src={photo} alt="" loading="lazy" /></button>)}</div>}
+              {photos.length ? <img className="vehicle-gallery-main" src={optimizeCloudinaryImage(photos[photoIndex], 1600)} alt={`${vehicle.brand} ${vehicle.name}`} loading="eager" /> : <div className="vehicle-gallery-main vehicle-photo-placeholder"><Bike size={54} strokeWidth={1.5} /></div>}
+              {photos.length > 1 && <div className="vehicle-gallery-thumbnails">{photos.map((photo, index) => <button type="button" key={`${photo}-${index}`} className={photoIndex === index ? "active" : ""} onClick={() => setPhotoIndex(index)} aria-label={`Show vehicle photo ${index + 1}`}><img src={optimizeCloudinaryImage(photo, 640)} alt="" loading="lazy" /></button>)}</div>}
             </div>
             <section className="vehicle-detail-section"><h2>Vehicle specifications</h2><div className="vehicle-spec-grid">
               <p><Bike size={17} /><span>Type</span><strong>{vehicle.type}</strong></p>

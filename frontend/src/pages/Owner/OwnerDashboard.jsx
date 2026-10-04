@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -155,10 +156,9 @@ function OwnerDashboard() {
                   style={{ cursor: "pointer" }}
                 >
                 <img
-                  src={room.images?.[0] || "/placeholder-room.jpg"}
+                  src={optimizeCloudinaryImage(room.images?.[0] || "/placeholder-room.jpg", 640)}
                   alt={room.title || "Room"}
-                  className="owner-room-image"
-                />
+                  className="owner-room-image" loading="lazy" />
                 <div className="owner-room-body">
                   <div className="owner-room-top-row">
                     <div>

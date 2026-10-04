@@ -1,3 +1,4 @@
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -156,7 +157,7 @@ function ManageFurniture() {
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div className="fa-thumb">
-                        {i.images && i.images[0] ? <img src={i.images[0]} alt="" /> : <Sofa size={18} />}
+                        {i.images && i.images[0] ? <img src={optimizeCloudinaryImage(i.images[0], 640)} alt="" loading="lazy" /> : <Sofa size={18} />}
                       </div>
                       <span style={{ fontWeight: 600 }}>{i.name}</span>
                     </div>
