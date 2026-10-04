@@ -37,6 +37,8 @@ const furnitureItemSchema = new mongoose.Schema(
     isAvailable: { type: Boolean, default: true }, // false = Out of stock
     isActive: { type: Boolean, default: true }, // false = hidden from public
     badge: { type: String, default: '' },
+    isDonated: { type: Boolean, default: false, index: true },
+    donatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, select: false },
   },
   { timestamps: true }
 );

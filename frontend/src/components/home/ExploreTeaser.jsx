@@ -17,6 +17,9 @@ import {
   Castle,
   BookOpen,
   FileText,
+  HeartHandshake,
+  PackageOpen,
+  HeartPulse,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
@@ -69,6 +72,27 @@ function ExploreTeaser() {
       desc: "Meet people with similar budgets and plans",
       pill: "Find",
       to: "/roommates",
+    },
+    {
+      icon: HeartHandshake,
+      title: "Social Work",
+      desc: "Find community services and support in Indore",
+      pill: "Explore",
+      to: "/social-work",
+    },
+    {
+      icon: PackageOpen,
+      title: "Donate Old Things",
+      desc: "Arrange a pickup for useful items you no longer need",
+      pill: "Donate",
+      to: "/donate",
+    },
+    {
+      icon: HeartPulse,
+      title: "Blood Requests",
+      desc: "Request help or learn about blood donation",
+      pill: "Explore",
+      to: "/blood",
     },
     {
       icon: Castle,

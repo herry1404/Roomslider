@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Bell, CheckCheck, CreditCard, MessageCircle, Package, Trash2, Users,
+  Bell, CheckCheck, CreditCard, HeartPulse, MessageCircle, Package, Trash2, Users,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
+import api from "../../api/axios";
 import { useNotifications } from "../../context/useNotifications";
 import EnablePushButton from "../../components/notifications/EnablePushButton";
 import roommateNotificationLink from "../../utils/roommateNotificationLink";
@@ -12,7 +14,7 @@ import "../../styles/notifications.css";
 const FILTERS = ["All", "Unread", "Requests", "Messages", "Payments"];
 const REQUEST_TYPES = new Set([
   "roommate_request", "roommate_accepted", "service_request", "service_status",
-  "furniture_status", "vehicle_status", "vacate_notice", "loan_status", "maintenance",
+  "furniture_status", "vehicle_status", "vacate_notice", "loan_status", "maintenance", "blood_request",
 ]);
 
 const relativeTime = (value) => {
@@ -29,6 +31,7 @@ const relativeTime = (value) => {
 
 const iconFor = (type) => {
   if (type === "payment") return CreditCard;
+  if (type === "blood_request") return HeartPulse;
   if (type === "roommate_message") return MessageCircle;
   if (type.startsWith("roommate")) return Users;
   if (type.includes("request") || type.includes("status") || type === "maintenance") return Package;
@@ -53,8 +56,21 @@ function Notifications() {
 
   const openNotification = (item) => {
     markRead(item);
-    const target = roommateNotificationLink(item);
+    const target = item.type === "blood_request" ? item.link : roommateNotificationLink(item);
     if (target) navigate(target);
+  };
+
+  const offerBloodHelp = async (event, item) => {
+    event.stopPropagation();
+    const requestId = item.data?.requestId;
+    if (!requestId) return toast.error("This request link is no longer available");
+    try {
+      const { data } = await api.post(`/blood-requests/${requestId}/help`);
+      markRead(item);
+      navigate(`/blood/requests/${requestId}`, { state: { contact: data.contact } });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Your response could not be recorded");
+    }
   };
 
   return (
@@ -114,7 +130,7 @@ function Notifications() {
           const Icon = iconFor(item.type);
           return (
             <article
-              className={`notifications-item${item.isRead ? "" : " is-unread"}`}
+              className={`notifications-item${item.isRead ? "" : " is-unread"}${item.type === "blood_request" ? " is-blood" : ""}`}
               key={item._id}
               onClick={() => openNotification(item)}
             >
@@ -126,6 +142,7 @@ function Notifications() {
                 </div>
                 {item.body && <p>{item.body}</p>}
                 <time dateTime={item.createdAt}>{relativeTime(item.createdAt)}</time>
+                {item.type === "blood_request" && item.data?.canHelp && <button className="notifications-blood-help" type="button" onClick={(event) => offerBloodHelp(event, item)}>I can help</button>}
               </div>
               <div className="notifications-item-actions">
                 {!item.isRead && (

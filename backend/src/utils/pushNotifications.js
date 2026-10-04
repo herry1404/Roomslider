@@ -43,7 +43,11 @@ async function sendPushNotifications(recipients, notification) {
             title: notification.title,
             body: notification.message,
             url: notification.actionUrl || "/",
-          })
+            requestId: notification.requestId || null,
+            priority: notification.priority === "high" ? "high" : "normal",
+            actions: Array.isArray(notification.actions) ? notification.actions.slice(0, 2) : [],
+          }),
+          { urgency: notification.priority === "high" ? "high" : "normal" }
         );
         delivered += 1;
       } catch (error) {

@@ -3,9 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- Local HEAD: `b61dbb9` (Roommate Finder restructure). It is one commit ahead of `origin/main` (`2e99c8c`, notifications) until pushed.
-- Recent history: `2e99c8c` notifications, `ea136a4` service catalogue and requests, `4fd3da3` public slug URLs.
-- Two-account roommate tests and notification tests are still pending.
+- Local HEAD: `d2114b2` (handoff update); recent commits are `b61dbb9` (Roommate Finder restructure) and `2e99c8c` (notifications).
+- Worktree is intentionally dirty with uncommitted Social Work and Donate Old Things work; no commit was created.
+- Phase A and Phase B backend syntax checks and frontend production builds passed; live database/browser checks remain pending.
 
 ## Completed work
 
@@ -224,3 +224,55 @@ npm run seed:study
 
 - Manual two-account flow: create profiles; send interest and verify notification/request badge; accept; message; verify inbox unread count; open chat and verify read state; block and confirm requests/conversations disappear.
 - Manual responsive visual check at 360px and dark mode; live SSE/polling behavior against an authenticated backend/database was not exercised.
+
+### 4 Oct 2026 - Phase A: Social Work directory
+
+NEXT: Phase B
+
+- Added SocialPlace and SocialSuggestion models, public category/list/detail endpoints with area, subtype, search, today/open-now/upcoming/nearby filters, validated admin CRUD, and authenticated suggestions. Admin approval creates an unpublished, unverified draft; no helpline/contact data was seeded.
+- Added Social Work category, listing, detail and suggestion flows, schedule/event details, hours/verified metadata, maps/call links, blood-category emergency notice, and published-data disclaimers. Added admin listing/suggestion pages and Explore/sidebar links.
+- `cd frontend && npm run build`: passed; existing Vite configuration/chunk-size warnings remain.
+- `node --check` passed for all five changed backend JavaScript files; `git diff --check` passed.
+- Pending: admin/database integration, geospatial index and nearby queries against MongoDB, category filters/open-hours calculations, suggestion moderation, map/call links, 360px/dark-mode/browser accessibility review, and confirming listing content/timings with organizers.
+
+### 4 Oct 2026 - Phase B: Donate Old Things
+
+NEXT: Phase C
+
+- Added a private DonationRequest workflow with authenticated pickup submission, account-linked donor identity, up to four Cloudinary photos, pickup address/location, date/time, own-request status and cancellation. Admin notifications go to user accounts with the admin role; donor notifications cover status and catalog transitions.
+- Integrated donations into the admin Service Requests filter with donor contact, pickup information, photos, status updates, a Mark collected action, and conversion to unpublished donated FurnitureItem drafts with an admin-set monthly rent.
+- Added `isDonated` and admin-only `donatedBy` furniture fields, public donated filtering/badge without donor metadata, a Donated filter chip, `/donate` with exclusions and private request tracking, and Explore tiles.
+- Chose a separate DonationRequest model rather than overloading ServiceBooking: pickup addresses/photos and the collection/listing lifecycle are distinct from provider service bookings.
+- `cd frontend && npm run build`: passed; existing Vite configuration/chunk-size warnings remain.
+- `node --check` passed for all changed backend JavaScript files through Phase B; `git diff --check` passed.
+- Pending: authenticated upload/cloud configuration, donor/admin notification delivery, pickup/status/cancel workflows, collected-to-catalog flow, draft/public furniture checks, account phone availability, mobile/dark-mode/browser checks.
+
+### 4 Oct 2026 - Phase C: Blood group and Blood Request flow
+
+NEXT: Planned (later) - Updates section
+
+- Added optional blood group, donor consent timestamp, availability and last-donation date to the account profile. Donor matching requires consent, availability, age 18+, a compatible freshness window, and an active/unblocked account. Turning off consent immediately removes the donor from future matches.
+- Added authenticated BloodRequest create/mine/close/detail/help/unavailable APIs, the three-per-day limit, request expiry checks, approval/rejection, recipient estimates, compatible-group and area broadcasts, fulfillment/close actions, admin-only request blocking, and admin-only helper details.
+- Contact details are disclosed only after a notified donor taps “I can help” (or to an admin); requester views show helper counts only. Blood notifications exclude patient/contact details, exact-group alerts use high priority and a push action, and notification-center items offer a quick “I can help” action.
+- Added `/blood`, `/blood/request`, `/blood/requests/:id`, `/admin/blood-requests`, the admin pending badge, profile donor controls, Explore entry points, and request/profile disclaimers.
+- Projection review confirmed blood fields are not included in roommate, chat, owner-public, or other-user projections. The account-owner endpoint and admin-only views are the intended access surfaces; `bloodRequestsBlocked` is omitted from the owner profile response.
+- The public furniture ID endpoint now hides inactive donation drafts; donated donor metadata remains admin-only, and donor-submitted descriptions are not copied to public catalog items.
+- Earlier final frontend build, backend syntax checks, push-worker syntax check, and `git diff --check` passed before the last privacy-hardening edits. The latest verification re-run was started but its result is not recorded in this note.
+- Pending: three-account requester/donor/admin end-to-end verification, MongoDB authorization and expiry checks, real Cloudinary uploads, VAPID/browser push action behavior, donor matching and all compatibility audiences, profile consent/revocation, 360px/dark-mode visual review, plus organizer validation for Social Work listings. No automated test files were found in the repository.
+- Repository state at handoff: HEAD remains `d2114b2`; all phase changes are intentionally uncommitted.
+
+### Planned (later) - Updates section
+
+NEXT: Updates section (after Profile page improvements)
+
+- Order of work: 1) Profile page improvements, 2) Updates section.
+- Goal: Updates page with college news/events, Indore events and timetable alerts, personalised by the college, course, subject and year saved in the user's profile.
+- Profile prerequisite: add college, course, subject and year dropdown fields to the user model, profile edit form and its validation.
+- Sources: admin saves a source URL per college (and Indore events sources); backend scraper job fetches pages, skips unchanged content using a hash, and sends only changed text to an AI call that returns structured JSON items (title, type, date, college, subject, year).
+- Review: AI-created items are saved as pending; admin approves/rejects/edits before they are published. Admin can also add items manually and upload timetable PDF/image.
+- Timetable: first version is admin upload plus a "new timetable" notification with link; automatic PDF parsing is later.
+- Delivery: published items go to a For You feed filtered by profile, and matching users get in-app/push notifications through the existing notification system.
+- Rules: respect robots.txt, public pages only, show source link on every item, API keys only in env vars, external cron endpoint (Render free tier may sleep). Update sitemap and page metadata for published public items; exclude private or personalised routes from indexing.
+- First version: one college plus Indore events only.
+- Pending decision: which college to start with.
+- Not started.

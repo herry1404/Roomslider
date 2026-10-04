@@ -11,7 +11,10 @@ self.addEventListener("push", (event) => {
       body: payload.body || "You have a new notification.",
       icon: "/pwa-192x192.png",
       badge: "/pwa-192x192.png",
-      data: { url: payload.url || "/" },
+      requireInteraction: payload.priority === "high",
+      tag: payload.requestId ? `blood-request-${payload.requestId}` : undefined,
+      actions: Array.isArray(payload.actions) ? payload.actions.slice(0, 2) : [],
+      data: { url: payload.url || "/", requestId: payload.requestId || null },
     })
   );
 });
@@ -20,6 +23,9 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
   const requestedUrl = new URL(event.notification.data?.url || "/", self.location.origin);
+  if (event.action === "help" && event.notification.data?.requestId) {
+    requestedUrl.searchParams.set("help", "1");
+  }
   const targetUrl =
     requestedUrl.origin === self.location.origin
       ? requestedUrl.href

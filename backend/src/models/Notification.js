@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const TYPES = [
   "roommate_request", "roommate_accepted", "roommate_message", "service_request", "service_status",
-  "vacate_notice", "payment", "loan_status", "furniture_status", "vehicle_status", "maintenance", "broadcast", "system",
+  "vacate_notice", "payment", "loan_status", "furniture_status", "vehicle_status", "maintenance", "blood_request", "broadcast", "system",
 ];
 
 const notificationSchema = new mongoose.Schema({
@@ -15,6 +15,7 @@ const notificationSchema = new mongoose.Schema({
   body: { type: String, maxlength: 500, default: "" },
   link: { type: String, default: "" },
   data: { type: mongoose.Schema.Types.Mixed, default: {} },
+  priority: { type: String, enum: ["normal", "high"], default: "normal" },
   isRead: { type: Boolean, default: false },
   readAt: { type: Date, default: null },
   // Compatibility aliases for existing callers and records.

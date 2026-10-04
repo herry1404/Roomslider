@@ -5,6 +5,7 @@ const { migrateLegacyForUser } = require("../utils/migrateRoommateProfile");
 const USERNAME_REGEX = /^[a-z0-9_.]{3,20}$/;
 const OCCUPATIONS = ["", "student", "working", "business", "other"];
 const GENDERS = ["", "male", "female", "other"];
+const BLOOD_GROUPS = ["", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // free-text fields and their max lengths
 const TEXT_FIELDS = {
@@ -35,6 +36,7 @@ const getMyProfile = async (req, res) => {
     const user = userDocument.toObject();
     delete user.password;
     delete user.wishlist;
+    delete user.bloodRequestsBlocked;
     res.json({ success: true, user });
   } catch (error) {
     fail(res, 500, "Profile load nahi hua");
@@ -114,6 +116,42 @@ const updateMyProfile = async (req, res) => {
           return fail(res, 400, field + " " + max + " characters se zyada nahi ho sakta");
         }
         update[field] = clean;
+      }
+    }
+
+    if (req.body.bloodGroup !== undefined) {
+      if (!BLOOD_GROUPS.includes(req.body.bloodGroup)) return fail(res, 400, "Choose a valid blood group");
+      update.bloodGroup = req.body.bloodGroup;
+    }
+    if (req.body.bloodDonorConsent !== undefined) {
+      if (typeof req.body.bloodDonorConsent !== "boolean") return fail(res, 400, "Donor consent must be selected");
+      if (req.body.bloodDonorConsent) {
+        const rawDob = req.body.dob !== undefined ? req.body.dob : req.user.dob;
+        const dob = rawDob ? new Date(rawDob) : null;
+        if (!dob || Number.isNaN(dob.getTime())) return fail(res, 400, "Add your date of birth before confirming donor eligibility");
+        const adultDate = new Date(dob);
+        adultDate.setFullYear(adultDate.getFullYear() + 18);
+        if (adultDate > new Date()) return fail(res, 400, "Blood donors must be at least 18 years old");
+        const group = req.body.bloodGroup !== undefined ? req.body.bloodGroup : req.user.bloodGroup;
+        if (!BLOOD_GROUPS.includes(group) || !group) return fail(res, 400, "Select your blood group before enabling donor consent");
+        update.bloodDonorConsent = true;
+        update.bloodDonorConsentAt = req.user.bloodDonorConsentAt || new Date();
+      } else {
+        update.bloodDonorConsent = false;
+        update.bloodDonorConsentAt = null;
+      }
+    }
+    if (req.body.bloodDonorAvailable !== undefined) {
+      if (typeof req.body.bloodDonorAvailable !== "boolean") return fail(res, 400, "Donor availability must be selected");
+      update.bloodDonorAvailable = req.body.bloodDonorAvailable;
+    }
+    if (req.body.lastDonatedAt !== undefined) {
+      if (req.body.lastDonatedAt === null || req.body.lastDonatedAt === "") {
+        update.lastDonatedAt = null;
+      } else {
+        const donatedAt = new Date(req.body.lastDonatedAt);
+        if (Number.isNaN(donatedAt.getTime()) || donatedAt > new Date()) return fail(res, 400, "Enter a valid last donation date");
+        update.lastDonatedAt = donatedAt;
       }
     }
 

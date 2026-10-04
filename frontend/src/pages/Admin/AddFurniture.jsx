@@ -34,7 +34,7 @@ function AddFurniture() {
   useEffect(() => {
     if (!editing) return;
     api
-      .get(`/furniture/${id}`)
+      .get(`/furniture/admin/${id}`)
       .then((res) => {
         const i = res.data;
         const plan = (m) => {

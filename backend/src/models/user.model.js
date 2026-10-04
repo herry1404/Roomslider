@@ -194,6 +194,19 @@ const userSchema = new mongoose.Schema(
       default: undefined,
     },
 
+    bloodGroup: {
+      type: String,
+      enum: ["", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      default: "",
+    },
+    bloodDonorConsent: { type: Boolean, default: false },
+    bloodDonorConsentAt: { type: Date, default: null },
+    bloodDonorAvailable: { type: Boolean, default: true },
+    lastDonatedAt: { type: Date, default: null },
+    bloodRequestsBlocked: { type: Boolean, default: false, select: false },
+    isActive: { type: Boolean, default: true, select: false },
+    isBlocked: { type: Boolean, default: false, select: false },
+
   },
   {
     timestamps: true,

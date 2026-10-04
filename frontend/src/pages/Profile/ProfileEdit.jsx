@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/profile.css";
+import "../../styles/blood-donor.css";
 
 const BIO_MAX = 150;
 const MAX_PHOTO_MB = 10;
@@ -23,10 +24,15 @@ const EMPTY = {
   city: "",
   area: "",
   hometown: "",
+  bloodGroup: "",
+  bloodDonorConsent: false,
+  bloodDonorAvailable: true,
+  lastDonatedAt: "",
 };
 
 function ProfileEdit() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, setUser } = useAuth();
 
   const cameraRef = useRef(null);
@@ -55,6 +61,10 @@ function ProfileEdit() {
       course: u.course,
       subject: u.subject,
       studyYear: u.studyYear,
+      bloodGroup: u.bloodGroup || "",
+      bloodDonorConsent: Boolean(u.bloodDonorConsent),
+      bloodDonorAvailable: u.bloodDonorAvailable !== false,
+      lastDonatedAt: u.lastDonatedAt ? String(u.lastDonatedAt).slice(0, 10) : "",
     };
     localStorage.setItem("user", JSON.stringify(merged));
     setUser(merged);
@@ -87,6 +97,10 @@ function ProfileEdit() {
           city: u.city || "",
           area: u.area || "",
           hometown: u.hometown || "",
+          bloodGroup: u.bloodGroup || "",
+          bloodDonorConsent: Boolean(u.bloodDonorConsent),
+          bloodDonorAvailable: u.bloodDonorAvailable !== false,
+          lastDonatedAt: u.lastDonatedAt ? String(u.lastDonatedAt).slice(0, 10) : "",
         });
         setAvatar(u.avatar || null);
       } catch (err) {
@@ -100,6 +114,12 @@ function ProfileEdit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!profileLoading && location.hash === "#blood-donation") {
+      document.getElementById("blood-donation")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location.hash, profileLoading]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((current) => ({
@@ -109,6 +129,23 @@ function ProfileEdit() {
         ? { course: "", subject: "", studyYear: "" }
         : {}),
     }));
+  };
+
+  const setBloodConsent = (event) => {
+    if (event.target.checked) {
+      const dob = form.dob ? new Date(`${form.dob}T00:00:00`) : null;
+      const adultDate = dob ? new Date(dob) : null;
+      if (adultDate) adultDate.setFullYear(adultDate.getFullYear() + 18);
+      if (!adultDate || adultDate > new Date()) {
+        toast.error("Blood donor registration is available to adults aged 18 and over. Add your date of birth first.");
+        return;
+      }
+      if (!form.bloodGroup) {
+        toast.error("Select your blood group before enabling donor consent.");
+        return;
+      }
+    }
+    setForm((current) => ({ ...current, bloodDonorConsent: event.target.checked }));
   };
 
   const handlePhoto = async (e) => {
@@ -382,6 +419,27 @@ function ProfileEdit() {
           <span className="profile-hint">
             Roommate suggestions may show your gender, education and basic profile info. DOB and hometown remain private.
           </span>
+
+          <section className="blood-profile-section" id="blood-donation">
+            <h2 className="profile-section">Blood donation (optional)</h2>
+            <p className="blood-profile-notice">You must be at least 18 years old to register as a donor. Your blood group is never shown on your public profile.</p>
+            <label className="profile-label" htmlFor="blood-group">Blood group</label>
+            <select className="profile-input" id="blood-group" name="bloodGroup" value={form.bloodGroup} onChange={handleChange}>
+              <option value="">Select blood group</option>
+              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => <option key={group} value={group}>{group}</option>)}
+            </select>
+            <label className="blood-profile-check">
+              <input type="checkbox" checked={form.bloodDonorConsent} onChange={setBloodConsent} />
+              <span>I agree to receive blood donation requests from RoomSlider and to share my contact number with a requester only when I tap “I can help”.</span>
+            </label>
+            <label className="blood-profile-check">
+              <input type="checkbox" checked={form.bloodDonorAvailable} onChange={(event) => setForm((current) => ({ ...current, bloodDonorAvailable: event.target.checked }))} />
+              <span>Available now</span>
+            </label>
+            <label className="profile-label" htmlFor="last-donated-at">Last donated (optional)</label>
+            <input className="profile-input" id="last-donated-at" type="date" max={today} value={form.lastDonatedAt} onChange={handleChange} name="lastDonatedAt" />
+            <p className="blood-profile-footnote">Turning off consent removes you from future donor matching immediately.</p>
+          </section>
         </div>
 
         <div className="profile-save-bar">

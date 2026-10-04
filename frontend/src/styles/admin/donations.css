@@ -1,0 +1,6 @@
+.donation-admin-overlay{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:14px;background:#0008}
+.donation-admin-modal{width:min(480px,100%);box-sizing:border-box;display:grid;gap:13px;padding:20px;border:1px solid var(--admin-border);border-radius:15px;background:var(--admin-card);color:var(--admin-text)}
+.donation-admin-modal h2{margin:0;font-size:19px}
+.donation-admin-modal p{margin:0;color:var(--admin-muted);font-size:13px;line-height:1.5}
+.donation-admin-modal label{display:grid;gap:5px;color:var(--admin-muted);font-size:13px}
+.donation-admin-modal select,.donation-admin-modal input{width:100%;box-sizing:border-box;min-height:42px;padding:9px 10px;border:1px solid var(--admin-border);border-radius:9px;background:var(--admin-bg);color:var(--admin-text);font:inherit}

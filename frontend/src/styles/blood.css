@@ -1,0 +1,60 @@
+.blood-page{width:min(920px,100%);box-sizing:border-box;margin:0 auto;padding:24px 16px 48px;color:var(--color-text)}
+.blood-hero{padding:25px 0 22px}
+.blood-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;color:#dc2626;background:color-mix(in srgb,#dc2626 12%,var(--color-surface))}
+.blood-eyebrow{display:block;margin-top:13px;color:#dc2626;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.blood-hero h1,.blood-page-heading h1{font-size:clamp(28px,6vw,38px);line-height:1.1;margin:6px 0}
+.blood-hero>p,.blood-page-heading p{max-width:700px;color:var(--color-text-light);font-size:14px;line-height:1.55}
+.blood-hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}
+.blood-primary,.blood-secondary,.blood-danger{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface);color:var(--color-text);font:inherit;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+.blood-primary{background:#b91c1c;border-color:#b91c1c;color:#fff}
+.blood-danger{color:#b91c1c;border-color:#b91c1c;background:transparent}
+.blood-primary:disabled,.blood-secondary:disabled,.blood-danger:disabled{opacity:.55;cursor:wait}
+.blood-disclaimer{margin:13px 0 18px;padding:12px 14px;border-left:3px solid #dc2626;border-radius:9px;background:color-mix(in srgb,#dc2626 8%,var(--color-surface));color:var(--color-text);font-size:12px;line-height:1.6}
+.blood-my-requests{margin-top:22px}
+.blood-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
+.blood-section-heading h2{font-size:20px;margin:0}
+.blood-section-heading p{margin:4px 0 0;color:var(--color-text-light);font-size:13px}
+.blood-request-list{display:grid;gap:9px}
+.blood-request-card{display:flex;align-items:center;gap:11px;min-width:0;padding:13px;border:1px solid var(--color-border);border-radius:13px;background:var(--color-surface);color:inherit;text-decoration:none}
+.blood-group-tag{flex:none;padding:6px 9px;border-radius:99px;background:color-mix(in srgb,#dc2626 12%,var(--color-surface));color:#b91c1c;font-size:13px;font-weight:800}
+.blood-request-info{display:grid;gap:3px;flex:1;min-width:0}
+.blood-request-info strong{font-size:14px}
+.blood-request-info small{overflow:hidden;color:var(--color-text-light);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.blood-status{flex:none;padding:5px 8px;border-radius:99px;background:color-mix(in srgb,var(--color-primary) 12%,transparent);color:var(--color-primary);font-size:10px;font-weight:750}
+.blood-status.pending{background:rgba(245,158,11,.13);color:#b45309}
+.blood-status.rejected,.blood-status.expired,.blood-status.closed{background:rgba(220,38,38,.1);color:#b91c1c}
+.blood-helper-count{flex:none;color:var(--color-text-light);font-size:11px}
+.blood-empty{padding:25px 14px;border:1px dashed var(--color-border);border-radius:13px;color:var(--color-text-light);font-size:13px;text-align:center}
+.blood-request-skeletons{display:grid;gap:8px}.blood-request-skeletons i{height:66px;border-radius:13px;background:color-mix(in srgb,var(--color-text-light) 12%,transparent);animation:blood-pulse 1.3s infinite}
+.blood-back{display:inline-flex;align-items:center;gap:6px;margin:5px 0 17px;color:#b91c1c;text-decoration:none;font-size:13px;font-weight:700}
+.blood-page-heading{margin-bottom:10px}.blood-page-heading p{margin:4px 0}
+.blood-form{display:grid;gap:15px;padding:16px;border:1px solid var(--color-border);border-radius:15px;background:var(--color-surface)}
+.blood-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.blood-form label{display:grid;gap:5px;color:var(--color-text);font-size:13px;font-weight:650}
+.blood-form input,.blood-form select,.blood-form textarea{width:100%;min-width:0;box-sizing:border-box;min-height:42px;padding:9px 10px;border:1px solid var(--color-border);border-radius:9px;background:var(--color-background);color:var(--color-text);font:inherit}
+.blood-form textarea{resize:vertical}
+.blood-form-wide{grid-column:1/-1}
+.blood-consent-check{display:flex!important;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--color-border);border-radius:10px;font-size:12px!important;line-height:1.5}
+.blood-consent-check input{flex:none;width:16px;height:16px;min-height:16px;margin:2px 0 0;accent-color:#b91c1c}
+.blood-submit{min-height:46px;width:100%;font-size:14px}
+.blood-form-limit{margin:-9px 0 0;color:var(--color-text-light);font-size:11px;text-align:center}
+.blood-detail{max-width:680px;margin:0 auto;padding:18px;border:1px solid var(--color-border);border-radius:16px;background:var(--color-surface)}
+.blood-detail-head{display:flex;align-items:center;gap:9px}
+.blood-detail-head .blood-status{margin-left:auto}
+.blood-detail h1{font-size:24px;margin:13px 0}
+.blood-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.blood-detail-grid>div{min-width:0;padding:10px;border:1px solid var(--color-border);border-radius:10px}
+.blood-detail-grid small{display:block;color:var(--color-text-light);font-size:11px}
+.blood-detail-grid strong{display:block;margin-top:3px;font-size:13px;overflow-wrap:anywhere}
+.blood-response-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
+.blood-private-contact,.blood-revealed-contact{margin-top:16px;padding:13px;border:1px solid var(--color-border);border-radius:11px}
+.blood-private-contact h2,.blood-revealed-contact h2{font-size:15px;margin:0 0 7px}
+.blood-private-contact p,.blood-revealed-contact p{font-size:13px;line-height:1.5}
+.blood-private-contact a{color:var(--color-primary)}
+.blood-verify-reminder,.blood-response-note{color:var(--color-text-light);font-size:12px}
+.blood-detail-skeleton{max-width:680px;min-height:260px;display:grid;align-content:start;gap:12px;margin:auto;padding:20px;border:1px solid var(--color-border);border-radius:16px}
+.blood-detail-skeleton i{height:16px;border-radius:8px;background:color-mix(in srgb,var(--color-text-light) 12%,transparent);animation:blood-pulse 1.3s infinite}
+.blood-detail-skeleton i:first-child{width:40%;height:32px}
+@keyframes blood-pulse{50%{opacity:.45}}
+@media(max-width:600px){.blood-page{padding:18px 12px 40px}.blood-hero{padding-top:14px}.blood-form{padding:13px}.blood-request-card{align-items:flex-start;flex-wrap:wrap}.blood-request-info{flex-basis:calc(100% - 65px)}.blood-request-card .blood-status{margin-left:49px}.blood-helper-count{margin:5px 0 0 auto}}
+@media(max-width:380px){.blood-form-grid{grid-template-columns:1fr}.blood-form-wide{grid-column:auto}.blood-detail{padding:13px}.blood-detail h1{font-size:21px}.blood-detail-grid{gap:7px}.blood-detail-grid>div{padding:8px}.blood-section-heading{align-items:flex-start;flex-direction:column}}

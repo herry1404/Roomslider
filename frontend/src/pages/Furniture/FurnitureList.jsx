@@ -57,6 +57,7 @@ function FurnitureList() {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState("rent");
   const [cat, setCat] = useState("all");
+  const [donatedOnly, setDonatedOnly] = useState(false);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(null);
   const [d, setD] = useState({ mode: "rent", months: 6, cond: "new", qty: 1 });
@@ -110,8 +111,9 @@ function FurnitureList() {
     const s = q.trim().toLowerCase();
     return items.filter(
       (i) => (cat === "all" || i.category === cat) && (!s || i.name.toLowerCase().includes(s))
+        && (!donatedOnly || i.isDonated)
     );
-  }, [items, cat, q]);
+  }, [items, cat, q, donatedOnly]);
 
   const openItem = (item) => {
     setSel(item);
@@ -428,6 +430,7 @@ function FurnitureList() {
                 {c.label}
               </button>
             ))}
+            <button type="button" className={`fu-chip ${donatedOnly ? "on" : ""}`} onClick={() => setDonatedOnly((value) => !value)}>Donated</button>
           </div>
         </div>
 
@@ -452,7 +455,7 @@ function FurnitureList() {
                   return (
                     <div key={item._id} className={`fu-card ${out ? "out" : ""}`} onClick={() => openItem(item)}>
                       <div className="fu-img"><Thumb src={item.images && item.images[0]} /></div>
-                      {out ? <span className="fu-tag out">Out of stock</span> : item.badge ? <span className="fu-tag">{item.badge}</span> : null}
+                      {out ? <span className="fu-tag out">Out of stock</span> : item.isDonated ? <span className="fu-tag">Donated - low rent</span> : item.badge ? <span className="fu-tag">{item.badge}</span> : null}
                       <div className="fu-body">
                         <div className="fu-name">{item.name}</div>
                         <div className="fu-price">{price} {m === "rent" && <small>/ month</small>}</div>

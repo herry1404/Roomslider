@@ -25,7 +25,9 @@ exports.getItems = async (req, res) => {
   try {
     const filter = { isActive: true };
     if (req.query.category && req.query.category !== 'all') filter.category = req.query.category;
-    const items = await FurnitureItem.find(filter).sort({ createdAt: -1 }).lean();
+    if (req.query.donated === "true") filter.isDonated = true;
+    if (req.query.donated === "false") filter.isDonated = false;
+    const items = await FurnitureItem.find(filter).select("-donatedBy").sort({ createdAt: -1 }).lean();
     res.json(items);
   } catch (error) {
     console.error('getItems error:', error);
@@ -36,7 +38,9 @@ exports.getItems = async (req, res) => {
 // ADMIN: all items (including hidden)
 exports.getAllItems = async (req, res) => {
   try {
-    const items = await FurnitureItem.find({}).sort({ createdAt: -1 }).lean();
+    let query = FurnitureItem.find({}).sort({ createdAt: -1 });
+    if (req.user?.role === "admin") query = query.select("+donatedBy");
+    const items = await query.lean();
     res.json(items);
   } catch (error) {
     console.error('getAllItems error:', error);
@@ -46,11 +50,21 @@ exports.getAllItems = async (req, res) => {
 
 exports.getItemById = async (req, res) => {
   try {
-    const item = await FurnitureItem.findById(req.params.id).lean();
+    const item = await FurnitureItem.findOne({ _id: req.params.id, isActive: true }).select("-donatedBy").lean();
     if (!item) return res.status(404).json({ message: 'Item not found' });
     res.json(item);
   } catch (error) {
     res.status(404).json({ message: 'Item not found' });
+  }
+};
+
+exports.getAdminItemById = async (req, res) => {
+  try {
+    const item = await FurnitureItem.findById(req.params.id).select("+donatedBy").lean();
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json(item);
+  } catch {
+    res.status(404).json({ message: "Item not found" });
   }
 };
 
@@ -80,6 +94,7 @@ exports.createItem = async (req, res) => {
       isAvailable: b.isAvailable === undefined ? true : toBool(b.isAvailable),
       isActive: b.isActive === undefined ? true : toBool(b.isActive),
       badge: b.badge || '',
+      isDonated: req.user?.role === "admin" && toBool(b.isDonated),
     });
     res.status(201).json(item);
   } catch (error) {
@@ -104,6 +119,8 @@ exports.updateItem = async (req, res) => {
     if (b.secondHandPrice !== undefined) item.secondHandPrice = toNum(b.secondHandPrice);
     if (b.isAvailable !== undefined) item.isAvailable = toBool(b.isAvailable);
     if (b.isActive !== undefined) item.isActive = toBool(b.isActive);
+    if (req.user?.role === "admin" && b.isDonated !== undefined) item.isDonated = toBool(b.isDonated);
+    if (req.user?.role === "admin" && b.donatedBy !== undefined) item.donatedBy = b.donatedBy || null;
     if (b.rentPlans !== undefined) item.rentPlans = cleanPlans(parseJSON(b.rentPlans, []));
 
     // existingImages = list of old image URLs to keep; new uploads get appended

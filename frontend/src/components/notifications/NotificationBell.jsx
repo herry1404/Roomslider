@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, CheckCheck, CreditCard, MessageCircle, Package, Users } from "lucide-react";
+import { Bell, CheckCheck, CreditCard, HeartPulse, MessageCircle, Package, Users } from "lucide-react";
 
 import { useNotifications } from "../../context/useNotifications";
 import roommateNotificationLink from "../../utils/roommateNotificationLink";
@@ -17,6 +17,7 @@ const relativeTime = (value) => {
 
 const iconFor = (type) => {
   if (type === "payment") return CreditCard;
+  if (type === "blood_request") return HeartPulse;
   if (type === "roommate_message") return MessageCircle;
   if (type.startsWith("roommate")) return Users;
   if (type.includes("request") || type.includes("status") || type === "maintenance") return Package;

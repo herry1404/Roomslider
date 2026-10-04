@@ -12,6 +12,7 @@ const serialize = (notification) => {
     body: item.body || item.message || "",
     link: item.link || item.actionUrl || "",
     data: item.data || {},
+    priority: item.priority || "normal",
     isRead: Boolean(item.isRead || item.read),
     readAt: item.readAt || null,
     createdAt: item.createdAt,
@@ -45,7 +46,7 @@ function addStream(userId, res) {
   };
 }
 
-async function notifyUser(userId, { type = "system", title, body, link = "", data = {} } = {}) {
+async function notifyUser(userId, { type = "system", title, body, link = "", data = {}, priority = "normal", actions = [] } = {}) {
   try {
     const payload = {
       user: userId,
@@ -56,6 +57,7 @@ async function notifyUser(userId, { type = "system", title, body, link = "", dat
       body: safeText(body, 500),
       link: safeText(link, 300),
       data: data && typeof data === "object" ? data : {},
+      priority: priority === "high" ? "high" : "normal",
       isRead: false,
       message: safeText(body, 500),
       actionUrl: safeText(link, 300),
@@ -89,6 +91,9 @@ async function notifyUser(userId, { type = "system", title, body, link = "", dat
         title: notification.title,
         message: notification.body || notification.message,
         actionUrl: notification.link || notification.actionUrl,
+        priority: notification.priority,
+        actions,
+        requestId: notification.data?.requestId || null,
       });
     } catch (error) { console.error("NOTIFICATION PUSH ERROR:", error.message); }
     return notification;
@@ -124,6 +129,8 @@ async function sendNotificationToRecipients(recipients, notification) {
           title: createdNotification.title,
           message: body,
           actionUrl: link,
+          priority: notification.priority === "high" ? "high" : "normal",
+          actions: Array.isArray(notification.actions) ? notification.actions.slice(0, 2) : [],
         });
       } catch (error) {
         console.error("NOTIFICATION PUSH ERROR:", error.message);

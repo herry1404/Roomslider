@@ -15,6 +15,9 @@ import {
   ShoppingBasket,
   BookOpen,
   Bike,
+  HeartHandshake,
+  PackageOpen,
+  HeartPulse,
 } from "lucide-react";
 import LoanModal from "../services/LoanModal";
 
@@ -62,6 +65,27 @@ function ComingSoonServices() {
       desc: "Meet people with similar budgets and plans",
       button: "Find",
       onClick: () => navigate(user ? "/roommates" : "/login"),
+    },
+    {
+      icon: HeartHandshake,
+      title: "Social Work",
+      desc: "Find community services and support in Indore",
+      button: "Explore",
+      onClick: () => navigate("/social-work"),
+    },
+    {
+      icon: PackageOpen,
+      title: "Donate Old Things",
+      desc: "Arrange a pickup for useful items you no longer need",
+      button: "Donate",
+      onClick: () => navigate("/donate"),
+    },
+    {
+      icon: HeartPulse,
+      title: "Blood Requests",
+      desc: "Request help or learn about blood donation",
+      button: "Explore",
+      onClick: () => navigate("/blood"),
     },
     {
       icon: UtensilsCrossed,

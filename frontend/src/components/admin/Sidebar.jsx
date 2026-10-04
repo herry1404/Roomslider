@@ -20,6 +20,8 @@ import {
   Home,
   Megaphone,
   Castle,
+  HeartPulse,
+  Droplet,
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
@@ -33,8 +35,10 @@ function Sidebar({ open, closeSidebar }) {
 
   const { logout } = useAuth();
   const [newServiceRequests, setNewServiceRequests] = useState(0);
+  const [pendingBloodRequests, setPendingBloodRequests] = useState(0);
   useEffect(() => {
     api.get("/service-bookings/new-count").then((res) => setNewServiceRequests(Number(res.data.count) || 0)).catch(() => {});
+    api.get("/blood-requests/admin/pending-count").then((res) => setPendingBloodRequests(Number(res.data.count) || 0)).catch(() => {});
   }, []);
 
   const groups = [
@@ -59,6 +63,8 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
         { title: "Service Requests", icon: <ClipboardList size={18} />, path: "/admin/service-requests", badge: newServiceRequests },
+        { title: "Social Work", icon: <HeartPulse size={18} />, path: "/admin/social" },
+        { title: "Blood Requests", icon: <Droplet size={18} />, path: "/admin/blood-requests", badge: pendingBloodRequests },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
         { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
       ],

@@ -9,6 +9,7 @@ const Villa = require("../models/Villa");
 const LaundryVendor = require("../models/laundryVendor.model");
 const HourlyRoom = require("../models/HourlyRoom.model");
 const Property = require("../models/property.model");
+const SocialPlace = require("../models/SocialPlace");
 const { ensureMessSlugs } = require("../utils/messSlug");
 const { ensurePublicSlugs } = require("../utils/publicSlug");
 
@@ -32,7 +33,7 @@ const categoryPathMap = {
 
 router.get("/", async (req, res) => {
   try {
-    const [rooms, messes, owners, vehicles, villas, vendors, hourlyRooms, properties] = await Promise.all([
+    const [rooms, messes, owners, vehicles, villas, vendors, hourlyRooms, properties, socialPlaces] = await Promise.all([
       Room.find({ status: "vacant" }, "_id title slug category property updatedAt"),
       Mess.find({}, "_id name slug updatedAt"),
       Owner.find({}, "_id name propertyName slug updatedAt"),
@@ -41,6 +42,7 @@ router.get("/", async (req, res) => {
       LaundryVendor.find({ isActive: true }, "_id vendorName slug updatedAt"),
       HourlyRoom.find({ isActive: true, status: "approved" }, "_id title slug updatedAt"),
       Property.find({}, "_id name slug propertyType updatedAt"),
+      SocialPlace.find({ isActive: true }, "_id category slug updatedAt"),
     ]);
     await ensureMessSlugs(Mess, messes);
     await Promise.all([
@@ -69,6 +71,7 @@ router.get("/", async (req, res) => {
       { loc: "/services/wifi", priority: "0.6", changefreq: "weekly" },
       { loc: "/services/appliance-repair", priority: "0.6", changefreq: "weekly" },
       { loc: "/explore", priority: "0.7", changefreq: "weekly" },
+      { loc: "/social-work", priority: "0.7", changefreq: "weekly" },
       { loc: "/map", priority: "0.6", changefreq: "weekly" },
       { loc: "/about", priority: "0.5", changefreq: "monthly" },
       { loc: "/team", priority: "0.4", changefreq: "monthly" },
@@ -132,6 +135,18 @@ router.get("/", async (req, res) => {
         changefreq: "weekly",
         lastmod: property.updatedAt,
       }));
+    const socialCategories = [...new Set(socialPlaces.map((place) => place.category).filter(Boolean))];
+    const socialCategoryUrls = socialCategories.map((category) => ({
+      loc: `/social-work/${category}`,
+      priority: "0.6",
+      changefreq: "weekly",
+    }));
+    const socialPlaceUrls = socialPlaces.map((place) => ({
+      loc: `/social-work/${place.category}/${place.slug || place._id}`,
+      priority: "0.6",
+      changefreq: "weekly",
+      lastmod: place.updatedAt,
+    }));
 
     const allUrls = [
       ...staticUrls,
@@ -143,6 +158,8 @@ router.get("/", async (req, res) => {
       ...laundryUrls,
       ...hourlyRoomUrls,
       ...propertyUrls,
+      ...socialCategoryUrls,
+      ...socialPlaceUrls,
     ];
 
     const xmlEntries = allUrls

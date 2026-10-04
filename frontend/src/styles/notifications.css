@@ -376,6 +376,29 @@
   background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
 }
 
+.notifications-item.is-blood {
+  border-left: 3px solid #dc2626;
+}
+
+.notifications-item.is-blood .notifications-item-icon {
+  color: #dc2626;
+  background: color-mix(in srgb, #dc2626 12%, var(--color-surface));
+}
+
+.notifications-blood-help {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  margin-top: 7px;
+  padding: 6px 11px;
+  color: #fff;
+  background: #b91c1c;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .notifications-item-content {
   flex: 1;
   min-width: 0;

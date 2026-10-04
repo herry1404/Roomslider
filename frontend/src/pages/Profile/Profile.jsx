@@ -337,6 +337,9 @@ function Profile() {
       <Link className="profile-complete-hint" to="/roommates/profile">
         Roommate profile
       </Link>
+      <Link className="profile-complete-hint" to="/profile/edit#blood-donation">
+        Blood donation settings
+      </Link>
 
       {incomplete && (
         <Link className="profile-complete-hint" to="/profile/edit">

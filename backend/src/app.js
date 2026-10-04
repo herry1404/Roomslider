@@ -35,6 +35,9 @@ const sitemapRoutes = require("./routes/sitemap.routes"); // ✅ Added for SEO s
 const userRoutes = require("./routes/user.routes");
 const villaRoutes = require("./routes/villa.routes");
 const villaBookingRoutes = require("./routes/villaBooking.routes");
+const socialRoutes = require("./routes/social.routes");
+const donationRoutes = require("./routes/donation.routes");
+const bloodRequestRoutes = require("./routes/bloodRequest.routes");
 
 
 const {
@@ -336,6 +339,9 @@ app.use("/api/furniture-requests", furnitureRequestRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/villas", villaRoutes);
 app.use("/api/villa-bookings", villaBookingRoutes);
+app.use("/api/social", socialRoutes);
+app.use("/api/donations", donationRoutes);
+app.use("/api/blood-requests", bloodRequestRoutes);
 
 // ✅ SITEMAP ROUTE (for SEO)
 app.use(

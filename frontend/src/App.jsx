@@ -90,6 +90,14 @@ import ManageVillas from "./pages/Admin/ManageVillas";
 import ManageNotifications from "./pages/Admin/ManageNotifications";
 import OwnerDetail from "./pages/Admin/OwnerDetail";
 import HourlyBookingReceipt from "./pages/Rooms/HourlyBookingReceipt";
+import SocialWork from "./pages/SocialWork/SocialWork";
+import ManageSocial from "./pages/Admin/ManageSocial";
+import AddSocial from "./pages/Admin/AddSocial";
+import Donate from "./pages/Donate/Donate";
+import BloodHome from "./pages/Blood/BloodHome";
+import BloodRequestForm from "./pages/Blood/BloodRequestForm";
+import BloodRequestDetail from "./pages/Blood/BloodRequestDetail";
+import ManageBloodRequests from "./pages/Admin/ManageBloodRequests";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -123,6 +131,13 @@ function App() {
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
+        <Route path="/social-work" element={<MainLayout><SocialWork /></MainLayout>} />
+        <Route path="/social-work/:category" element={<MainLayout><SocialWork /></MainLayout>} />
+        <Route path="/social-work/:category/:slug" element={<MainLayout><SocialWork /></MainLayout>} />
+        <Route path="/donate" element={<MainLayout><Donate /></MainLayout>} />
+        <Route path="/blood" element={<MainLayout><BloodHome /></MainLayout>} />
+        <Route path="/blood/request" element={<MainLayout><BloodRequestForm /></MainLayout>} />
+        <Route path="/blood/requests/:id" element={<MainLayout><BloodRequestDetail /></MainLayout>} />
         <Route path="/roommates/chat/:userId" element={<MainLayout><RoommateChatPage /></MainLayout>} />
         <Route path="/roommates/profile/:userId" element={<MainLayout><RoommateProfilePage /></MainLayout>} />
         <Route path="/roommates/profile" element={<MainLayout><MyRoommateProfile /></MainLayout>} />
@@ -187,6 +202,10 @@ function App() {
         <Route path="/admin/vehicle-requests" element={<AdminRoute><ManageVehicleRequests /></AdminRoute>} />
         <Route path="/admin/services" element={<AdminRoute><ManageServices /></AdminRoute>} />
         <Route path="/admin/service-requests" element={<AdminRoute><ServiceRequests /></AdminRoute>} />
+        <Route path="/admin/social" element={<AdminRoute><ManageSocial /></AdminRoute>} />
+        <Route path="/admin/social/add" element={<AdminRoute><AddSocial /></AdminRoute>} />
+        <Route path="/admin/social/edit/:id" element={<AdminRoute><AddSocial /></AdminRoute>} />
+        <Route path="/admin/blood-requests" element={<AdminRoute><ManageBloodRequests /></AdminRoute>} />
         <Route path="/admin/home-layout" element={<AdminRoute><ManageHomeLayout /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
         <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />

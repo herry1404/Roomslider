@@ -1,0 +1,6 @@
+.blood-profile-section{display:grid;grid-column:1/-1;gap:10px;padding:16px 0;border-top:1px solid var(--color-border);scroll-margin-top:90px}
+.blood-profile-section .profile-section{margin:0}
+.blood-profile-notice,.blood-profile-footnote{margin:0;color:var(--color-text-light);font-size:13px;line-height:1.5}
+.blood-profile-check{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:13px;line-height:1.45}
+.blood-profile-check input{flex:none;margin:3px 0 0;accent-color:var(--color-primary)}
+@media(max-width:380px){.blood-profile-section{padding:12px 0}.blood-profile-check{font-size:12px}}
