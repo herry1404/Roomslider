@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Ban, Heart, MapPin, ShieldAlert, UserRound } from "lucide-react";
+import { Ban, Heart, MapPin, ShieldAlert, UserRound, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
@@ -24,6 +24,8 @@ function RoommateFinder() {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ city: "", area: "", budget: "", sharingType: "" });
+  const [reportingId, setReportingId] = useState("");
+  const [reportReason, setReportReason] = useState("");
 
   const loadData = useCallback(async () => {
     try {
@@ -76,12 +78,14 @@ function RoommateFinder() {
     }
   };
 
-  const report = async (personId) => {
-    const reason = window.prompt("Tell us briefly why you are reporting this profile:");
-    if (reason === null) return;
+  const report = async (event) => {
+    event.preventDefault();
+    if (!reportingId) return;
     try {
-      await api.post(`/roommates/report/${personId}`, { reason });
+      await api.post(`/roommates/report/${reportingId}`, { reason: reportReason });
       toast.success("Report submitted");
+      setReportingId("");
+      setReportReason("");
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not submit report");
     }
@@ -203,13 +207,24 @@ function RoommateFinder() {
                 )}
                 <Link className="roommate-icon-action" to={`/roommates/profile/${person.id}`} aria-label={`View ${person.name}'s profile`} title="View profile"><UserRound size={17} /></Link>
                 <button className="roommate-icon-action" type="button" title="Block profile" aria-label="Block profile" onClick={() => block(person.id)}><Ban size={17} /></button>
-                <button className="roommate-icon-action" type="button" title="Report profile" aria-label="Report profile" onClick={() => report(person.id)}><ShieldAlert size={17} /></button>
+                <button className="roommate-icon-action" type="button" title="Report profile" aria-label="Report profile" onClick={() => setReportingId(person.id)}><ShieldAlert size={17} /></button>
               </div>
             </article>
           ))}
         </section>
       )}
       <p className="roommate-private-note"><ShieldAlert size={14} /> Contact details are not shared. <Link to="/privacy">Privacy details</Link></p>
+      {reportingId && <div className="roommate-report-overlay" onMouseDown={(event) => {
+        if (event.target === event.currentTarget) setReportingId("");
+      }}>
+        <form className="roommate-report-modal" onSubmit={report}>
+          <button type="button" className="roommate-report-close" aria-label="Close report dialog" onClick={() => setReportingId("")}><X size={18} /></button>
+          <h2>Report profile</h2>
+          <p>Tell us what happened. Our team will review your report.</p>
+          <textarea value={reportReason} maxLength={500} onChange={(event) => setReportReason(event.target.value)} placeholder="Describe the issue (optional)" />
+          <button className="roommate-primary-action" type="submit">Submit report</button>
+        </form>
+      </div>}
     </main>
   );
 }

@@ -3,6 +3,7 @@ const RoommateProfile = require("../models/roommateProfile.model");
 const RoommateRequest = require("../models/roommateRequest.model");
 const RoommateReport = require("../models/roommateReport.model");
 const RoommateMessage = require("../models/roommateMessage.model");
+const Room = require("../models/room.model");
 const User = require("../models/user.model");
 const { notifyUser } = require("../utils/notificationDelivery");
 const { sanitizeRoommatePreferences } = require("../utils/roommatePreferences");
@@ -155,6 +156,7 @@ const getChatMessages = async (req, res) => {
     }
 
     const messages = await RoommateMessage.find({
+      hiddenFor: { $ne: req.user._id },
       $or: [
         { from: req.user._id, to: otherUserId },
         { from: otherUserId, to: req.user._id },
@@ -164,7 +166,7 @@ const getChatMessages = async (req, res) => {
       .limit(100)
       .lean();
     await RoommateMessage.updateMany(
-      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true } },
+      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true }, hiddenFor: { $ne: req.user._id } },
       { $set: { readAt: new Date(), isRead: true } }
     );
     try {
@@ -172,16 +174,42 @@ const getChatMessages = async (req, res) => {
     } catch (error) {
       console.error("ROOMMATE MESSAGE NOTIFICATION READ ERROR:", error);
     }
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`user:${otherUserId}`).emit("roommate:seen", {
+        userId: String(req.user._id),
+        readAt: new Date(),
+      });
+    }
+    const otherUser = await User.findById(otherUserId).select("area preferredArea").lean();
+    const area = otherUser?.area || otherUser?.preferredArea || "";
+    let relatedRoom = null;
+    if (area.trim()) {
+      const escapedArea = area.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      relatedRoom = await Room.findOne({ status: "vacant", location: new RegExp(escapedArea, "i") })
+        .select("title price location images category slug")
+        .lean();
+    }
     res.json({
       success: true,
       messages: messages.reverse().map((message) => ({
         id: String(message._id),
         from: String(message.from),
         body: message.body,
+        imageUrl: message.imageUrl || "",
         createdAt: message.createdAt,
         readAt: message.readAt,
         isRead: Boolean(message.isRead || message.readAt),
       })),
+      relatedRoom: relatedRoom ? {
+        id: String(relatedRoom._id),
+        title: relatedRoom.title,
+        price: relatedRoom.price,
+        location: relatedRoom.location,
+        image: relatedRoom.images?.[0] || "",
+        category: relatedRoom.category,
+        slug: relatedRoom.slug,
+      } : null,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
@@ -196,7 +224,8 @@ const sendChatMessage = async (req, res) => {
     if (!mongoose.isValidObjectId(otherUserId) || String(otherUserId) === String(req.user._id)) {
       return res.status(400).json({ success: false, message: "Invalid roommate connection" });
     }
-    if (!body || body.length > 2000) {
+    const imageUrl = req.file?.path || "";
+    if ((!body && !imageUrl) || body.length > 2000) {
       return res.status(400).json({ success: false, message: "Message must contain 1 to 2000 characters" });
     }
     if (!(await getAcceptedConnection(req.user._id, otherUserId))) {
@@ -207,6 +236,7 @@ const sendChatMessage = async (req, res) => {
       from: req.user._id,
       to: otherUserId,
       body,
+      imageUrl,
     });
     try {
       await notifyUser(otherUserId, {
@@ -219,16 +249,35 @@ const sendChatMessage = async (req, res) => {
     } catch (error) {
       console.error("ROOMMATE MESSAGE NOTIFICATION ERROR:", error);
     }
+    const payload = {
+      id: String(message._id),
+      from: String(message.from),
+      body: message.body,
+      imageUrl: message.imageUrl || "",
+      createdAt: message.createdAt,
+      readAt: message.readAt,
+    };
+    req.app.get("io")?.to(`user:${otherUserId}`).emit("roommate:message", payload);
     res.status(201).json({
       success: true,
-      message: {
-        id: String(message._id),
-        from: String(message.from),
-        body: message.body,
-        createdAt: message.createdAt,
-        readAt: message.readAt,
-      },
+      message: payload,
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const checkChatImagePermission = async (req, res, next) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const otherUserId = req.params.userId;
+    if (!mongoose.isValidObjectId(otherUserId) || String(otherUserId) === String(req.user._id)) {
+      return res.status(400).json({ success: false, message: "Invalid roommate connection" });
+    }
+    if (!(await getAcceptedConnection(req.user._id, otherUserId))) {
+      return res.status(403).json({ success: false, message: "This roommate connection is not available" });
+    }
+    next();
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
   }
@@ -598,12 +647,13 @@ const getConversations = async (req, res) => {
         ],
       };
       const [last, unreadCount] = await Promise.all([
-        RoommateMessage.findOne(filter).sort({ createdAt: -1 }).select("body createdAt").lean(),
+        RoommateMessage.findOne({ ...filter, hiddenFor: { $ne: req.user._id } }).sort({ createdAt: -1 }).select("body imageUrl createdAt").lean(),
         RoommateMessage.countDocuments({
           from: person._id,
           to: req.user._id,
           readAt: null,
           isRead: { $ne: true },
+          hiddenFor: { $ne: req.user._id },
         }),
       ]);
       return {
@@ -611,7 +661,7 @@ const getConversations = async (req, res) => {
         name: person.name,
         username: person.username,
         avatar: person.avatar,
-        lastMessage: last?.body || "",
+        lastMessage: last?.body || (last?.imageUrl ? "Photo" : ""),
         lastMessageAt: last?.createdAt || null,
         unreadCount,
       };
@@ -635,7 +685,7 @@ const markConversationRead = async (req, res) => {
     }
     const readAt = new Date();
     const result = await RoommateMessage.updateMany(
-      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true } },
+      { from: otherUserId, to: req.user._id, readAt: null, isRead: { $ne: true }, hiddenFor: { $ne: req.user._id } },
       { $set: { readAt, isRead: true } }
     );
     try {
@@ -643,6 +693,10 @@ const markConversationRead = async (req, res) => {
     } catch (error) {
       console.error("ROOMMATE MESSAGE NOTIFICATION READ ERROR:", error);
     }
+    req.app.get("io")?.to(`user:${otherUserId}`).emit("roommate:seen", {
+      userId: String(req.user._id),
+      readAt,
+    });
     res.json({ success: true, modifiedCount: result.modifiedCount });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });
@@ -695,6 +749,7 @@ const getConversationsForUser = async (userId) => {
     to: userId,
     readAt: null,
     isRead: { $ne: true },
+    hiddenFor: { $ne: userId },
   })));
   return counts.map((unreadCount) => ({ unreadCount }));
 };
@@ -750,6 +805,64 @@ const blockUser = async (req, res) => {
   }
 };
 
+const deleteConversation = async (req, res) => {
+  try {
+    if (!isRegularUser(req, res)) return;
+    const otherUserId = req.params.id;
+    if (!mongoose.isValidObjectId(otherUserId) || String(otherUserId) === String(req.user._id)) {
+      return res.status(400).json({ success: false, message: "Invalid roommate connection" });
+    }
+    if (!(await getAcceptedConnection(req.user._id, otherUserId))) {
+      return res.status(403).json({ success: false, message: "This roommate connection is not available" });
+    }
+    await RoommateMessage.updateMany({
+      $or: [
+        { from: req.user._id, to: otherUserId },
+        { from: otherUserId, to: req.user._id },
+      ],
+    }, { $addToSet: { hiddenFor: req.user._id } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const getRoommateReports = async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Admin access required" });
+    }
+    const reports = await RoommateReport.find()
+      .sort({ createdAt: -1 })
+      .populate("reporter", "name email")
+      .populate("reported", "name email")
+      .lean();
+    res.json({ success: true, reports });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const updateRoommateReport = async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Admin access required" });
+    }
+    if (!["open", "resolved"].includes(req.body.status)) {
+      return res.status(400).json({ success: false, message: "Choose open or resolved" });
+    }
+    const report = await RoommateReport.findByIdAndUpdate(
+      req.params.id,
+      { $set: { status: req.body.status } },
+      { new: true, runValidators: true }
+    );
+    if (!report) return res.status(404).json({ success: false, message: "Report not found" });
+    res.json({ success: true, report });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
 const reportUser = async (req, res) => {
   try {
     if (!isRegularUser(req, res)) return;
@@ -764,7 +877,7 @@ const reportUser = async (req, res) => {
     }
     await RoommateReport.findOneAndUpdate(
       { reporter: req.user._id, reported: targetId },
-      { $set: { reason } },
+      { $set: { reason, status: "open" } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     res.status(201).json({ success: true, message: "Report submitted" });
@@ -787,7 +900,11 @@ module.exports = {
   getRoommateBadges,
   getChatMessages,
   sendChatMessage,
+  checkChatImagePermission,
   cancelRequest,
   blockUser,
   reportUser,
+  deleteConversation,
+  getRoommateReports,
+  updateRoommateReport,
 };

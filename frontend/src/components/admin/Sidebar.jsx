@@ -22,6 +22,7 @@ import {
   Castle,
   HeartPulse,
   Droplet,
+  ShieldAlert,
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
@@ -65,6 +66,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Service Requests", icon: <ClipboardList size={18} />, path: "/admin/service-requests", badge: newServiceRequests },
         { title: "Social Work", icon: <HeartPulse size={18} />, path: "/admin/social" },
         { title: "Blood Requests", icon: <Droplet size={18} />, path: "/admin/blood-requests", badge: pendingBloodRequests },
+        { title: "Roommate Reports", icon: <ShieldAlert size={18} />, path: "/admin/roommate-reports" },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
         { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
       ],

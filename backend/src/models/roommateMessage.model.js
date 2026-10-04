@@ -12,12 +12,20 @@ const roommateMessageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    body: { type: String, required: true, trim: true, maxlength: 2000 },
+    body: { type: String, trim: true, maxlength: 2000, default: "" },
+    imageUrl: { type: String, trim: true, default: "" },
+    hiddenFor: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     readAt: { type: Date, default: null },
     isRead: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+roommateMessageSchema.pre("validate", function validateMessage() {
+  if (!this.body && !this.imageUrl) {
+    this.invalidate("body", "A message must include text or an image");
+  }
+});
 
 roommateMessageSchema.index({ from: 1, to: 1, createdAt: -1 });
 roommateMessageSchema.index({ to: 1, from: 1, createdAt: -1 });

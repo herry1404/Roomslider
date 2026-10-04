@@ -13,6 +13,7 @@ const roommateReportSchema = new mongoose.Schema(
       required: true,
     },
     reason: { type: String, trim: true, maxlength: 500, default: "" },
+    status: { type: String, enum: ["open", "resolved"], default: "open" },
   },
   { timestamps: true }
 );
