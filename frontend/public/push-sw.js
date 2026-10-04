@@ -9,8 +9,9 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title || "RoomSlider", {
       body: payload.body || "You have a new notification.",
-      icon: "/pwa-192x192.png",
-      badge: "/pwa-192x192.png",
+      icon: payload.icon || "/pwa-192x192.png",
+      badge: payload.badge || "/pwa-192x192.png",
+      image: payload.image || undefined,
       requireInteraction: payload.priority === "high",
       tag: payload.requestId ? `blood-request-${payload.requestId}` : undefined,
       actions: Array.isArray(payload.actions) ? payload.actions.slice(0, 2) : [],

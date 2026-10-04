@@ -94,6 +94,7 @@ async function notifyUser(userId, { type = "system", title, body, link = "", dat
         priority: notification.priority,
         actions,
         requestId: notification.data?.requestId || null,
+        type: notification.type,
       });
     } catch (error) { console.error("NOTIFICATION PUSH ERROR:", error.message); }
     return notification;
@@ -129,6 +130,7 @@ async function sendNotificationToRecipients(recipients, notification) {
           title: createdNotification.title,
           message: body,
           actionUrl: link,
+          type: createdNotification.type,
           priority: notification.priority === "high" ? "high" : "normal",
           actions: Array.isArray(notification.actions) ? notification.actions.slice(0, 2) : [],
         });
@@ -138,7 +140,7 @@ async function sendNotificationToRecipients(recipients, notification) {
       return createdNotification;
     } catch (error) { console.error("NOTIFY RECIPIENT ERROR:", error.message); return null; }
   }));
-  return { recipientCount: created.filter(Boolean).length, push: { configured: Boolean(process.env.VAPID_PUBLIC_KEY), delivered: 0, failed: 0 } };
+  return { recipientCount: created.filter(Boolean).length, push: { configured: Boolean(process.env.VAPID_PUBLIC || process.env.VAPID_PUBLIC_KEY), delivered: 0, failed: 0 } };
 }
 
 module.exports = { notifyUser, sendNotificationToRecipients, addStream, serialize };

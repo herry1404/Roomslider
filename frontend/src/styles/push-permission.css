@@ -1,0 +1,62 @@
+.push-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 62%);
+}
+
+.push-prompt {
+  width: min(100%, 390px);
+  padding: 28px;
+  color: var(--color-text);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.push-prompt-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  place-items: center;
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  border-radius: 50%;
+}
+
+.push-prompt h2 { margin: 0; font-size: 22px; }
+.push-prompt p { margin: 9px 0 22px; color: var(--color-text-light); line-height: 1.5; }
+.push-prompt-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.push-prompt-actions button { min-height: 44px; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; }
+.push-prompt-allow { color: #fff; background: var(--color-success); border: 1px solid var(--color-success); }
+.push-prompt-later { color: var(--color-text); background: transparent; border: 1px solid var(--color-border); }
+.push-prompt-actions button:disabled { opacity: .65; cursor: wait; }
+
+.push-ios-tip {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 11000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+}
+
+.push-ios-tip button { display: grid; flex: none; padding: 4px; color: inherit; background: none; border: 0; cursor: pointer; }

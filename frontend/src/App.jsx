@@ -100,6 +100,8 @@ import BloodRequestForm from "./pages/Blood/BloodRequestForm";
 import BloodRequestDetail from "./pages/Blood/BloodRequestDetail";
 import ManageBloodRequests from "./pages/Admin/ManageBloodRequests";
 import ManageRoommateReports from "./pages/Admin/ManageRoommateReports";
+import PushNotifications from "./pages/Admin/PushNotifications";
+import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -115,6 +117,7 @@ function App() {
       <ScrollToTop />
       <BackToTop />
       <InstallPrompt />
+      <PushPermissionPrompt />
       {showPreferences && (
         <PreferencesModal onClose={dismissPreferencesPrompt} />
       )}
@@ -221,6 +224,7 @@ function App() {
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
         <Route path="/admin/villas" element={<AdminRoute><ManageVillas /></AdminRoute>} />
         <Route path="/admin/notifications" element={<AdminRoute><ManageNotifications /></AdminRoute>} />
+        <Route path="/admin/push" element={<AdminRoute><PushNotifications /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
 

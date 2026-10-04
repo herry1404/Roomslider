@@ -52,6 +52,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Hourly Rooms", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
+        { title: "Push Notifications", icon: <Megaphone size={18} />, path: "/admin/push" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],
     },

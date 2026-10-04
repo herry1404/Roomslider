@@ -4,15 +4,20 @@ const Room = require("../models/room.model");
 const Notification = require("../models/Notification");
 const User = require("../models/user.model");
 const PushSubscription = require("../models/PushSubscription");
+const PushHistory = require("../models/PushHistory");
+const Owner = require("../models/Owner");
+const HourlyRoomManager = require("../models/HourlyRoomManager");
 const ElectricityBill = require("../models/ElectricityBill");
 const { computeRentStatus } = require("./room.controller");
 const { notifyUser, sendNotificationToRecipients, addStream, serialize } = require("../utils/notificationDelivery");
+const { sendPushNotifications } = require("../utils/pushNotifications");
 
 const notificationAccountModel = (role) => role === "hourlyManager" ? "HourlyRoomManager" : role === "owner" ? "Owner" : "User";
 const ownFilter = (req) => ({ $or: [{ user: req.user._id }, { recipient: req.user._id, recipientModel: notificationAccountModel(req.user.role || "user") }] });
 const unreadQuery = { $or: [{ isRead: false }, { read: false }] };
+const getVapidPublicKey = () => process.env.VAPID_PUBLIC || process.env.VAPID_PUBLIC_KEY || null;
 
-const getPushConfig = (req, res) => res.json({ success: true, publicKey: process.env.VAPID_PUBLIC_KEY || null });
+const getPushConfig = (req, res) => res.json({ success: true, publicKey: getVapidPublicKey() });
 
 const savePushSubscription = async (req, res) => {
   try {
@@ -30,6 +35,82 @@ const removePushSubscription = async (req, res) => {
     await PushSubscription.deleteOne({ endpoint: req.body.endpoint, recipient: req.user._id, recipientModel: notificationAccountModel(req.user.role || "user") });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ success: false, message: safeMsg(error) }); }
+};
+
+const sendPushBroadcast = async (req, res) => {
+  try {
+    const { title, message, hiTitle = "", hiMessage = "", audience, link = "/" } = req.body || {};
+    const cleanTitle = String(title || "").trim();
+    const cleanMessage = String(message || "").trim();
+    const cleanHiTitle = String(hiTitle || "").trim();
+    const cleanHiMessage = String(hiMessage || "").trim();
+    const cleanLink = String(link || "/").trim();
+    if (!cleanTitle || !cleanMessage || cleanTitle.length > 100 || cleanMessage.length > 500) {
+      return res.status(400).json({ success: false, message: "Title (1-100 characters) and message (1-500 characters) are required" });
+    }
+    if (!["all", "owners", "students"].includes(audience)) {
+      return res.status(400).json({ success: false, message: "Choose a valid audience" });
+    }
+    if (cleanHiTitle.length > 100 || cleanHiMessage.length > 500 || cleanLink.length > 300) {
+      return res.status(400).json({ success: false, message: "Hinglish content or link is too long" });
+    }
+
+    let recipients;
+    if (audience === "owners") {
+      const owners = await Owner.find({}).select("_id").lean();
+      recipients = owners.map(({ _id }) => ({ id: _id, model: "Owner" }));
+    } else if (audience === "students") {
+      const students = await User.find({ occupation: { $regex: /^student$/i } }).select("_id").lean();
+      recipients = students.map(({ _id }) => ({ id: _id, model: "User" }));
+    } else {
+      const [users, owners, managers] = await Promise.all([
+        User.find({}).select("_id").lean(),
+        Owner.find({}).select("_id").lean(),
+        HourlyRoomManager.find({}).select("_id").lean(),
+      ]);
+      recipients = [
+        ...users.map(({ _id }) => ({ id: _id, model: "User" })),
+        ...owners.map(({ _id }) => ({ id: _id, model: "Owner" })),
+        ...managers.map(({ _id }) => ({ id: _id, model: "HourlyRoomManager" })),
+      ];
+    }
+
+    const push = await sendPushNotifications(recipients, {
+      type: "broadcast",
+      preference: "offers",
+      title: cleanTitle,
+      message: cleanMessage,
+      hiTitle: cleanHiTitle,
+      hiMessage: cleanHiMessage,
+      actionUrl: cleanLink,
+      image: req.file?.path || "",
+    });
+    const history = await PushHistory.create({
+      title: cleanTitle,
+      message: cleanMessage,
+      hiTitle: cleanHiTitle,
+      hiMessage: cleanHiMessage,
+      link: cleanLink,
+      image: req.file?.path || "",
+      audience,
+      recipientCount: recipients.length,
+      delivered: push.delivered,
+      failed: push.failed,
+      sentBy: req.user._id,
+    });
+    res.status(201).json({ success: true, history, recipientCount: recipients.length, push });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
+const listPushHistory = async (req, res) => {
+  try {
+    const history = await PushHistory.find({}).sort({ createdAt: -1 }).limit(50).lean();
+    res.json({ success: true, history });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
 };
 
 const sendBroadcast = async (req, res) => {
@@ -110,4 +191,4 @@ const notificationStream = (req, res) => {
   } catch { res.status(401).end(); }
 };
 
-module.exports = { getOverdueTenants, sendBulkReminders, getMyNotifications, listNotifications, getUnreadCount, markNotificationRead, markAllRead, deleteNotification, getPushConfig, savePushSubscription, removePushSubscription, sendBroadcast, createStreamToken, notificationStream };
+module.exports = { getOverdueTenants, sendBulkReminders, getMyNotifications, listNotifications, getUnreadCount, markNotificationRead, markAllRead, deleteNotification, getPushConfig, savePushSubscription, removePushSubscription, sendBroadcast, sendPushBroadcast, listPushHistory, createStreamToken, notificationStream };

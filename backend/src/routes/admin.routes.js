@@ -3,6 +3,8 @@ const router = express.Router();
 
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
+const upload = require("../middleware/upload.middleware");
+const { sendPushBroadcast, listPushHistory } = require("../controllers/notification.controller");
 
 const {
   getDashboard,
@@ -42,5 +44,8 @@ router.delete(
   adminOnly,
   deleteUser
 );
+
+router.post("/push/send", protect, adminOnly, upload.single("image"), sendPushBroadcast);
+router.get("/push/history", protect, adminOnly, listPushHistory);
 
 module.exports = router;

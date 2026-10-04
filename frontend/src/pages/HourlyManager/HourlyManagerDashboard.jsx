@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Phone, LogOut, BedDouble, KeyRound, Users, Clock, Search, Bell } from "lucide-react";
+import { Phone, LogOut, BedDouble, KeyRound, Users, Clock, Search } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-import EnablePushButton from "../../components/notifications/EnablePushButton";
 import BroadcastComposer from "../../components/notifications/BroadcastComposer";
 
 import "../../styles/hourly-manager.css";
@@ -156,9 +155,6 @@ function HourlyManagerDashboard() {
             }}
           />
         </div>
-        <EnablePushButton className="hm-push-btn" aria-label="Enable push notifications" title="Enable push notifications">
-          <Bell size={18} />
-        </EnablePushButton>
         <button className="hm-logout" onClick={handleLogout}>
           <LogOut size={18} />
         </button>

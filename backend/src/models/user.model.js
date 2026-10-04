@@ -206,6 +206,14 @@ const userSchema = new mongoose.Schema(
     bloodRequestsBlocked: { type: Boolean, default: false, select: false },
     isActive: { type: Boolean, default: true, select: false },
     isBlocked: { type: Boolean, default: false, select: false },
+    notificationPrefs: {
+      chat: { type: Boolean, default: true },
+      booking: { type: Boolean, default: true },
+      offers: { type: Boolean, default: true },
+      blood: { type: Boolean, default: true },
+      alerts: { type: Boolean, default: true },
+    },
+    preferredLanguage: { type: String, enum: ["en", "hi-en"], default: "en" },
 
   },
   {

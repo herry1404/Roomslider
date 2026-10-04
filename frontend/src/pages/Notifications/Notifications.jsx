@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useNotifications } from "../../context/useNotifications";
-import EnablePushButton from "../../components/notifications/EnablePushButton";
 import roommateNotificationLink from "../../utils/roommateNotificationLink";
 import "../../styles/notifications.css";
 
@@ -81,10 +80,6 @@ function Notifications() {
           <h1>Notifications</h1>
           <p className="notifications-subtitle">Updates about your requests, messages and payments.</p>
         </div>
-        <EnablePushButton className="notifications-push-button">
-          <Bell size={17} />
-          Enable browser alerts
-        </EnablePushButton>
       </header>
 
       <div className="notifications-toolbar">

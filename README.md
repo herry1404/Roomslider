@@ -8,12 +8,15 @@ enabled notifications on an HTTPS site.
 Configure these server environment variables with a generated VAPID key pair:
 
 ```text
-VAPID_PUBLIC_KEY=<public-key>
-VAPID_PRIVATE_KEY=<private-key>
-VAPID_SUBJECT=mailto:<support-email>
+VAPID_PUBLIC=<public-key>
+VAPID_PRIVATE=<private-key>
+VAPID_EMAIL=<support-email>
 ```
 
 Generate a key pair with `cd backend && npx web-push generate-vapid-keys`, then
 set the public and private keys in the backend deployment environment. Keep the
-private key secret. Without VAPID configuration, announcements still appear in
-the in-app notification list but browser push is unavailable.
+private key secret. The legacy `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and
+`VAPID_SUBJECT` names remain supported. Without VAPID configuration, in-app
+notifications remain available but browser push is unavailable. Admins can send
+push notifications from `/admin/push`; audience, optional image, delivery history,
+and per-user notification preferences are supported.
