@@ -15,6 +15,7 @@ const ownerSchema = new mongoose.Schema({
   slug: { type: String, unique: true, sparse: true },
   totalRooms: { type: Number, default: 0 },
   role: { type: String, default: "owner" },
+  isVerified: { type: Boolean, default: false },
   // Electricity rate this owner charges tenants, per unit consumed (₹/unit)
   ratePerUnit: { type: Number, default: 0 },
   // Optional social links shown on the owner's public profile page

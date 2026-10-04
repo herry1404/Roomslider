@@ -38,4 +38,32 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const optionalAuth = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) return next();
+
+  try {
+    const decoded = jwt.verify(authHeader.split(" ")[1], process.env.JWT_SECRET);
+    let account;
+    if (decoded.role === "owner") {
+      account = await Owner.findById(decoded.id).select("-password");
+    } else if (decoded.role === "mess") {
+      account = await Mess.findById(decoded.id).select("-password");
+    } else if (decoded.role === "hourlyManager") {
+      account = await HourlyRoomManager.findById(decoded.id).select("-password");
+    } else {
+      account = await User.findById(decoded.id).select("-password");
+    }
+    if (account) {
+      req.user = account.toObject ? account.toObject() : account;
+      if (decoded.role === "owner" || decoded.role === "mess" || decoded.role === "hourlyManager") {
+        req.user.role = decoded.role;
+      }
+    }
+  } catch {
+    // Public routes remain available when an optional/stale token is present.
+  }
+  next();
+};
+
+module.exports = { protect, optionalAuth };

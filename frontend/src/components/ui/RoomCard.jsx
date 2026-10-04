@@ -1,6 +1,6 @@
 import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
-import { MapPin, Heart } from "lucide-react";
+import { MapPin, Heart, BadgeCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ShareButton from "./ShareButton";
@@ -92,6 +92,9 @@ function RoomCard({ room, onWishlistChange }) {
         />
 
         <ShareButton room={room} variant="card" />
+        {(room.isVerified || room.owner?.isVerified) && (
+          <span className="room-card-verified"><BadgeCheck size={14} /> Verified</span>
+        )}
 
         <button
           className={`wishlist-icon ${wishlisted ? "active" : ""} ${burst ? "burst" : ""}`}

@@ -7,6 +7,7 @@ import {
   Plus,
   Home,
   CheckCircle2,
+  BadgeCheck,
   DoorOpen,
   Clock,
 } from "lucide-react";
@@ -79,6 +80,17 @@ function ManageRooms() {
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete room");
+    }
+  };
+
+  const toggleVerification = async (room) => {
+    const isVerified = !room.isVerified;
+    try {
+      await api.patch(`/admin/rooms/${room._id}/verification`, { isVerified });
+      setRooms((current) => current.map((item) => item._id === room._id ? { ...item, isVerified } : item));
+      toast.success(isVerified ? "Listing verified" : "Listing verification removed");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Listing verification could not be updated");
     }
   };
 
@@ -237,6 +249,14 @@ function ManageRooms() {
                       >
                         <Pencil size={16} />
                       </Link>
+                      <button
+                        className={`admin-icon-btn${room.isVerified ? " accent" : ""}`}
+                        title={room.isVerified ? "Remove verified badge" : "Verify listing"}
+                        aria-label={room.isVerified ? "Remove verified badge" : "Verify listing"}
+                        onClick={() => toggleVerification(room)}
+                      >
+                        <BadgeCheck size={16} />
+                      </button>
                       <button
                         className="admin-icon-btn danger"
                         title="Delete"

@@ -498,13 +498,27 @@ a.pd-host-row:hover .pd-host-copy strong {
   border-radius: var(--pd-radius-button);
   font-size: 15px;
   font-weight: 600;
+  font-family: inherit;
+  padding: 0 12px;
   transition: filter 180ms ease;
+  text-decoration: none;
+  cursor: pointer;
 }
+
+.pd-contact-call { border: 0; }
 
 .pd-contact-call,
 .pd-mobile-call {
   color: var(--color-surface);
   background: var(--color-primary);
+}
+
+.pd-mobile-call,
+.pd-mobile-whatsapp {
+  border: 0;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .pd-contact-call:hover,

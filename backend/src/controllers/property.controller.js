@@ -5,6 +5,7 @@ require("../models/Owner");
 
 const TYPES = ["Room", "PG", "Hostel", "Flat"];
 const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
+const { sanitizeRoomListing } = require("../utils/maskListingPhoneNumbers");
 const safeMsg = (e) =>
   process.env.NODE_ENV === "production" ? "Something went wrong" : e.message;
 
@@ -176,7 +177,7 @@ const getPublicProperty = async (req, res) => {
       ? { _id: req.params.id }
       : { slug: req.params.id.toLowerCase() };
     const property = await Property.findOne(identity)
-      .populate("owner", "name slug")
+      .populate("owner", "name slug isVerified")
       ;
     if (!property) {
       return res.status(404).json({ success: false, message: "Property not found" });
@@ -186,7 +187,7 @@ const getPublicProperty = async (req, res) => {
       .select("-currentTenant -currentTenantUser -occupancyHistory -paymentStatus")
       .sort({ priority: 1, roomNumber: 1 });
     await ensurePublicSlugs(Room, relatedRooms, (room) => room.title);
-    const rooms = relatedRooms.map((room) => room.toObject());
+    const rooms = relatedRooms.map((room) => sanitizeRoomListing(room));
 
     res.status(200).json({ success: true, property, rooms });
   } catch (error) {

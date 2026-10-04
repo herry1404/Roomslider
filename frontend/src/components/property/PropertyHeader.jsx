@@ -1,4 +1,4 @@
-import { Heart, Share2 } from "lucide-react";
+import { Heart, Share2, BadgeCheck } from "lucide-react";
 import shareProperty from "../../utils/shareProperty";
 
 function PropertyHeader({ room, wishlisted, onSave, onShare = () => shareProperty(room), showSave = true }) {
@@ -13,7 +13,10 @@ function PropertyHeader({ room, wishlisted, onSave, onShare = () => sharePropert
   return (
     <header className="pd-header">
       <div className="pd-header-copy">
-        <h1>{room.title}</h1>
+        <h1>
+          {room.title}
+          {(room.isVerified || room.owner?.isVerified) && <span className="pd-verified-badge"><BadgeCheck size={17} /> Verified</span>}
+        </h1>
         {facts.length > 0 && <p>{facts.join(" · ")}</p>}
       </div>
       <div className="pd-header-actions">

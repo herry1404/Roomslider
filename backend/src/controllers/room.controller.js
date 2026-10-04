@@ -6,6 +6,7 @@ require("../models/property.model"); // register model so populate("property") w
 const User = require("../models/user.model");
 const Property = require("../models/property.model");
 const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
+const { maskPhoneNumbers, sanitizeRoomListing } = require("../utils/maskListingPhoneNumbers");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -220,21 +221,23 @@ const getRooms = async (req, res) => {
       filter.$or = [{ title: regex }, { location: regex }, { category: regex }];
     }
 
-    // Public users should only ever see vacant rooms. Admin panel passes
-    // ?includeOccupied=true so it can still manage occupied rooms too.
-    if (req.query.includeOccupied !== "true") {
+    // Public users see vacant rooms; managers can inspect occupied listings.
+    const canViewOccupied = req.query.includeOccupied === "true"
+      && ["admin", "owner"].includes(req.user?.role);
+    if (!canViewOccupied) {
       filter.status = "vacant";
-    } else if (req.query.status) {
-      filter.status = req.query.status;
+    } else {
+      if (req.user.role === "owner") filter.owner = req.user._id;
+      if (req.query.status) filter.status = req.query.status;
     }
 
-    if (req.query.owner) {
+    if (req.query.owner && req.user?.role !== "owner") {
       filter.owner = req.query.owner;
     }
 
     const grouped = req.query.grouped === "true";
 
-    let query = Room.find(filter).populate("owner", "name slug");
+    let query = Room.find(filter).populate("owner", "name slug isVerified");
     if (grouped) {
       query = query.populate("property", "name slug area propertyType buildings");
     }
@@ -272,7 +275,7 @@ const getRooms = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      rooms,
+      rooms: rooms.map((room) => sanitizeRoomListing(room)),
     });
   } catch (error) {
     res.status(500).json({
@@ -292,7 +295,7 @@ const getSingleRoom = async (req, res) => {
     const identity = /^[a-f\d]{24}$/i.test(identifier)
       ? { _id: identifier }
       : { slug: identifier.toLowerCase() };
-    const room = await Room.findOne(identity).populate("owner", "name slug");
+    const room = await Room.findOne(identity).populate("owner", "name slug isVerified");
 
     if (!room) {
       return res.status(404).json({
@@ -306,7 +309,26 @@ const getSingleRoom = async (req, res) => {
     await ensurePublicSlugs(Room, [room], (item) => item.title);
 
     const roomObj = room.toObject();
-    if (room.status === "occupied") {
+    roomObj.title = maskPhoneNumbers(roomObj.title);
+    roomObj.description = maskPhoneNumbers(roomObj.description);
+    roomObj.location = maskPhoneNumbers(roomObj.location);
+    roomObj.ownerName = maskPhoneNumbers(roomObj.ownerName);
+    roomObj.amenities = roomObj.amenities?.map(maskPhoneNumbers);
+    roomObj.nearby = roomObj.nearby?.map(maskPhoneNumbers);
+    roomObj.hasContact = Boolean(room.contact || room.whatsapp);
+    roomObj.hasPhoneContact = Boolean(room.contact);
+    roomObj.hasWhatsAppContact = Boolean(room.whatsapp || room.contact);
+    const mayManageRoom = req.user?.role === "admin"
+      || (req.user?.role === "owner" && String(room.owner?._id || room.owner || "") === String(req.user._id));
+    if (!mayManageRoom) {
+      delete roomObj.contact;
+      delete roomObj.whatsapp;
+      delete roomObj.currentTenant;
+      delete roomObj.currentTenantUser;
+      delete roomObj.occupancyHistory;
+      delete roomObj.paymentStatus;
+    }
+    if (room.status === "occupied" && mayManageRoom) {
       roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);
     }
 
@@ -319,6 +341,28 @@ const getSingleRoom = async (req, res) => {
       success: false,
       message: safeMsg(error),
     });
+  }
+};
+
+const getRoomContact = async (req, res) => {
+  try {
+    if (!/^[a-f\d]{24}$/i.test(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Listing not found" });
+    }
+    const room = await Room.findById(req.params.id).select("contact whatsapp owner");
+    if (!room) return res.status(404).json({ success: false, message: "Listing not found" });
+    if (!["user", "admin", "owner"].includes(req.user?.role)) {
+      return res.status(403).json({ success: false, message: "Your account cannot access listing contact details" });
+    }
+    if (req.user.role === "owner" && String(room.owner || "") !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: "You can only access contact details for your own listings" });
+    }
+    if (!room.contact && !room.whatsapp) {
+      return res.status(404).json({ success: false, message: "Contact details are not available" });
+    }
+    res.json({ success: true, contact: room.contact || "", whatsapp: room.whatsapp || room.contact || "" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -1089,7 +1133,7 @@ const getNearbyRooms = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      rooms: nearbyRooms,
+      rooms: nearbyRooms.map((nearbyRoom) => sanitizeRoomListing(nearbyRoom)),
       nearestPlace: nearestPlace ? nearestPlace.name : null,
     });
   } catch (error) {
@@ -1114,6 +1158,7 @@ module.exports = {
   createRoom,
   getRooms,
   getSingleRoom,
+  getRoomContact,
   updateRoom,
   deleteRoom,
   createBulkRooms,

@@ -9,7 +9,7 @@ const {
   getPublicProperty,
 } = require("../controllers/property.controller");
 
-const { protect } = require("../middleware/auth.middleware");
+const { protect, optionalAuth } = require("../middleware/auth.middleware");
 const { adminOrOwner } = require("../middleware/admin.middleware");
 
 // "/mine" pehle, warna "/:id" isse "mine" samajh lega
@@ -19,6 +19,6 @@ router.post("/:id/buildings", protect, adminOrOwner, createBuilding);
 router.put("/:id", protect, adminOrOwner, updateProperty);
 
 // Public
-router.get("/:id", getPublicProperty);
+router.get("/:id", optionalAuth, getPublicProperty);
 
 module.exports = router;

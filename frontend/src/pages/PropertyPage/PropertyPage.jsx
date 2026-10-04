@@ -108,6 +108,7 @@ function PropertyPage() {
   const groupedListing = {
     title: property.name,
     location: [property.area, "Indore"].filter(Boolean).join(", "),
+    isVerified: property.owner?.isVerified,
   };
   const title = `${property.name} - ${property.propertyType} in ${property.area} | RoomSlider`;
   const backPath = propertyCategoryPath[property.propertyType] || "/rooms";

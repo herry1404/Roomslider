@@ -5,6 +5,7 @@ const {
   createRoom,
   getRooms,
   getSingleRoom,
+  getRoomContact,
   updateRoom,
   deleteRoom,
   createBulkRooms,
@@ -18,16 +19,17 @@ const {
 
 const upload = require("../middleware/upload.middleware");
 const uploadDocument = require("../middleware/uploadDocument.middleware");
-const { protect } = require("../middleware/auth.middleware");
+const { protect, optionalAuth } = require("../middleware/auth.middleware");
 const { adminOnly, adminOrOwner } = require("../middleware/admin.middleware");
 
 // ===== PUBLIC =====
 
 // Get all rooms (optional ?category=Room/PG/Hostel/Flat)
-router.get("/", getRooms);
+router.get("/", optionalAuth, getRooms);
 
 // Get single room
-router.get("/:id", getSingleRoom);
+router.get("/:id", optionalAuth, getSingleRoom);
+router.get("/:id/contact", protect, getRoomContact);
 
 // Get other rooms in the same area (any category)
 router.get("/:id/nearby", getNearbyRooms);

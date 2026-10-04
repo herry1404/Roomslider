@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { BadgeCheck, Home, Link2 } from "lucide-react";
+import { BadgeCheck, Home } from "lucide-react";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
@@ -80,10 +80,10 @@ function OwnerProfile() {
           <div>
             <h1 style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
               {displayName}
-              <BadgeCheck size={20} color="#16a34a" />
+              {owner.isVerified && <BadgeCheck size={20} color="#16a34a" aria-label="Verified owner" />}
             </h1>
             <p style={{ color: "#555", margin: "6px 0 0" }}>
-              Verified Owner &middot; Member since {memberSince}
+              {owner.isVerified ? "Verified owner · " : ""}Member since {memberSince}
             </p>
             <p style={{ color: "#555", margin: "4px 0 0", display: "flex", alignItems: "center", gap: "6px" }}>
               <Home size={16} />

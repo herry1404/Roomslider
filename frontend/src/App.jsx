@@ -101,6 +101,7 @@ import BloodRequestDetail from "./pages/Blood/BloodRequestDetail";
 import ManageBloodRequests from "./pages/Admin/ManageBloodRequests";
 import ManageRoommateReports from "./pages/Admin/ManageRoommateReports";
 import PushNotifications from "./pages/Admin/PushNotifications";
+import ManageListingReports from "./pages/Admin/ManageListingReports";
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 
 import AdminRoute from "./components/AdminRoute";
@@ -213,6 +214,7 @@ function App() {
         <Route path="/admin/social/edit/:id" element={<AdminRoute><AddSocial /></AdminRoute>} />
         <Route path="/admin/blood-requests" element={<AdminRoute><ManageBloodRequests /></AdminRoute>} />
         <Route path="/admin/roommate-reports" element={<AdminRoute><ManageRoommateReports /></AdminRoute>} />
+        <Route path="/admin/listing-reports" element={<AdminRoute><ManageListingReports /></AdminRoute>} />
         <Route path="/admin/home-layout" element={<AdminRoute><ManageHomeLayout /></AdminRoute>} />
         <Route path="/admin/services/add" element={<AdminRoute><AddService /></AdminRoute>} />
         <Route path="/admin/furniture" element={<AdminRoute><ManageFurniture /></AdminRoute>} />

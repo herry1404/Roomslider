@@ -14,6 +14,7 @@ const electricityRoutes = require("./routes/electricity.routes");
 const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const pushRoutes = require("./routes/push.routes");
+const reportRoutes = require("./routes/report.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const loanRoutes = require("./routes/loan.routes");
@@ -263,6 +264,7 @@ app.use(
   notificationRoutes
 );
 app.use("/api/push", pushRoutes);
+app.use("/api/reports", reportRoutes);
 
 
 // ✅ PAYMENT ROUTES

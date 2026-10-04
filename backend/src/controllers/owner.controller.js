@@ -223,7 +223,7 @@ const getPublicOwnerProfile = async (req, res) => {
     const idOrSlug = req.params.id;
     const query = /^[0-9a-fA-F]{24}$/.test(idOrSlug) ? { _id: idOrSlug } : { slug: idOrSlug };
     const owner = await Owner.findOne(query).select(
-      "name propertyName slug instagram facebook youtube createdAt"
+      "name propertyName slug instagram facebook youtube createdAt isVerified"
     );
     if (!owner) return res.status(404).json({ message: "Owner not found" });
     if (!owner.slug) {

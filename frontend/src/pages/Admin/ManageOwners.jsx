@@ -7,6 +7,7 @@ import {
   Plus,
   Search,
   X,
+  BadgeCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -66,6 +67,18 @@ function ManageOwners() {
       fetchOwners();
     } catch (error) {
       toast.error(error.response?.data?.message || "Delete failed");
+    }
+  };
+
+  const toggleVerification = async (event, owner) => {
+    event.stopPropagation();
+    const isVerified = !owner.isVerified;
+    try {
+      await api.patch(`/admin/owners/${owner._id}/verification`, { isVerified });
+      setOwners((current) => current.map((item) => item._id === owner._id ? { ...item, isVerified } : item));
+      toast.success(isVerified ? "Owner verified" : "Owner verification removed");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Owner verification could not be updated");
     }
   };
 
@@ -210,6 +223,14 @@ function ManageOwners() {
                   </td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <div className="admin-row-actions" style={{ justifyContent: "flex-end" }}>
+                      <button
+                        className={`admin-icon-btn${owner.isVerified ? " accent" : ""}`}
+                        title={owner.isVerified ? "Remove verified badge" : "Verify owner"}
+                        aria-label={owner.isVerified ? "Remove verified badge" : "Verify owner"}
+                        onClick={(event) => toggleVerification(event, owner)}
+                      >
+                        <BadgeCheck size={16} />
+                      </button>
                       <button
                         className="admin-icon-btn danger"
                         title="Delete"

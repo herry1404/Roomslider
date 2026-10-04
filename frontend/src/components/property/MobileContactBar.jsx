@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
 
-function MobileContactBar({ price, callHref, whatsappHref, loginHref }) {
-  if (!callHref && !whatsappHref && !loginHref) return null;
+function MobileContactBar({ price, showCall, showWhatsApp, loginHref, onCall, onWhatsApp }) {
+  if (!showCall && !showWhatsApp) return null;
 
   return (
     <div className="pd-mobile-contact-bar" aria-label="Contact the owner">
@@ -12,16 +12,12 @@ function MobileContactBar({ price, callHref, whatsappHref, loginHref }) {
           <span>/ month</span>
         </div>
       )}
-      {callHref ? (
-        <a className="pd-mobile-call" href={callHref}><Phone size={17} /> Call</a>
-      ) : loginHref ? (
-        <Link className="pd-mobile-call" to={loginHref} state={{ from: window.location.pathname }}><Phone size={17} /> Contact</Link>
-      ) : null}
-      {whatsappHref && (
-        <a className="pd-mobile-whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" aria-label="Contact on WhatsApp">
-          WA
-        </a>
-      )}
+      {showCall && (loginHref
+        ? <Link className="pd-mobile-call" to={loginHref} state={{ from: window.location.pathname }}><Phone size={17} /> Contact</Link>
+        : <button className="pd-mobile-call" type="button" onClick={onCall}><Phone size={17} /> Call</button>)}
+      {showWhatsApp && (loginHref
+        ? <Link className="pd-mobile-whatsapp" to={loginHref} state={{ from: window.location.pathname }} aria-label="Log in to contact on WhatsApp">WA</Link>
+        : <button className="pd-mobile-whatsapp" type="button" onClick={onWhatsApp} aria-label="Contact on WhatsApp">WA</button>)}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { BadgeCheck } from "lucide-react";
 
 function HostRow({ ownerName, owner }) {
   const name = ownerName || owner?.name;
@@ -12,6 +13,7 @@ function HostRow({ ownerName, owner }) {
       <span className="pd-host-avatar" aria-hidden="true">{name.trim().charAt(0).toUpperCase()}</span>
       <span className="pd-host-copy">
         <strong>Hosted by {name}</strong>
+        {owner?.isVerified && <span className="pd-host-verified"><BadgeCheck size={14} /> Verified</span>}
       </span>
     </>
   );

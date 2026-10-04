@@ -6,6 +6,7 @@ import { idFromParam, roomPath } from "../../utils/roomUrl";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import ReportListing from "../../components/property/ReportListing";
 import PhotoGallery from "../../components/property/PhotoGallery";
 import PropertyHeader from "../../components/property/PropertyHeader";
 import HostRow from "../../components/property/HostRow";
@@ -84,19 +85,30 @@ function PropertyDetails() {
   }
 
   const ownerName = room.ownerName || room.owner?.name;
-  const contactValue = room.contact || "";
-  const whatsappValue = room.whatsapp || contactValue;
-  const phoneDigits = contactValue.replace(/\D/g, "");
-  const whatsappDigits = whatsappValue.replace(/\D/g, "").replace(/^0/, "");
-  const internationalWhatsapp = whatsappDigits.startsWith("91")
-    ? whatsappDigits
-    : `91${whatsappDigits}`;
-  const hasContact = Boolean(contactValue || whatsappValue);
-  const callHref = user && phoneDigits ? `tel:${contactValue}` : "";
-  const whatsappHref = user && whatsappDigits
-    ? `https://wa.me/${internationalWhatsapp}`
-    : "";
-  const loginHref = !user && hasContact ? "/login" : "";
+  const showCall = Boolean(room.hasPhoneContact ?? room.contact);
+  const showWhatsApp = Boolean(room.hasWhatsAppContact ?? (room.whatsapp || room.contact));
+  const loginHref = !user && (room.hasContact || showCall || showWhatsApp) ? "/login" : "";
+  const openContact = async (channel) => {
+    const whatsappWindow = channel === "whatsapp" ? window.open("about:blank", "_blank") : null;
+    if (whatsappWindow) whatsappWindow.opener = null;
+    try {
+      const { data } = await api.get(`/rooms/${room._id}/contact`);
+      const phone = channel === "call" ? data.contact : data.whatsapp;
+      if (!phone) throw new Error("Contact details are not available");
+      if (channel === "call") {
+        window.location.assign(`tel:${phone}`);
+        return;
+      }
+      const digits = phone.replace(/\D/g, "").replace(/^0/, "");
+      const international = digits.startsWith("91") ? digits : `91${digits}`;
+      const target = `https://wa.me/${international}`;
+      if (whatsappWindow) whatsappWindow.location.href = target;
+      else window.location.assign(target);
+    } catch (error) {
+      whatsappWindow?.close();
+      toast.error(error.response?.data?.message || error.message || "Contact details could not be loaded");
+    }
+  };
   const detailLocation = room.location
     ? room.location.toLowerCase().includes("indore")
       ? room.location
@@ -124,6 +136,7 @@ function PropertyDetails() {
         onSave={toggleWishlist}
         onShare={() => shareProperty(room)}
       />
+      <ReportListing roomId={room._id} />
 
       <div className="pd-layout">
         <div className="pd-details">
@@ -154,18 +167,22 @@ function PropertyDetails() {
           price={room.price}
           deposit={room.deposit}
           ownerName={ownerName}
-          callHref={callHref}
-          whatsappHref={whatsappHref}
+          showCall={showCall}
+          showWhatsApp={showWhatsApp}
           loginHref={loginHref}
+          onCall={() => openContact("call")}
+          onWhatsApp={() => openContact("whatsapp")}
         />
       </div>
 
       <NearbyStays room={room} />
       <MobileContactBar
         price={room.price}
-        callHref={callHref}
-        whatsappHref={whatsappHref}
+        showCall={showCall}
+        showWhatsApp={showWhatsApp}
         loginHref={loginHref}
+        onCall={() => openContact("call")}
+        onWhatsApp={() => openContact("whatsapp")}
       />
     </main>
   );

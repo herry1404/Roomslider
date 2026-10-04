@@ -8,6 +8,7 @@ const roomSchema = new mongoose.Schema(
       trim: true,
     },
     slug: { type: String, unique: true, sparse: true, trim: true, lowercase: true },
+    isVerified: { type: Boolean, default: false },
 
     price: {
       type: Number,

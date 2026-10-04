@@ -68,6 +68,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Social Work", icon: <HeartPulse size={18} />, path: "/admin/social" },
         { title: "Blood Requests", icon: <Droplet size={18} />, path: "/admin/blood-requests", badge: pendingBloodRequests },
         { title: "Roommate Reports", icon: <ShieldAlert size={18} />, path: "/admin/roommate-reports" },
+        { title: "Listing Reports", icon: <ShieldAlert size={18} />, path: "/admin/listing-reports" },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
         { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
       ],
