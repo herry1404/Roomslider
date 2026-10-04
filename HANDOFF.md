@@ -3,9 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- HEAD: `2e99c8c` (`Notifications: bell, live SSE updates, notification center, event hooks across roommate, services, payments, loans, maintenance`), tracking `origin/main`.
-- Recent history: `ea136a4` (service catalogue and requests), `4fd3da3` (public slug URLs, mess reviews, address helper).
-- The worktree has uncommitted notification-center and Roommate Finder restructuring changes across backend and frontend. No commit was created.
+- Local HEAD: `b61dbb9` (Roommate Finder restructure). It is one commit ahead of `origin/main` (`2e99c8c`, notifications) until pushed.
+- Recent history: `2e99c8c` notifications, `ea136a4` service catalogue and requests, `4fd3da3` public slug URLs.
+- Two-account roommate tests and notification tests are still pending.
 
 ## Completed work
 
