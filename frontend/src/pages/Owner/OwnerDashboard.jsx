@@ -205,6 +205,15 @@ function OwnerDashboard() {
                     </div>
                   )}
 
+                  <div className="owner-advance-tag">
+                    Listing views: <strong>{Number(room.views || 0).toLocaleString("en-IN")}</strong>
+                  </div>
+                  <div className="owner-advance-tag">
+                    Inquiries: <strong>{room.inquiryCounts?.call || 0}</strong> calls
+                    {" · "}<strong>{room.inquiryCounts?.whatsapp || 0}</strong> WhatsApp
+                    {" · "}<strong>{room.inquiryCounts?.chat || 0}</strong> chats
+                  </div>
+
                   {room.currentTenant?.vacateNoticeDate && (
                     <div style={{ marginTop: 6, fontSize: 12.5, color: "#b91c1c", fontWeight: 600 }}>
                       Notice: vacating {new Date(room.currentTenant.vacateNoticeDate).toLocaleDateString("en-IN")}

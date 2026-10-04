@@ -8,6 +8,7 @@ const MessOrder = require("../models/MessOrder");
 const User = require("../models/user.model");
 const { notifyUser, sendNotificationToRecipients } = require("../utils/notificationDelivery");
 const { addOneMonth } = require("./room.controller");
+const { uploadRentReceipt } = require("../utils/rentReceipt");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -140,6 +141,7 @@ const verifyPayment = async (req, res) => {
       method: "razorpay",
       type: "rent",
     });
+    const payment = openEntry.payments[openEntry.payments.length - 1];
     openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
 
     const baseDate = room.currentTenant?.nextDueDate || new Date();
@@ -147,6 +149,15 @@ const verifyPayment = async (req, res) => {
     room.paymentStatus = "paid";
 
     await room.save();
+
+    let receiptAvailable = false;
+    try {
+      payment.receiptUrl = await uploadRentReceipt(room, payment, openEntry.tenantName);
+      await room.save();
+      receiptAvailable = true;
+    } catch (receiptError) {
+      console.error("RENT RECEIPT GENERATION ERROR:", receiptError);
+    }
 
     let bill = null;
 
@@ -191,7 +202,10 @@ const verifyPayment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Payment verified and recorded",
+      message: receiptAvailable
+        ? "Payment verified and recorded. Your receipt is ready."
+        : "Payment verified and recorded. The receipt is not available yet.",
+      receiptAvailable,
       room,
       bill,
     });

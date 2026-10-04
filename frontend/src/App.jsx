@@ -101,6 +101,7 @@ import BloodRequestDetail from "./pages/Blood/BloodRequestDetail";
 import ManageBloodRequests from "./pages/Admin/ManageBloodRequests";
 import ManageRoommateReports from "./pages/Admin/ManageRoommateReports";
 import PushNotifications from "./pages/Admin/PushNotifications";
+import AdminAnalytics from "./pages/Admin/AdminAnalytics";
 import ManageListingReports from "./pages/Admin/ManageListingReports";
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 
@@ -195,6 +196,7 @@ function App() {
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
         <Route path="/admin/rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />
         <Route path="/admin/rooms/add" element={<AdminRoute><AddRoom /></AdminRoute>} />
         <Route path="/admin/rooms/edit/:id" element={<AdminRoute><EditRoom /></AdminRoute>} />

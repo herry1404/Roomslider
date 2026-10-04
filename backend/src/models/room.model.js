@@ -180,6 +180,7 @@ const roomSchema = new mongoose.Schema(
             date: { type: Date, default: Date.now },
             method: String,
             type: { type: String, enum: ["rent", "advance"], default: "rent" },
+            receiptUrl: { type: String, default: "" },
           },
         ],
       },
@@ -187,7 +188,7 @@ const roomSchema = new mongoose.Schema(
 
     // ---- END NEW FIELDS ----
 
-    // Total number of times this room's detail page has been opened
+    // Legacy views plus deduplicated unique visitor/day views collected going forward.
     views: {
       type: Number,
       default: 0,

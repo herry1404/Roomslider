@@ -97,6 +97,9 @@ function PropertyDetails() {
     const whatsappWindow = channel === "whatsapp" ? window.open("about:blank", "_blank") : null;
     if (whatsappWindow) whatsappWindow.opener = null;
     try {
+      api.post(`/rooms/${room._id}/engagement`, { type: channel }).catch((trackingError) => {
+        console.error("LISTING INQUIRY TRACKING ERROR:", trackingError);
+      });
       const { data } = await api.get(`/rooms/${room._id}/contact`);
       const phone = channel === "call" ? data.contact : data.whatsapp;
       if (!phone) throw new Error("Contact details are not available");

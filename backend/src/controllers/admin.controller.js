@@ -1,6 +1,8 @@
 const User = require("../models/user.model");
 const Room = require("../models/room.model");
 const Owner = require("../models/Owner");
+const SearchEvent = require("../models/SearchEvent");
+const PushHistory = require("../models/PushHistory");
 
 
 // ===============================
@@ -128,6 +130,70 @@ const getDashboard = async (req, res) => {
 
     });
 
+  }
+};
+
+const getAnalytics = async (req, res) => {
+  try {
+    const end = new Date();
+    end.setUTCHours(23, 59, 59, 999);
+    const start = new Date(end);
+    start.setUTCDate(start.getUTCDate() - 29);
+    start.setUTCHours(0, 0, 0, 0);
+
+    const dateGroup = {
+      $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+    };
+    const [signups, searches, topAreas, listingsByCategory, pushSentCount] = await Promise.all([
+      User.aggregate([
+        { $match: { role: "user", createdAt: { $gte: start, $lte: end } } },
+        { $group: { _id: dateGroup, count: { $sum: 1 } } },
+      ]),
+      SearchEvent.aggregate([
+        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $group: { _id: dateGroup, count: { $sum: 1 } } },
+      ]),
+      Room.aggregate([
+        { $group: { _id: "$location", count: { $sum: 1 } } },
+        { $sort: { count: -1, _id: 1 } },
+        { $limit: 8 },
+      ]),
+      Room.aggregate([
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $sort: { count: -1, _id: 1 } },
+      ]),
+      PushHistory.countDocuments(),
+    ]);
+
+    const signupCounts = new Map(signups.map((item) => [item._id, item.count]));
+    const searchCounts = new Map(searches.map((item) => [item._id, item.count]));
+    const dailyActivity = [];
+    for (let offset = 0; offset < 30; offset += 1) {
+      const date = new Date(start);
+      date.setUTCDate(start.getUTCDate() + offset);
+      const key = date.toISOString().slice(0, 10);
+      dailyActivity.push({
+        date: key,
+        signups: signupCounts.get(key) || 0,
+        searches: searchCounts.get(key) || 0,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      analytics: {
+        dailyActivity,
+        topAreas: topAreas.map((item) => ({ area: item._id || "Unknown", count: item.count })),
+        listingsByCategory: listingsByCategory.map((item) => ({
+          category: item._id || "Uncategorized",
+          count: item.count,
+        })),
+        pushSentCount,
+      },
+    });
+  } catch (error) {
+    console.error("ADMIN ANALYTICS ERROR:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -260,6 +326,7 @@ const deleteUser = async(req,res)=>{
 module.exports = {
 
   getDashboard,
+  getAnalytics,
 
   getAllUsers,
 

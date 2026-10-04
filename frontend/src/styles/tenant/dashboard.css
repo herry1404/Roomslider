@@ -237,6 +237,21 @@
   font-weight: 700;
 }
 
+.tenant-receipt-download {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tenant-receipt-download:hover {
+  text-decoration: underline;
+}
+
 .tenant-empty {
   color: var(--color-text-light);
   font-size: 14px;

@@ -8,6 +8,9 @@ const Property = require("../models/property.model");
 const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 const { maskPhoneNumbers, sanitizeRoomListing } = require("../utils/maskListingPhoneNumbers");
 const { notifySavedSearchMatches } = require("../utils/savedSearchAlerts");
+const { recordListingEngagement } = require("../utils/listingEngagement");
+const SearchEvent = require("../models/SearchEvent");
+const { uploadRentReceipt } = require("../utils/rentReceipt");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -221,6 +224,11 @@ const getRooms = async (req, res) => {
         .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const regex = new RegExp(searchText, "i");
       filter.$or = [{ title: regex }, { location: regex }, { category: regex }];
+      setImmediate(() => {
+        SearchEvent.create({
+          userId: req.user?.role === "user" ? req.user._id : null,
+        }).catch((error) => console.error("SEARCH ANALYTICS ERROR:", error));
+      });
     }
 
     // Public users see vacant rooms; managers can inspect occupied listings.
@@ -318,8 +326,9 @@ const getSingleRoom = async (req, res) => {
       });
     }
 
-    // Fire-and-forget view counter increment (does not block or fail the response)
-    Room.findByIdAndUpdate(room._id, { $inc: { views: 1 } }).catch(() => {});
+    recordListingEngagement(room._id, req, "view").catch((error) => {
+      console.error("LISTING VIEW TRACKING ERROR:", error);
+    });
     await ensurePublicSlugs(Room, [room], (item) => item.title);
 
     const roomObj = room.toObject();
@@ -355,6 +364,26 @@ const getSingleRoom = async (req, res) => {
       success: false,
       message: safeMsg(error),
     });
+  }
+};
+
+const recordListingInquiry = async (req, res) => {
+  try {
+    const { type } = req.body;
+    if (!["call", "whatsapp", "chat"].includes(type)) {
+      return res.status(400).json({ success: false, message: "Invalid engagement type" });
+    }
+
+    const room = await Room.findById(req.params.id).select("_id");
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const tracked = await recordListingEngagement(room._id, req, type);
+    return res.status(200).json({ success: true, tracked });
+  } catch (error) {
+    console.error("LISTING INQUIRY TRACKING ERROR:", error);
+    return res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -884,12 +913,13 @@ const recordPayment = async (req, res) => {
       });
     }
 
-    openEntry.payments.push({
+    const payment = openEntry.payments.create({
       amount: Number(amount),
       date: new Date(),
       method: method || "cash",
       type: type === "advance" ? "advance" : "rent",
     });
+    openEntry.payments.push(payment);
     openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
 
     // Only rent payments advance the rent cycle / mark this cycle paid.
@@ -904,9 +934,21 @@ const recordPayment = async (req, res) => {
 
     await room.save();
 
+    let receiptAvailable = false;
+    if (payment.type === "rent") {
+      try {
+        payment.receiptUrl = await uploadRentReceipt(room, payment, openEntry.tenantName);
+        await room.save();
+        receiptAvailable = true;
+      } catch (receiptError) {
+        console.error("RENT RECEIPT GENERATION ERROR:", receiptError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Payment recorded successfully",
+      receiptAvailable,
       room,
     });
   } catch (error) {
@@ -916,6 +958,54 @@ const recordPayment = async (req, res) => {
       success: false,
       message: safeMsg(error),
     });
+  }
+};
+
+const getRentReceipt = async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const isAdmin = req.user.role === "admin";
+    const isOwner = req.user.role === "owner"
+      && room.owner?.toString() === req.user._id.toString();
+    const isTenant = req.user.role === "user"
+      && room.currentTenantUser?.toString() === req.user._id.toString();
+    if (!isAdmin && !isOwner && !isTenant) {
+      return res.status(403).json({ success: false, message: "You cannot access this receipt" });
+    }
+
+    const paymentEntry = room.occupancyHistory.find((entry) =>
+      entry.payments?.some((item) => item._id.toString() === req.params.paymentId)
+    );
+    if (isTenant && (!paymentEntry || paymentEntry.endDate)) {
+      return res.status(403).json({ success: false, message: "You cannot access this receipt" });
+    }
+    const payment = paymentEntry?.payments.find((item) =>
+      item._id.toString() === req.params.paymentId
+    );
+    if (!payment || payment.type !== "rent") {
+      return res.status(404).json({ success: false, message: "Rent receipt not found" });
+    }
+
+    if (!payment.receiptUrl) {
+      payment.receiptUrl = await uploadRentReceipt(room, payment, paymentEntry.tenantName);
+      await room.save();
+    }
+
+    const receiptResponse = await fetch(payment.receiptUrl);
+    if (!receiptResponse.ok) {
+      throw new Error("Receipt file could not be downloaded from storage");
+    }
+    const buffer = Buffer.from(await receiptResponse.arrayBuffer());
+    res.set("Content-Type", "application/pdf");
+    res.set("Content-Disposition", `attachment; filename="rent-receipt-${payment._id}.pdf"`);
+    return res.send(buffer);
+  } catch (error) {
+    console.error("DOWNLOAD RENT RECEIPT ERROR:", error);
+    return res.status(500).json({ success: false, message: safeMsg(error) });
   }
 };
 
@@ -1174,6 +1264,8 @@ module.exports = {
   getRooms,
   getSingleRoom,
   getRoomContact,
+  recordListingInquiry,
+  getRentReceipt,
   updateRoom,
   deleteRoom,
   createBulkRooms,

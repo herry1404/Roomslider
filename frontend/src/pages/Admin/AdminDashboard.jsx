@@ -110,7 +110,7 @@ function AdminDashboard() {
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
     { label: "Manage Users", icon: <UserCog size={18} />, path: "/admin/users" },
     { label: "Send Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
-    { label: "Analytics", icon: <BarChart3 size={18} />, action: () => alert("Analytics Coming Soon") },
+    { label: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
   ];
 
   return (

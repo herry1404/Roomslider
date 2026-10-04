@@ -97,7 +97,7 @@ function TenantDashboard() {
         description: payBillId ? "Rent + Electricity Bill Payment" : "Rent Payment",
         handler: async (response) => {
           try {
-            await api.post("/payments/verify", {
+            const verification = await api.post("/payments/verify", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -106,9 +106,7 @@ function TenantDashboard() {
               billId: payBillId,
             });
 
-            toast.success(
-              payBillId ? "Rent and electricity bill paid successfully!" : "Rent paid successfully!"
-            );
+            toast.success(verification.data.message || "Rent paid successfully!");
             setShowPayModal(false);
             fetchTenancy();
           } catch (verifyError) {
@@ -215,6 +213,24 @@ function TenantDashboard() {
     } catch (error) {
       console.error("CANCEL NOTICE ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to cancel notice");
+    }
+  };
+
+  const handleDownloadReceipt = async (payment) => {
+    try {
+      const response = await api.get(
+        `/rooms/${room.id}/payments/${payment._id}/receipt`,
+        { responseType: "blob" }
+      );
+      const fileUrl = URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = `rent-receipt-${payment._id}.pdf`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+    } catch (error) {
+      console.error("RENT RECEIPT DOWNLOAD ERROR:", error);
+      toast.error(error.response?.data?.message || "Receipt could not be downloaded");
     }
   };
 
@@ -486,6 +502,15 @@ function TenantDashboard() {
                   <div className="tenant-payment-amount">
                     ₹{p.amount?.toLocaleString("en-IN")}
                   </div>
+                  {p.type !== "advance" && (
+                    <button
+                      type="button"
+                      className="tenant-receipt-download"
+                      onClick={() => handleDownloadReceipt(p)}
+                    >
+                      Download receipt
+                    </button>
+                  )}
                 </div>
               ))
             )}

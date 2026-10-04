@@ -23,6 +23,7 @@ import {
   HeartPulse,
   Droplet,
   ShieldAlert,
+  BarChart3,
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
@@ -53,6 +54,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Push Notifications", icon: <Megaphone size={18} />, path: "/admin/push" },
+        { title: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],
     },

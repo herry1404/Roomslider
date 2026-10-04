@@ -139,8 +139,10 @@ function OwnerRoomDetail() {
     }
 
     try {
-      await api.post(`/rooms/${id}/payment`, paymentForm);
-      toast.success("Payment recorded");
+      const response = await api.post(`/rooms/${id}/payment`, paymentForm);
+      toast.success(response.data.receiptAvailable
+        ? "Payment recorded and receipt generated"
+        : "Payment recorded; receipt will be generated when downloaded");
       setPaymentForm({ amount: "", method: "cash" });
       setShowPayModal(false);
       fetchRoom();

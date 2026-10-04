@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Owner = require("../models/Owner");
 const Room = require("../models/room.model");
+const ListingEngagement = require("../models/ListingEngagement");
 const { createUniqueSlug } = require("../utils/publicSlug");
 
 const createOwnerToken = (owner) => {
@@ -203,9 +204,25 @@ const getMyRooms = async (req, res) => {
     const { computeRentStatus } = require("./room.controller");
 
     const rooms = await Room.find({ owner: owner._id });
+    const roomIds = rooms.map((room) => room._id);
+    const engagementRows = roomIds.length
+      ? await ListingEngagement.aggregate([
+          { $match: { room: { $in: roomIds }, type: { $ne: "view" } } },
+          { $group: { _id: { room: "$room", type: "$type" }, count: { $sum: 1 } } },
+        ])
+      : [];
+    const inquiryCounts = new Map();
+    engagementRows.forEach((row) => {
+      const key = String(row._id.room);
+      const counts = inquiryCounts.get(key) || { call: 0, whatsapp: 0, chat: 0 };
+      counts[row._id.type] = row.count;
+      inquiryCounts.set(key, counts);
+    });
 
     const roomsWithStatus = rooms.map((room) => {
       const roomObj = room.toObject();
+      const counts = inquiryCounts.get(String(room._id)) || { call: 0, whatsapp: 0, chat: 0 };
+      roomObj.inquiryCounts = counts;
       if (room.status === "occupied") {
         roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);
       }

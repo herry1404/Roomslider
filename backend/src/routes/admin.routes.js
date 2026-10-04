@@ -14,6 +14,7 @@ const {
 
 const {
   getDashboard,
+  getAnalytics,
   getAllUsers,
   deleteUser,
 } = require("../controllers/admin.controller");
@@ -28,6 +29,8 @@ router.get(
   adminOnly,
   getDashboard
 );
+
+router.get("/analytics", protect, adminOnly, getAnalytics);
 
 // ===============================
 // Get All Users
