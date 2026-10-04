@@ -28,6 +28,13 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "User nahi mila" });
     }
 
+    if (
+      ["user", "admin"].includes(decoded.role) &&
+      (decoded.tokenVersion || 0) !== (account.tokenVersion || 0)
+    ) {
+      return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
+    }
+
     req.user = account.toObject ? account.toObject() : account;
     if (decoded.role === "owner") req.user.role = "owner";
     if (decoded.role === "mess") req.user.role = "mess";

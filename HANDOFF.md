@@ -3,9 +3,15 @@
 ## Current state
 
 - Branch: `main`
-- Local HEAD: `d2114b2` (handoff update); recent commits are `b61dbb9` (Roommate Finder restructure) and `2e99c8c` (notifications).
-- Worktree is intentionally dirty with uncommitted Social Work and Donate Old Things work; no commit was created.
-- Phase A and Phase B backend syntax checks and frontend production builds passed; live database/browser checks remain pending.
+- Nine-step RoomSlider task status (5 Oct 2026): Steps 1–6 were already present; Step 7 was committed as `5df2b84` (`Owner and admin analytics`) and Step 8 as `ff196f4` (`Performance and monitoring`). Step 9 (Language and Settings) is paused at the user's request and is not complete.
+- Step 9 has preliminary, uncommitted work in `frontend/package.json`, `frontend/package-lock.json`, `backend/src/models/user.model.js`, `backend/src/controllers/auth.controller.js`, and `backend/src/middleware/auth.middleware.js`. This adds `i18next`/`react-i18next`, initial user-preference fields, and token-version session scaffolding; it has not been validated as a complete feature.
+- No translation initialization/locales, translated UI, settings UI, preference/account-management endpoints, or Step 9 validation/commit have been completed. `NOTES.md` for the original nine-step request is also still outstanding until the work is resumed or finalized.
+- The current worktree is intentionally dirty. Preserve the existing Step 9 edits and this handoff update; inspect them before continuing.
+- Local HEAD: `ff196f4` (Performance and monitoring), eight commits ahead of `origin/main`; `origin/main` remains at `96a4b26` (Social Work, Donate Old Things, Blood Requests, sitemap and SEO updates). Earlier commits include `d2114b2` (handoff update), `b61dbb9` (Roommate Finder restructure), and `2e99c8c` (notifications).
+- Social Work, donation, blood-request and related SEO/sitemap changes are committed and pushed. Vercel is serving the updated frontend; the Render Social Work API and production sitemap both returned HTTP 200 during smoke checks.
+- Latest frontend production build, backend JavaScript syntax checks, push-worker syntax check, and `git diff --check` passed. Build output contains existing Vite `__dirname` and large-chunk warnings.
+- The worktree was clean after the `96a4b26` feature commit, before later local commits and the current uncommitted Step 9 preparation. Check `git status --short` before continuing.
+- Social Work listings have not been seeded; admin must publish verified listings. Live database-backed workflows, Cloudinary uploads, VAPID/browser push, and manual requester/donor/admin scenarios remain unverified.
 
 ## Completed work
 
@@ -257,9 +263,9 @@ NEXT: Planned (later) - Updates section
 - Added `/blood`, `/blood/request`, `/blood/requests/:id`, `/admin/blood-requests`, the admin pending badge, profile donor controls, Explore entry points, and request/profile disclaimers.
 - Projection review confirmed blood fields are not included in roommate, chat, owner-public, or other-user projections. The account-owner endpoint and admin-only views are the intended access surfaces; `bloodRequestsBlocked` is omitted from the owner profile response.
 - The public furniture ID endpoint now hides inactive donation drafts; donated donor metadata remains admin-only, and donor-submitted descriptions are not copied to public catalog items.
-- Earlier final frontend build, backend syntax checks, push-worker syntax check, and `git diff --check` passed before the last privacy-hardening edits. The latest verification re-run was started but its result is not recorded in this note.
+- Final frontend build, backend JavaScript syntax checks, push-worker syntax check, and `git diff --check` passed after the privacy-hardening edits.
 - Pending: three-account requester/donor/admin end-to-end verification, MongoDB authorization and expiry checks, real Cloudinary uploads, VAPID/browser push action behavior, donor matching and all compatibility audiences, profile consent/revocation, 360px/dark-mode visual review, plus organizer validation for Social Work listings. No automated test files were found in the repository.
-- Repository state at handoff: HEAD remains `d2114b2`; all phase changes are intentionally uncommitted.
+- At the initial Phase C handoff, HEAD was `d2114b2` and the feature work was uncommitted. It was subsequently committed and pushed as `96a4b26`.
 
 ### Planned (later) - Updates section
 
@@ -276,3 +282,17 @@ NEXT: Updates section (after Profile page improvements)
 - First version: one college plus Indore events only.
 - Pending decision: which college to start with.
 - Not started.
+
+### 4 Oct 2026 - Deployment and SEO follow-up
+
+- Added Social Work landing, active category, and active listing URLs to the dynamic sitemap. The existing `/sitemap.xml` frontend rewrite and `robots.txt` sitemap declaration remain in place.
+- Added page titles, descriptions, and canonical URLs for Social Work pages. Donation and blood-request entry pages are marked `noindex, nofollow`; personalised/private flows are not added to the sitemap.
+- Confirmed the pushed commit is on `origin/main`, the live frontend serves the updated bundle, `/api/social` responds successfully, and the deployed sitemap includes `/social-work`.
+- Changes were included in commit `96a4b26` and pushed to `main`. Automated production build and syntax/format checks passed; real listing data and end-to-end account flows remain pending.
+
+### 5 Oct 2026 - Nine-step task handoff
+
+- Steps 7 and 8 for the requested feature sequence are committed as `5df2b84` and `ff196f4`. Step 9 is explicitly deferred; do not continue implementing it until the user resumes the work.
+- Uncommitted Step 9 preparation currently includes the two frontend i18n dependencies, user-model preference fields (`privacySettings`, `themePreference`, `emergencyContact`, and `savedAddresses`), and token-version checks intended to support logging out all sessions.
+- These changes are only scaffolding. No new Step 9 API endpoint or environment key has been added, and the code has not been validated or committed. The token-version session behavior should be reviewed as part of implementation before relying on it.
+- When resumed, continue from the current uncommitted changes rather than discarding them; implement the agreed remaining language/settings scope, run relevant validation, and create the requested final `NOTES.md`. The user may also narrow or change the scope before work resumes.

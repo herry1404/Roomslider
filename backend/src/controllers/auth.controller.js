@@ -24,6 +24,7 @@ const createToken = (user) => {
       id: user._id,
       email: user.email,
       role: user.role,
+      tokenVersion: user.tokenVersion || 0,
     },
     process.env.JWT_SECRET,
     {

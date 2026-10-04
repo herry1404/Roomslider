@@ -74,6 +74,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    tokenVersion: { type: Number, default: 0, select: false },
 
 
     // Wishlist Rooms
@@ -213,6 +214,33 @@ const userSchema = new mongoose.Schema(
       blood: { type: Boolean, default: true },
       alerts: { type: Boolean, default: true },
     },
+    privacySettings: {
+      showPhone: { type: Boolean, default: false },
+      roommateSuggestions: { type: Boolean, default: true },
+    },
+    themePreference: {
+      type: String,
+      enum: ["dark", "light", "system"],
+      default: "dark",
+    },
+    emergencyContact: {
+      name: { type: String, default: "", trim: true, maxlength: 100 },
+      phone: { type: String, default: "", trim: true, maxlength: 10 },
+    },
+    savedAddresses: [
+      {
+        label: { type: String, trim: true, maxlength: 50 },
+        recipientName: { type: String, trim: true, maxlength: 100 },
+        phone: { type: String, trim: true, maxlength: 10 },
+        address: { type: String, trim: true, maxlength: 500 },
+        flatNo: { type: String, trim: true, maxlength: 100 },
+        building: { type: String, trim: true, maxlength: 150 },
+        area: { type: String, trim: true, maxlength: 100 },
+        landmark: { type: String, trim: true, maxlength: 150 },
+        latitude: { type: Number, min: -90, max: 90, default: null },
+        longitude: { type: Number, min: -180, max: 180, default: null },
+      },
+    ],
     preferredLanguage: { type: String, enum: ["en", "hi-en"], default: "en" },
 
   },
