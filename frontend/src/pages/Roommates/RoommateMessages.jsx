@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useNotifications } from "../../context/useNotifications";
 import RoommateSubnav from "./RoommateSubnav";
+import EmptyState from "../../components/ui/EmptyState";
+import Skeleton from "../../components/ui/Skeleton";
 import "../../styles/roommate-chat.css";
 
 const relativeTime = (value) => {
@@ -53,15 +55,22 @@ function RoommateMessages() {
       <section className="roommate-hub-list" aria-live="polite">
         {loading ? (
           <div className="roommate-hub-skeletons">
-            {[1, 2, 3].map((item) => <div className="roommate-hub-skeleton" key={item} />)}
+            {[1, 2, 3].map((item) => (
+              <div className="roommate-hub-skeleton" key={item}>
+                <Skeleton circle width={42} height={42} />
+                <span><Skeleton width="8rem" /><Skeleton width="12rem" height={12} /></span>
+              </div>
+            ))}
           </div>
         ) : !result?.length ? (
-          <div className="roommate-hub-empty">
-            <span className="roommate-hub-empty-icon"><MessageCircle size={22} /></span>
-            <h2>No messages yet</h2>
-            <p>Chat opens here after a roommate request is accepted.</p>
-            <button type="button" className="roommate-primary-action" onClick={() => navigate("/roommates/requests")}>View requests</button>
-          </div>
+          <EmptyState
+            icon={MessageCircle}
+            title="No messages yet"
+            description="Chat opens here after a roommate request is accepted."
+            actionLabel="View requests"
+            onAction={() => navigate("/roommates/requests")}
+            className="roommate-hub-empty"
+          />
         ) : result.map((conversation) => (
           <button
             className="roommate-conversation-row"

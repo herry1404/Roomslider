@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import ConfirmModalHost from "./components/ui/ConfirmModal";
 
 import "./index.css";
 import "./styles/leaflet-theme.css";
@@ -37,7 +38,20 @@ createRoot(document.getElementById("root")).render(
                 <NotificationProvider>
                   <GoogleOneTap />
                   <App />
-                  <Toaster position="top-center" />
+                  <ConfirmModalHost />
+                  <Toaster
+                    position="top-center"
+                    toastOptions={{
+                      duration: 3500,
+                      style: {
+                        background: "var(--color-surface)",
+                        color: "var(--color-text)",
+                        border: "1px solid var(--color-border)",
+                      },
+                      success: { iconTheme: { primary: "var(--color-success)", secondary: "var(--color-surface)" } },
+                      error: { iconTheme: { primary: "var(--color-error)", secondary: "var(--color-surface)" } },
+                    }}
+                  />
                   <SpeedInsights />
                 </NotificationProvider>
               </ThemeProvider>

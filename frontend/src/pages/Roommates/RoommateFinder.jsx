@@ -4,6 +4,7 @@ import { Ban, Heart, MapPin, ShieldAlert, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/useNotifications";
 import RoommateSubnav from "./RoommateSubnav";
@@ -65,7 +66,7 @@ function RoommateFinder() {
   };
 
   const block = async (personId) => {
-    if (!window.confirm("Block this profile? They will no longer see you or contact you.")) return;
+    if (!await confirmAction("Block this profile? They will no longer see you or contact you.", { confirmText: "Block" })) return;
     try {
       await api.post(`/roommates/block/${personId}`);
       toast.success("Profile blocked");

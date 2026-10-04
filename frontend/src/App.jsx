@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import MapLayout from "./layouts/MapLayout";
 import ScrollToTop from "./components/ScrollToTop";
+import BackToTop from "./components/ui/BackToTop";
 import InstallPrompt from "./components/InstallPrompt";
 import PreferencesModal from "./components/onboarding/PreferencesModal";
 import { useAuth } from "./context/AuthContext";
@@ -111,6 +112,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <BackToTop />
       <InstallPrompt />
       {showPreferences && (
         <PreferencesModal onClose={dismissPreferencesPrompt} />

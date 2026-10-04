@@ -52,7 +52,6 @@ export default function InstallPrompt() {
         justifyContent: "space-between",
         gap: "12px",
         boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
-        position: "relative",
         zIndex: 9999,
       }}
     >

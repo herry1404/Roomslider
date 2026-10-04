@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   UserCog,
-  Phone,
   Building2,
   Home,
   Trash2,
@@ -12,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 function ManageOwners() {
@@ -41,7 +41,7 @@ function ManageOwners() {
   };
 
   useEffect(() => {
-    fetchOwners();
+    Promise.resolve().then(fetchOwners);
   }, []);
 
   const handleAddOwner = async (e) => {
@@ -58,7 +58,7 @@ function ManageOwners() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Kya aap is owner ko delete karna chahte ho?")) return;
+    if (!await confirmAction("Kya aap is owner ko delete karna chahte ho?", { confirmText: "Delete" })) return;
 
     try {
       await api.delete(`/owners/${id}`);
@@ -272,7 +272,6 @@ function ManageOwners() {
               onSubmit={handleAddOwner}
               style={{ display: "flex", flexDirection: "column", gap: 12 }}
             >
-              {["name", "phone", "password", "propertyName"].map((f) => null)}
               <input
                 type="text"
                 placeholder="Owner Name"

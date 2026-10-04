@@ -6,8 +6,11 @@
   background: var(--color-border, #e5e7eb);
   position: relative;
   overflow: hidden;
+  display: block;
+  max-width: 100%;
 }
 
+.skeleton-circle { border-radius: 50%; flex: none; }
 .shimmer::after {
   content: "";
   position: absolute;

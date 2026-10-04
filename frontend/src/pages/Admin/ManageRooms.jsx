@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Pencil,
@@ -13,12 +13,12 @@ import {
 
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 
 import "../../styles/admin/theme.css";
 
 function ManageRooms() {
   const [rooms, setRooms] = useState([]);
-  const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -31,7 +31,6 @@ function ManageRooms() {
       const res = await api.get("/rooms?includeOccupied=true");
       const data = res.data.rooms || [];
       setRooms(data);
-      setFilteredRooms(data);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load rooms");
@@ -41,7 +40,7 @@ function ManageRooms() {
   };
 
   useEffect(() => {
-    fetchRooms();
+    Promise.resolve().then(fetchRooms);
     api
       .get("/owners")
       .then((res) => setOwners(res.data || []))
@@ -50,7 +49,7 @@ function ManageRooms() {
 
   const uniqueCities = [...new Set(rooms.map((room) => room.location).filter(Boolean))];
 
-  useEffect(() => {
+  const filteredRooms = useMemo(() => {
     const keyword = search.toLowerCase();
 
     const filtered = rooms.filter((room) => {
@@ -66,18 +65,17 @@ function ManageRooms() {
       return matchesSearch && matchesStatus && matchesOwner && matchesCity;
     });
 
-    setFilteredRooms(filtered);
+    return filtered;
   }, [search, rooms, statusFilter, ownerFilter, cityFilter]);
 
   const deleteRoom = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this room?")) return;
+    if (!await confirmAction("Are you sure you want to delete this room?", { confirmText: "Delete" })) return;
 
     try {
       await api.delete(`/rooms/${id}`);
       toast.success("Room deleted successfully");
       const updated = rooms.filter((room) => room._id !== id);
       setRooms(updated);
-      setFilteredRooms(updated);
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete room");

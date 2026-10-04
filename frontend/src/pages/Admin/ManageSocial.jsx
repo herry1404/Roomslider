@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 const CATEGORIES = ["free-food", "blood", "shelter", "medical", "helpline", "scholarship", "volunteer"];
@@ -15,7 +16,7 @@ function ManageSocial() {
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       if (tab === "places") {
@@ -30,8 +31,8 @@ function ManageSocial() {
     } finally {
       setLoading(false);
     }
-  };
-  useEffect(() => { load(); }, [tab]);
+  }, [tab]);
+  useEffect(() => { Promise.resolve().then(load); }, [load]);
 
   const review = async (suggestion, action) => {
     try {
@@ -44,7 +45,7 @@ function ManageSocial() {
   };
 
   const removePlace = async (place) => {
-    if (!window.confirm(`Delete "${place.name}"?`)) return;
+    if (!await confirmAction(`Delete "${place.name}"?`, { confirmText: "Delete" })) return;
     try {
       await api.delete(`/social/${place._id}`);
       setPlaces((current) => current.filter((item) => item._id !== place._id));

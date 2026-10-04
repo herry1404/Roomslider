@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DoorOpen, MapPin, Trash2, Plus, X, Pencil, Check, Ban } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 function ManageHourlyRooms() {
@@ -39,7 +40,7 @@ function ManageHourlyRooms() {
   };
 
   useEffect(() => {
-    fetchData();
+    Promise.resolve().then(fetchData);
   }, []);
 
   const openAddModal = () => {
@@ -104,7 +105,7 @@ function ManageHourlyRooms() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this hourly room?")) return;
+    if (!await confirmAction("Delete this hourly room?", { confirmText: "Delete" })) return;
     try {
       await api.delete(`/hourly-rooms/${id}`);
       toast.success("Room deleted");

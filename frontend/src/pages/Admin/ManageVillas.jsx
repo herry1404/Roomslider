@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MapPin, Plus, Trash2, Pencil, X, Building2, CalendarCheck } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import { formatLocationAddress, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/dashboard.css";
@@ -163,7 +164,7 @@ function ManageVillas() {
   };
 
   const remove = async (villa) => {
-    if (!window.confirm(`Delete ${villa.name}?`)) return;
+    if (!await confirmAction(`Delete ${villa.name}?`, { confirmText: "Delete" })) return;
     try {
       await api.delete(`/villas/${villa._id}`);
       toast.success("Villa deleted");

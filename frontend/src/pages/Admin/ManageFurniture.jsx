@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Pencil, Sofa } from "lucide-react";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/furniture-admin.css";
 
@@ -35,7 +36,7 @@ function ManageFurniture() {
   };
 
   useEffect(() => {
-    load();
+    Promise.resolve().then(load);
   }, []);
 
   const patch = async (id, body, msg) => {
@@ -49,7 +50,7 @@ function ManageFurniture() {
   };
 
   const remove = async (id) => {
-    if (!window.confirm("Delete this item?")) return;
+    if (!await confirmAction("Delete this item?", { confirmText: "Delete" })) return;
     try {
       await api.delete(`/furniture/${id}`);
       toast.success("Item deleted");

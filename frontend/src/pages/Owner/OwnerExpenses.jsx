@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Trash2 } from "lucide-react";
 
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 
 import "../../styles/owner/dashboard.css";
 
@@ -47,7 +48,7 @@ function OwnerExpenses() {
   };
 
   useEffect(() => {
-    fetchData();
+    Promise.resolve().then(fetchData);
   }, []);
 
   const fetchTransactions = async () => {
@@ -66,7 +67,7 @@ function OwnerExpenses() {
   };
 
   useEffect(() => {
-    fetchTransactions();
+    Promise.resolve().then(fetchTransactions);
   }, [txFrom, txTo]);
 
   const handleAddExpense = async (e) => {
@@ -92,7 +93,7 @@ function OwnerExpenses() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this expense?")) return;
+    if (!await confirmAction("Delete this expense?", { confirmText: "Delete" })) return;
 
     try {
       await api.delete(`/expenses/${id}`);

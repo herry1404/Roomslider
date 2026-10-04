@@ -278,10 +278,7 @@ function SelectedRoomCard({ room, onView }) {
   const [pos, setPos] = useState(null);
 
   useEffect(() => {
-    if (!room) {
-      setPos(null);
-      return;
-    }
+    if (!room) return;
     const update = () => {
       const pt = map.latLngToContainerPoint([room.latitude, room.longitude]);
       setPos({ x: pt.x, y: pt.y });
@@ -411,13 +408,14 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
     (m) => m.location?.coordinates?.length === 2
   );
 
-  let prefCollege = null;
-  try {
-    const u = JSON.parse(localStorage.getItem("user") || "null");
-    prefCollege = indoreColleges.find((c) => c.name === u?.preferredCollege) || null;
-  } catch {
-    prefCollege = null;
-  }
+  const prefCollege = (() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "null");
+      return indoreColleges.find((c) => c.name === u?.preferredCollege) || null;
+    } catch {
+      return null;
+    }
+  })();
   const refPoint = prefCollege
     ? [prefCollege.latitude, prefCollege.longitude]
     : userPos || INDORE_CENTER;
@@ -428,9 +426,12 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   // Map popup auto-closes after 5s; bottom card stack stays as it is
   useEffect(() => {
     if (!selectedId) return;
-    setPopupOpen(true);
-    const t = setTimeout(() => setPopupOpen(false), 5000);
-    return () => clearTimeout(t);
+    const openTimer = setTimeout(() => setPopupOpen(true), 0);
+    const closeTimer = setTimeout(() => setPopupOpen(false), 5000);
+    return () => {
+      clearTimeout(openTimer);
+      clearTimeout(closeTimer);
+    };
   }, [selectedId]);
   const CARD_STEP = 260;
 

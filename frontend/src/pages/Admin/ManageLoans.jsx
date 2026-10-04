@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import axios from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import toast from "react-hot-toast";
 import {
   Banknote,
@@ -72,7 +73,7 @@ function ManageLoans() {
   const handleStatusChange = async (id, newStatus) => {
     if (
       ["approved", "rejected"].includes(newStatus) &&
-      !window.confirm("Applicant ki ID photo hamesha ke liye delete ho jayegi. Continue?")
+      !await confirmAction("Applicant ki ID photo hamesha ke liye delete ho jayegi. Continue?", { confirmText: "Continue" })
     ) {
       return;
     }

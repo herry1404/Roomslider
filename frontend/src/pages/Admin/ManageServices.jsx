@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Plus, Trash2, MapPin, Sparkles } from "lucide-react";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 const CATEGORIES = [
@@ -37,11 +38,11 @@ function ManageServices() {
   };
 
   useEffect(() => {
-    load();
+    Promise.resolve().then(load);
   }, []);
 
   const deleteProvider = async (id) => {
-    if (!window.confirm("Delete this provider?")) return;
+    if (!await confirmAction("Delete this provider?", { confirmText: "Delete" })) return;
     try {
       await api.delete(`/services/${id}`);
       toast.success("Provider deleted");

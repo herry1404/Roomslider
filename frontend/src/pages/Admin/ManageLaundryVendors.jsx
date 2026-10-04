@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Shirt, Trash2, Plus, X, Pencil, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import { formatLocationAddress, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/admin/theme.css";
 
@@ -151,7 +152,7 @@ function ManageLaundryVendors() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this laundry profile?")) return;
+    if (!await confirmAction("Delete this laundry profile?", { confirmText: "Delete" })) return;
     try {
       await api.delete(`/laundry-vendors/${id}`);
       toast.success("Laundry profile deleted");

@@ -1,0 +1,3 @@
+.pull-refresh-indicator{display:flex;align-items:center;justify-content:center;gap:8px;height:0;overflow:hidden;color:var(--color-text-light);font-size:.85rem;transition:height .12s ease}
+.pull-refresh-indicator .is-refreshing{animation:pull-refresh-spin .8s linear infinite}
+@keyframes pull-refresh-spin{to{transform:rotate(360deg)}}

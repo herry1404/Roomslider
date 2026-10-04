@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
+import Skeleton from "../../components/ui/Skeleton";
 import { useNotifications } from "../../context/useNotifications";
 import roommateNotificationLink from "../../utils/roommateNotificationLink";
 import "../../styles/profile.css";
@@ -192,7 +193,11 @@ function Profile() {
   if (loading && isUserAccount) {
     return (
       <div className="profile-view">
-        <div className="profile-empty">Loading...</div>
+        <div className="profile-empty" aria-label="Loading profile">
+          <Skeleton width="12rem" height={22} />
+          <Skeleton width="100%" height={80} />
+          <Skeleton width="60%" />
+        </div>
       </div>
     );
   }

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 function ManageUsers() {
@@ -33,11 +34,11 @@ function ManageUsers() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    Promise.resolve().then(fetchUsers);
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Kya aap is user ko delete karna chahte ho?")) return;
+    if (!await confirmAction("Kya aap is user ko delete karna chahte ho?", { confirmText: "Delete" })) return;
 
     try {
       await api.delete(`/admin/users/${id}`);

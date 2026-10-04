@@ -1,0 +1,1 @@
+.back-to-top{position:fixed;right:20px;bottom:calc(24px + env(safe-area-inset-bottom));z-index:var(--z-dropdown,1100);display:grid;place-items:center;width:46px;height:46px;border:1px solid var(--color-border);border-radius:50%;background:var(--color-surface);color:var(--color-text);box-shadow:var(--shadow-md)}

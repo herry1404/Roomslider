@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 const TYPE_LABEL = {
@@ -85,7 +86,7 @@ function ManageHomeLayout() {
   };
 
   useEffect(() => {
-    load();
+    Promise.resolve().then(load);
   }, []);
 
   const move = async (index, dir) => {
@@ -114,7 +115,7 @@ function ManageHomeLayout() {
   };
 
   const remove = async (s) => {
-    if (!window.confirm(`"${s.title || TYPE_LABEL[s.type]}" delete karein?`)) return;
+    if (!await confirmAction(`"${s.title || TYPE_LABEL[s.type]}" delete karein?`, { confirmText: "Delete" })) return;
     try {
       await api.delete(`/home-sections/${s._id}`);
       toast.success("Section delete ho gaya");

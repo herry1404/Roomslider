@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
+import EmptyState from "../../components/ui/EmptyState";
 import { distanceKm, findIndorePlace, normalizePlaceName } from "../../utils/indoreLocation";
 
 const NEARBY_RADIUS_KM = 8;
@@ -113,11 +114,13 @@ function Rooms() {
         )}
 
         {rooms.length === 0 ? (
-          <div className="rooms-search-empty">
-            {place
+          <EmptyState
+            title="No available rooms yet"
+            description={place
               ? `${place.name} ya uske aas-paas abhi koi available room nahi mila.`
-              : "No available listings found. Try searching a nearby area or college."}
-          </div>
+              : "Try searching a nearby area or college."}
+            className="rooms-search-empty"
+          />
         ) : (
           <div className="listing-grid">
             {rooms.map((room) => <RoomCard key={room._id} room={room} />)}

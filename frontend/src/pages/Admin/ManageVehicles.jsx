@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Bike, Plus, Trash2, Pencil, Search } from "lucide-react";
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/furniture-admin.css";
 import "../../styles/vehicles.css";
@@ -36,7 +37,7 @@ function ManageVehicles() {
   };
 
   const removeVehicle = async (vehicle) => {
-    if (!window.confirm(`Delete ${vehicle.name}?`)) return;
+    if (!await confirmAction(`Delete ${vehicle.name}?`, { confirmText: "Delete" })) return;
     try {
       await api.delete(`/vehicles/${vehicle._id}`);
       setVehicles((current) => current.filter((item) => item._id !== vehicle._id));

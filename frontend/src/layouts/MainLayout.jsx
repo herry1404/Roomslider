@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import BottomNav from "../components/layout/BottomNav";
+import PullToRefresh from "../components/ui/PullToRefresh";
 
 function MainLayout({ children }) {
   const { pathname } = useLocation();
@@ -12,7 +13,9 @@ function MainLayout({ children }) {
       <Navbar />
 
       <main style={{ minHeight: "calc(100vh - var(--navbar-height))" }}>
-        {children}
+        {immersiveChat
+          ? children
+          : <PullToRefresh onRefresh={() => window.location.reload()}>{children}</PullToRefresh>}
       </main>
 
       {!immersiveChat && <Footer />}

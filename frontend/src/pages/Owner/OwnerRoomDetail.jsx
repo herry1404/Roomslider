@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Wallet, X } from "lucide-react";
 
 import api from "../../api/axios";
+import confirmAction from "../../utils/confirmAction";
 
 import "../../styles/owner/dashboard.css";
 
@@ -47,7 +48,7 @@ function OwnerRoomDetail() {
   };
 
   useEffect(() => {
-    fetchRoom();
+    Promise.resolve().then(fetchRoom);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -115,7 +116,7 @@ function OwnerRoomDetail() {
   };
 
   const handleVacate = async () => {
-    if (!window.confirm("Mark this room as vacant? This will close the current tenancy.")) {
+    if (!await confirmAction("Mark this room as vacant? This will close the current tenancy.", { confirmText: "Mark as vacant" })) {
       return;
     }
 
