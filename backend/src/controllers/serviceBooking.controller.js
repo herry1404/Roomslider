@@ -2,7 +2,7 @@ const ServiceBooking = require('../models/serviceBooking.model');
 const ServiceProvider = require('../models/service.model');
 const User = require('../models/user.model');
 const cloudinary = require('../config/cloudinary');
-const { sendNotificationToRecipients } = require('../utils/notificationDelivery');
+const { sendNotificationToRecipients, notifyUser } = require('../utils/notificationDelivery');
 
 const STATUSES = ['new', 'contacted', 'confirmed', 'completed', 'cancelled'];
 const cleanBooking = (booking) => {
@@ -104,7 +104,7 @@ exports.createBooking = async (req, res) => {
     try {
       const admins = await User.find({ role: 'admin' }).select('_id').lean();
       await sendNotificationToRecipients(admins.map((admin) => ({ id: admin._id, model: 'User' })), {
-        title: 'New service request', message: `${booking.name} requested ${provider.name}.`, actionUrl: '/admin/service-requests',
+        type: 'service_request', title: 'New service request', message: 'A customer submitted a new service request.', actionUrl: '/admin/service-requests',
       });
     } catch (error) { console.error('SERVICE REQUEST NOTIFICATION ERROR:', error); }
     res.status(201).json({ request: cleanBooking(booking), requestId: booking._id, id: booking._id });
@@ -150,8 +150,24 @@ exports.updateBookingStatus = async (req, res) => {
   try {
     const { status } = req.body;
     if (!STATUSES.includes(status)) return res.status(400).json({ message: 'Invalid status' });
-    const booking = await ServiceBooking.findByIdAndUpdate(req.params.id, { status }, { new: true, runValidators: true });
+    const booking = await ServiceBooking.findById(req.params.id);
     if (!booking) return res.status(404).json({ message: 'Request not found' });
+    const previousStatus = booking.status;
+    booking.status = status;
+    await booking.save();
+    if (previousStatus !== status) {
+      try {
+        const statusLabel = status.replace(/_/g, ' ');
+        await notifyUser(booking.user, {
+          type: 'service_status',
+          title: 'Service request update',
+          body: `Your service request is now ${statusLabel}.`,
+          link: '/profile?tab=activity',
+        });
+      } catch (notificationError) {
+        console.error('SERVICE STATUS NOTIFICATION ERROR:', notificationError);
+      }
+    }
     res.json(cleanBooking(booking));
   } catch (error) {
     console.error('updateBookingStatus error:', error);

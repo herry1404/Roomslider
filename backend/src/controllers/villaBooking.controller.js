@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const Villa = require("../models/Villa");
 const VillaBooking = require("../models/VillaBooking");
+const User = require("../models/user.model");
+const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -232,6 +234,20 @@ exports.verifyBookingPayment = async (req, res) => {
       return res.status(409).json({ success: false, message: "Villa booking is being processed; please retry verification" });
     }
     if (!(await slotAvailable(villaId, booking.startDate, booking.endDate, booking._id))) {
+      try {
+        const admins = await User.find({ role: "admin" }).select("_id").lean();
+        await sendNotificationToRecipients(
+          [{ id: booking.guest, model: "User" }, ...admins.map((admin) => ({ id: admin._id, model: "User" }))],
+          {
+            type: "payment",
+            title: "Villa payment needs review",
+            message: "Your payment was captured, but the booking dates were no longer available. Contact support for next steps.",
+            actionUrl: "/profile?tab=activity",
+          }
+        );
+      } catch (notificationError) {
+        console.error("VILLA PAYMENT CONFLICT NOTIFICATION ERROR:", notificationError);
+      }
       return res.status(409).json({ success: false, message: "Villa dates were booked while payment was processing; contact support for a refund" });
     }
     booking.paymentStatus = "paid";
@@ -239,6 +255,20 @@ exports.verifyBookingPayment = async (req, res) => {
     booking.razorpayPaymentId = razorpay_payment_id;
     booking.paidAt = new Date();
     await booking.save();
+    try {
+      const admins = await User.find({ role: "admin" }).select("_id").lean();
+      await sendNotificationToRecipients(
+        [{ id: booking.guest, model: "User" }, ...admins.map((admin) => ({ id: admin._id, model: "User" }))],
+        {
+          type: "payment",
+          title: "Villa booking confirmed",
+          message: "Your villa payment is complete and the booking is confirmed.",
+          actionUrl: "/profile?tab=activity",
+        }
+      );
+    } catch (notificationError) {
+      console.error("VILLA PAYMENT NOTIFICATION ERROR:", notificationError);
+    }
     res.status(200).json({ success: true, message: "Villa booking confirmed", booking });
   } catch (error) {
     console.error("VERIFY VILLA PAYMENT ERROR:", error);

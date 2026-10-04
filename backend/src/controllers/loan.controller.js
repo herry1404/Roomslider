@@ -1,6 +1,6 @@
 const Loan = require("../models/loan.model");
 const cloudinary = require("../config/cloudinary");
-const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
+const { notifyUser } = require("../utils/notificationDelivery");
 
 const STATUS_MESSAGES = {
   submitted: "Your student loan application has been received.",
@@ -358,22 +358,14 @@ const updateLoanStatus = async (req, res) => {
     }
 
     try {
-      await sendNotificationToRecipients(
-        [{ id: loan.user, model: "User" }],
-        {
-          title: "Student loan application update",
-          message: STATUS_MESSAGES[status],
-          actionUrl: "/profile?tab=activity",
-        }
-      );
+      await notifyUser(loan.user, {
+        type: "loan_status",
+        title: "Student loan application update",
+        body: STATUS_MESSAGES[status],
+        link: "/profile?tab=activity",
+      });
     } catch (notificationError) {
       console.error("LOAN STATUS NOTIFICATION ERROR:", notificationError);
-      return res.status(500).json({
-        success: false,
-        message: "Status updated, but the applicant notification could not be sent",
-        statusUpdated: true,
-        loan: loan.toObject(),
-      });
     }
 
     res.status(200).json({ success: true, loan });

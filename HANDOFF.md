@@ -3,9 +3,9 @@
 ## Current state
 
 - Branch: `main`
-- `main` and `origin/main` are at `547d571` (`Property details redesign, vehicle requests, seed script and UI updates`).
-- Laundry, villa, and roommate privacy/chat changes were pushed in `b1f97bd` (`Add laundry, villa bookings, and private roommate chat`); vehicle catalog work and property UI are included in `547d571`.
-- The current furniture/vehicle multipart-upload fix and other active workspace changes are not committed. Do not discard them.
+- HEAD: `ea136a4` (`Services: one card per worker, price list with quantity, service requests, study support and rent agreement categories, seed scripts`), tracking `origin/main`.
+- Recent history: `4fd3da3` (public slug URLs, mess reviews, address helper), `2613f46` (student loan workflow).
+- The worktree has uncommitted notification-center changes across backend and frontend, including pre-existing notification API/schema/SSE work. No commit was created.
 
 ## Completed work
 
@@ -188,3 +188,21 @@ Run seeds from `backend/`:
 npm run seed:cleaning
 npm run seed:study
 ```
+
+### 4 Oct 2026 — in-app notification system
+
+- Completed the typed, paginated notification center with unread/read/delete actions, SSE stream-token delivery, client reconnect backoff and 30-second unread-count polling fallback. Existing broadcast, push subscription, and hourly-manager notification paths remain supported; Owner recipients are also supported.
+- Added roommate interest/acceptance/chat, service booking status, furniture/vehicle request and status, vacate notice, rent/hourly/villa payment, student-loan status, and maintenance request/status notifications. Notification copy avoids contact details and full addresses. Captured payments that cannot confirm an hourly/villa booking alert the payer and staff for follow-up.
+- Added the shared frontend notification context, responsive navbar bell/dropdown, `/notifications` filters and actions, browser-alert opt-in in the page header, and a latest-five Profile view with a View all link.
+
+**Tested**
+
+- `cd frontend && npm run build` passed; Vite reported its existing `__dirname` configuration and large-chunk warnings.
+- `node --check` passed for all changed backend JavaScript files.
+- Targeted ESLint passed for the notification frontend changes; `git diff --check` passed.
+
+**Pending**
+
+- Manual browser/API acceptance for notifications, read/delete/pagination, SSE reconnect/logout, 30-second fallback, mobile layout/dark mode, and browser push.
+- Multi-account event tests for roommate, request/status, vacate, payment, loan, and maintenance notifications; live Razorpay/database delivery is not verified.
+- Vacate notice delivery requires the legacy room record to have `owner` and `currentTenantUser` references. If either is absent, that recipient cannot be notified.

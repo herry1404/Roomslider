@@ -1,5 +1,7 @@
 const Maintenance = require("../models/maintenance.model");
 const Room = require("../models/room.model");
+const { notifyUser, sendNotificationToRecipients } = require("../utils/notificationDelivery");
+const User = require("../models/user.model");
 
 // Tenant raises a maintenance request for their room.
 // Photo is optional; multer-cloudinary middleware (if used) attaches req.file.path as the hosted URL.
@@ -14,7 +16,7 @@ const createRequest = async (req, res) => {
       });
     }
 
-    const room = await Room.findById(roomId).select("_id currentTenantUser");
+    const room = await Room.findById(roomId).select("_id currentTenantUser owner");
 
     if (!room) {
       return res.status(404).json({
@@ -36,6 +38,26 @@ const createRequest = async (req, res) => {
       photoUrl: req.file ? req.file.path : null,
     });
 
+    try {
+      if (room.owner) {
+        await sendNotificationToRecipients([{ id: room.owner, model: "Owner" }], {
+          type: "maintenance",
+          title: "New maintenance request",
+          message: "Your tenant submitted a maintenance request.",
+          actionUrl: "/owner/maintenance",
+        });
+      } else {
+        const admins = await User.find({ role: "admin" }).select("_id").lean();
+        await sendNotificationToRecipients(admins.map((admin) => ({ id: admin._id, model: "User" })), {
+          type: "maintenance",
+          title: "New maintenance request",
+          message: "A tenant submitted a maintenance request.",
+          actionUrl: "/admin/rooms",
+        });
+      }
+    } catch (error) {
+      console.error("MAINTENANCE REQUEST NOTIFICATION ERROR:", error);
+    }
     res.status(201).json({ success: true, request });
   } catch (error) {
     console.error("CREATE MAINTENANCE REQUEST ERROR:", error);
@@ -118,8 +140,21 @@ const updateRequestStatus = async (req, res) => {
       });
     }
 
+    const previousStatus = request.status;
     request.status = status;
     await request.save();
+    if (previousStatus !== status) {
+      try {
+        await notifyUser(request.tenant, {
+          type: "maintenance",
+          title: "Maintenance request update",
+          body: `Your maintenance request is now ${status.replace(/_/g, " ")}.`,
+          link: "/my-place",
+        });
+      } catch (error) {
+        console.error("MAINTENANCE STATUS NOTIFICATION ERROR:", error);
+      }
+    }
 
     res.status(200).json({ success: true, request });
   } catch (error) {

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const FurnitureItem = require('../models/furnitureItem.model');
 const FurnitureRequest = require('../models/furnitureRequest.model');
+const User = require('../models/user.model');
+const { sendNotificationToRecipients, notifyUser } = require('../utils/notificationDelivery');
 
 const isAdmin = (req) => req.user && req.user.role === 'admin';
 const STATUSES = ['new', 'confirmed', 'delivered', 'cancelled'];
@@ -99,6 +101,17 @@ exports.createRequest = async (req, res) => {
       deliveryDate: String(deliveryDate || ''),
     });
 
+    try {
+      const admins = await User.find({ role: 'admin' }).select('_id').lean();
+      await sendNotificationToRecipients(admins.map((admin) => ({ id: admin._id, model: 'User' })), {
+        type: 'service_request',
+        title: 'New furniture request',
+        message: 'A customer submitted a new furniture request.',
+        actionUrl: '/admin/furniture/requests',
+      });
+    } catch (error) {
+      console.error('FURNITURE REQUEST NOTIFICATION ERROR:', error);
+    }
     res.status(201).json(doc);
   } catch (error) {
     console.error('createRequest error:', error);
@@ -136,9 +149,22 @@ exports.updateRequestStatus = async (req, res) => {
     }
     const doc = await FurnitureRequest.findById(req.params.id);
     if (!doc) return res.status(404).json({ message: 'Request not found' });
+    const previousStatus = doc.status;
     if (status !== undefined) doc.status = status;
     if (adminNote !== undefined) doc.adminNote = String(adminNote);
     await doc.save();
+    if (status !== undefined && status !== previousStatus) {
+      try {
+        await notifyUser(doc.user, {
+          type: 'furniture_status',
+          title: 'Furniture request update',
+          body: `Your furniture request is now ${status.replace(/_/g, ' ')}.`,
+          link: '/profile?tab=activity',
+        });
+      } catch (error) {
+        console.error('FURNITURE STATUS NOTIFICATION ERROR:', error);
+      }
+    }
     res.json(doc);
   } catch (error) {
     res.status(500).json({ message: 'Could not update request' });

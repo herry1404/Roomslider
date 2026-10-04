@@ -5,6 +5,8 @@ const Room = require("../models/room.model");
 const ElectricityBill = require("../models/ElectricityBill");
 const Mess = require("../models/Mess");
 const MessOrder = require("../models/MessOrder");
+const User = require("../models/user.model");
+const { notifyUser, sendNotificationToRecipients } = require("../utils/notificationDelivery");
 const { addOneMonth } = require("./room.controller");
 
 const razorpay = new Razorpay({
@@ -156,6 +158,35 @@ const verifyPayment = async (req, res) => {
         bill.paidAt = new Date();
         await bill.save();
       }
+    }
+
+    try {
+      const alerts = [
+        notifyUser(req.user._id, {
+          type: "payment",
+          title: "Rent payment received",
+          body: "Your rent payment was recorded successfully.",
+          link: "/my-place",
+        }),
+      ];
+      if (room.owner) {
+        alerts.push(sendNotificationToRecipients([{ id: room.owner, model: "Owner" }], {
+          type: "payment",
+          title: "Rent payment received",
+          message: "A rent payment was recorded for one of your properties.",
+          actionUrl: "/owner/dashboard",
+        }));
+      }
+      const admins = await User.find({ role: "admin" }).select("_id").lean();
+      alerts.push(sendNotificationToRecipients(admins.map((admin) => ({ id: admin._id, model: "User" })), {
+        type: "payment",
+        title: "Rent payment received",
+        message: "A rent payment was recorded.",
+        actionUrl: "/admin/rooms",
+      }));
+      await Promise.all(alerts);
+    } catch (notificationError) {
+      console.error("RENT PAYMENT NOTIFICATION ERROR:", notificationError);
     }
 
     res.status(200).json({

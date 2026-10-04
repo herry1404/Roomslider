@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Vehicle = require('../models/vehicle.model');
 const VehicleRequest = require('../models/vehicleRequest.model');
+const User = require('../models/user.model');
+const { sendNotificationToRecipients, notifyUser } = require('../utils/notificationDelivery');
 
 const STATUSES = ['new', 'confirmed', 'picked_up', 'returned', 'cancelled'];
 const isAdmin = (req) => req.user?.role === 'admin';
@@ -91,6 +93,17 @@ exports.createRequest = async (req, res) => {
       location: cleanLocation(location),
       totalPrice: getTotal(vehicle, durationType, pickupDate, returnDate),
     });
+    try {
+      const admins = await User.find({ role: 'admin' }).select('_id').lean();
+      await sendNotificationToRecipients(admins.map((admin) => ({ id: admin._id, model: 'User' })), {
+        type: 'service_request',
+        title: 'New vehicle request',
+        message: 'A customer submitted a new vehicle request.',
+        actionUrl: '/admin/vehicle-requests',
+      });
+    } catch (error) {
+      console.error('VEHICLE REQUEST NOTIFICATION ERROR:', error);
+    }
     res.status(201).json(await request.populate('vehicle', 'name brand type'));
   } catch (error) {
     console.error('createVehicleRequest error:', error);
@@ -140,8 +153,21 @@ exports.updateRequestStatus = async (req, res) => {
         await hasOverlap(request.vehicle, request.pickupDate, request.returnDate, request._id)) {
       return res.status(409).json({ message: 'Another confirmed rental overlaps these dates' });
     }
+    const previousStatus = request.status;
     request.status = status;
     await request.save();
+    if (previousStatus !== status) {
+      try {
+        await notifyUser(request.user, {
+          type: 'vehicle_status',
+          title: 'Vehicle request update',
+          body: `Your vehicle request is now ${status.replace(/_/g, ' ')}.`,
+          link: '/profile?tab=activity',
+        });
+      } catch (error) {
+        console.error('VEHICLE STATUS NOTIFICATION ERROR:', error);
+      }
+    }
     res.json(request);
   } catch (error) {
     console.error('updateVehicleRequestStatus error:', error);

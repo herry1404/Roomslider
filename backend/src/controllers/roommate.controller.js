@@ -4,6 +4,7 @@ const RoommateRequest = require("../models/roommateRequest.model");
 const RoommateReport = require("../models/roommateReport.model");
 const RoommateMessage = require("../models/roommateMessage.model");
 const User = require("../models/user.model");
+const { notifyUser } = require("../utils/notificationDelivery");
 const { sanitizeRoommatePreferences } = require("../utils/roommatePreferences");
 const {
   migrateLegacyForUser,
@@ -192,6 +193,17 @@ const sendChatMessage = async (req, res) => {
       to: otherUserId,
       body,
     });
+    try {
+      await notifyUser(otherUserId, {
+        type: "roommate_message",
+        title: "New roommate message",
+        body: "You received a new message.",
+        link: `/roommates/chat/${req.user._id}`,
+        data: { senderId: String(req.user._id) },
+      });
+    } catch (error) {
+      console.error("ROOMMATE MESSAGE NOTIFICATION ERROR:", error);
+    }
     res.status(201).json({
       success: true,
       message: {
@@ -348,6 +360,24 @@ const sendRequest = async (req, res) => {
     if (reverse?.status === "pending") {
       reverse.status = "accepted";
       await reverse.save();
+      try {
+        await Promise.all([
+          notifyUser(req.user._id, {
+            type: "roommate_accepted",
+            title: "Roommate interest accepted",
+            body: "Your roommate interest was accepted.",
+            link: `/roommates/chat/${targetId}`,
+          }),
+          notifyUser(targetId, {
+            type: "roommate_accepted",
+            title: "It's a roommate match",
+            body: "Your roommate connection is now accepted.",
+            link: `/roommates/chat/${req.user._id}`,
+          }),
+        ]);
+      } catch (error) {
+        console.error("ROOMMATE ACCEPTANCE NOTIFICATION ERROR:", error);
+      }
       return res.json({ success: true, status: "accepted", message: "It's a match! You can now chat privately on RoomSlider." });
     }
     if (reverse?.status === "accepted") {
@@ -361,6 +391,16 @@ const sendRequest = async (req, res) => {
     const request = existing || new RoommateRequest({ from: req.user._id, to: targetId });
     request.status = "pending";
     await request.save();
+    try {
+      await notifyUser(targetId, {
+        type: "roommate_request",
+        title: "New roommate interest",
+        body: "Someone is interested in connecting as roommates.",
+        link: "/roommates",
+      });
+    } catch (error) {
+      console.error("ROOMMATE REQUEST NOTIFICATION ERROR:", error);
+    }
     res.status(201).json({ success: true, status: request.status });
   } catch (error) {
     if (error.code === 11000) {
@@ -411,6 +451,18 @@ const respondToRequest = async (req, res) => {
     }
     request.status = req.body.status;
     await request.save();
+    if (request.status === "accepted") {
+      try {
+        await notifyUser(request.from, {
+          type: "roommate_accepted",
+          title: "Roommate interest accepted",
+          body: "Your roommate interest was accepted.",
+          link: `/roommates/chat/${req.user._id}`,
+        });
+      } catch (error) {
+        console.error("ROOMMATE ACCEPTANCE NOTIFICATION ERROR:", error);
+      }
+    }
     if (req.body.status === "accepted") {
       await RoommateRequest.deleteOne({
         from: req.user._id,

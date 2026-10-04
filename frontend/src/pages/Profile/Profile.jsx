@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
+import { useNotifications } from "../../context/useNotifications";
 import "../../styles/profile.css";
 
 const TABS = [
@@ -37,6 +38,7 @@ function Profile() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const { unreadCount: notificationUnread, markRead: markNotificationRead } = useNotifications();
   const requestedTab = searchParams.get("tab");
   const tab = TABS.some((item) => item.key === requestedTab) ? requestedTab : "saved";
 
@@ -44,7 +46,6 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [tabLoading, setTabLoading] = useState(false);
   const [tabData, setTabData] = useState({ saved: null, activity: null, notifications: null });
-  const [unread, setUnread] = useState(0);
 
   const isUserAccount = user && (!user.role || ["user", "admin"].includes(user.role));
 
@@ -161,9 +162,8 @@ function Profile() {
       }
 
       if (key === "notifications") {
-        const res = await api.get("/notifications/my-notifications");
+        const res = await api.get("/notifications", { params: { limit: 5 } });
         setTabData((d) => ({ ...d, notifications: res.data.notifications || [] }));
-        setUnread(res.data.unreadCount || 0);
       }
     } catch {
       toast.error("Ye tab load nahi hua");
@@ -178,19 +178,14 @@ function Profile() {
   }, [tab, profile, tabData[tab]]);
 
   const markRead = async (n) => {
-    if (n.read) return;
-    try {
-      await api.put("/notifications/" + n._id + "/read");
-      setTabData((d) => ({
-        ...d,
-        notifications: d.notifications.map((x) =>
-          x._id === n._id ? { ...x, read: true } : x
-        ),
-      }));
-      setUnread((u) => Math.max(0, u - 1));
-    } catch {
-      // ignore, will retry on next click
-    }
+    if (n.isRead) return;
+    await markNotificationRead(n);
+    setTabData((d) => ({
+      ...d,
+      notifications: d.notifications.map((x) =>
+        x._id === n._id ? { ...x, isRead: true } : x
+      ),
+    }));
   };
 
   if (loading && isUserAccount) {
@@ -278,35 +273,39 @@ function Profile() {
       return (
         <div className="profile-empty">
           <p>Koi notification nahi hai.</p>
+          <Link to="/notifications">View all</Link>
         </div>
       );
     }
     return (
-      <div className="profile-list">
-        {tabData.notifications.map((n) => (
-          <div
-            className={"profile-item profile-item--click" + (n.read ? "" : " profile-item--unread")}
-            key={n._id}
-            onClick={() => {
-              markRead(n);
-              if (n.actionUrl) {
-                if (n.actionUrl.includes("tab=activity")) {
-                  setTabData((current) => ({ ...current, activity: null }));
+      <>
+        <div className="profile-list">
+          {tabData.notifications.map((n) => (
+            <div
+              className={"profile-item profile-item--click" + (n.isRead ? "" : " profile-item--unread")}
+              key={n._id}
+              onClick={() => {
+                markRead(n);
+                if (n.link) {
+                  if (n.link.includes("tab=activity")) {
+                    setTabData((current) => ({ ...current, activity: null }));
+                  }
+                  navigate(n.link);
                 }
-                navigate(n.actionUrl);
-              }
-            }}
-          >
-            <div className="profile-item-main">
-              <strong>{n.title}</strong>
-              <span className="profile-hint">{n.message}</span>
+              }}
+            >
+              <div className="profile-item-main">
+                <strong>{n.title}</strong>
+                <span className="profile-hint">{n.body}</span>
+              </div>
+              <div className="profile-item-side">
+                <span className="profile-hint">{fmtDate(n.createdAt)}</span>
+              </div>
             </div>
-            <div className="profile-item-side">
-              <span className="profile-hint">{fmtDate(n.createdAt)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+        <Link className="profile-notifications-view-all" to="/notifications">View all notifications</Link>
+      </>
     );
   };
 
@@ -354,8 +353,8 @@ function Profile() {
             }}
           >
             {t.label}
-            {t.key === "notifications" && unread > 0 && (
-              <span className="profile-tab-badge">{unread}</span>
+            {t.key === "notifications" && notificationUnread > 0 && (
+              <span className="profile-tab-badge">{notificationUnread}</span>
             )}
           </button>
         ))}

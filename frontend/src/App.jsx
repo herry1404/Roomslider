@@ -44,6 +44,7 @@ import Privacy from "./pages/Privacy/Privacy";
 import RoommateFinder from "./pages/Roommates/RoommateFinder";
 import RoommateProfilePage from "./pages/Roommates/RoommateProfilePage";
 import RoommateChatPage from "./pages/Roommates/RoommateChatPage";
+import Notifications from "./pages/Notifications/Notifications";
 
 import Rooms from "./pages/Rooms/Rooms";
 import HourlyRooms from "./pages/Rooms/HourlyRooms";
@@ -143,6 +144,7 @@ function App() {
         <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
         <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
         <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+        <Route path="/notifications" element={<MainLayout><Notifications /></MainLayout>} />
         <Route path="/profile/edit" element={<MainLayout><ProfileEdit /></MainLayout>} />
         <Route path="/my-place" element={<MainLayout><TenantDashboard /></MainLayout>} />
         <Route path="/recently-viewed" element={<MainLayout><RecentlyViewed /></MainLayout>} />

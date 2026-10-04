@@ -3,6 +3,7 @@ const Razorpay = require("razorpay");
 const HourlyRoom = require("../models/HourlyRoom.model");
 const HourlyBooking = require("../models/HourlyBooking.model");
 const HourlyRoomManager = require("../models/HourlyRoomManager");
+const User = require("../models/user.model");
 const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
 
 const razorpay = new Razorpay({
@@ -212,6 +213,27 @@ exports.verifyBookingPayment = async (req, res) => {
       booking.paymentStatus = "paid";
       booking.status = "cancelled";
       await booking.save();
+      try {
+        const [managers, room, admins] = await Promise.all([
+          HourlyRoomManager.find({ isActive: true }).select("_id"),
+          HourlyRoom.findById(booking.room).select("requestedByOwner"),
+          User.find({ role: "admin" }).select("_id").lean(),
+        ]);
+        const recipients = [
+          { id: booking.guest, model: "User" },
+          ...managers.map((manager) => ({ id: manager._id, model: "HourlyRoomManager" })),
+          ...admins.map((admin) => ({ id: admin._id, model: "User" })),
+          ...(room?.requestedByOwner ? [{ id: room.requestedByOwner, model: "Owner" }] : []),
+        ];
+        await sendNotificationToRecipients(recipients, {
+          type: "payment",
+          title: "Hourly booking needs review",
+          message: "Your payment was captured, but the booking could not be confirmed. Contact support for next steps.",
+          actionUrl: `/hourly-bookings/${booking._id}/receipt`,
+        });
+      } catch (notificationError) {
+        console.error("HOURLY PAYMENT CONFLICT NOTIFICATION ERROR:", notificationError);
+      }
       return res.status(409).json({
         message: "Slot got booked by someone else during payment. Contact support for a refund.",
         booking,
@@ -229,23 +251,50 @@ exports.verifyBookingPayment = async (req, res) => {
     if (!alreadyConfirmed) {
       try {
         const managers = await HourlyRoomManager.find({ isActive: true }).select("_id");
+        const room = await HourlyRoom.findById(booking.room).select("requestedByOwner");
+        const admins = await User.find({ role: "admin" }).select("_id").lean();
         const receiptUrl = `/hourly-bookings/${booking._id}/receipt`;
-        await sendNotificationToRecipients(
+        const notifications = [
+          sendNotificationToRecipients(
           [{ id: booking.guest, model: "User" }],
           {
+            type: "payment",
             title: "Hourly room booking confirmed",
-            message: `Your payment of ₹${booking.amount} is complete. Booking ID: ${booking._id}`,
+            message: "Your hourly room payment is complete and the booking is confirmed.",
             actionUrl: receiptUrl,
           }
-        );
-        await sendNotificationToRecipients(
+          ),
+          sendNotificationToRecipients(
           managers.map((manager) => ({ id: manager._id, model: "HourlyRoomManager" })),
           {
+            type: "payment",
             title: "New hourly room booking",
-            message: `A booking has been paid and confirmed. Booking ID: ${booking._id}`,
+            message: "An hourly room booking has been paid and confirmed.",
             actionUrl: receiptUrl,
           }
-        );
+          ),
+          sendNotificationToRecipients(
+            admins.map((admin) => ({ id: admin._id, model: "User" })),
+            {
+              type: "payment",
+              title: "New hourly room booking",
+              message: "An hourly room booking has been paid and confirmed.",
+              actionUrl: receiptUrl,
+            }
+          ),
+        ];
+        if (room?.requestedByOwner) {
+          notifications.push(sendNotificationToRecipients(
+            [{ id: room.requestedByOwner, model: "Owner" }],
+            {
+              type: "payment",
+              title: "New hourly room booking",
+              message: "An hourly room booking for your property has been paid and confirmed.",
+              actionUrl: receiptUrl,
+            }
+          ));
+        }
+        await Promise.all(notifications);
       } catch (notificationError) {
         notificationWarning = "Booking confirmed, but notification delivery was incomplete.";
         console.error("HOURLY BOOKING NOTIFICATION ERROR:", notificationError);

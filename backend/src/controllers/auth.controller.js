@@ -4,6 +4,7 @@ const { registerSchema, loginSchema, preferencesSchema } = require("../validator
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
+const { sendNotificationToRecipients } = require("../utils/notificationDelivery");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -433,6 +434,19 @@ const giveVacateNotice = async (req, res) => {
 
     room.currentTenant.vacateNoticeDate = new Date(vacateDate);
     await room.save();
+
+    try {
+      if (room.owner) {
+        await sendNotificationToRecipients([{ id: room.owner, model: "Owner" }], {
+          type: "vacate_notice",
+          title: "Tenant submitted a vacate notice",
+          message: "A tenant submitted a request to vacate a property.",
+          actionUrl: "/owner/dashboard",
+        });
+      }
+    } catch (notificationError) {
+      console.error("VACATE NOTICE NOTIFICATION ERROR:", notificationError);
+    }
 
     return res.status(200).json({
       success: true,

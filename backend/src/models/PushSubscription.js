@@ -9,7 +9,7 @@ const pushSubscriptionSchema = new mongoose.Schema(
     },
     recipientModel: {
       type: String,
-      enum: ["User", "HourlyRoomManager"],
+      enum: ["User", "Owner", "HourlyRoomManager"],
       required: true,
     },
     endpoint: {

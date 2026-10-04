@@ -8,6 +8,7 @@ import GoogleOneTap from "./components/auth/GoogleOneTap";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 import "./index.css";
 import "./styles/leaflet-theme.css";
@@ -33,11 +34,13 @@ createRoot(document.getElementById("root")).render(
           <AuthProvider>
             <WishlistProvider>
               <ThemeProvider>
-              <GoogleOneTap />
-              <App />
-              <Toaster position="top-center" />
-              <SpeedInsights />
-            </ThemeProvider>
+                <NotificationProvider>
+                  <GoogleOneTap />
+                  <App />
+                  <Toaster position="top-center" />
+                  <SpeedInsights />
+                </NotificationProvider>
+              </ThemeProvider>
             </WishlistProvider>
           </AuthProvider>
         </HelmetProvider>

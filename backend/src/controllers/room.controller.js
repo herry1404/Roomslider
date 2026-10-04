@@ -1,5 +1,6 @@
 const safeMsg = require("../utils/safeMsg");
 const Room = require("../models/room.model");
+const { notifyUser } = require("../utils/notificationDelivery");
 const { findNearestPlace, findPlaceByLocationText } = require("../data/nearbyPlaces");
 require("../models/property.model"); // register model so populate("property") works
 const User = require("../models/user.model");
@@ -890,6 +891,19 @@ const resolveVacateNotice = async (req, res) => {
       room.currentTenant.vacateNoticeDate = null;
       await room.save();
 
+      try {
+        if (room.currentTenantUser) {
+          await notifyUser(room.currentTenantUser, {
+            type: "vacate_notice",
+            title: "Vacate notice acknowledged",
+            body: "Your landlord reviewed your vacate notice; your tenancy remains active.",
+            link: "/my-place",
+          });
+        }
+      } catch (notificationError) {
+        console.error("VACATE NOTICE ACKNOWLEDGEMENT ERROR:", notificationError);
+      }
+
       return res.status(200).json({
         success: true,
         message: "Vacate notice declined. Tenant continues.",
@@ -923,6 +937,19 @@ const resolveVacateNotice = async (req, res) => {
       room.paymentStatus = "pending";
 
       await room.save();
+
+      try {
+        if (room.currentTenantUser) {
+          await notifyUser(room.currentTenantUser, {
+            type: "vacate_notice",
+            title: "Vacate notice acknowledged",
+            body: "Your landlord confirmed your vacate notice.",
+            link: "/my-place",
+          });
+        }
+      } catch (notificationError) {
+        console.error("VACATE NOTICE ACKNOWLEDGEMENT ERROR:", notificationError);
+      }
 
       return res.status(200).json({
         success: true,
