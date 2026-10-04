@@ -123,6 +123,15 @@ function PropertyPage() {
           name="description"
           content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`}
         />
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={`${property.name} | RoomSlider`} />
+        <meta property="og:description" content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`} />
+        <meta property="og:url" content={`https://www.roomslider.in/property/${property.slug || id}`} />
+        <meta property="og:image" content={galleryImages[0] || "https://www.roomslider.in/og-image.jpg"} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${property.name} | RoomSlider`} />
+        <meta name="twitter:description" content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`} />
+        <meta name="twitter:image" content={galleryImages[0] || "https://www.roomslider.in/og-image.jpg"} />
       </Helmet>
 
       <Link className="pd-grouped-back" to={backPath}>

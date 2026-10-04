@@ -15,6 +15,7 @@ const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const pushRoutes = require("./routes/push.routes");
 const reportRoutes = require("./routes/report.routes");
+const savedSearchRoutes = require("./routes/savedSearch.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const maintenanceRoutes = require("./routes/maintenance.routes");
 const loanRoutes = require("./routes/loan.routes");
@@ -265,6 +266,7 @@ app.use(
 );
 app.use("/api/push", pushRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/saved-searches", savedSearchRoutes);
 
 
 // ✅ PAYMENT ROUTES

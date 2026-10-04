@@ -7,6 +7,7 @@ const User = require("../models/user.model");
 const Property = require("../models/property.model");
 const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 const { maskPhoneNumbers, sanitizeRoomListing } = require("../utils/maskListingPhoneNumbers");
+const { notifySavedSearchMatches } = require("../utils/savedSearchAlerts");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -183,6 +184,7 @@ const createRoom = async (req, res) => {
 
     const { logActivity } = require("./activity.controller");
     await logActivity("room_added", `New room added: ${room.title || room.propertyName || "Untitled"}`, room._id, "Room");
+    setImmediate(() => notifySavedSearchMatches([room]));
 
     res.status(201).json({
       success: true,
@@ -235,6 +237,14 @@ const getRooms = async (req, res) => {
       filter.owner = req.query.owner;
     }
 
+    const requestedIds = req.query.ids === undefined
+      ? null
+      : [...new Set(String(req.query.ids).split(",").filter((id) => /^[a-f\d]{24}$/i.test(id)))].slice(0, 10);
+    if (requestedIds) {
+      if (requestedIds.length === 0) return res.status(200).json({ success: true, rooms: [] });
+      filter._id = { $in: requestedIds };
+    }
+
     const grouped = req.query.grouped === "true";
 
     let query = Room.find(filter).populate("owner", "name slug isVerified");
@@ -246,6 +256,10 @@ const getRooms = async (req, res) => {
       priority: 1,
       createdAt: -1,
     });
+    if (requestedIds) {
+      const order = new Map(requestedIds.map((id, index) => [id, index]));
+      rooms.sort((first, second) => order.get(String(first._id)) - order.get(String(second._id)));
+    }
     await ensurePublicSlugs(Room, rooms, (room) => room.title);
     const populatedProperties = [...new Map(
       rooms.map((room) => room.property).filter(Boolean)
@@ -632,6 +646,7 @@ const createBulkRooms = async (req, res) => {
       }
       throw err;
     }
+    setImmediate(() => notifySavedSearchMatches(createdRooms));
 
     res.status(201).json({
       success: true,

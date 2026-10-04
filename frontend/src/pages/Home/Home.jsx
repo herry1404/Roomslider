@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
 import Hero from "../../components/home/Hero";
@@ -7,6 +7,7 @@ import ExploreTeaser from "../../components/home/ExploreTeaser";
 import CategorySection from "../../components/home/CategorySection";
 import HomeBanner from "../../components/home/HomeBanner";
 import HomeRentalSection from "../../components/home/HomeRentalSection";
+import RecentlyViewedSection from "../../components/home/RecentlyViewedSection";
 import api from "../../api/axios";
 
 const CACHE_KEY = "homeSectionsV1";
@@ -141,7 +142,13 @@ function Home() {
       </Helmet>
 
       <div className="home-page">
-        {sections.map(renderSection)}
+        {sections.map((section) => (
+          <Fragment key={section._id}>
+            {renderSection(section)}
+            {section.type === "hero" && <RecentlyViewedSection />}
+          </Fragment>
+        ))}
+        {!sections.some((section) => section.type === "hero") && <RecentlyViewedSection />}
       </div>
     </>
   );

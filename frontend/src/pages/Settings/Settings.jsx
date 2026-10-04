@@ -1,4 +1,5 @@
 import ThemeToggle from "../../components/ThemeToggle";
+import SavedSearches from "../../components/settings/SavedSearches";
 
 function Settings() {
   return (
@@ -24,6 +25,7 @@ function Settings() {
         </div>
         <ThemeToggle />
       </div>
+      <SavedSearches />
     </div>
   );
 }

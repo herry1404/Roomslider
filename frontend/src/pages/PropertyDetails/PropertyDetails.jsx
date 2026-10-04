@@ -20,6 +20,7 @@ import MobileContactBar from "../../components/property/MobileContactBar";
 import NearbyStays from "../../components/property/NearbyStays";
 import PropertyDetailsSkeleton from "../../components/property/PropertyDetailsSkeleton";
 import shareProperty from "../../utils/shareProperty";
+import { recordRecentlyViewed } from "../../utils/recentlyViewed";
 import "../../styles/property-details.css";
 
 function PropertyDetails() {
@@ -38,7 +39,11 @@ function PropertyDetails() {
     window.scrollTo({ top: 0, behavior: "instant" });
     api.get(`/rooms/${id}`)
       .then(({ data }) => {
-        if (active) setRoomResult({ id, room: data.room || null });
+        if (active) {
+          const loadedRoom = data.room || null;
+          setRoomResult({ id, room: loadedRoom });
+          if (loadedRoom?._id) recordRecentlyViewed(loadedRoom._id);
+        }
       })
       .catch((error) => {
         if (!active) return;
@@ -125,6 +130,15 @@ function PropertyDetails() {
           content={`${room.title} - ${room.category || "rental"} for rent in ${room.location || "Indore"}. View photos, rent, amenities and contact the owner on RoomSlider.`}
         />
         <link rel="canonical" href={`https://www.roomslider.in${roomPath(room)}`} />
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={`${room.title} | RoomSlider`} />
+        <meta property="og:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
+        <meta property="og:url" content={`https://www.roomslider.in${roomPath(room)}`} />
+        <meta property="og:image" content={room.images?.[0] || "https://www.roomslider.in/og-image.jpg"} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${room.title} | RoomSlider`} />
+        <meta name="twitter:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
+        <meta name="twitter:image" content={room.images?.[0] || "https://www.roomslider.in/og-image.jpg"} />
       </Helmet>
 
       <PropertyHeader room={room} wishlisted={wishlisted} onSave={toggleWishlist} />

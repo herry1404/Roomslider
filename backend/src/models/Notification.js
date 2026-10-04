@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const TYPES = [
   "roommate_request", "roommate_accepted", "roommate_message", "service_request", "service_status",
-  "vacate_notice", "payment", "loan_status", "furniture_status", "vehicle_status", "maintenance", "blood_request", "broadcast", "system",
+  "vacate_notice", "payment", "loan_status", "furniture_status", "vehicle_status", "maintenance", "blood_request", "broadcast", "saved_search", "system",
 ];
 
 const notificationSchema = new mongoose.Schema({

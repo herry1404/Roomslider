@@ -46,7 +46,7 @@ function addStream(userId, res) {
   };
 }
 
-async function notifyUser(userId, { type = "system", title, body, link = "", data = {}, priority = "normal", actions = [] } = {}) {
+async function notifyUser(userId, { type = "system", title, body, link = "", data = {}, priority = "normal", actions = [], image = "", hiTitle = "", hiMessage = "" } = {}) {
   try {
     const payload = {
       user: userId,
@@ -95,6 +95,9 @@ async function notifyUser(userId, { type = "system", title, body, link = "", dat
         actions,
         requestId: notification.data?.requestId || null,
         type: notification.type,
+        image,
+        hiTitle,
+        hiMessage,
       });
     } catch (error) { console.error("NOTIFICATION PUSH ERROR:", error.message); }
     return notification;
