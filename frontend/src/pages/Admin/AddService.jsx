@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import "../../styles/add-room.css";
+import "../../styles/admin/theme.css";
 
 const CATEGORIES = [
   { value: "cleaning", label: "Cleaning & Housekeeping" },
@@ -10,12 +11,18 @@ const CATEGORIES = [
   { value: "furniture", label: "Furniture & Appliance Rental" },
   { value: "wifi", label: "WiFi & RO Water" },
   { value: "appliance-repair", label: "Appliance Repair" },
+  { value: "study-support", label: "Study Support" },
+  { value: "rent-agreement", label: "Rent Agreement" },
 ];
+
+const PER_UNITS = ["month", "day", "hour", "visit", "washroom", "room", "person", "machine", "page"];
+const emptyPrice = () => ({ name: "", type: "monthly", price: "", unit: "", note: "", perUnit: "month", allowQuantity: false });
 
 function AddService() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
+  const [priceList, setPriceList] = useState([]);
 
   const [formData, setFormData] = useState({
     category: "cleaning",
@@ -24,12 +31,22 @@ function AddService() {
     city: "Indore",
     contactNumber: "",
     priceNote: "",
+    subType: "",
+    experienceYears: "",
+    languages: "",
+    availability: "",
+    serviceAreas: "",
+    isVerified: false,
     description: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "category" ? { subType: value === "study-support" ? "library" : value === "rent-agreement" ? "agreement" : "" } : {}),
+    }));
   };
 
   const handleImageChange = (e) => setImages(Array.from(e.target.files));
@@ -41,6 +58,9 @@ function AddService() {
     try {
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+      data.append("priceList", JSON.stringify(priceList.filter((item) => item.name && item.price !== "").map((item) => ({ ...item, price: Number(item.price) }))));
+      data.set("languages", JSON.stringify(formData.languages.split(",").map((item) => item.trim()).filter(Boolean)));
+      data.set("serviceAreas", JSON.stringify(formData.serviceAreas.split(",").map((item) => item.trim()).filter(Boolean)));
       images.forEach((image) => data.append("images", image));
 
       await api.post("/services", data);
@@ -55,7 +75,7 @@ function AddService() {
   };
 
   return (
-    <div className="add-room-page">
+    <div className="add-room-page admin-page">
       <div className="add-room-card">
         <h1>Add Service Provider</h1>
 
@@ -69,6 +89,35 @@ function AddService() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {(formData.category === "study-support" || formData.category === "rent-agreement") && (
+            <div className="form-section">
+              <h2>Service Type</h2>
+              <select name="subType" value={formData.subType} onChange={handleChange}>
+                {(formData.category === "study-support"
+                  ? [["library", "Library"], ["tutor", "Tutor"], ["printing", "Printing"], ["exam-help", "Exam help"]]
+                  : [["agreement", "Agreement"], ["police-verification", "Police verification"]]
+                ).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </div>
+          )}
+
+          <div className="form-section">
+            <h2 className="section-title">Price List</h2>
+            {priceList.map((item, index) => (
+              <div className="admin-toolbar" key={index}>
+                <div className="admin-search"><input aria-label="Service name" placeholder="Service name" value={item.name} onChange={(e) => setPriceList((rows) => rows.map((row, i) => i === index ? { ...row, name: e.target.value } : row))} /></div>
+                <select value={item.type} onChange={(e) => setPriceList((rows) => rows.map((row, i) => i === index ? { ...row, type: e.target.value } : row))}>
+                  <option value="monthly">Monthly</option><option value="one-time">One-time</option>
+                </select>
+                <div className="admin-search"><input aria-label="Price" type="number" min="0" placeholder="Price" value={item.price} onChange={(e) => setPriceList((rows) => rows.map((row, i) => i === index ? { ...row, price: e.target.value } : row))} /></div>
+                <select aria-label="Rate per" value={item.perUnit} onChange={(e) => setPriceList((rows) => rows.map((row, i) => i === index ? { ...row, perUnit: e.target.value, unit: "" } : row))}>{PER_UNITS.map((unit) => <option key={unit} value={unit}>per {unit}</option>)}</select>
+                <label className="admin-badge blue"><input type="checkbox" checked={item.allowQuantity} onChange={(e) => setPriceList((rows) => rows.map((row, i) => i === index ? { ...row, allowQuantity: e.target.checked } : row))} /> Customer chooses quantity</label>
+                <button type="button" className="admin-btn secondary" onClick={() => setPriceList((rows) => rows.filter((_, i) => i !== index))}>Remove</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn secondary" onClick={() => setPriceList((rows) => [...rows, emptyPrice()])}>Add price</button>
           </div>
 
           <div className="form-section">
@@ -92,6 +141,18 @@ function AddService() {
                 required
               />
             </div>
+
+            <div className="form-row">
+              <input type="number" min="0" name="experienceYears" placeholder="Experience (years)" value={formData.experienceYears} onChange={handleChange} />
+              <input type="text" name="languages" placeholder="Languages (comma separated)" value={formData.languages} onChange={handleChange} />
+            </div>
+
+            <div className="form-row">
+              <input type="text" name="availability" placeholder="Availability (e.g. 6 AM - 10 AM)" value={formData.availability} onChange={handleChange} />
+              <input type="text" name="serviceAreas" placeholder="Service areas (comma separated)" value={formData.serviceAreas} onChange={handleChange} />
+            </div>
+
+            <label className="admin-badge green"><input type="checkbox" name="isVerified" checked={formData.isVerified} onChange={(e) => setFormData((prev) => ({ ...prev, isVerified: e.target.checked }))} /> Verified worker</label>
 
             <div className="form-row">
               <input
@@ -124,7 +185,7 @@ function AddService() {
           </div>
 
           <div className="form-section">
-            <h2>Images (optional)</h2>
+            <h2>Worker photo (optional)</h2>
             <input type="file" multiple accept="image/*" onChange={handleImageChange} />
             <div className="preview-grid">
               {images.map((image, index) => (

@@ -19,9 +19,7 @@ import {
 import LoanModal from "../services/LoanModal";
 
 const comingSoon = [
-  { icon: FileText, title: "Rent Agreement", desc: "Agreement and police verification" },
   { icon: ShoppingBasket, title: "Groceries", desc: "Order from nearby shops" },
-  { icon: BookOpen, title: "Study Help", desc: "Printing, stationery and coaching" },
 ];
 
 const cardStyle = {
@@ -127,6 +125,20 @@ function ComingSoonServices() {
       desc: "Cooler, AC and geyser repair",
       button: "Explore",
       onClick: () => navigate("/services/appliance-repair"),
+    },
+    {
+      icon: BookOpen,
+      title: "Study Support",
+      desc: "Libraries, tutors and printing help",
+      button: "Explore",
+      onClick: () => navigate("/services/study-support"),
+    },
+    {
+      icon: FileText,
+      title: "Rent Agreement",
+      desc: "Agreement and police verification",
+      button: "Explore",
+      onClick: () => navigate("/services/rent-agreement"),
     },
   ];
 

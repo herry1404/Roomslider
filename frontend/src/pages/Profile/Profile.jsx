@@ -84,7 +84,7 @@ function Profile() {
       if (key === "activity") {
         const [f, s, vehicles, villas, loan] = await Promise.allSettled([
           api.get("/furniture-requests/mine"),
-          api.get("/service-bookings/my"),
+          api.get("/service-bookings/mine"),
           api.get("/vehicle-requests/mine"),
           api.get("/villa-bookings/mine"),
           api.get("/loans"),
@@ -111,7 +111,7 @@ function Profile() {
               id: "s" + b._id,
               type: "Service",
               title: b.provider?.name || "Service request",
-              sub: b.provider?.category || "",
+              sub: `${b.category || b.provider?.category || ""}${b.selectedItems?.length ? ` · ${b.selectedItems.length} service(s) · ₹${Number(b.totalEstimate || 0).toLocaleString("en-IN")}` : ""}`,
               status: b.status,
               createdAt: b.createdAt,
             })

@@ -76,6 +76,19 @@
 - Verified locally that the interceptor leaves `FormData` intact and Axios sends a multipart body with an automatically generated boundary. An isolated HTTP PUT + public GET test passed for both controllers using simulated Cloudinary URLs; it also verified keeping and removing existing photo URLs. Frontend build, focused lint, backend syntax checks, and `git diff --check` passed.
 - Live authenticated Cloudinary upload + database GET remains untested: the running local API returned 404 for `/api/vehicles`, and no admin token was available. Avoided writing test data to configured persistent database/cloud storage. Browser end-to-end checks for furniture/vehicle add/edit and photo removal also remain outstanding.
 
+### Service catalogue and service requests
+
+- Extended the generic `ServiceProvider` categories with `study-support` and `rent-agreement`, plus optional `subType`. Study support supports library, tutor, printing, and exam-help types; rent agreement supports agreement and police-verification types.
+- The existing `ServiceBooking` model now handles service requests for all categories. It records the provider, chosen current price-list items, server-calculated estimate, logged-in customer name/phone, structured address/location, preferred date/time, note, category data, and lifecycle status: `new`, `contacted`, `confirmed`, `completed`, or `cancelled`.
+- Requests are posted to `/api/service-bookings`, require login, and use the logged-in account’s name and phone. `/mine` is the current customer history endpoint; legacy `/my` remains available. Admins can filter all requests by category/status, update their status, and fetch the `new` request count for the sidebar badge.
+- Provider price-list items are revalidated server-side before saving; submitted client prices are not trusted. The request total is calculated from the provider’s current list.
+- Rent-agreement requests capture owner/tenant names, rent, deposit, and start date. Their optional ID photo reuses the authenticated Cloudinary upload path. It is omitted from all public/customer responses; the admin listing creates a signed URL only for admins.
+- New service requests create an in-app/push notification for all admins when notification infrastructure is available. Notification failures are logged without blocking the already-saved request.
+- Public service cards now include provider image/icon, grouped monthly/one-time prices, Request Service, Call, and WhatsApp actions. Request Service opens a mobile bottom sheet or desktop modal with service selection, Indore address/location capture, date/time preference, optional note, and a post-save WhatsApp handoff containing the request ID and map link.
+- The Profile Activity tab shows service requests, while `/admin/service-requests` provides a searchable admin table with customer contact, selected items, totals, map links, preferred slot, statuses, rent-agreement data, and secure ID-photo access.
+- Explore now treats Study Support and Rent Agreement as live service links. The two matching home teaser tiles remain in the existing mobile-hidden extra-tile group.
+- Added idempotent seed scripts for Cleaning and Study Support/Rent Agreement. Both use `updateOne` plus `upsert` and require `MONGODB_URI`.
+
 ## Important files
 
 ### New files
@@ -103,12 +116,16 @@
 - `frontend/src/pages/Roommates/RoommateChat.jsx`, `RoommateChatPage.jsx`, `RoommateProfilePage.jsx`
 - `frontend/src/styles/roommate-chat.css`
 - `UI-CHANGES.md` — property/home interface before-and-after log.
+- `backend/scripts/seedCleaning.js`
+- `backend/scripts/seedStudySupport.js`
+- `frontend/src/pages/Admin/ServiceRequests.jsx`
 
 ### Updated files
 
 - `README.md`
 - Backend: `package.json`, `package-lock.json`, `src/controllers/hourlyBooking.controller.js`, `src/controllers/notification.controller.js`, `src/controllers/homeSection.controller.js`, `src/controllers/laundryVendor.controller.js`, `src/controllers/roommate.controller.js`, `src/models/HourlyBooking.model.js`, `src/models/Notification.js`, `src/models/homeSection.model.js`, `src/models/laundryVendor.model.js`, `src/routes/hourlyBooking.routes.js`, `src/routes/notification.routes.js`, `src/routes/laundryVendor.routes.js`, `src/routes/roommate.routes.js`, `src/app.js`
 - Frontend: `vite.config.js`, `src/App.jsx`, `src/components/admin/Sidebar.jsx`, `src/components/explore/ComingSoonServices.jsx`, `src/components/home/ExploreTeaser.jsx`, `src/components/layout/Navbar.jsx`, `src/pages/Admin/AdminDashboard.jsx`, `src/pages/Admin/ManageHomeLayout.jsx`, `src/pages/Admin/ManageLaundryVendors.jsx`, `src/pages/HourlyManager/HourlyManagerDashboard.jsx`, `src/pages/Home/Home.jsx`, `src/pages/Profile/Profile.jsx`, `src/pages/Rooms/HourlyRoomCheckout.jsx`, `src/pages/Roommates/RoommateFinder.jsx`, `src/pages/Tenant/TenantDashboard.jsx`, `src/styles/admin/sidebar.css`, `src/styles/hourly-manager.css`, `src/styles/profile.css`
+- Service request work: Backend `package.json`, `src/models/service.model.js`, `src/models/serviceBooking.model.js`, `src/controllers/service.controller.js`, `src/controllers/serviceBooking.controller.js`, `src/routes/serviceBooking.routes.js`; Frontend `src/App.jsx`, `src/components/admin/Sidebar.jsx`, `src/components/explore/ComingSoonServices.jsx`, `src/components/home/ExploreTeaser.jsx`, `src/pages/Admin/AddService.jsx`, `src/pages/Admin/ManageServices.jsx`, `src/pages/Admin/ServiceRequests.jsx`, `src/pages/Profile/Profile.jsx`, `src/pages/Services/ServiceList.jsx`, `src/styles/services.css`
 
 ## Deployment / operational setup still required
 
@@ -157,3 +174,17 @@ Keep the private key secret. Deploy the frontend over HTTPS and users/managers m
 - Targeted ESLint for the property detail page, grouped property page, and home search: passed.
 - `git diff --check`: passed.
 - Browser/device visual checks on desktop, tablet, and mobile remain outstanding.
+
+### Current service catalogue and request-flow changes
+
+- Frontend production build: passed with Node 24.19.0; Vite emitted its existing `__dirname` config and large-chunk warnings.
+- Backend `node --check` passed for the updated service model/controller, service booking model/controller/routes, and both seed scripts.
+- `git diff --check`: passed.
+- Manual browser validation remains outstanding for login return-to-request, geolocation permission outcomes, service submission, admin status updates, notification delivery, WhatsApp handoff, and authenticated Cloudinary ID-photo upload/viewing.
+
+Run seeds from `backend/`:
+
+```sh
+npm run seed:cleaning
+npm run seed:study
+```

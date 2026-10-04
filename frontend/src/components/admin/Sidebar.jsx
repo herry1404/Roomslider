@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
 import "../../styles/admin/sidebar.css";
@@ -30,6 +32,10 @@ import "../../styles/admin/sidebar.css";
 function Sidebar({ open, closeSidebar }) {
 
   const { logout } = useAuth();
+  const [newServiceRequests, setNewServiceRequests] = useState(0);
+  useEffect(() => {
+    api.get("/service-bookings/new-count").then((res) => setNewServiceRequests(Number(res.data.count) || 0)).catch(() => {});
+  }, []);
 
   const groups = [
     {
@@ -52,6 +58,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
+        { title: "Service Requests", icon: <ClipboardList size={18} />, path: "/admin/service-requests", badge: newServiceRequests },
         { title: "Furniture & Appliances", icon: <Sofa size={18} />, path: "/admin/furniture" },
         { title: "Furniture Requests", icon: <ClipboardList size={18} />, path: "/admin/furniture/requests" },
       ],
@@ -130,7 +137,7 @@ function Sidebar({ open, closeSidebar }) {
                   }
                 >
                   {item.icon}
-                  <span>{item.title}</span>
+                  <span>{item.title}{item.badge > 0 && <span className="admin-badge green" style={{ marginLeft: 8, padding: "2px 7px" }}>{item.badge}</span>}</span>
                 </NavLink>
               ))}
             </nav>

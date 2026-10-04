@@ -15,6 +15,8 @@ import {
   Wrench,
   Users,
   Castle,
+  BookOpen,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
@@ -144,6 +146,22 @@ function ExploreTeaser() {
       pill: "Explore",
       extra: true,
       to: "/services/appliance-repair",
+    },
+    {
+      icon: BookOpen,
+      title: "Study Support",
+      desc: "Libraries, tutors and printing help",
+      pill: "Explore",
+      extra: true,
+      to: "/services/study-support",
+    },
+    {
+      icon: FileText,
+      title: "Rent Agreement",
+      desc: "Agreement and police verification",
+      pill: "Explore",
+      extra: true,
+      to: "/services/rent-agreement",
     },
     {
       icon: LayoutGrid,
