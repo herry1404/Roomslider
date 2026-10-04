@@ -186,7 +186,14 @@
   display: flex;
   justify-content: center;
   padding: 14px 20px 20px;
-  background: var(--color-bg, #f8fafc);
+  background: #0b0f0e;
+}
+
+html:has(.roommate-chat-page),
+body:has(.roommate-chat-page),
+body:has(.roommate-chat-page) #root {
+  min-height: 100vh;
+  background: #0b0f0e;
 }
 
 .roommate-chat-message-state {
@@ -1028,7 +1035,7 @@
   display: block;
   width: 21px;
   height: 21px;
-  background: #fff;
+  background: var(--color-surface, #161a19);
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(15, 23, 42, .25);
   transition: transform .15s ease;

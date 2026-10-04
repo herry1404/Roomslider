@@ -137,6 +137,33 @@ select{
   font:inherit;
 }
 
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea{
+  box-sizing:border-box;
+  max-width:100%;
+  min-width:0;
+}
+
+input[type="checkbox"],
+input[type="radio"]{
+  width:auto;
+  flex:none;
+  margin:0;
+}
+
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]){
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+:where(.input-grid,.fa-grid,.fa-form,.profile-form-fields,.donate-layout,.donate-grid,.donate-form,.service-form-grid,.vehicle-detail-layout,.vehicle-request-card form,.sw-filter-panel,.sw-category-grid,.sw-card-grid,.owner-detail-grid) > *{
+  min-width:0;
+}
+
 button{
   cursor:pointer;
   border:none;

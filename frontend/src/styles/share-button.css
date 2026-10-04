@@ -27,8 +27,8 @@
   right: 52px;
   width: 32px;
   height: 32px;
-  background: white;
-  color: #374151;
+  background: var(--color-surface, #161a19);
+  color: var(--color-text, #f1f5f4);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 .share-btn--tile:hover { color: var(--color-primary, #2563eb); }

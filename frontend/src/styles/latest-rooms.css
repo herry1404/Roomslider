@@ -212,7 +212,7 @@
     border-radius:50%;
 
 
-    background:white;
+    background:var(--color-surface);
 
 
     display:flex;
@@ -272,7 +272,7 @@
     bottom:12px;
 
 
-    background:white;
+    background:var(--color-surface);
 
 
     padding:7px 12px;

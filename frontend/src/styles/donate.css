@@ -14,6 +14,7 @@
 .donate-condition{margin:0;padding:11px;border:1px solid var(--color-border);border-radius:11px;display:flex;gap:12px;flex-wrap:wrap}
 .donate-condition legend{padding:0 5px;font-size:13px;font-weight:650}
 .donate-condition label{display:flex;align-items:center;gap:6px}
+.donate-condition input[type=radio]{width:auto;flex:none;margin:0}
 .donate-upload{position:relative;display:flex!important;align-items:center;gap:10px;padding:12px;border:1px dashed var(--color-primary);border-radius:10px;color:var(--color-primary);cursor:pointer}
 .donate-upload span{display:grid;gap:2px}.donate-upload small{font-size:11px;font-weight:400;color:var(--color-text-light)}
 .donate-upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
@@ -42,4 +43,5 @@
 .donate-skeleton{display:grid;gap:8px}.donate-skeleton i{height:54px;border-radius:10px;background:color-mix(in srgb,var(--color-text-light) 12%,transparent);animation:donate-pulse 1.3s infinite}
 @keyframes donate-pulse{50%{opacity:.45}}
 @media(max-width:700px){.donate-page{padding:18px 12px 40px}.donate-layout{grid-template-columns:1fr}.donate-aside{order:2}.donate-form{padding:14px}.donate-section-heading{flex-direction:column}.donate-location{min-height:36px}}
+@media(max-width:520px){.donate-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:380px){.donate-grid{grid-template-columns:1fr}.donate-condition{gap:9px}.donate-request{align-items:flex-start}.donate-request-state{font-size:10px}}
