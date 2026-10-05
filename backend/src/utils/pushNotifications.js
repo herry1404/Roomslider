@@ -74,6 +74,8 @@ async function sendPushNotifications(recipients, notification) {
             badge: notification.badge || "/pwa-192x192.png",
             requestId: notification.requestId || null,
             priority: notification.priority === "high" ? "high" : "normal",
+            requireInteraction: notification.requireInteraction === true,
+            vibrate: Array.isArray(notification.vibrate) ? notification.vibrate : undefined,
             actions: Array.isArray(notification.actions) ? notification.actions.slice(0, 2) : [],
           }),
           { urgency: notification.priority === "high" ? "high" : "normal" }
@@ -84,7 +86,7 @@ async function sendPushNotifications(recipients, notification) {
         if (error.statusCode === 404 || error.statusCode === 410) {
           expiredIds.push(subscription._id);
         } else {
-          console.error("PUSH DELIVERY ERROR:", error.message);
+          console.error("PUSH DELIVERY ERROR:", String(error.message || "delivery failed").slice(0, 160));
         }
       }
     })

@@ -18,6 +18,13 @@ const {
   getAllUsers,
   deleteUser,
 } = require("../controllers/admin.controller");
+const {
+  getAdminAlerts,
+  markAdminAlertRead,
+  markAllAdminAlertsRead,
+  subscribeAdminPush,
+  unsubscribeAdminPush,
+} = require("../controllers/adminAlert.controller");
 
 // ===============================
 // Dashboard
@@ -31,6 +38,11 @@ router.get(
 );
 
 router.get("/analytics", protect, adminOnly, getAnalytics);
+router.get("/alerts", protect, adminOnly, getAdminAlerts);
+router.patch("/alerts/read-all", protect, adminOnly, markAllAdminAlertsRead);
+router.patch("/alerts/:id/read", protect, adminOnly, markAdminAlertRead);
+router.post("/push/subscribe", protect, adminOnly, subscribeAdminPush);
+router.delete("/push/unsubscribe", protect, adminOnly, unsubscribeAdminPush);
 
 // ===============================
 // Get All Users

@@ -6,6 +6,7 @@ const Owner = require("../models/Owner");
 const Room = require("../models/room.model");
 const ListingEngagement = require("../models/ListingEngagement");
 const { createUniqueSlug } = require("../utils/publicSlug");
+const { notifyAdmin } = require("../services/adminAlert.service");
 
 const createOwnerToken = (owner) => {
   if (!process.env.JWT_SECRET) {
@@ -43,6 +44,13 @@ const createOwner = async (req, res) => {
       phone,
       password,
       propertyName,
+    });
+
+    notifyAdmin({
+      type: "owner_submission",
+      title: "New owner added",
+      message: "A new owner account was created.",
+      link: "/admin/owners",
     });
 
     const { logActivity } = require("./activity.controller");

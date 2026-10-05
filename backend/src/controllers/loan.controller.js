@@ -1,6 +1,7 @@
 const Loan = require("../models/loan.model");
 const cloudinary = require("../config/cloudinary");
 const { notifyUser } = require("../utils/notificationDelivery");
+const { notifyAdmin } = require("../services/adminAlert.service");
 
 const STATUS_MESSAGES = {
   submitted: "Your student loan application has been received.",
@@ -207,6 +208,13 @@ const createLoanRequest = async (req, res) => {
         status: "submitted",
         message: STATUS_MESSAGES.submitted,
       }],
+    });
+
+    notifyAdmin({
+      type: "student_loan_request",
+      title: "New student loan request",
+      message: "A student submitted a new loan request.",
+      link: "/admin/loans",
     });
 
     try {

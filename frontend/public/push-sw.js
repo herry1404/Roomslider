@@ -8,11 +8,12 @@ self.addEventListener("push", (event) => {
 
   event.waitUntil(
     self.registration.showNotification(payload.title || "RoomSlider", {
-      body: payload.body || "You have a new notification.",
+      body: payload.message || payload.body || "You have a new notification.",
       icon: payload.icon || "/pwa-192x192.png",
       badge: payload.badge || "/pwa-192x192.png",
       image: payload.image || undefined,
-      requireInteraction: payload.priority === "high",
+      requireInteraction: payload.requireInteraction === true || payload.priority === "high",
+      vibrate: Array.isArray(payload.vibrate) ? payload.vibrate : undefined,
       tag: payload.requestId ? `blood-request-${payload.requestId}` : undefined,
       actions: Array.isArray(payload.actions) ? payload.actions.slice(0, 2) : [],
       data: { url: payload.url || "/", requestId: payload.requestId || null },

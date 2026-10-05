@@ -8,6 +8,7 @@ const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 const { sanitizeRoomListing } = require("../utils/maskListingPhoneNumbers");
 const safeMsg = (e) =>
   process.env.NODE_ENV === "production" ? "Something went wrong" : e.message;
+const { notifyAdmin } = require("../services/adminAlert.service");
 
 // Owner: apni properties. Admin: saari (ya ?owner=<id>)
 const getMyProperties = async (req, res) => {
@@ -76,6 +77,14 @@ const createProperty = async (req, res) => {
       owner,
       ...(buildingName ? { buildings: [{ name: buildingName }] } : {}),
     });
+    if (req.user.role === "owner") {
+      notifyAdmin({
+        type: "property_submission",
+        title: "New property submission",
+        message: "An owner submitted a new property.",
+        link: "/admin/rooms",
+      });
+    }
     res.status(201).json({ success: true, property });
   } catch (error) {
     res.status(500).json({ success: false, message: safeMsg(error) });

@@ -11,6 +11,7 @@ const { notifySavedSearchMatches } = require("../utils/savedSearchAlerts");
 const { recordListingEngagement } = require("../utils/listingEngagement");
 const SearchEvent = require("../models/SearchEvent");
 const { uploadRentReceipt } = require("../utils/rentReceipt");
+const { notifyAdmin } = require("../services/adminAlert.service");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -187,6 +188,14 @@ const createRoom = async (req, res) => {
 
     const { logActivity } = require("./activity.controller");
     await logActivity("room_added", `New room added: ${room.title || room.propertyName || "Untitled"}`, room._id, "Room");
+    if (req.user.role === "owner") {
+      notifyAdmin({
+        type: "room_submission",
+        title: "New room submission",
+        message: "An owner submitted a new room listing.",
+        link: "/admin/rooms",
+      });
+    }
     setImmediate(() => notifySavedSearchMatches([room]));
 
     res.status(201).json({
@@ -380,6 +389,14 @@ const recordListingInquiry = async (req, res) => {
     }
 
     const tracked = await recordListingEngagement(room._id, req, type);
+    if (tracked) {
+      notifyAdmin({
+        type: "contact_inquiry",
+        title: "New contact inquiry",
+        message: "A visitor contacted an owner about a room.",
+        link: `/admin/rooms/${room._id}`,
+      });
+    }
     return res.status(200).json({ success: true, tracked });
   } catch (error) {
     console.error("LISTING INQUIRY TRACKING ERROR:", error);

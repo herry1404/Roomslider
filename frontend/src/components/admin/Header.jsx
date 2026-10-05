@@ -1,5 +1,6 @@
-import { Bell, Search, Menu } from "lucide-react";
+import { Search, Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import AdminAlertBell from "./AdminAlertBell";
 import "../../styles/admin/header.css";
 
 function Header({ openSidebar }) {
@@ -48,9 +49,7 @@ function Header({ openSidebar }) {
 
         </div>
 
-        <button className="notification-btn">
-          <Bell size={20} />
-        </button>
+        <AdminAlertBell />
 
         <div className="admin-profile">
 

@@ -296,3 +296,12 @@ NEXT: Updates section (after Profile page improvements)
 - Uncommitted Step 9 preparation currently includes the two frontend i18n dependencies, user-model preference fields (`privacySettings`, `themePreference`, `emergencyContact`, and `savedAddresses`), and token-version checks intended to support logging out all sessions.
 - These changes are only scaffolding. No new Step 9 API endpoint or environment key has been added, and the code has not been validated or committed. The token-version session behavior should be reviewed as part of implementation before relying on it.
 - When resumed, continue from the current uncommitted changes rather than discarding them; implement the agreed remaining language/settings scope, run relevant validation, and create the requested final `NOTES.md`. The user may also narrow or change the scope before work resumes.
+
+### 5 Oct 2026 - Admin alert system handoff
+
+- Implemented an uncommitted admin alert system for student loan submissions, maintenance requests, owner creation, owner-submitted rooms/properties, and tracked listing contact actions. Contact alerts use the existing `ListingEngagement` model; there is no separate contact form inquiry model.
+- Admin in-app alert routes are under `/api/admin/alerts`; the admin header bell polls every 15 seconds only while the page is visible. Admins can enable browser push from Admin Settings.
+- Backend environment placeholders are in `backend/.env.example`: `ADMIN_APP_URL`, VAPID keys/subject, Telegram bot token/chat ID, and WhatsApp Cloud API token/phone-number ID/admin number/template name/enabled flag. Do not add real credentials to the repository.
+- Telegram chat ID helper: `cd backend && node scripts/telegram-get-chat-id.js` after messaging the bot. WhatsApp requires an approved two-variable template; setup guidance and manual curl examples are in `README.md`.
+- Telegram and WhatsApp sends have a MongoDB per-channel, per-event-type 30-second rate limit. Capacitor/FCM remains a TODO.
+- Pending before relying on this feature: configure deployment secrets and test browser push, Telegram, WhatsApp template delivery, unread/read routes, and one request for each event type against real accounts. The frontend production build and changed-file syntax/targeted lint checks passed; full lint still has unrelated existing errors. No live external-channel or database integration tests have been performed.

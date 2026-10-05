@@ -61,12 +61,112 @@
 }
 
 .notification-btn{
+    position:relative;
     width:46px;
     height:46px;
     border:none;
     border-radius:50%;
     background:rgba(16,185,129,.10);
     cursor:pointer;
+}
+
+.admin-alert-menu{
+    position:relative;
+}
+
+.admin-alert-count{
+    position:absolute;
+    top:-4px;
+    right:-5px;
+    min-width:18px;
+    height:18px;
+    padding:0 4px;
+    border-radius:999px;
+    background:#ef4444;
+    color:#fff;
+    font-size:10px;
+    font-weight:700;
+    line-height:18px;
+    text-align:center;
+}
+
+.admin-alert-dropdown{
+    position:absolute;
+    top:56px;
+    right:0;
+    z-index:1001;
+    width:min(360px, calc(100vw - 32px));
+    overflow:hidden;
+    border:1px solid var(--color-border);
+    border-radius:14px;
+    background:var(--color-surface);
+    color:var(--color-text);
+    box-shadow:0 16px 40px rgba(0,0,0,.2);
+}
+
+.admin-alert-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    border-bottom:1px solid var(--color-border);
+}
+
+.admin-alert-sound,
+.admin-alert-mark-all{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    border:0;
+    background:transparent;
+    color:var(--color-primary);
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+}
+
+.admin-alert-list{
+    max-height:360px;
+    overflow:auto;
+}
+
+.admin-alert-item{
+    display:flex;
+    width:100%;
+    flex-direction:column;
+    gap:5px;
+    padding:13px 16px;
+    border:0;
+    border-bottom:1px solid var(--color-border);
+    background:transparent;
+    color:inherit;
+    text-align:left;
+    cursor:pointer;
+}
+
+.admin-alert-item:hover,
+.admin-alert-item.unread{
+    background:rgba(16,185,129,.08);
+}
+
+.admin-alert-item span,
+.admin-alert-item time{
+    color:var(--color-text-light);
+    font-size:12px;
+}
+
+.admin-alert-empty{
+    margin:0;
+    padding:20px 16px;
+    color:var(--color-text-light);
+    font-size:13px;
+}
+
+.admin-alert-mark-all{
+    justify-content:center;
+    width:100%;
+    padding:12px;
+    border-top:1px solid var(--color-border);
 }
 
 .admin-profile{
@@ -126,10 +226,6 @@
 }
 
 @media(max-width:600px){
-
-.notification-btn{
-    display:none;
-}
 
 .admin-profile h4{
     display:none;

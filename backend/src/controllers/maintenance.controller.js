@@ -2,6 +2,7 @@ const Maintenance = require("../models/maintenance.model");
 const Room = require("../models/room.model");
 const { notifyUser, sendNotificationToRecipients } = require("../utils/notificationDelivery");
 const User = require("../models/user.model");
+const { notifyAdmin } = require("../services/adminAlert.service");
 
 // Tenant raises a maintenance request for their room.
 // Photo is optional; multer-cloudinary middleware (if used) attaches req.file.path as the hosted URL.
@@ -36,6 +37,13 @@ const createRequest = async (req, res) => {
       description,
       category: category || "other",
       photoUrl: req.file ? req.file.path : null,
+    });
+
+    notifyAdmin({
+      type: "maintenance_request",
+      title: "New maintenance request",
+      message: "A tenant submitted a maintenance request.",
+      link: "/admin/rooms",
     });
 
     try {
