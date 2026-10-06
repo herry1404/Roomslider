@@ -5,10 +5,19 @@ import "../../styles/back-to-top.css";
 export default function BackToTop() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const update = () => setVisible(window.scrollY > 500);
+    let assistantOpen = false;
+    const update = () => setVisible(window.scrollY > 500 && !assistantOpen);
+    const assistantVisibilityChanged = (event) => {
+      assistantOpen = event.detail?.open === true;
+      update();
+    };
     window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("roomslider:assistant-visibility", assistantVisibilityChanged);
     update();
-    return () => window.removeEventListener("scroll", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("roomslider:assistant-visibility", assistantVisibilityChanged);
+    };
   }, []);
   if (!visible) return null;
   return (
