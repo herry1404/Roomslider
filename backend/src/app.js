@@ -9,6 +9,7 @@ const Sentry = require("./config/sentry");
 const authRoutes = require("./routes/auth.routes");
 const wishlistRoutes = require("./routes/wishlist.routes");
 const roomRoutes = require("./routes/room.routes");
+const assistantRoutes = require("./routes/assistant.routes");
 const adminRoutes = require("./routes/admin.routes"); // ✅ Added
 const ownerRoutes = require("./routes/owner.routes"); // ✅ Added for Owner Portal
 const electricityRoutes = require("./routes/electricity.routes");
@@ -42,6 +43,7 @@ const villaBookingRoutes = require("./routes/villaBooking.routes");
 const socialRoutes = require("./routes/social.routes");
 const donationRoutes = require("./routes/donation.routes");
 const bloodRequestRoutes = require("./routes/bloodRequest.routes");
+const telegramWebhookRoutes = require("./routes/telegramWebhook.routes");
 
 
 const {
@@ -179,6 +181,8 @@ if(process.env.NODE_ENV !== "production"){
 // =====================
 
 
+app.use("/api/telegram/webhook", telegramWebhookRoutes);
+
 app.use(
   express.json()
 );
@@ -230,6 +234,11 @@ app.use(
 app.use(
   "/api/rooms",
   roomRoutes
+);
+
+app.use(
+  "/api/assistant",
+  assistantRoutes
 );
 
 
