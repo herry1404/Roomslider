@@ -8,6 +8,7 @@ import CategorySection from "../../components/home/CategorySection";
 import HomeBanner from "../../components/home/HomeBanner";
 import HomeRentalSection from "../../components/home/HomeRentalSection";
 import RecentlyViewedSection from "../../components/home/RecentlyViewedSection";
+import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import api from "../../api/axios";
 
 const CACHE_KEY = "homeSectionsV1";
@@ -26,6 +27,24 @@ const DEFAULT_SECTIONS = [
 ];
 
 const CATEGORY_PATH = { Room: "/rooms", PG: "/pg", Hostel: "/hostels", Flat: "/flats" };
+
+function ListingSectionSkeleton({ title, viewAllPath }) {
+  return (
+    <section className="latest-rooms home-listings-loading" aria-label={`Loading ${title}`}>
+      <div className="container">
+        <div className="section-header">
+          <h2>{title}</h2>
+          <span className="home-skeleton-view-all" aria-hidden="true" />
+        </div>
+        <div className="rooms-grid" aria-hidden="true">
+          {Array.from({ length: 6 }, (_, index) => (
+            <SkeletonRoomCard key={`${viewAllPath}-${index}`} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 const readCache = () => {
   try {
@@ -61,18 +80,25 @@ function Home() {
   const [sections, setSections] = useState(() => readCache() || DEFAULT_SECTIONS);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchRooms = async () => {
       try {
-        const res = await api.get("/rooms", { params: { grouped: "true" } });
+        const res = await api.get("/rooms", {
+          params: { grouped: "true" },
+          signal: controller.signal,
+        });
         setRooms(res.data?.rooms || []);
       } catch (error) {
-        console.error("Home Rooms Error:", error);
+        if (!controller.signal.aborted) {
+          console.error("Home Rooms Error:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
     fetchRooms();
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -113,14 +139,18 @@ function Home() {
       case "banner":
         return <HomeBanner key={s._id} section={s} />;
       case "listings": {
-        if (loading) return null;
         const cfg = s.config || {};
+        const title = s.title || "Listings";
+        const viewAllPath = cfg.viewAllPath || CATEGORY_PATH[cfg.category] || "/rooms";
+        if (loading) {
+          return <ListingSectionSkeleton key={s._id} title={title} viewAllPath={viewAllPath} />;
+        }
         const list = rooms.filter((r) => matches(r, cfg)).slice(0, cfg.limit || 10);
         return (
           <CategorySection
             key={s._id}
-            title={s.title || "Listings"}
-            viewAllPath={cfg.viewAllPath || CATEGORY_PATH[cfg.category] || "/rooms"}
+            title={title}
+            viewAllPath={viewAllPath}
             rooms={list}
           />
         );

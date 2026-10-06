@@ -738,3 +738,30 @@
   from{ left:-80%; }
   to{ left:140%; }
 }
+
+.home-listings-loading .section-header h2 {
+  min-width: 120px;
+}
+.home-skeleton-view-all {
+  width: 84px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+}
+.home-listings-loading .rooms-grid,
+.home-rental-skeleton {
+  min-height: 300px;
+}
+.home-rental-skeleton .skeleton-card {
+  flex: 0 0 200px;
+  min-width: 0;
+}
+@media (max-width: 576px) {
+  .home-listings-loading .rooms-grid,
+  .home-rental-skeleton {
+    min-height: 260px;
+  }
+  .home-rental-skeleton .skeleton-card {
+    flex-basis: 160px;
+  }
+}
