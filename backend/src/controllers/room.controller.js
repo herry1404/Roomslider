@@ -12,6 +12,7 @@ const { recordListingEngagement } = require("../utils/listingEngagement");
 const SearchEvent = require("../models/SearchEvent");
 const { uploadRentReceipt } = require("../utils/rentReceipt");
 const { notifyAdmin } = require("../services/adminAlert.service");
+const { buildPublicRoomFilter } = require("../services/publicRoomListings.service");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -228,11 +229,11 @@ const getRooms = async (req, res) => {
     }
 
     if (req.query.search) {
-      const searchText = String(req.query.search)
-        .slice(0, 100)
-        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(searchText, "i");
-      filter.$or = [{ title: regex }, { location: regex }, { category: regex }];
+      const publicSearch = buildPublicRoomFilter({
+        search: req.query.search,
+        maxSearchLength: 100,
+      });
+      filter.$or = publicSearch.$or;
       setImmediate(() => {
         SearchEvent.create({
           userId: req.user?.role === "user" ? req.user._id : null,
@@ -244,7 +245,11 @@ const getRooms = async (req, res) => {
     const canViewOccupied = req.query.includeOccupied === "true"
       && ["admin", "owner"].includes(req.user?.role);
     if (!canViewOccupied) {
-      filter.status = "vacant";
+      Object.assign(filter, buildPublicRoomFilter({
+        category: req.query.category,
+        search: req.query.search,
+        maxSearchLength: 100,
+      }));
     } else {
       if (req.user.role === "owner") filter.owner = req.user._id;
       if (req.query.status) filter.status = req.query.status;

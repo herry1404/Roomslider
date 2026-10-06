@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
     "seed:vehicles": "node scripts/seedVehicles.js",
     "seed:cleaning": "node scripts/seedCleaning.js",
     "seed:study": "node scripts/seedStudySupport.js"

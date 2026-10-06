@@ -105,9 +105,74 @@ Telegram and WhatsApp sends are rate-limited in MongoDB to at most one message
 per event type per 30 seconds across backend instances. Set WhatsApp enabled to
 the exact string `true`; otherwise it is skipped.
 
+# User-facing Telegram bot
+
+The RoomSlider user bot is a separate Telegram bot from the admin-alert bot above.
+It uses `TELEGRAM_USER_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET`; the existing
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID` continue to serve admin alerts.
+The user bot browses public vacant Room, PG, Hostel, and Flat listings, searches
+by area/text, and links to the matching public RoomSlider listing page. It does
+not expose owner contact information or private tenancy data.
+
+1. In Telegram, open **@BotFather**, run `/newbot`, and follow the prompts. Keep
+   the resulting token private. Register commands using `/setcommands`:
+
+   ```text
+   start - Start browsing RoomSlider
+   help - Show bot help and menu
+   rooms - Browse latest public listings
+   search - Search listings by area or keyword
+   support - Open RoomSlider support page
+   ```
+
+2. Generate a random webhook secret:
+
+   ```sh
+   openssl rand -hex 32
+   ```
+
+3. Add these values to the backend environment in Render. `BACKEND_PUBLIC_URL`
+   must be the public HTTPS origin of the backend service, without an API path:
+
+   ```text
+   TELEGRAM_USER_BOT_TOKEN=<BotFather token>
+   TELEGRAM_WEBHOOK_SECRET=<generated random secret>
+   BACKEND_PUBLIC_URL=https://your-backend.onrender.com
+   SITE_URL=https://roomslider.in
+   ```
+
+4. Deploy/restart the backend, then configure the webhook from the backend
+   directory where the environment variables are available:
+
+   ```sh
+   cd backend
+   node scripts/telegram-set-webhook.js
+   node scripts/telegram-set-webhook.js --info
+   ```
+
+   `--delete` removes the webhook. These commands never print the bot token.
+
+For local end-to-end testing, expose the local backend over HTTPS with a tunnel
+such as ngrok or Cloudflare Tunnel, set `BACKEND_PUBLIC_URL` to that temporary
+HTTPS origin, and run the same webhook script. Alternatively, POST a sample
+Telegram update to `/api/telegram/webhook` with the
+`X-Telegram-Bot-Api-Secret-Token` header set to your local secret. Do not commit
+real credentials. The webhook only processes `message` and `callback_query`
+updates, acknowledges valid updates quickly, and applies per-IP and per-chat
+rate limits. Render's free tier may take time to wake after inactivity, so bot
+responses can be delayed by cold starts.
+
 # Error monitoring
 
 Set `SENTRY_DSN` in the backend environment and `VITE_SENTRY_DSN` in the
 frontend build environment to enable Sentry error and performance monitoring.
 Both integrations remain disabled when their DSN is unset. The backend uptime
 health check is available at `GET /api/health`.
+
+# AI Room Finder
+
+Set `GEMINI_API_KEY` in the backend environment to enable AI filter extraction.
+`GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash`.
+Copy both variables from `backend/.env.example`; without the API key, the
+assistant endpoint returns a friendly unavailable response. The frontend calls
+`/api/assistant` through the existing `VITE_API_URL`-configured API client.
