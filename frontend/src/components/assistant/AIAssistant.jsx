@@ -58,10 +58,11 @@ function isComingSoonService(result) {
 }
 
 function resultLink(result) {
+  if (typeof result.link === "string" && result.link.startsWith("/")) return result.link;
   if (result.type === "room" && result.category && (result.slug || result.title)) {
     return roomPath(result);
   }
-  return typeof result.link === "string" && result.link.startsWith("/") ? result.link : "/explore";
+  return "/explore";
 }
 
 function AssistantResultCard({ result }) {
@@ -85,22 +86,57 @@ function AssistantResultCard({ result }) {
       <span className="ai-assistant-result-info">
         <span className="ai-assistant-result-title">
           <strong>{result.title}</strong>
-          {comingSoon && <span className="ai-assistant-coming-soon">Coming Soon</span>}
         </span>
-        {result.subtitle && <span className="ai-assistant-result-subtitle">{result.subtitle}</span>}
-        {Number.isFinite(price) && (
-          <span className="ai-assistant-result-price">₹{price.toLocaleString("en-IN")}</span>
-        )}
-        {result.location && (
-          <span className="ai-assistant-result-location"><MapPin size={12} />{result.location}</span>
-        )}
+        <span className="ai-assistant-result-meta">
+          {result.category && <span className="ai-assistant-category">{result.category}</span>}
+          {comingSoon && <span className="ai-assistant-coming-soon">Coming Soon</span>}
+          {Number.isFinite(price) && (
+            <span className="ai-assistant-result-price">₹{price.toLocaleString("en-IN")}</span>
+          )}
+        </span>
+        {result.location
+          ? <span className="ai-assistant-result-location"><MapPin size={12} />{result.location}</span>
+          : result.subtitle && <span className="ai-assistant-result-subtitle">{result.subtitle}</span>}
       </span>
     </Link>
   );
 }
 
 function normalizeResults(data) {
-  const items = [...(Array.isArray(data.results) ? data.results : []), ...(Array.isArray(data.cards) ? data.cards : [])];
+  const items = [
+    ...(Array.isArray(data.results) ? data.results : []),
+    ...(Array.isArray(data.cards) ? data.cards : []),
+  ].map((item) => {
+    if (item?.type && item.title) return item;
+    if (item?._id && item.title && item.category) {
+      const path = { Room: "rooms", PG: "pg", Hostel: "hostels", Flat: "flats" }[item.category] || "rooms";
+      return {
+        ...item,
+        type: "room",
+        subtitle: [item.sharingType, item.gender === "Female" ? "Girls" : item.gender === "Male" ? "Boys" : null]
+          .filter(Boolean)
+          .join(" · ") || item.category,
+        image: item.images?.[0] || null,
+        link: `/${path}/${item.slug || item._id}`,
+      };
+    }
+    return item;
+  });
+  if (items.length === 0 && Array.isArray(data.rooms)) {
+    items.push(...data.rooms.map((room) => {
+      if (!room?._id || !room.title || !room.category) return room;
+      const path = { Room: "rooms", PG: "pg", Hostel: "hostels", Flat: "flats" }[room.category] || "rooms";
+      return {
+        ...room,
+        type: "room",
+        subtitle: [room.sharingType, room.gender === "Female" ? "Girls" : room.gender === "Male" ? "Boys" : null]
+          .filter(Boolean)
+          .join(" · ") || room.category,
+        image: room.images?.[0] || null,
+        link: `/${path}/${room.slug || room._id}`,
+      };
+    }));
+  }
   const seen = new Set();
   return items.filter((item) => {
     if (!item || typeof item !== "object" || typeof item.title !== "string") return false;
@@ -124,13 +160,25 @@ function AssistantMessage({ item }) {
 
   return (
     <div className={`ai-assistant-message-row ${item.role === "user" ? "is-user" : ""}`}>
+      {item.role === "assistant" && (
+        <span className="ai-assistant-message-avatar">
+          <img src="/ai-avatar.webp" alt="" width="28" height="28" decoding="async" />
+        </span>
+      )}
       {item.text && <div className={`ai-assistant-bubble ${item.error ? "is-error" : ""}`}>{item.text}</div>}
       {results.length > 0 && (
-        <div className="ai-assistant-results">
-          {results.map((result, index) => (
-            <AssistantResultCard key={`${result.type}-${result.title}-${index}`} result={result} />
-          ))}
-        </div>
+        <>
+          <div className="ai-assistant-results" aria-label="Search results">
+            {results.map((result, index) => (
+              <AssistantResultCard key={`${result.type}-${result.title}-${index}`} result={result} />
+            ))}
+          </div>
+          {item.hasMore && (
+            <Link className="ai-assistant-view-all" to={item.viewAllLink || "/rooms"}>
+              View all on map / list
+            </Link>
+          )}
+        </>
       )}
       {showEmpty && <p className="ai-assistant-empty">Abhi koi matching result nahi mila. Area ya budget badal kar try karein.</p>}
     </div>
@@ -200,12 +248,25 @@ function AIAssistant({ initialOpen = false, onClose }) {
     try {
       const { data } = await api.post("/assistant", { message: text });
       const results = normalizeResults(data);
+      if (import.meta.env.DEV) {
+        console.debug("AI ASSISTANT API RESPONSE:", data);
+        const rawResultCount = (Array.isArray(data.results) ? data.results.length : 0)
+          + (Array.isArray(data.cards) ? data.cards.length : 0)
+          + (Array.isArray(data.rooms) ? data.rooms.length : 0);
+        if (rawResultCount > 0 && results.length === 0) {
+          console.error("AI assistant received results but could not render result cards.", data);
+        }
+      }
       setMessages((previous) => appendMessages(previous, [{
         id: `${Date.now()}-assistant`,
         role: "assistant",
         text: data.reply || "Samajh gaya. Aap thoda aur detail bata sakte hain?",
         intent: data.intent,
         results,
+        hasMore: data.hasMore === true || Number(data.total) > results.length,
+        viewAllLink: typeof data.viewAllLink === "string" && data.viewAllLink.startsWith("/")
+          ? data.viewAllLink
+          : "/rooms",
       }]));
     } catch (error) {
       const status = error.response?.status;
@@ -243,7 +304,9 @@ function AIAssistant({ initialOpen = false, onClose }) {
       {open && (
         <section className="ai-assistant-panel" style={panelStyle} aria-label="RoomSlider AI Assistant">
           <header className="ai-assistant-header">
-            <span className="ai-assistant-avatar"><Sparkles size={19} /></span>
+            <span className="ai-assistant-avatar">
+              <img src="/ai-avatar.webp" alt="" width="28" height="28" decoding="async" />
+            </span>
             <span className="ai-assistant-heading">
               <strong>RoomSlider AI Assistant</strong>
               <small>Rooms, food, laundry & more</small>

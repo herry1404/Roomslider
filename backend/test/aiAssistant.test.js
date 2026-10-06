@@ -5,6 +5,7 @@ const {
   extractAssistantFilters,
   sanitizeSearchMessage,
 } = require("../src/services/aiAssistant.service");
+const { makeReply, roomCard } = require("../src/controllers/assistant.controller");
 
 test("builds public-room query from assistant filters", () => {
   const query = buildAssistantRoomQuery({
@@ -78,4 +79,41 @@ test("requires a Gemini key before making a request", async () => {
     }),
     { code: "GEMINI_API_KEY_MISSING" }
   );
+});
+
+test("builds a specific Hinglish reply from real rooms", () => {
+  const rooms = [
+    { title: "DAVV Girls PG", category: "PG", price: 3500, location: "Vijay Nagar" },
+    { title: "Student PG", category: "PG", price: 5000, location: "Bhawarkuan" },
+  ];
+
+  assert.equal(
+    makeReply("PG under 6000 chahiye", rooms, { category: "PG" }, 6),
+    "Aapke liye 6 PGs mile. Sabse sasta ₹3,500, Vijay Nagar. Neeche dekho."
+  );
+});
+
+test("maps a room to the shared API card contract", () => {
+  const card = roomCard({
+    _id: "room-id",
+    title: "DAVV Girls PG",
+    slug: "davv-girls-pg",
+    category: "PG",
+    price: 3500,
+    location: "Vijay Nagar",
+    images: ["room.jpg"],
+    gender: "Female",
+    sharingType: "Double",
+  });
+
+  assert.deepEqual(card, {
+    type: "room",
+    title: "DAVV Girls PG",
+    subtitle: "Double · Girls",
+    category: "PG",
+    price: 3500,
+    image: "room.jpg",
+    location: "Vijay Nagar",
+    link: "/pg/davv-girls-pg",
+  });
 });

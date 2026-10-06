@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import BottomNav from "../components/layout/BottomNav";
-import PullToRefresh from "../components/ui/PullToRefresh";
 
 const AIAssistant = lazy(() => import("../components/assistant/AIAssistant"));
 
@@ -26,9 +25,7 @@ function MainLayout({ children }) {
       <Navbar />
 
       <main style={{ minHeight: "calc(100vh - var(--navbar-height))" }}>
-        {immersiveChat
-          ? children
-          : <PullToRefresh onRefresh={() => window.location.reload()}>{children}</PullToRefresh>}
+        {children}
       </main>
 
       {!immersiveChat && <Footer />}
@@ -40,7 +37,13 @@ function MainLayout({ children }) {
           aria-label="Open AI Room Finder"
           onClick={() => setAssistantStarted(true)}
         >
-          ✨
+          <img
+            src="/ai-avatar.webp"
+            alt=""
+            width="44"
+            height="44"
+            decoding="async"
+          />
         </button>
       )}
       {assistantStarted && (
