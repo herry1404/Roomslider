@@ -306,8 +306,8 @@ body.dark {
     display: none;
   }
   body.map-page .map-fullscreen-wrap {
-    height: calc(100vh - 50px);
-    height: calc(100dvh - 50px);
+    height: calc(100vh - 58px - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - 58px - env(safe-area-inset-bottom, 0px));
   }
   body.map-page .bottom-nav {
     z-index: 2000;

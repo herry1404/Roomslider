@@ -1,4 +1,30 @@
 
+# Capacitor mobile app
+
+The Vite frontend can be built as native Android and iOS apps with Capacitor.
+Location permission is requested when a map needs the device's position, and
+notification permission is requested from the signed-in app experience; neither
+is requested unconditionally at launch. Android declares coarse/fine location,
+notifications, vibration, and internet access. iOS explains foreground-only
+location access in its permission prompt. The app does not request background
+location, contacts, camera, microphone, or other unrelated permissions.
+
+Build and sync the native projects. Production builds use the RoomSlider API by
+default; set `VITE_API_URL` only when building against a different backend:
+
+```sh
+cd frontend
+npm run cap:sync
+npm run cap:open:android
+# On macOS with Xcode:
+npm run cap:open:ios
+```
+
+Android builds require Android Studio/SDK; iOS builds require macOS and Xcode.
+The native notification permission is wired, but remote native push delivery
+still needs Firebase Cloud Messaging/APNs configuration and backend token
+delivery; browser push continues to use the existing VAPID setup below.
+
 # Browser push notifications
 
 Admin announcements and hourly-manager announcements are saved to each user's

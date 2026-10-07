@@ -3,6 +3,8 @@ import { Bell, X } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { Capacitor } from "@capacitor/core";
+import { PushNotifications } from "@capacitor/push-notifications";
 import "../../styles/push-permission.css";
 
 const SNOOZE_KEY = "pushPromptSnoozedUntil";
@@ -30,10 +32,28 @@ export default function PushPermissionPrompt() {
   const [iosTipDismissed, setIosTipDismissed] = useState(false);
   const [enabling, setEnabling] = useState(false);
   const [snoozed, setSnoozed] = useState(true);
+  const [nativePermission, setNativePermission] = useState(null);
 
-  const iosNeedsInstall = user && isIosDevice() && !isStandalone();
+  const nativeApp = Capacitor.isNativePlatform();
+  const iosNeedsInstall = user && !nativeApp && isIosDevice() && !isStandalone();
   const iosTipVisible = iosNeedsInstall && !iosTipDismissed && localStorage.getItem(IOS_TIP_KEY) !== "1";
-  const pushSupported = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+  const pushSupported = !nativeApp && "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+
+  useEffect(() => {
+    if (!user || !nativeApp) return undefined;
+    let active = true;
+    PushNotifications.checkPermissions()
+      .then(({ receive }) => {
+        if (active) setNativePermission(receive);
+      })
+      .catch((error) => {
+        console.error("NATIVE NOTIFICATION PERMISSION CHECK ERROR:", error);
+        if (active) setNativePermission("denied");
+      });
+    return () => {
+      active = false;
+    };
+  }, [nativeApp, user]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -46,8 +66,9 @@ export default function PushPermissionPrompt() {
     user
     && !iosNeedsInstall
     && !dismissed
-    && pushSupported
-    && Notification.permission === "default"
+    && (nativeApp
+      ? nativePermission === "prompt" || nativePermission === "prompt-with-rationale"
+      : pushSupported && Notification.permission === "default")
     && !snoozed
   );
 
@@ -66,6 +87,14 @@ export default function PushPermissionPrompt() {
     if (enabling) return;
     setEnabling(true);
     try {
+      if (nativeApp) {
+        const { receive } = await PushNotifications.requestPermissions();
+        setNativePermission(receive);
+        setDismissed(true);
+        if (receive === "granted") toast.success("Device notification permission enabled");
+        return;
+      }
+
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setDismissed(true);
@@ -100,7 +129,9 @@ export default function PushPermissionPrompt() {
           <section className="push-prompt" role="dialog" aria-modal="true" aria-labelledby="push-prompt-title">
             <span className="push-prompt-icon"><Bell size={24} /></span>
             <h2 id="push-prompt-title">Updates chahiye?</h2>
-            <p>Get useful updates about messages, bookings and new listings.</p>
+            <p>{nativeApp
+              ? "Allow RoomSlider to show notifications on this device."
+              : "Get useful updates about messages, bookings and new listings."}</p>
             <div className="push-prompt-actions">
               <button type="button" className="push-prompt-allow" onClick={enablePush} disabled={enabling}>
                 {enabling ? "Please wait…" : "Allow"}

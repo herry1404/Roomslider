@@ -1,8 +1,10 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useState } from "react";
 import { Locate } from "lucide-react";
+import toast from "react-hot-toast";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getCurrentPosition } from "../../utils/deviceLocation";
 
 const icon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -27,13 +29,14 @@ function LocationPicker({ latitude, longitude, onChange }) {
 
   const useMyLocation = () => {
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    getCurrentPosition()
+      .then((pos) => {
         onChange(pos.coords.latitude, pos.coords.longitude);
-        setLocating(false);
-      },
-      () => setLocating(false)
-    );
+      })
+      .catch((error) => {
+        toast.error(error.message || "Could not get your location");
+      })
+      .finally(() => setLocating(false));
   };
 
   return (

@@ -1,0 +1,8 @@
+{
+  "appId": "in.roomslider.app",
+  "appName": "RoomSlider",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
