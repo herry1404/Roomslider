@@ -7,7 +7,7 @@ export default function Privacy() {
       <Helmet>
         <title>Privacy Policy | RoomSlider</title>
         <meta name="description" content="How RoomSlider collects, uses and protects your personal data on roomslider.in." />
-        <link rel="canonical" href="https://www.roomslider.in/privacy" />
+        <link rel="canonical" href="https://roomslider.in/privacy" />
       </Helmet>
     <div className="legal-page">
       <div className="legal-container">

@@ -94,7 +94,7 @@ function MessList() {
           name="description"
           content="Find mess and tiffin services near you in Indore. Daily menu, price per person, and easy ordering with RoomSlider."
         />
-        <link rel="canonical" href="https://www.roomslider.in/mess" />
+        <link rel="canonical" href="https://roomslider.in/mess" />
       </Helmet>
 
       <main className="mess-page">

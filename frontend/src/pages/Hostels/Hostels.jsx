@@ -42,7 +42,7 @@ function Hostels() {
       <Helmet>
         <title>Hostels in Indore | RoomSlider</title>
         <meta name="description" content="Comfortable and affordable hostel stays in Indore. Browse verified hostel listings with RoomSlider." />
-        <link rel="canonical" href="https://www.roomslider.in/hostels" />
+        <link rel="canonical" href="https://roomslider.in/hostels" />
       </Helmet>
 
     <section className="container" style={{ padding: "40px 0" }}>

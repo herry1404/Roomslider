@@ -45,7 +45,7 @@ function HourlyRooms() {
       <Helmet>
         <title>Hourly / Short Stay in Indore | RoomSlider</title>
         <meta name="description" content="Book rooms by the hour in Indore. Verified hourly rooms with RoomSlider." />
-        <link rel="canonical" href="https://www.roomslider.in/hourly-rooms" />
+        <link rel="canonical" href="https://roomslider.in/hourly-rooms" />
       </Helmet>
 
       <section className="container hourly-rooms-page">

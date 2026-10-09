@@ -133,16 +133,16 @@ function PropertyDetails() {
           name="description"
           content={`${room.title} - ${room.category || "rental"} for rent in ${room.location || "Indore"}. View photos, rent, amenities and contact the owner on RoomSlider.`}
         />
-        <link rel="canonical" href={`https://www.roomslider.in${roomPath(room)}`} />
+        <link rel="canonical" href={`https://roomslider.in${roomPath(room)}`} />
         <meta property="og:type" content="product" />
         <meta property="og:title" content={`${room.title} | RoomSlider`} />
         <meta property="og:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
-        <meta property="og:url" content={`https://www.roomslider.in${roomPath(room)}`} />
-        <meta property="og:image" content={room.images?.[0] || "https://www.roomslider.in/og-image.jpg"} />
+        <meta property="og:url" content={`https://roomslider.in${roomPath(room)}`} />
+        <meta property="og:image" content={room.images?.[0] || "https://roomslider.in/og-image.jpg"} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${room.title} | RoomSlider`} />
         <meta name="twitter:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
-        <meta name="twitter:image" content={room.images?.[0] || "https://www.roomslider.in/og-image.jpg"} />
+        <meta name="twitter:image" content={room.images?.[0] || "https://roomslider.in/og-image.jpg"} />
       </Helmet>
 
       <PropertyHeader room={room} wishlisted={wishlisted} onSave={toggleWishlist} />

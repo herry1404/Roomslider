@@ -65,7 +65,7 @@ function OwnerProfile() {
     <>
       <Helmet>
         <title>{displayName} | RoomSlider</title>
-        <link rel="canonical" href={`https://www.roomslider.in/owners/${owner.slug || id}`} />
+        <link rel="canonical" href={`https://roomslider.in/owners/${owner.slug || id}`} />
       </Helmet>
 
       <section className="container" style={{ padding: "40px 0" }}>

@@ -7,7 +7,7 @@ export default function Terms() {
       <Helmet>
         <title>Terms of Use | RoomSlider</title>
         <meta name="description" content="Terms of Use and conditions for using the RoomSlider rental marketplace in Indore." />
-        <link rel="canonical" href="https://www.roomslider.in/terms" />
+        <link rel="canonical" href="https://roomslider.in/terms" />
       </Helmet>
     <div className="legal-page">
       <div className="legal-container">

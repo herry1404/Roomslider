@@ -127,7 +127,7 @@ function SocialWork() {
   const seo = <Helmet>
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    <link rel="canonical" href={`https://www.roomslider.in${canonicalPath}`} />
+    <link rel="canonical" href={`https://roomslider.in${canonicalPath}`} />
     {!isPublishedPage && <meta name="robots" content="noindex, nofollow" />}
   </Helmet>;
 

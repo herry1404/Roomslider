@@ -95,7 +95,7 @@ function Rooms() {
       <Helmet>
         <title>{search ? `${search} Rooms in Indore | RoomSlider` : "Rooms for Rent in Indore | RoomSlider"}</title>
         <meta name="description" content="Find available rooms near your preferred area in Indore. Browse nearby options, compare prices and contact owners." />
-        <link rel="canonical" href="https://www.roomslider.in/rooms" />
+        <link rel="canonical" href="https://roomslider.in/rooms" />
       </Helmet>
 
       <section className="container rooms-search-page">

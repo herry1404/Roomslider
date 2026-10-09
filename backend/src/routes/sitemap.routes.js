@@ -13,7 +13,7 @@ const SocialPlace = require("../models/SocialPlace");
 const { ensureMessSlugs } = require("../utils/messSlug");
 const { ensurePublicSlugs } = require("../utils/publicSlug");
 
-const SITE_URL = "https://www.roomslider.in";
+const SITE_URL = "https://roomslider.in";
 
 const slugify = (text = "") =>
   text

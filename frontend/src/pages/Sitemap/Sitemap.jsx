@@ -72,7 +72,7 @@ function Sitemap() {
           name="description"
           content="Browse the RoomSlider site map to find rooms for rent, PGs, hostels, flats, hourly stays, mess, local services and community listings in Indore."
         />
-        <link rel="canonical" href="https://www.roomslider.in/sitemap" />
+        <link rel="canonical" href="https://roomslider.in/sitemap" />
       </Helmet>
 
       <header className="site-map-hero">
