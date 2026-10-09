@@ -181,6 +181,23 @@
 
 }
 
+.rc-amenities {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 2px 0;
+}
+
+.rc-amenities span {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  color: var(--color-text-light);
+  background: var(--color-surface-2);
+  border-radius: 50%;
+}
+
 
 
 .room-content h3 {
@@ -647,7 +664,7 @@
   transform:scale(1.04);
 }
 .rc-air .room-content{
-  padding:10px 2px 0;
+  padding:7px 2px 0;
 }
 .rc-air .room-content h3{
   font-size:15px;

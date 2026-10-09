@@ -11,7 +11,7 @@ function PG() {
   const fetchRooms = async () => {
     try {
       const response = await api.get("/rooms", {
-        params: { category: "PG" },
+        params: { category: "PG", hourly: "false" },
       });
       setRooms(response.data.rooms);
     } catch (error) {

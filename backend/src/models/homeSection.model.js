@@ -24,6 +24,14 @@ const homeSectionSchema = new mongoose.Schema(
       text: { type: String, default: "" },
       buttonText: { type: String, default: "" },
       linkUrl: { type: String, default: "" },
+      tiles: [{
+        icon: { type: String, default: "LayoutGrid" },
+        title: { type: String, default: "" },
+        desc: { type: String, default: "" },
+        pill: { type: String, default: "Explore" },
+        action: { type: String, enum: ["link", "loan"], default: "link" },
+        to: { type: String, default: "" },
+      }],
     },
   },
   { timestamps: true }

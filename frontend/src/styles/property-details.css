@@ -355,9 +355,34 @@ a.pd-host-row:hover .pd-host-copy strong {
 
 .pd-amenities-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--pd-space-4) var(--pd-space-5);
 }
+
+.pd-hourly-slabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pd-hourly-slabs li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.pd-hourly-slabs li svg { color: var(--color-primary); }
+.pd-hourly-slabs li strong { margin-left: auto; }
+.pd-extra-hour-price { margin-top: 12px; color: var(--color-text-light); font-size: 14px; }
+.pd-extra-hour-price strong { color: var(--color-text); }
+.pd-checkin-tag { width: fit-content; margin-top: 10px; padding: 5px 9px; color: var(--color-primary-hover); background: var(--color-surface-2); border-radius: 999px; font-size: 12px; }
 
 .pd-amenities-grid li,
 .pd-amenities-modal-list li {

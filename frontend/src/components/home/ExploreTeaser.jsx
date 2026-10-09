@@ -1,238 +1,105 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import {
-  BedDouble,
   Banknote,
+  BedDouble,
   Bike,
-  LayoutGrid,
-  ArrowRight,
-  UtensilsCrossed,
-  Shirt,
-  Sparkles,
-  Truck,
-  Sofa,
-  Wifi,
-  Wrench,
-  Users,
-  Castle,
   BookOpen,
+  Castle,
   FileText,
   HeartHandshake,
-  PackageOpen,
   HeartPulse,
+  LayoutGrid,
+  PackageOpen,
+  Shirt,
+  Sofa,
+  Sparkles,
+  Truck,
+  Users,
+  UtensilsCrossed,
+  Wifi,
+  Wrench,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LoanModal from "../services/LoanModal";
+import { DEFAULT_HOME_TILES } from "../../utils/homeExploreTiles";
 
-const tileStyle = {
-  background: "var(--color-surface)",
-  border: "1px solid var(--color-border)",
-  borderRadius: "20px",
-  padding: "20px",
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px",
-  cursor: "pointer",
+const ICONS = {
+  Banknote,
+  BedDouble,
+  Bike,
+  BookOpen,
+  Castle,
+  FileText,
+  HeartHandshake,
+  HeartPulse,
+  LayoutGrid,
+  PackageOpen,
+  Shirt,
+  Sofa,
+  Sparkles,
+  Truck,
+  Users,
+  UtensilsCrossed,
+  Wifi,
+  Wrench,
 };
 
-const titleStyle = { fontWeight: 600, fontSize: "16px", color: "var(--color-text)" };
-const descStyle = { fontSize: "12.5px", color: "var(--color-text-light)" };
-
-const pillStyle = {
-  alignSelf: "flex-start",
-  marginTop: "4px",
-  fontSize: "13px",
-  fontWeight: 600,
-  padding: "0",
-  borderRadius: "999px",
-  background: "none",
-  color: "var(--color-primary)",
-  border: "none",
-  display: "flex",
-  alignItems: "center",
-  gap: "4px",
-};
-
-function ExploreTeaser() {
+function ExploreTeaser({ section }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showLoanModal, setShowLoanModal] = useState(false);
-
-  const tiles = [
-    {
-      icon: BedDouble,
-      title: "Hourly Rooms",
-      desc: "Short stays, day use, hourly rate",
-      pill: "Explore",
-      to: "/hourly-rooms",
-    },
-    {
-      icon: Users,
-      title: "Roommates",
-      desc: "Meet people with similar budgets and plans",
-      pill: "Find",
-      to: "/roommates",
-    },
-    {
-      icon: HeartHandshake,
-      title: "Social Work",
-      desc: "Find community services and support in Indore",
-      pill: "Explore",
-      to: "/social-work",
-    },
-    {
-      icon: PackageOpen,
-      title: "Donate Old Things",
-      desc: "Arrange a pickup for useful items you no longer need",
-      pill: "Donate",
-      to: "/donate",
-    },
-    {
-      icon: HeartPulse,
-      title: "Blood Requests",
-      desc: "Request help or learn about blood donation",
-      pill: "Explore",
-      to: "/blood",
-    },
-    {
-      icon: Castle,
-      title: "Villas",
-      desc: "Book a private villa for a stay or party",
-      pill: "Explore",
-      to: "/villas",
-    },
-    {
-      icon: Banknote,
-      title: "Student Loans",
-      desc: "Help finding a loan for rent or fees",
-      pill: "Apply",
-      onClick: () => (user ? setShowLoanModal(true) : navigate("/login")),
-    },
-    {
-      icon: Bike,
-      title: "Vehicle Rental",
-      desc: "Bike and scooty rental by the day",
-      pill: "Explore",
-      to: "/vehicles",
-    },
-    {
-      icon: UtensilsCrossed,
-      title: "Food",
-      desc: "Mess near you with today's menu",
-      pill: "Explore",
-      extra: true,
-      to: "/mess",
-    },
-    {
-      icon: Shirt,
-      title: "Laundry",
-      desc: "Find nearby laundries and order clothes",
-      pill: "Explore",
-      extra: true,
-      to: "/laundry",
-    },
-    {
-      icon: Sparkles,
-      title: "Cleaning",
-      desc: "Room and bathroom cleaning",
-      pill: "Explore",
-      extra: true,
-      to: "/services/cleaning",
-    },
-    {
-      icon: Truck,
-      title: "Moving",
-      desc: "Easy shifting to your new place",
-      pill: "Explore",
-      extra: true,
-      to: "/services/packers",
-    },
-    {
-      icon: Sofa,
-      title: "Furniture Rental",
-      desc: "Bed, cooler, AC, fridge on rent",
-      pill: "Explore",
-      extra: true,
-      to: "/furniture",
-    },
-    {
-      icon: Wifi,
-      title: "Wi-Fi & RO",
-      desc: "Broadband and RO purifier service",
-      pill: "Explore",
-      extra: true,
-      to: "/services/wifi",
-    },
-    {
-      icon: Wrench,
-      title: "Repairs",
-      desc: "Cooler, AC and geyser repair",
-      pill: "Explore",
-      extra: true,
-      to: "/services/appliance-repair",
-    },
-    {
-      icon: BookOpen,
-      title: "Study Support",
-      desc: "Libraries, tutors and printing help",
-      pill: "Explore",
-      extra: true,
-      to: "/services/study-support",
-    },
-    {
-      icon: FileText,
-      title: "Rent Agreement",
-      desc: "Agreement and police verification",
-      pill: "Explore",
-      extra: true,
-      to: "/services/rent-agreement",
-    },
-    {
-      icon: LayoutGrid,
-      title: "More Services",
-      desc: "See everything RoomSlider offers",
-      pill: "View All",
-      to: "/explore",
-    },
-  ];
+  const tiles = Array.isArray(section?.config?.tiles) && section.config.tiles.length
+    ? section.config.tiles
+    : DEFAULT_HOME_TILES;
 
   return (
-    <section className="latest-rooms">
+    <section className="latest-rooms home-explore-section">
       <div className="container">
         <div className="section-header">
-          <h2>Everything you need away from home</h2>
+          <h2>{section?.title && section.title !== "Explore" ? section.title : "Everything you need away from home"}</h2>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-            gap: "12px",
-          }}
-        >
-          {tiles.map(({ icon: Icon, title, desc, pill, onClick, to, extra }) => {
-            const Tag = to ? Link : "div";
-            const tagProps = to ? { to } : { onClick };
-            return (
-            <Tag
-              key={title}
-              {...tagProps}
-              style={{ ...tileStyle, textDecoration: "none", color: "inherit" }}
-              className={extra ? "explore-extra-tile" : ""}
-            >
-              <Icon size={22} color="var(--color-primary)" />
-              <div style={titleStyle}>{title}</div>
-              <div style={descStyle}>{desc}</div>
-              <span style={pillStyle}>
-                {pill}
-                <ArrowRight size={12} />
-              </span>
-            </Tag>
+        <div className="home-explore-tiles">
+          {tiles.map((tile, index) => {
+            const Icon = ICONS[tile.icon] || LayoutGrid;
+            const openLoan = () => {
+              if (user) setShowLoanModal(true);
+              else navigate("/login");
+            };
+            const content = (
+              <>
+                <Icon size={22} color="var(--color-primary)" />
+                <span className="home-explore-tile-title">{tile.title}</span>
+                <span className="home-explore-tile-description">{tile.desc}</span>
+                <span className="home-explore-tile-action">
+                  {tile.pill || "Explore"} <ArrowRight size={12} />
+                </span>
+              </>
+            );
+
+            return tile.action === "loan" ? (
+              <button
+                type="button"
+                key={`${tile.title}-${index}`}
+                className="home-explore-tile"
+                onClick={openLoan}
+              >
+                {content}
+              </button>
+            ) : (
+              <Link
+                key={`${tile.title}-${index}`}
+                className="home-explore-tile"
+                to={tile.to || "/explore"}
+              >
+                {content}
+              </Link>
             );
           })}
         </div>
       </div>
-
       {showLoanModal && <LoanModal onClose={() => setShowLoanModal(false)} />}
     </section>
   );

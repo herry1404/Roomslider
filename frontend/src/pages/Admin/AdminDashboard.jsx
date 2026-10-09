@@ -14,6 +14,7 @@ import {
   Wallet,
   Home,
   Megaphone,
+  LayoutGrid,
 } from "lucide-react";
 import {
   LineChart,
@@ -109,6 +110,7 @@ function AdminDashboard() {
     { label: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
     { label: "Manage Users", icon: <UserCog size={18} />, path: "/admin/users" },
+    { label: "Home Tiles & Layout", icon: <LayoutGrid size={18} />, path: "/admin/home-layout" },
     { label: "Send Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
     { label: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
   ];

@@ -25,6 +25,8 @@ function parseAssistantFilters(content) {
 
 function sanitizeSearchMessage(message) {
   return message
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/<[^>]*>/g, " ")
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, " ")
     .replace(/(?:\+?\d[\d\s().-]{7,}\d)/g, " ")
     .replace(/\s+/g, " ")
@@ -35,8 +37,9 @@ function sanitizeSearchMessage(message) {
 function fallbackFilters(message) {
   const keywords = message
     .toLowerCase()
-    .replace(/\b(?:i|am|a|an|the|for|with|in|near|nearby|under|below|less|than|around|please|want|need|looking|find|me|room|chahiye|mujhe|ke|liye|hai|karo)\b/gi, " ")
+    .replace(/\b(?:i|am|a|an|the|for|with|in|near|nearby|under|below|less|than|around|please|want|need|looking|find|show|search|me|room|rooms|pg|hostel|flat|villa|villas|stay|chahiye|mujhe|ke|liye|hai|karo|rupees|rs)\b/gi, " ")
     .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .replace(/\b\d+(?:\.\d+)?\b/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 100);
@@ -49,7 +52,7 @@ function fallbackFilters(message) {
     area: null,
     college: null,
     sharingType: null,
-    keywords: keywords || message.trim().slice(0, 100),
+    keywords: keywords || null,
   };
 }
 
@@ -59,9 +62,7 @@ async function extractAssistantFilters(message, {
   logger = console,
 } = {}) {
   if (!env.GEMINI_API_KEY) {
-    const error = new Error("AI Room Finder is not configured");
-    error.code = "GEMINI_API_KEY_MISSING";
-    throw error;
+    return fallbackFilters(sanitizeSearchMessage(message));
   }
 
   const controller = new AbortController();

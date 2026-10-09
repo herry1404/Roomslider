@@ -1,11 +1,13 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { MapPin, CheckCircle2 } from "lucide-react";
+import { MapPin, CheckCircle2, Heart, Share2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
+import shareVilla from "../../utils/shareVilla";
 import NearbyVillas from "../../components/home/NearbyVillas";
 import "../../styles/villas.css";
 
@@ -25,6 +27,7 @@ function VillaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [villa, setVilla] = useState(null);
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
@@ -163,6 +166,22 @@ function VillaDetail() {
     ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([villa.address, villa.area, villa.city].filter(Boolean).join(", "))}`;
   const location = [villa.address, villa.area, villa.city].filter(Boolean).join(", ");
+  const wishlisted = isWishlisted(villa._id);
+  const toggleWishlist = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const updated = wishlisted
+        ? await removeFromWishlist(villa._id)
+        : await addToWishlist(villa._id);
+      if (!updated) return;
+      toast.success(wishlisted ? "Wishlist se hata diya" : "Wishlist mein add ho gaya");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Wishlist update nahi hua");
+    }
+  };
 
   return (
     <main className="container villa-detail-page">
@@ -171,7 +190,19 @@ function VillaDetail() {
         <meta name="description" content={`${villa.name} in ${villa.area}, ${villa.city}. View photos, amenities, guest capacity and real rates before booking.`} />
       </Helmet>
       <div className="villa-detail-top">
-        <h1>{villa.name}</h1>
+        <div className="villa-detail-heading">
+          <h1>{villa.name}</h1>
+          <div className="villa-detail-actions">
+            <button type="button" onClick={toggleWishlist} aria-label={wishlisted ? "Remove villa from wishlist" : "Add villa to wishlist"}>
+              <Heart size={18} fill={wishlisted ? "currentColor" : "none"} />
+              <span>{wishlisted ? "Saved" : "Save"}</span>
+            </button>
+            <button type="button" onClick={() => shareVilla(villa)} aria-label="Share villa">
+              <Share2 size={18} />
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
         <p><MapPin size={16} aria-hidden="true" />{location}</p>
       </div>
 

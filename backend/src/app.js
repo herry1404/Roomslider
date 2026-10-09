@@ -367,11 +367,8 @@ app.use("/api/social", socialRoutes);
 app.use("/api/donations", donationRoutes);
 app.use("/api/blood-requests", bloodRequestRoutes);
 
-// ✅ SITEMAP ROUTE (for SEO)
-app.use(
-  "/sitemap.xml",
-  sitemapRoutes
-);
+// Search-engine XML sitemap. The visitor-friendly directory is served by the frontend.
+app.use("/sitemap.xml", sitemapRoutes);
 
 
 

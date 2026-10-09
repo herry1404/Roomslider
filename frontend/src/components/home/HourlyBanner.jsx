@@ -35,7 +35,7 @@ function HourlyBanner() {
             Need a Room Immediately?
           </h3>
           <p style={{ fontSize: "13px", color: "var(--color-text-light)", margin: "2px 0 0" }}>
-            Check our Hourly Stays for short visits &amp; day use.
+            Browse hourly and short-stay rooms for visits &amp; day use.
           </p>
         </div>
       </div>

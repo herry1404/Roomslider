@@ -50,7 +50,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
-        { title: "Hourly Rooms", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
+        { title: "Hourly / Short Stay", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Push Notifications", icon: <Megaphone size={18} />, path: "/admin/push" },

@@ -22,14 +22,14 @@ function Rooms() {
       const place = findIndorePlace(search);
       try {
         const response = await api.get("/rooms", {
-          params: search ? { search } : { category: "Room" },
+          params: search ? { search, hourly: "false" } : { category: "Room", hourly: "false" },
         });
         let rooms = response.data?.rooms || [];
         let nearbyOnly = false;
         let nearestFallback = false;
 
         if (search && rooms.length === 0 && place) {
-          const allRoomsResponse = await api.get("/rooms");
+          const allRoomsResponse = await api.get("/rooms", { params: { hourly: "false" } });
           const allRooms = allRoomsResponse.data?.rooms || [];
           const areaName = normalizePlaceName(place.name);
           const rankedRooms = allRooms.map((room) => {

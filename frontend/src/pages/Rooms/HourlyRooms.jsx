@@ -13,7 +13,7 @@ function HourlyRooms() {
     let active = true;
     api.get("/hourly-rooms/public")
       .then(({ data }) => {
-        if (active) setRooms(data);
+        if (active) setRooms(Array.isArray(data) ? data : []);
       })
       .catch((error) => {
         if (active) {
@@ -43,13 +43,13 @@ function HourlyRooms() {
   return (
     <>
       <Helmet>
-        <title>Hourly Rooms in Indore | RoomSlider</title>
+        <title>Hourly / Short Stay in Indore | RoomSlider</title>
         <meta name="description" content="Book rooms by the hour in Indore. Verified hourly rooms with RoomSlider." />
         <link rel="canonical" href="https://www.roomslider.in/hourly-rooms" />
       </Helmet>
 
       <section className="container hourly-rooms-page">
-        <h1>Hourly Rooms</h1>
+        <h1>Hourly / Short Stay</h1>
         <p>Ghante ke hisaab se book karo — verified rooms Indore mein.</p>
 
         {rooms.length === 0 ? (

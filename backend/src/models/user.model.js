@@ -84,6 +84,18 @@ const userSchema = new mongoose.Schema(
         ref: "Room",
       },
     ],
+    hourlyWishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "HourlyRoom",
+      },
+    ],
+    villaWishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Villa",
+      },
+    ],
 
     // The room this user is currently renting as a tenant (set when an
     // owner assigns them to a room, cleared on vacate)

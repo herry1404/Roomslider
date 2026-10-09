@@ -19,7 +19,7 @@ import {
 
 import api from "../../api/axios";
 
-function ProfileMenu({ variant }) {
+function ProfileMenu({ variant, active = false }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -78,9 +78,10 @@ function ProfileMenu({ variant }) {
   return (
     <div className={variant === "bottom" ? "profile-menu bottom-profile-menu" : "profile-menu"} ref={menuRef}>
       <button
-        className="profile-btn"
+        className={`profile-btn${active ? " active" : ""}`}
         aria-label="Account Menu"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
       >
         {variant === "bottom" ? (
           <>

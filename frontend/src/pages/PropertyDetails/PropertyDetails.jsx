@@ -13,6 +13,7 @@ import HostRow from "../../components/property/HostRow";
 import Highlights from "../../components/property/Highlights";
 import Description from "../../components/property/Description";
 import Amenities from "../../components/property/Amenities";
+import HourlyStay from "../../components/property/HourlyStay";
 import LocationSection from "../../components/property/LocationSection";
 import ThingsToKnow from "../../components/property/ThingsToKnow";
 import ContactCard from "../../components/property/ContactCard";
@@ -170,6 +171,7 @@ function PropertyDetails() {
           <Highlights room={room} />
           <Description description={room.description} />
           <Amenities amenities={room.amenities || []} />
+          <HourlyStay room={room} />
           <LocationSection
             location={room.location}
             latitude={room.latitude}

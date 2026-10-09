@@ -14,8 +14,10 @@ function HomeRentalSection({ type, title }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    const url = isVilla ? "/villas/public" : "/hourly-rooms/public";
-    api.get(url, { signal: controller.signal })
+    const request = isVilla
+      ? api.get("/villas/public", { signal: controller.signal })
+      : api.get("/hourly-rooms/public", { signal: controller.signal });
+    request
       .then((response) => setItems(isVilla ? response.data.villas || [] : response.data || []))
       .catch((error) => {
         if (!controller.signal.aborted) {
@@ -28,23 +30,27 @@ function HomeRentalSection({ type, title }) {
     return () => controller.abort();
   }, [type, isVilla]);
 
-  if (!loading && items.length === 0) return null;
-
   return (
     <section className="latest-rooms">
       <div className="container">
         <div className="section-header">
-          <h2>{title}</h2>
+          <h2>{isVilla ? title : "Hourly / Short Stay"}</h2>
           {!loading && <Link className="view-all" to={isVilla ? "/villas" : "/hourly-rooms"}>
             View All <ArrowRight size={16} />
           </Link>}
         </div>
         {loading ? (
-          <div className="rooms-grid home-rental-skeleton" aria-label={`Loading ${title}`}>
-            {Array.from({ length: 6 }, (_, index) => <SkeletonRoomCard key={`${type}-${index}`} />)}
-          </div>
+          isVilla
+            ? <div className="rooms-grid home-rental-skeleton" aria-label={`Loading ${title}`}>
+                {Array.from({ length: 6 }, (_, index) => <SkeletonRoomCard key={`${type}-${index}`} />)}
+              </div>
+            : <div className="hourly-listings-row hourly-listings-skeleton" aria-label={`Loading ${title}`}>
+                {Array.from({ length: 5 }, (_, index) => <div className="hourly-listing-skeleton" key={`${type}-${index}`} />)}
+              </div>
+        ) : items.length === 0 ? (
+          <p className="hourly-listings-empty">{isVilla ? "No stays available right now." : "No hourly stays available right now."}</p>
         ) : (
-          <div className={isVilla ? "villa-grid" : "rooms-grid"}>
+          <div className={isVilla ? "villa-grid" : "hourly-listings-row"}>
             {items.slice(0, 8).map((item) =>
               isVilla
                 ? <VillaCard key={item._id} villa={item} />

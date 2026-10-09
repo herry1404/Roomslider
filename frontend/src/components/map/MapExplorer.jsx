@@ -378,7 +378,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
     const fetchRooms = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get("/rooms", {});
+        const { data } = await api.get("/rooms", { params: { hourly: "false" } });
         setRooms(data.rooms || []);
       } catch (err) {
         console.error("Map fetch error:", err);

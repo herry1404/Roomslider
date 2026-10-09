@@ -2,6 +2,8 @@
 
 ## Current state
 
+- Homepage/navigation follow-up (9 Oct 2026): simplified the header and mobile bottom navigation, moved Recently Viewed off the homepage into Profile, added persistent villa wishlist/share controls, made homepage feature tiles editable in Admin Home Layout, and improved the AI assistant's close-on-result-navigation and mobile placement. Local validation is recorded below; production deployment and device-level visual checks remain pending.
+- Sitemap access follow-up (9 Oct 2026): `/sitemap` is a visitor-friendly directory page; `/sitemap.xml` serves the dynamic XML feed and remains the URL advertised in `robots.txt`. The directory is linked from the site footer. Local checks are recorded in the latest handoff entry below; production deployment/live URL verification remains pending.
 - Branch: `main`
 - Nine-step RoomSlider task status (5 Oct 2026): Steps 1–6 were already present; Step 7 was committed as `5df2b84` (`Owner and admin analytics`) and Step 8 as `ff196f4` (`Performance and monitoring`). Step 9 (Language and Settings) is paused at the user's request and is not complete.
 - Step 9 has preliminary, uncommitted work in `frontend/package.json`, `frontend/package-lock.json`, `backend/src/models/user.model.js`, `backend/src/controllers/auth.controller.js`, and `backend/src/middleware/auth.middleware.js`. This adds `i18next`/`react-i18next`, initial user-preference fields, and token-version session scaffolding; it has not been validated as a complete feature.
@@ -305,3 +307,22 @@ NEXT: Updates section (after Profile page improvements)
 - Telegram chat ID helper: `cd backend && node scripts/telegram-get-chat-id.js` after messaging the bot. WhatsApp requires an approved two-variable template; setup guidance and manual curl examples are in `README.md`.
 - Telegram and WhatsApp sends have a MongoDB per-channel, per-event-type 30-second rate limit. Capacitor/FCM remains a TODO.
 - Pending before relying on this feature: configure deployment secrets and test browser push, Telegram, WhatsApp template delivery, unread/read routes, and one request for each event type against real accounts. The frontend production build and changed-file syntax/targeted lint checks passed; full lint still has unrelated existing errors. No live external-channel or database integration tests have been performed.
+
+### 9 Oct 2026 - Sitemap URL accessibility
+
+- The visitor-facing `/sitemap` page now groups links to RoomSlider's public rental listings, local services, community pages and company information. It includes page title, description, canonical URL and descriptive headings/links, and is accessible from the footer.
+- `/sitemap.xml` remains the backend-generated XML sitemap for search engines and the URL declared in `robots.txt`. The frontend rewrite serves the human-readable page at `/sitemap`.
+- Validation: frontend production build passed; targeted ESLint for the sitemap page, app routes and footer passed; backend `node --check`, Vercel rewrite JSON parsing and `git diff --check` passed. Existing Vite config and large-chunk warnings remain.
+- Production availability depends on deploying the updated backend and frontend rewrite; the live URLs have not been verified from this workspace.
+
+### 9 Oct 2026 - Homepage navigation, villa actions and AI assistant
+
+- Removed Hourly / Short Stay, About, Explore and Wishlist from the primary header. Replaced the mobile bottom Explore item with Search, leaving Home, Search, Map and Profile. Wishlist remains accessible in Profile and the account menu; Recently Viewed is now a Profile tab instead of appearing on the homepage.
+- Added villa wishlist persistence alongside room/hourly wishlists, villa save/share actions on cards and detail pages, and villa entries in the saved-listing views. Standardized villa cards to use the same room-card appearance and image dimensions, and tightened details spacing across room/villa cards.
+- Added editing for homepage “Everything you need away from home” tiles through Admin > Home Layout, including title, description, icon, action, destination, add/remove and reorder controls. Added a dashboard shortcut to Home Tiles & Layout.
+- AI result-card links now close the assistant. Improved the mobile launcher and panel placement around the bottom navigation and keyboard; the AI avatar displays without a visible frame.
+- Validation: frontend production build and targeted ESLint passed; all 28 backend tests passed; changed backend syntax checks and `git diff --check` passed. Build output retains the project's existing Vite config and large-chunk warnings.
+- Production deployment, live database wishlist operations, and physical mobile-device visual checks remain pending.
+- Villa card data spacing follow-up (9 Oct 2026): removed the legacy shared paragraph minimum-height and margins from villa-card data rows, which caused visible blank space below/between details despite the earlier padding adjustment.
+- AI search follow-up (9 Oct 2026): added active villa search with location/nightly budget and event/day budget filters, villa result cards and `/villas` view-all navigation. Added room/villa quick-search examples and simpler search guidance; removed budget/filler words from fallback room keywords so broad room searches do not incorrectly return no matches.
+- RO search follow-up (9 Oct 2026): recognize `RO`, `R.O.`, spaced spellings, water purifier and water filter queries. Don't require the service keyword to appear in each provider's name/description after the Wi-Fi & RO category has already been identified, so matching providers are not filtered out.

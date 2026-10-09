@@ -15,8 +15,6 @@ const navLinks = [
   { name: "PG", path: "/pg" },
   { name: "Hostels", path: "/hostels" },
   { name: "Flats", path: "/flats" },
-  { name: "About", path: "/about" },
-  { name: "Explore", path: "/explore" },
 ];
 
 function SearchPill({ searchOpen, setSearchOpen, searchValue, setSearchValue, handleSearchSubmit, closeSearch }) {
@@ -68,16 +66,6 @@ function Navbar() {
     document.documentElement.setAttribute("data-theme", "light");
   }, []);
 
-  const links = user
-    ? [
-        ...navLinks,
-        {
-          name: "Wishlist",
-          path: "/wishlist",
-        },
-      ]
-    : navLinks;
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchValue.trim()) {
@@ -100,7 +88,7 @@ function Navbar() {
 
           <nav className="navbar-nav" aria-label="Primary Navigation">
             <ul className="navbar-menu">
-              {links.map((item) => (
+              {navLinks.map((item) => (
                 <li key={item.path}>
                   <NavLink
                     to={item.path}

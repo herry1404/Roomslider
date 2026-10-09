@@ -1,7 +1,10 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
-import { MapPin, Heart, BadgeCheck } from "lucide-react";
+import {
+  MapPin, Heart, BadgeCheck, Wifi, Snowflake, Bath, Tv, Refrigerator,
+  Zap, Camera, Car, Shirt, Utensils, Droplets, BookOpen, Sparkles,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ShareButton from "./ShareButton";
@@ -15,6 +18,23 @@ import "../../styles/room-card.css";
 function getThumbnailUrl(url) {
   if (!url || !url.includes("/upload/")) return url;
   return url.replace("/upload/", "/upload/w_600,h_600,c_fill,q_auto,f_auto/");
+}
+
+function amenityIcon(amenity) {
+  const value = String(amenity).toLowerCase();
+  if (value.includes("wi-fi") || value.includes("wifi")) return Wifi;
+  if (value === "ac" || value.includes("air condition")) return Snowflake;
+  if (value.includes("washroom") || value.includes("geyser")) return Bath;
+  if (value.includes("tv")) return Tv;
+  if (value.includes("fridge")) return Refrigerator;
+  if (value.includes("power")) return Zap;
+  if (value.includes("cctv")) return Camera;
+  if (value.includes("parking")) return Car;
+  if (value.includes("laundry")) return Shirt;
+  if (value.includes("meal")) return Utensils;
+  if (value.includes("water")) return Droplets;
+  if (value.includes("study")) return BookOpen;
+  return Sparkles;
 }
 
 function RoomCard({ room, onWishlistChange }) {
@@ -80,6 +100,12 @@ function RoomCard({ room, onWishlistChange }) {
   const genderLabel = { Male: "Boys", Female: "Girls" }[room.gender];
   const sharingLabel = { Single: "Single Room", Double: "Double Sharing", Triple: "Triple Sharing" }[room.sharingType] || room.category;
   const typeLine = [sharingLabel, genderLabel].filter(Boolean).join(" · ");
+  const hourlySlab = (room.hourlySlabs || [])
+    .filter((slab) => Number(slab.hours) > 0 && Number(slab.price) > 0)
+    .sort((first, second) => Number(first.hours) - Number(second.hours))[0];
+  const amenities = Array.isArray(room.amenities)
+    ? room.amenities
+    : typeof room.amenities === "string" ? room.amenities.split(",").map((item) => item.trim()).filter(Boolean) : [];
 
   return (
     <div className="room-card rc-air" onClick={handleDetails} style={{ cursor: "pointer" }}>
@@ -131,11 +157,20 @@ function RoomCard({ room, onWishlistChange }) {
         </h3>
 
         <div className="rc-price">
-          <strong>₹{room.price?.toLocaleString()}</strong>
-          <span>/month</span>
+          {room.hourlyEnabled && hourlySlab
+            ? <><strong>From ₹{Number(hourlySlab.price).toLocaleString("en-IN")}</strong><span>/ {hourlySlab.hours} hrs</span></>
+            : <><strong>₹{room.price?.toLocaleString()}</strong><span>/month</span></>}
         </div>
 
         <p className="rc-type">{typeLine}</p>
+        {amenities.length > 0 && (
+          <div className="rc-amenities" aria-label="Top amenities">
+            {amenities.slice(0, 3).map((amenity) => {
+              const Icon = amenityIcon(amenity);
+              return <span key={amenity} title={amenity} aria-label={amenity}><Icon size={14} /></span>;
+            })}
+          </div>
+        )}
 
         <div className="room-location">
           <MapPin size={14} />

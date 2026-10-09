@@ -5,48 +5,68 @@
 }
 
 .villa-card {
+  position: relative;
   display: grid;
   align-content: start;
-  gap: 12px;
+  gap: 0;
   min-width: 0;
   color: var(--color-text);
   text-decoration: none;
   background: transparent;
 }
 
-.villa-card:focus-visible {
+.villa-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.villa-card-main-link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.villa-card-main-link:focus-visible,
+.villa-card-info h3 a:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 4px;
   border-radius: 16px;
 }
 
-.villa-card>img,
 .villa-card-placeholder {
   display: grid;
   width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  height: 100%;
   place-items: center;
   color: var(--color-primary);
   background: var(--color-surface-2);
-  border-radius: 16px;
   font-size: 22px;
   font-weight: 800;
-  transition:filter 180ms ease;
 }
 
-.villa-card:hover>img { filter:brightness(.96); }
-.villa-card-info { display: grid; gap: 5px; min-width: 0; }
+.villa-card:hover .room-image { filter:brightness(.96); }
+.villa-card-actions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.villa-card-actions button { pointer-events: auto; }
+.villa-card .wishlist-icon { top: 16px; right: 12px; }
+.villa-share-btn { top: 18px; right: 58px; }
+.villa-share-btn:disabled { opacity: .6; cursor: wait; }
+.villa-card-info h3 a { color: inherit; text-decoration: none; }
+.villa-card-info h3 a:hover { color: var(--color-primary); }
+.villa-card-info { display: grid; gap: 3px; min-width: 0; }
+.room-card.rc-air .villa-card-info p { min-height: 0; margin: 0; line-height: 1.35; }
 .villa-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .villa-card-info h3 { min-width: 0; margin: 0; overflow: hidden; font-size: 15px; font-weight: 600; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
-.villa-card-info p,.villa-card-meta span { display: flex; align-items: center; gap: 5px; min-width: 0; margin: 0; color: var(--color-text-light); font-size: 13px; }
+.villa-card-info p { display: flex; align-items: center; gap: 5px; min-width: 0; margin: 0; color: var(--color-text-light); font-size: 13px; }
 .villa-card-info p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.villa-card-info p svg,.villa-card-meta svg { flex: none; }
-.villa-card-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; }
-.villa-card-rates { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; }
-.villa-card-rates .villa-card-nightly { display: inline-flex; gap: 4px; color: var(--color-text-light); font-size: 13px; }
-.villa-card-rates .villa-card-nightly strong { color: var(--color-text); font-size: 15px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
-.villa-card-rates .villa-card-event { color: var(--color-text-light); font-size: 12px; }
+.villa-card-info p svg { flex: none; }
 .villa-card-info p.villa-card-distance { font-size: 12px; }
 
 .villa-list-page,.villa-detail-page { padding-block: 40px 70px; }
@@ -126,21 +146,23 @@
 .villa-detail-section .villa-amenities { margin:0; }
 .villa-availability.available { color:var(--color-success); background:var(--color-surface-2); }
 .villa-availability.unavailable { color:var(--color-error); background:var(--color-surface-2); }
-.latest-rooms .villa-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 20px 16px; }
+.latest-rooms .villa-grid { display:flex; overflow-x:auto; gap:18px; padding:10px 2px 12px; margin-top:-10px; scrollbar-width:none; }
+.latest-rooms .villa-grid::-webkit-scrollbar { display:none; }
+.latest-rooms .villa-card { flex:0 0 230px; width:230px; scroll-snap-align:start; }
+.villa-detail-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.villa-detail-heading h1 { margin:0 0 8px; }
+.villa-detail-actions { display:flex; flex:none; gap:8px; }
+.villa-detail-actions button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:8px 12px; color:var(--color-text); background:var(--color-surface); border:1px solid var(--color-border); border-radius:999px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.villa-detail-actions button:hover { color:var(--color-primary); border-color:var(--color-primary); }
 @media(max-width:560px) {
   .villa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
-  .latest-rooms .villa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
-  .villa-card { gap: 8px; }
-  .villa-card>img,.villa-card-placeholder { border-radius: 12px; }
+  .latest-rooms .villa-grid { display:flex; gap:16px 12px; }
+  .villa-image-wrapper { border-radius:16px; }
   .villa-card-heading { gap: 5px; }
   .villa-card-info h3 { font-size: 13px; }
   .villa-card-rating { gap: 2px; font-size: 12px; }
   .villa-card-rating small { display:none; }
-  .villa-card-info p,.villa-card-meta span { font-size: 11px; }
-  .villa-card-meta { gap: 5px 8px; }
-  .villa-card-rates .villa-card-nightly { font-size: 11px; }
-  .villa-card-rates .villa-card-nightly strong { font-size: 13px; }
-  .villa-card-rates .villa-card-event { font-size: 10px; }
+  .villa-card-info p { font-size: 11px; }
   .villa-detail-page { padding-top: 20px; }
   .villa-detail-grid { gap: 16px; }
   .villa-detail-main,.villa-booking-panel { min-width: 0; padding: 16px; }
@@ -150,6 +172,9 @@
   .villa-search-nearby { margin-top:28px; }
   .villa-nearby-section { margin-top:30px; padding-top:22px; }
   .villa-detail-top { margin-bottom:14px; }
+  .villa-detail-heading { flex-direction:column; gap:6px; }
+  .villa-detail-heading h1 { font-size:26px; }
+  .latest-rooms .villa-card { flex-basis:230px; width:230px; }
   .villa-detail-gallery { grid-template-columns:1fr; grid-template-rows:auto auto; max-height:none; aspect-ratio:auto; gap:6px; border-radius:12px; }
   .villa-detail-gallery-main { aspect-ratio:4 / 3; }
   .villa-detail-gallery-main,.villa-detail-gallery-thumbnails { grid-row:auto; }

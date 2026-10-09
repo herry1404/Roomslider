@@ -9,7 +9,8 @@
     "test": "node --test test/*.test.js",
     "seed:vehicles": "node scripts/seedVehicles.js",
     "seed:cleaning": "node scripts/seedCleaning.js",
-    "seed:study": "node scripts/seedStudySupport.js"
+    "seed:study": "node scripts/seedStudySupport.js",
+    "backfill:hourly-rooms": "node scripts/backfillHourlyRoomFields.js"
   },
   "keywords": [
     "roomslider",

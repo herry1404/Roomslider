@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import LocationPicker from "../../components/map/LocationPicker";
+import AmenitiesInput from "../../components/forms/AmenitiesInput";
+import HourlySlabsInput from "../../components/forms/HourlySlabsInput";
 
 import "../../styles/add-room.css";
 
@@ -20,37 +22,6 @@ function AddRoom() {
     /* ======================================================
                         AMENITIES
     ====================================================== */
-
-    const amenitiesList = [
-
-        "WiFi",
-        "AC",
-        "Cooler",
-        "Fan",
-        "RO Water",
-
-        "Power Backup",
-        "Parking",
-        "Lift",
-        "CCTV",
-
-        "Kitchen",
-        "Fridge",
-        "Washing Machine",
-
-        "Bed",
-        "Mattress",
-        "Wardrobe",
-
-        "Study Table",
-        "Chair",
-        "TV",
-
-        "Balcony"
-
-    ];
-
-
 
     /* ======================================================
                     NEARBY PLACES
@@ -124,6 +95,11 @@ function AddRoom() {
         amenities: [],
 
         nearby: [],
+        hourlyEnabled: false,
+        hourlyOnly: false,
+        hourlySlabs: [],
+        extraHourPrice: "",
+        checkIn24x7: false,
 
         priority: "",
 
@@ -184,24 +160,6 @@ function AddRoom() {
     /* ======================================================
                     AMENITIES
     ====================================================== */
-
-    const handleAmenityChange = (item) => {
-
-        setFormData((prev) => ({
-
-            ...prev,
-
-            amenities: prev.amenities.includes(item)
-
-                ? prev.amenities.filter((a) => a !== item)
-
-                : [...prev.amenities, item]
-
-        }));
-
-    };
-
-
 
     /* ======================================================
                     NEARBY
@@ -264,6 +222,13 @@ function AddRoom() {
             data.append("description", formData.description);
             data.append("amenities", JSON.stringify(formData.amenities));
             data.append("nearby", JSON.stringify(formData.nearby));
+            data.append("hourlyEnabled", String(formData.hourlyEnabled));
+            data.append("hourlyOnly", String(formData.hourlyEnabled && formData.hourlyOnly));
+            data.append("hourlySlabs", JSON.stringify(formData.hourlySlabs
+                .filter((slab) => slab.hours !== "" && slab.price !== "")
+                .map((slab) => ({ hours: Number(slab.hours), price: Number(slab.price) }))));
+            if (formData.extraHourPrice) data.append("extraHourPrice", formData.extraHourPrice);
+            data.append("checkIn24x7", String(formData.checkIn24x7));
             data.append("priority", formData.priority);
             if (formData.latitude) data.append("latitude", formData.latitude);
             if (formData.longitude) data.append("longitude", formData.longitude);
@@ -589,31 +554,29 @@ function AddRoom() {
 
     <h2>Amenities</h2>
 
-    <div className="amenities-grid">
-
-        {
-
-            amenitiesList.map((item)=>(
-
-                <label key={item}>
-
-                    <input
-                        type="checkbox"
-                        checked={formData.amenities.includes(item)}
-                        onChange={()=>handleAmenityChange(item)}
-                    />
-
-                    {item}
-
-                </label>
-
-            ))
-
-        }
-
-    </div>
+    <AmenitiesInput
+        value={formData.amenities}
+        onChange={(amenities) => setFormData((prev) => ({ ...prev, amenities }))}
+    />
 
 </div>
+
+<HourlySlabsInput
+    enabled={formData.hourlyEnabled}
+    onEnabledChange={(hourlyEnabled) => setFormData((prev) => ({
+        ...prev,
+        hourlyEnabled,
+        hourlyOnly: hourlyEnabled ? prev.hourlyOnly : false,
+    }))}
+    hourlyOnly={formData.hourlyOnly}
+    onHourlyOnlyChange={(hourlyOnly) => setFormData((prev) => ({ ...prev, hourlyOnly }))}
+    slabs={formData.hourlySlabs}
+    onSlabsChange={(hourlySlabs) => setFormData((prev) => ({ ...prev, hourlySlabs }))}
+    extraHourPrice={formData.extraHourPrice}
+    onExtraHourPriceChange={(extraHourPrice) => setFormData((prev) => ({ ...prev, extraHourPrice }))}
+    checkIn24x7={formData.checkIn24x7}
+    onCheckIn24x7Change={(checkIn24x7) => setFormData((prev) => ({ ...prev, checkIn24x7 }))}
+/>
 
 
 

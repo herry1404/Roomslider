@@ -6,6 +6,23 @@ import api from "../../api/axios";
 import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
+const HOURLY_AMENITIES = [
+  "Wi-Fi",
+  "AC",
+  "Attached Washroom",
+  "TV",
+  "Fridge",
+  "Geyser",
+  "Hot Water",
+  "Power Backup",
+  "CCTV",
+  "Parking",
+  "Lift",
+  "Laundry",
+  "Meals",
+  "24x7 Check-in",
+];
+
 function ManageHourlyRooms() {
   const [rooms, setRooms] = useState([]);
   const [owners, setOwners] = useState([]);
@@ -13,6 +30,7 @@ function ManageHourlyRooms() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [images, setImages] = useState([]);
+  const [customAmenity, setCustomAmenity] = useState("");
 
   const [form, setForm] = useState({
     ownerId: "",
@@ -21,7 +39,7 @@ function ManageHourlyRooms() {
     address: "",
     city: "",
     pricePerHour: "",
-    amenities: "",
+    amenities: [],
   });
 
   const fetchData = async () => {
@@ -47,13 +65,18 @@ function ManageHourlyRooms() {
   const openAddModal = () => {
     setEditingId(null);
     setImages([]);
-    setForm({ ownerId: "", title: "", description: "", address: "", city: "", pricePerHour: "", amenities: "" });
+    setCustomAmenity("");
+    setForm({ ownerId: "", title: "", description: "", address: "", city: "", pricePerHour: "", amenities: [] });
     setShowModal(true);
   };
 
   const openEditModal = (room) => {
     setEditingId(room._id);
     setImages([]);
+    setCustomAmenity("");
+    const currentAmenities = Array.isArray(room.amenities)
+      ? room.amenities
+      : typeof room.amenities === "string" ? room.amenities.split(",") : [];
     setForm({
       ownerId: room.requestedByOwner?._id || "",
       title: room.title,
@@ -61,13 +84,27 @@ function ManageHourlyRooms() {
       address: room.location?.address || "",
       city: room.location?.city || "",
       pricePerHour: room.pricePerHour,
-      amenities: (room.amenities || []).join(", "),
+      amenities: [...new Set(currentAmenities.map((amenity) => String(amenity).trim()).filter(Boolean))],
     });
     setShowModal(true);
   };
 
   const handleImageChange = (e) => setImages(Array.from(e.target.files));
   const removeImage = (index) => setImages(images.filter((_, i) => i !== index));
+  const toggleAmenity = (amenity) => {
+    setForm((current) => ({
+      ...current,
+      amenities: current.amenities.includes(amenity)
+        ? current.amenities.filter((item) => item !== amenity)
+        : [...current.amenities, amenity],
+    }));
+  };
+  const addCustomAmenity = () => {
+    const amenity = customAmenity.trim();
+    if (!amenity || form.amenities.some((item) => item.toLowerCase() === amenity.toLowerCase())) return;
+    setForm((current) => ({ ...current, amenities: [...current.amenities, amenity] }));
+    setCustomAmenity("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,10 +122,7 @@ function ManageHourlyRooms() {
       data.append("location[address]", form.address);
       data.append("location[city]", form.city);
       data.append("pricePerHour", form.pricePerHour);
-      data.append(
-        "amenities",
-        JSON.stringify(form.amenities ? form.amenities.split(",").map((a) => a.trim()).filter(Boolean) : [])
-      );
+      data.append("amenities", JSON.stringify(form.amenities));
       images.forEach((image) => data.append("images", image));
 
       if (editingId) {
@@ -152,8 +186,8 @@ function ManageHourlyRooms() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1>Hourly Rooms</h1>
-          <p>Ghante ke hisaab se book hone wale rooms manage karo.</p>
+          <h1>Hourly / Short Stay</h1>
+          <p>Short stay aur hourly rate par book hone wale rooms manage karo.</p>
         </div>
         <button className="admin-btn" onClick={openAddModal}>
           <Plus size={18} /> Add Room
@@ -193,8 +227,8 @@ function ManageHourlyRooms() {
       <div className="admin-table-wrap">
         {rooms.length === 0 ? (
           <div className="admin-empty">
-            <h3>No hourly rooms yet</h3>
-            <p>Koi hourly room add nahi hua hai abhi tak.</p>
+            <h3>No short stays yet</h3>
+            <p>Koi hourly ya short-stay room add nahi hua hai abhi tak.</p>
           </div>
         ) : (
           <table className="admin-table">
@@ -297,7 +331,7 @@ function ManageHourlyRooms() {
               <X size={20} />
             </button>
 
-            <h2 style={{ marginBottom: 18 }}>{editingId ? "Edit Room" : "Add Room"}</h2>
+            <h2 style={{ marginBottom: 18 }}>{editingId ? "Edit Short Stay" : "Add Short Stay"}</h2>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <select required value={form.ownerId} onChange={(e) => setForm({ ...form, ownerId: e.target.value })} style={inputStyle}>
@@ -313,7 +347,43 @@ function ManageHourlyRooms() {
               <input type="text" placeholder="Address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} style={inputStyle} />
               <input type="text" placeholder="City" required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} style={inputStyle} />
               <input type="number" placeholder="Price per hour" required value={form.pricePerHour} onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })} style={inputStyle} />
-              <input type="text" placeholder="Amenities (comma separated)" value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} style={inputStyle} />
+              <fieldset style={{ border: "1px solid var(--admin-border)", borderRadius: 12, padding: 12 }}>
+                <legend style={{ padding: "0 5px", color: "var(--admin-muted)", fontSize: 13 }}>Amenities</legend>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: 8 }}>
+                  {[...HOURLY_AMENITIES, ...form.amenities.filter((amenity) => !HOURLY_AMENITIES.includes(amenity))].map((amenity) => (
+                    <label
+                      key={amenity}
+                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 9px", background: "var(--admin-bg)", border: "1px solid var(--admin-border)", borderRadius: 9, color: "var(--admin-text)", fontSize: 13 }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.amenities.includes(amenity)}
+                        onChange={() => toggleAmenity(amenity)}
+                        style={{ width: 16, height: 16, accentColor: "var(--admin-accent)" }}
+                      />
+                      {amenity}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                  <input
+                    type="text"
+                    placeholder="Other amenity"
+                    value={customAmenity}
+                    onChange={(event) => setCustomAmenity(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        addCustomAmenity();
+                      }
+                    }}
+                    style={inputStyle}
+                  />
+                  <button type="button" className="admin-btn" onClick={addCustomAmenity} disabled={!customAmenity.trim()}>
+                    Add
+                  </button>
+                </div>
+              </fieldset>
 
               <label style={{ fontSize: 13, color: "var(--admin-muted)" }}>
                 Room Images {editingId ? "(leave empty to keep existing)" : ""}

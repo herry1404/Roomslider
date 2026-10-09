@@ -174,7 +174,7 @@ function HourlyRoomDetail() {
   return (
     <main className="container hourly-detail-page">
       <Helmet>
-        <title>{room.title} | Hourly Rooms | RoomSlider</title>
+        <title>{room.title} | Hourly / Short Stay | RoomSlider</title>
         <meta
           name="description"
           content={`${room.title}${location ? ` in ${location}` : ""}. View room details and hourly price on RoomSlider.`}

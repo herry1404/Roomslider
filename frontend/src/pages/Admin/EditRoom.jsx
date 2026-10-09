@@ -3,6 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import LocationPicker from "../../components/map/LocationPicker";
+import AmenitiesInput from "../../components/forms/AmenitiesInput";
+import HourlySlabsInput from "../../components/forms/HourlySlabsInput";
+import { normalizeAmenities } from "../../utils/amenities";
 
 import "../../styles/add-room.css";
 
@@ -28,50 +31,64 @@ function EditRoom() {
     ownerName: "",
     contact: "",
     whatsapp: "",
-    amenities: "",
+    amenities: [],
     nearby: "",
     priority: 9999,
     latitude: null,
     longitude: null,
+    hourlyEnabled: false,
+    hourlyOnly: false,
+    hourlySlabs: [],
+    extraHourPrice: "",
+    checkIn24x7: false,
   });
 
   useEffect(() => {
-    fetchRoom();
-  }, []);
-
-  const fetchRoom = async () => {
-    try {
-      const res = await api.get(`/rooms/${id}`);
-      const room = res.data.room;
-
-      setFormData({
-        title: room.title || "",
-        price: room.price || "",
-        deposit: room.deposit || "",
-        location: room.location || "",
-        description: room.description || "",
-        category: room.category || "Room",
-        gender: room.gender || "Any",
-        sharingType: room.sharingType || "",
-        rooms: room.rooms || 1,
-        bathrooms: room.bathrooms || 1,
-        furnished: room.furnished || false,
-        ownerName: room.ownerName || "",
-        contact: room.contact || "",
-        whatsapp: room.whatsapp || "",
-        amenities: (room.amenities || []).join(", "),
-        nearby: (room.nearby || []).join(", "),
-        priority: room.priority || 9999,
-        latitude: room.latitude || null,
-        longitude: room.longitude || null,
+    let active = true;
+    api.get(`/rooms/${id}`)
+      .then((res) => {
+        if (!active) return;
+        const room = res.data.room;
+        setFormData({
+          title: room.title || "",
+          price: room.price || "",
+          deposit: room.deposit || "",
+          location: room.location || "",
+          description: room.description || "",
+          category: room.category || "Room",
+          gender: room.gender || "Any",
+          sharingType: room.sharingType || "",
+          rooms: room.rooms || 1,
+          bathrooms: room.bathrooms || 1,
+          furnished: room.furnished || false,
+          ownerName: room.ownerName || "",
+          contact: room.contact || "",
+          whatsapp: room.whatsapp || "",
+          amenities: normalizeAmenities(room.amenities),
+          nearby: (room.nearby || []).join(", "),
+          priority: room.priority || 9999,
+          latitude: room.latitude || null,
+          longitude: room.longitude || null,
+          hourlyEnabled: room.hourlyEnabled || false,
+          hourlyOnly: room.hourlyOnly || false,
+          hourlySlabs: (room.hourlySlabs || []).map((slab) => ({
+            hours: slab.hours,
+            price: slab.price,
+          })),
+          extraHourPrice: room.extraHourPrice || "",
+          checkIn24x7: room.checkIn24x7 || false,
+        });
+      })
+      .catch((error) => {
+        if (!active) return;
+        toast.error("Failed to load room");
+        console.error(error);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
-    } catch (err) {
-      toast.error("Failed to load room");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => { active = false; };
+  }, [id]);
 
   const changeHandler = (e) => {
     const { name, value, type, checked } = e.target;
@@ -90,18 +107,17 @@ function EditRoom() {
 
       const payload = {
         ...formData,
-        amenities: JSON.stringify(
-          formData.amenities
-            .split(",")
-            .map((x) => x.trim())
-            .filter(Boolean)
-        ),
+        hourlyOnly: formData.hourlyEnabled && formData.hourlyOnly,
+        amenities: JSON.stringify(normalizeAmenities(formData.amenities)),
         nearby: JSON.stringify(
           formData.nearby
             .split(",")
             .map((x) => x.trim())
             .filter(Boolean)
         ),
+        hourlySlabs: formData.hourlySlabs
+          .filter((slab) => slab.hours !== "" && slab.price !== "")
+          .map((slab) => ({ hours: Number(slab.hours), price: Number(slab.price) })),
       };
 
       await api.put(`/rooms/${id}`, payload);
@@ -257,11 +273,29 @@ function EditRoom() {
           onChange={changeHandler}
         />
 
-        <textarea
-          name="amenities"
-          placeholder="Amenities (comma separated)"
-          value={formData.amenities}
-          onChange={changeHandler}
+        <section className="form-section">
+          <h2>Amenities</h2>
+          <AmenitiesInput
+            value={formData.amenities}
+            onChange={(amenities) => setFormData((prev) => ({ ...prev, amenities }))}
+          />
+        </section>
+
+        <HourlySlabsInput
+          enabled={formData.hourlyEnabled}
+          onEnabledChange={(hourlyEnabled) => setFormData((prev) => ({
+            ...prev,
+            hourlyEnabled,
+            hourlyOnly: hourlyEnabled ? prev.hourlyOnly : false,
+          }))}
+          hourlyOnly={formData.hourlyOnly}
+          onHourlyOnlyChange={(hourlyOnly) => setFormData((prev) => ({ ...prev, hourlyOnly }))}
+          slabs={formData.hourlySlabs}
+          onSlabsChange={(hourlySlabs) => setFormData((prev) => ({ ...prev, hourlySlabs }))}
+          extraHourPrice={formData.extraHourPrice}
+          onExtraHourPriceChange={(extraHourPrice) => setFormData((prev) => ({ ...prev, extraHourPrice }))}
+          checkIn24x7={formData.checkIn24x7}
+          onCheckIn24x7Change={(checkIn24x7) => setFormData((prev) => ({ ...prev, checkIn24x7 }))}
         />
 
         <textarea

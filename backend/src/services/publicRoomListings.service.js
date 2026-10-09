@@ -9,7 +9,7 @@ function escapeRegExp(value) {
 }
 
 function buildPublicRoomFilter({ category, search, maxSearchLength = 50 } = {}) {
-  const filter = { status: "vacant" };
+  const filter = { status: "vacant", hourlyOnly: { $ne: true } };
 
   if (typeof category === "string" && category) {
     filter.category = category;
@@ -23,6 +23,16 @@ function buildPublicRoomFilter({ category, search, maxSearchLength = 50 } = {}) 
     }
   }
 
+  return filter;
+}
+
+function applyHourlyRoomVisibility(filter, hourly) {
+  if (hourly === true) {
+    filter.hourlyEnabled = true;
+    delete filter.hourlyOnly;
+  } else {
+    filter.hourlyOnly = { $ne: true };
+  }
   return filter;
 }
 
@@ -40,6 +50,7 @@ async function findPublicRoomListings({ category, search, page = 0, limit = 5 } 
 
 module.exports = {
   PUBLIC_ROOM_CATEGORIES,
+  applyHourlyRoomVisibility,
   buildPublicRoomFilter,
   findPublicRoomListings,
 };

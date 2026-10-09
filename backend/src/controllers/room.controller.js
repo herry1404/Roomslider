@@ -12,7 +12,11 @@ const { recordListingEngagement } = require("../utils/listingEngagement");
 const SearchEvent = require("../models/SearchEvent");
 const { uploadRentReceipt } = require("../utils/rentReceipt");
 const { notifyAdmin } = require("../services/adminAlert.service");
-const { buildPublicRoomFilter } = require("../services/publicRoomListings.service");
+const {
+  applyHourlyRoomVisibility,
+  buildPublicRoomFilter,
+} = require("../services/publicRoomListings.service");
+const { parseRoomHourlyFields } = require("../validators/roomHourly.validator");
 
 // ============================
 // Compute live rent-cycle status from nextDueDate.
@@ -131,6 +135,10 @@ const createRoom = async (req, res) => {
 
     const parsedAmenities = amenities ? JSON.parse(amenities) : [];
     const parsedNearby = nearby ? JSON.parse(nearby) : [];
+    const hourlyFields = parseRoomHourlyFields(req.body);
+    if (!hourlyFields.success) {
+      return res.status(400).json({ success: false, message: hourlyFields.message });
+    }
 
     const roomData = {
       title,
@@ -152,6 +160,7 @@ const createRoom = async (req, res) => {
       priority: priority ? Number(priority) : 9999,
       latitude: latitude ? Number(latitude) : undefined,
       longitude: longitude ? Number(longitude) : undefined,
+      ...hourlyFields.data,
     };
 
     // If an owner (not admin) is creating this room, auto-tag it as theirs
@@ -267,10 +276,12 @@ const getRooms = async (req, res) => {
       filter._id = { $in: requestedIds };
     }
 
+    applyHourlyRoomVisibility(filter, req.query.hourly === "true");
+
     const grouped = req.query.grouped === "true";
 
     let query = Room.find(filter).populate("owner", "name slug isVerified");
-    if (grouped) {
+    if (grouped || req.query.includeProperty === "true") {
       query = query.populate("property", "name slug area propertyType buildings");
     }
 
@@ -305,6 +316,9 @@ const getRooms = async (req, res) => {
       }
       rooms = cards;
 
+      const limit = parseInt(req.query.limit, 10);
+      if (limit > 0) rooms = rooms.slice(0, Math.min(limit, 100));
+    } else if (req.query.limit) {
       const limit = parseInt(req.query.limit, 10);
       if (limit > 0) rooms = rooms.slice(0, Math.min(limit, 100));
     }
@@ -478,6 +492,11 @@ const updateRoom = async (req, res) => {
       longitude,
     } = req.body;
 
+    const hourlyFields = parseRoomHourlyFields(req.body, { partial: true });
+    if (!hourlyFields.success) {
+      return res.status(400).json({ success: false, message: hourlyFields.message });
+    }
+
     if (title !== undefined) {
       if (title !== room.title) room.slug = await createUniqueSlug(Room, title, room._id);
       room.title = title;
@@ -507,6 +526,9 @@ const updateRoom = async (req, res) => {
     if (priority !== undefined) room.priority = Number(priority) || 9999;
     if (latitude !== undefined) room.latitude = Number(latitude);
     if (longitude !== undefined) room.longitude = Number(longitude);
+    Object.entries(hourlyFields.data).forEach(([key, value]) => {
+      room[key] = value;
+    });
 
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => file.path);
@@ -618,6 +640,10 @@ const createBulkRooms = async (req, res) => {
 
     const parsedAmenities = amenities ? JSON.parse(amenities) : [];
     const parsedNearby = nearby ? JSON.parse(nearby) : [];
+    const hourlyFields = parseRoomHourlyFields(req.body);
+    if (!hourlyFields.success) {
+      return res.status(400).json({ success: false, message: hourlyFields.message });
+    }
 
     const start = Number(roomNumberStart);
     const end = Number(roomNumberEnd);
@@ -654,6 +680,7 @@ const createBulkRooms = async (req, res) => {
       amenities: parsedAmenities,
       nearby: parsedNearby,
       priority: priority ? Number(priority) : 9999,
+      ...hourlyFields.data,
     };
 
     if (req.user.role === "owner") {

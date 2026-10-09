@@ -5,7 +5,11 @@ const rateLimit = require("express-rate-limit");
 const { createTelegramBot } = require("../src/services/telegramBot.service");
 const { createTelegramWebhookRouter } = require("../src/routes/telegramWebhook.routes");
 const Room = require("../src/models/room.model");
-const { findPublicRoomListings, buildPublicRoomFilter } = require("../src/services/publicRoomListings.service");
+const {
+  applyHourlyRoomVisibility,
+  findPublicRoomListings,
+  buildPublicRoomFilter,
+} = require("../src/services/publicRoomListings.service");
 
 const LISTING = {
   title: "Sunny room",
@@ -97,6 +101,7 @@ test("search escapes regular expression characters, caps input, and handles no m
 test("public query shares vacant/category/search filters and selects no owner or private fields", async () => {
   const filter = buildPublicRoomFilter({ category: "PG", search: "A.*B" });
   assert.equal(filter.status, "vacant");
+  assert.deepEqual(filter.hourlyOnly, { $ne: true });
   assert.equal(filter.category, "PG");
   assert.equal(filter.$or[1].location.source, "A\\.\\*B");
 
@@ -123,6 +128,14 @@ test("public query shares vacant/category/search filters and selects no owner or
   } finally {
     Room.find = originalFind;
   }
+});
+
+test("hourly and normal listings receive mutually correct visibility filters", () => {
+  const hourlyFilter = applyHourlyRoomVisibility({}, true);
+  assert.deepEqual(hourlyFilter, { hourlyEnabled: true });
+
+  const normalFilter = applyHourlyRoomVisibility({}, false);
+  assert.deepEqual(normalFilter, { hourlyOnly: { $ne: true } });
 });
 
 test("Search by Area button captures the next text message", async () => {

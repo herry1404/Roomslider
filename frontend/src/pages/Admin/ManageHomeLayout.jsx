@@ -3,15 +3,16 @@ import toast from "react-hot-toast";
 import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 import api from "../../api/axios";
 import confirmAction from "../../utils/confirmAction";
+import { DEFAULT_HOME_TILES } from "../../utils/homeExploreTiles";
 import "../../styles/admin/theme.css";
 
 const TYPE_LABEL = {
   hero: "Hero",
   categories: "Categories",
-  explore: "Explore",
+  explore: "Everything you need away from home",
   listings: "Listings",
   banner: "Banner",
-  hourlyRooms: "Hourly Rooms",
+  hourlyRooms: "Hourly / Short Stay",
   villas: "Villas",
 };
 const CUSTOM = ["listings", "banner"];
@@ -41,6 +42,7 @@ const emptyForm = (type = "listings") => ({
   text: "",
   buttonText: "",
   linkUrl: "",
+  tiles: [],
 });
 
 const detailsFor = (s) => {
@@ -55,6 +57,10 @@ const detailsFor = (s) => {
   if (s.type === "banner") {
     if (c.text) return c.text.slice(0, 50);
     return c.imageUrl ? "Image banner" : "Empty banner";
+  }
+  if (s.type === "explore") {
+    const tileCount = Array.isArray(c.tiles) && c.tiles.length ? c.tiles.length : DEFAULT_HOME_TILES.length;
+    return `${tileCount} editable home tiles`;
   }
   return "Built-in section";
 };
@@ -130,7 +136,9 @@ function ManageHomeLayout() {
     setForm({
       id: s._id,
       type: s.type,
-      title: s.title || "",
+      title: s.type === "explore" && s.title === "Explore"
+        ? "Everything you need away from home"
+        : s.title || "",
       category: c.category || "",
       area: c.area || "",
       college: c.college || "",
@@ -140,11 +148,16 @@ function ManageHomeLayout() {
       text: c.text || "",
       buttonText: c.buttonText || "",
       linkUrl: c.linkUrl || "",
+      tiles: s.type === "explore"
+        ? (Array.isArray(c.tiles) && c.tiles.length ? c.tiles : DEFAULT_HOME_TILES).map((tile) => ({ ...tile }))
+        : [],
     });
   };
 
   const buildConfig = (f) =>
-    f.type === "listings"
+    f.type === "explore"
+      ? { tiles: f.tiles }
+      : f.type === "listings"
       ? {
           category: f.category,
           area: f.area,
@@ -168,6 +181,12 @@ function ManageHomeLayout() {
       toast.error("Image link ya text me se kuch daalo");
       return;
     }
+    if (form.type === "explore" && form.tiles.some((tile) =>
+      !tile.title.trim() || (tile.action !== "loan" && (!tile.to.startsWith("/") || tile.to.startsWith("//")))
+    )) {
+      toast.error("Har tile ko title dein aur valid site path set karein");
+      return;
+    }
     setSaving(true);
     try {
       const body = { title: form.title, config: buildConfig(form) };
@@ -187,6 +206,23 @@ function ManageHomeLayout() {
   };
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const updateTile = (index, key, value) => {
+    setForm((current) => ({
+      ...current,
+      tiles: current.tiles.map((tile, tileIndex) =>
+        tileIndex === index ? { ...tile, [key]: value } : tile
+      ),
+    }));
+  };
+  const moveTile = (index, direction) => {
+    const target = index + direction;
+    if (target < 0 || target >= form.tiles.length) return;
+    setForm((current) => {
+      const tiles = [...current.tiles];
+      [tiles[index], tiles[target]] = [tiles[target], tiles[index]];
+      return { ...current, tiles };
+    });
+  };
 
   if (loading) {
     return (
@@ -201,7 +237,7 @@ function ManageHomeLayout() {
       <div className="admin-page-header">
         <div>
           <h1>Home Layout</h1>
-          <p>Homepage ke sections ka order, show/hide, aur naye sections.</p>
+          <p>Homepage sections manage karein aur “Everything you need away from home” tiles edit karein.</p>
         </div>
         <div className="admin-toolbar" style={{ margin: 0 }}>
           <button className="admin-btn" onClick={() => setForm(emptyForm("listings"))}>
@@ -269,6 +305,81 @@ function ManageHomeLayout() {
             </>
           )}
 
+          {form.type === "explore" && (
+            <div style={{ display: "grid", gap: 12 }}>
+              <p style={{ margin: 0, color: "var(--admin-muted)", fontSize: 13 }}>
+                Edit, add, remove, and reorder the homepage feature tiles. Use a site path such as /villas.
+              </p>
+              {form.tiles.map((tile, index) => (
+                <div
+                  key={`${index}-${tile.title}`}
+                  className="admin-table-wrap"
+                  style={{ display: "grid", gap: 10, padding: 12 }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <strong>Tile {index + 1}</strong>
+                    <span className="admin-row-actions">
+                      <button className="admin-icon-btn" type="button" onClick={() => moveTile(index, -1)} disabled={index === 0} aria-label={`Move tile ${index + 1} up`}>
+                        <ArrowUp size={16} />
+                      </button>
+                      <button className="admin-icon-btn" type="button" onClick={() => moveTile(index, 1)} disabled={index === form.tiles.length - 1} aria-label={`Move tile ${index + 1} down`}>
+                        <ArrowDown size={16} />
+                      </button>
+                    </span>
+                  </div>
+                  <Field label="Title">
+                    <input style={inputStyle} maxLength="60" value={tile.title} onChange={(event) => updateTile(index, "title", event.target.value)} />
+                  </Field>
+                  <Field label="Description">
+                    <input style={inputStyle} maxLength="120" value={tile.desc} onChange={(event) => updateTile(index, "desc", event.target.value)} />
+                  </Field>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+                    <Field label="Icon">
+                      <select style={inputStyle} value={tile.icon} onChange={(event) => updateTile(index, "icon", event.target.value)}>
+                        {["BedDouble", "Users", "HeartHandshake", "PackageOpen", "HeartPulse", "Castle", "Banknote", "Bike", "UtensilsCrossed", "Shirt", "Sparkles", "Truck", "Sofa", "Wifi", "Wrench", "BookOpen", "FileText", "LayoutGrid"].map((icon) => (
+                          <option key={icon} value={icon}>{icon}</option>
+                        ))}
+                      </select>
+                    </Field>
+                    <Field label="Button label">
+                      <input style={inputStyle} maxLength="24" value={tile.pill} onChange={(event) => updateTile(index, "pill", event.target.value)} />
+                    </Field>
+                    <Field label="Tile action">
+                      <select style={inputStyle} value={tile.action === "loan" ? "loan" : "link"} onChange={(event) => updateTile(index, "action", event.target.value)}>
+                        <option value="link">Open page</option>
+                        <option value="loan">Open student loan form</option>
+                      </select>
+                    </Field>
+                  </div>
+                  {tile.action !== "loan" && (
+                    <Field label="Destination path">
+                      <input style={inputStyle} maxLength="200" value={tile.to} onChange={(event) => updateTile(index, "to", event.target.value)} placeholder="/villas" />
+                    </Field>
+                  )}
+                  <button
+                    className="admin-btn secondary"
+                    type="button"
+                    onClick={() => setForm((current) => ({ ...current, tiles: current.tiles.filter((_, tileIndex) => tileIndex !== index) }))}
+                  >
+                    <Trash2 size={16} /> Remove tile
+                  </button>
+                </div>
+              ))}
+              {form.tiles.length < 24 && (
+                <button
+                  className="admin-btn secondary"
+                  type="button"
+                  onClick={() => setForm((current) => ({
+                    ...current,
+                    tiles: [...current.tiles, { icon: "LayoutGrid", title: "", desc: "", pill: "Explore", action: "link", to: "" }],
+                  }))}
+                >
+                  <Plus size={16} /> Add tile
+                </button>
+              )}
+            </div>
+          )}
+
           <div style={{ display: "flex", gap: 8 }}>
             <button className="admin-btn" onClick={save} disabled={saving}>
               {saving ? "Saving..." : "Save"}
@@ -325,11 +436,13 @@ function ManageHomeLayout() {
                       <button className="admin-icon-btn" onClick={() => toggle(s)} title={s.enabled ? "Hide" : "Show"}>
                         {s.enabled ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
+                      {(CUSTOM.includes(s.type) || s.type === "explore") && (
+                        <button className="admin-icon-btn" onClick={() => openEdit(s)} title="Edit">
+                          <Pencil size={16} />
+                        </button>
+                      )}
                       {CUSTOM.includes(s.type) && (
                         <>
-                          <button className="admin-icon-btn" onClick={() => openEdit(s)} title="Edit">
-                            <Pencil size={16} />
-                          </button>
                           <button className="admin-icon-btn" onClick={() => remove(s)} title="Delete">
                             <Trash2 size={16} />
                           </button>

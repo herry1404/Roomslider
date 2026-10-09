@@ -1,5 +1,7 @@
 const User = require("../models/user.model");
 const Room = require("../models/room.model");
+const HourlyRoom = require("../models/HourlyRoom.model");
+const Villa = require("../models/Villa");
 
 
 
@@ -15,18 +17,13 @@ const addToWishlist = async (req, res) => {
 
 
     const room = await Room.findById(roomId);
-
-
-    if (!room) {
-
+    const hourlyRoom = room ? null : await HourlyRoom.findById(roomId);
+    const villa = room || hourlyRoom ? null : await Villa.findById(roomId);
+    if (!room && !hourlyRoom && !villa) {
       return res.status(404).json({
-
-        success:false,
-
-        message:"Room not found",
-
+        success: false,
+        message: "Room not found",
       });
-
     }
 
 
@@ -53,10 +50,8 @@ const addToWishlist = async (req, res) => {
 
 
 
-    const alreadyAdded =
-      user.wishlist.some(
-        id => id.toString() === roomId
-      );
+    const wishlist = room ? user.wishlist : hourlyRoom ? user.hourlyWishlist : user.villaWishlist;
+    const alreadyAdded = wishlist.some((id) => id.toString() === roomId);
 
 
 
@@ -75,7 +70,7 @@ const addToWishlist = async (req, res) => {
 
 
 
-    user.wishlist.push(room._id);
+    wishlist.push(room?._id || hourlyRoom?._id || villa._id);
 
 
     await user.save();
@@ -126,7 +121,9 @@ const getWishlist = async(req,res)=>{
     const user = await User.findById(
       req.user._id
     )
-    .populate("wishlist");
+    .populate("wishlist")
+    .populate("hourlyWishlist")
+    .populate("villaWishlist");
 
 
 
@@ -147,8 +144,11 @@ const getWishlist = async(req,res)=>{
     res.status(200).json({
 
       success:true,
-
-      wishlist:user.wishlist,
+      wishlist: [
+        ...user.wishlist.filter(Boolean).map((room) => ({ ...room.toObject(), listingType: "room" })),
+        ...user.hourlyWishlist.filter(Boolean).map((room) => ({ ...room.toObject(), listingType: "hourly" })),
+        ...user.villaWishlist.filter(Boolean).map((villa) => ({ ...villa.toObject(), listingType: "villa" })),
+      ],
 
     });
 
@@ -217,6 +217,12 @@ const removeFromWishlist = async(req,res)=>{
         id => id.toString() !== roomId
 
       );
+    user.hourlyWishlist = user.hourlyWishlist.filter(
+      (id) => id.toString() !== roomId
+    );
+    user.villaWishlist = user.villaWishlist.filter(
+      (id) => id.toString() !== roomId
+    );
 
 
 

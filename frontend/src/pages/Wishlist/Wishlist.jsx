@@ -1,5 +1,5 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MapPin, IndianRupee, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { roomPath } from "../../utils/roomUrl";
+import VillaCard from "../../components/home/VillaCard";
 
 import "../../styles/wishlist.css";
 
@@ -21,7 +23,7 @@ function Wishlist() {
 
 
 
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
 
     try {
 
@@ -69,7 +71,7 @@ function Wishlist() {
 
     }
 
-  };
+  }, [user]);
 
 
 
@@ -78,7 +80,8 @@ function Wishlist() {
 
     try {
 
-      await removeFromWishlist(roomId);
+      const removed = await removeFromWishlist(roomId);
+      if (!removed) return;
 
       setWishlist(
         wishlist.filter(
@@ -103,11 +106,9 @@ function Wishlist() {
 
 
 
-  useEffect(()=>{
-
-    fetchWishlist();
-
-  },[]);
+  useEffect(() => {
+    Promise.resolve().then(fetchWishlist);
+  }, [fetchWishlist]);
 
 
 
@@ -178,12 +179,13 @@ function Wishlist() {
 
               {
                 wishlist.map((room)=>(
-
-
-                  <div
-                    className="wishlist-card"
-                    key={room._id}
-                  >
+                  room.listingType === "villa" ? (
+                    <VillaCard
+                      key={room._id}
+                      villa={room}
+                      onWishlistChange={() => setWishlist((current) => current.filter((item) => item._id !== room._id))}
+                    />
+                  ) : <div className="wishlist-card" key={room._id}>
 
 
                     <img
@@ -196,7 +198,12 @@ function Wishlist() {
 
 
                       <h2>
-                        {room.title}
+                        <Link to={room.listingType === "hourly"
+                          ? `/hourly-rooms/${room.slug || room._id}`
+                          : roomPath(room)}
+                        >
+                          {room.title}
+                        </Link>
                       </h2>
 
 
@@ -205,7 +212,9 @@ function Wishlist() {
 
                         <MapPin size={16}/>
 
-                        {room.location}
+                        {typeof room.location === "string"
+                          ? room.location
+                          : [room.location?.address, room.location?.city].filter(Boolean).join(", ")}
 
                       </p>
 
@@ -216,7 +225,9 @@ function Wishlist() {
 
                         <IndianRupee size={16}/>
 
-                        {room.price}/month
+                        {room.listingType === "hourly"
+                          ? `${room.pricePerHour}/hour`
+                          : `${room.price}/month`}
 
                       </p>
 

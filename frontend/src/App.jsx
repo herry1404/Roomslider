@@ -49,6 +49,7 @@ import RoommateMessages from "./pages/Roommates/RoommateMessages";
 import RoommateProfilePage from "./pages/Roommates/RoommateProfilePage";
 import RoommateChatPage from "./pages/Roommates/RoommateChatPage";
 import Notifications from "./pages/Notifications/Notifications";
+import Sitemap from "./pages/Sitemap/Sitemap";
 
 import Rooms from "./pages/Rooms/Rooms";
 import HourlyRooms from "./pages/Rooms/HourlyRooms";
@@ -179,6 +180,7 @@ function App() {
         <Route path="/recently-viewed" element={<MainLayout><RecentlyViewed /></MainLayout>} />
         <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
         <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
+        <Route path="/sitemap" element={<MainLayout><Sitemap /></MainLayout>} />
 
         <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/hourly-manager/login" element={<HourlyManagerLogin />} />

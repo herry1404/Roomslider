@@ -4,6 +4,11 @@ const HomeSection = require("../models/homeSection.model");
 const BUILT_IN = ["hero", "categories", "explore", "hourlyRooms", "villas"];
 const CUSTOM = ["listings", "banner"];
 const CATEGORIES = ["Room", "PG", "Hostel", "Flat"];
+const TILE_ICONS = new Set([
+  "BedDouble", "Users", "HeartHandshake", "PackageOpen", "HeartPulse", "Castle",
+  "Banknote", "Bike", "UtensilsCrossed", "Shirt", "Sparkles", "Truck", "Sofa",
+  "Wifi", "Wrench", "BookOpen", "FileText", "LayoutGrid",
+]);
 
 const DEFAULT_SECTIONS = [
   { type: "hero", title: "Hero", order: 0 },
@@ -12,7 +17,7 @@ const DEFAULT_SECTIONS = [
   { type: "listings", title: "Flats", order: 3, config: { category: "Flat", limit: 10, viewAllPath: "/flats" } },
   { type: "listings", title: "PG", order: 4, config: { category: "PG", limit: 10, viewAllPath: "/pg" } },
   { type: "listings", title: "Hostels", order: 5, config: { category: "Hostel", limit: 10, viewAllPath: "/hostels" } },
-  { type: "hourlyRooms", title: "Hourly Rooms", order: 6 },
+  { type: "hourlyRooms", title: "Hourly / Short Stay", order: 6 },
   { type: "villas", title: "Villas", order: 7 },
   { type: "explore", title: "Explore", order: 8 },
 ];
@@ -51,7 +56,7 @@ const ensureDefaults = () => {
         );
         await HomeSection.create({
           type: sectionType,
-          title: sectionType === "hourlyRooms" ? "Hourly Rooms" : "Villas",
+          title: sectionType === "hourlyRooms" ? "Hourly / Short Stay" : "Villas",
           order: insertOrder,
         });
       }
@@ -99,6 +104,21 @@ const cleanConfig = (type, input = {}) => {
       text: str(input.text, 300),
       buttonText: str(input.buttonText, 40),
       linkUrl: safeLink(input.linkUrl),
+    };
+  }
+  if (type === "explore") {
+    return {
+      tiles: (Array.isArray(input.tiles) ? input.tiles : [])
+        .slice(0, 24)
+        .map((tile) => ({
+          icon: TILE_ICONS.has(tile.icon) ? tile.icon : "LayoutGrid",
+          title: str(tile.title, 60),
+          desc: str(tile.desc, 120),
+          pill: str(tile.pill, 24) || "Explore",
+          action: tile.action === "loan" ? "loan" : "link",
+          to: tile.action === "loan" ? "" : safePath(tile.to),
+        }))
+        .filter((tile) => tile.title && (tile.action === "loan" || tile.to)),
     };
   }
   return {};
@@ -161,7 +181,7 @@ const updateSection = async (req, res) => {
     }
     if (req.body.title !== undefined) section.title = str(req.body.title, 80);
     if (typeof req.body.enabled === "boolean") section.enabled = req.body.enabled;
-    if (CUSTOM.includes(section.type) && req.body.config) {
+    if ((CUSTOM.includes(section.type) || section.type === "explore") && req.body.config) {
       section.config = cleanConfig(section.type, req.body.config);
     }
     await section.save();

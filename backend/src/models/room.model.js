@@ -95,6 +95,34 @@ const roomSchema = new mongoose.Schema(
       },
     ],
 
+    hourlyEnabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    hourlyOnly: {
+      type: Boolean,
+      default: false,
+    },
+
+    hourlySlabs: [
+      {
+        _id: false,
+        hours: { type: Number, required: true, min: 0.01 },
+        price: { type: Number, required: true, min: 0.01 },
+      },
+    ],
+
+    extraHourPrice: {
+      type: Number,
+      min: 0.01,
+    },
+
+    checkIn24x7: {
+      type: Boolean,
+      default: false,
+    },
+
     nearby: [
       {
         type: String,

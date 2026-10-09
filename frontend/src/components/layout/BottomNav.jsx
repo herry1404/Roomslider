@@ -1,12 +1,12 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Home, MapPin, Compass } from "lucide-react";
+import { Home, MapPin, Search } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
 
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   return (
     <nav className="bottom-nav" aria-label="Bottom Navigation">
@@ -21,6 +21,14 @@ function BottomNav() {
         <span>Home</span>
       </NavLink>
 
+      <NavLink
+        to="/rooms"
+        className={() => isActive("/rooms") ? "bottom-nav-item active" : "bottom-nav-item"}
+      >
+        <Search size={19} />
+        <span>Search</span>
+      </NavLink>
+
       <button
         type="button"
         className={
@@ -31,19 +39,7 @@ function BottomNav() {
         <MapPin size={18} />
         <span>Map</span>
       </button>
-
-      <button
-        type="button"
-        className={
-          isActive("/explore") ? "bottom-nav-item active" : "bottom-nav-item"
-        }
-        onClick={() => navigate("/explore")}
-      >
-        <Compass size={18} />
-        <span>Explore</span>
-      </button>
-
-      <ProfileMenu variant="bottom" />
+      <ProfileMenu variant="bottom" active={isActive("/profile")} />
     </nav>
   );
 }

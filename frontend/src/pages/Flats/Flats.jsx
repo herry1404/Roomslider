@@ -11,7 +11,7 @@ function Flats() {
   const fetchRooms = async () => {
     try {
       const response = await api.get("/rooms", {
-        params: { category: "Flat" },
+        params: { category: "Flat", hourly: "false" },
       });
       setRooms(response.data.rooms);
     } catch (error) {

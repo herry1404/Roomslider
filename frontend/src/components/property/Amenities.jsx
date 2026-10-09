@@ -3,29 +3,47 @@ import { createPortal } from "react-dom";
 import {
   Bath,
   BedDouble,
+  BookOpen,
+  CarFront,
+  Camera,
   Check,
+  Droplets,
   Fan,
+  Heater,
+  Refrigerator,
+  ShieldCheck,
   Shirt,
   Snowflake,
   Utensils,
   Wifi,
   X,
+  Tv,
 } from "lucide-react";
 
 const iconForAmenity = (amenity) => {
   const value = amenity.toLowerCase();
-  if (value.includes("wifi") || value.includes("internet")) return Wifi;
-  if (value.includes("bath") || value.includes("shower")) return Bath;
+  if (value.includes("wifi") || value.includes("wi-fi") || value.includes("internet")) return Wifi;
+  if (value.includes("bath") || value.includes("shower") || value.includes("washroom")) return Bath;
   if (value.includes("bed")) return BedDouble;
   if (value.includes("food") || value.includes("kitchen") || value.includes("mess")) return Utensils;
-  if (value.includes("ac") || value.includes("air condition")) return Snowflake;
+  if (value === "ac" || value.includes("air condition")) return Snowflake;
   if (value.includes("fan")) return Fan;
   if (value.includes("laundry") || value.includes("washing")) return Shirt;
+  if (value.includes("geyser") || value.includes("hot water")) return Heater;
+  if (value.includes("fridge")) return Refrigerator;
+  if (value.includes("parking")) return CarFront;
+  if (value.includes("cctv")) return Camera;
+  if (value.includes("power") || value.includes("backup")) return ShieldCheck;
+  if (value.includes("study")) return BookOpen;
+  if (value.includes("water")) return Droplets;
+  if (value.includes("tv")) return Tv;
   return Check;
 };
 
 function Amenities({ amenities = [] }) {
   const [open, setOpen] = useState(false);
+  const amenityList = [...new Set((Array.isArray(amenities) ? amenities : String(amenities).split(","))
+    .map((amenity) => String(amenity).trim()).filter(Boolean))];
 
   useEffect(() => {
     if (!open) return undefined;
@@ -41,8 +59,8 @@ function Amenities({ amenities = [] }) {
     };
   }, [open]);
 
-  if (!amenities.length) return null;
-  const shown = amenities.slice(0, 8);
+  if (!amenityList.length) return null;
+  const shown = amenityList.slice(0, 8);
 
   return (
     <section className="pd-section">
@@ -53,9 +71,9 @@ function Amenities({ amenities = [] }) {
           return <li key={amenity}><Icon size={19} aria-hidden="true" /><span>{amenity}</span></li>;
         })}
       </ul>
-      {amenities.length > 8 && (
+      {amenityList.length > 8 && (
         <button type="button" className="pd-outline-button" onClick={() => setOpen(true)}>
-          Show all {amenities.length} amenities
+          Show all {amenityList.length} amenities
         </button>
       )}
       {open && createPortal(
@@ -73,7 +91,7 @@ function Amenities({ amenities = [] }) {
               </button>
             </header>
             <ul className="pd-amenities-modal-list">
-              {amenities.map((amenity) => {
+              {amenityList.map((amenity) => {
                 const Icon = iconForAmenity(amenity);
                 return <li key={amenity}><Icon size={20} aria-hidden="true" /><span>{amenity}</span></li>;
               })}

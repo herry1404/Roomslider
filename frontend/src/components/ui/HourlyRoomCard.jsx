@@ -1,68 +1,106 @@
+import { useState } from "react";
+import { Heart, MapPin, Share2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { roomPath } from "../../utils/roomUrl";
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
-import { Link } from "react-router-dom";
-import { Clock3, MapPin, Star } from "lucide-react";
-import "../../styles/room-card.css";
-
-function getThumbnailUrl(url) {
-  if (!url || !url.includes("/upload/")) return url;
-  return url.replace("/upload/", "/upload/w_500,h_500,c_fill,q_auto,f_auto/");
-}
+import "../../styles/hourly-listings.css";
 
 function HourlyRoomCard({ room }) {
-  const firstImage = getThumbnailUrl(room.images?.[0]);
-  const ratingValue = room.averageRating ?? (
-    typeof room.rating === "object" ? room.rating?.average : room.rating
-  );
-  const rating = Number(ratingValue);
-  const hasRating = Number.isFinite(rating) && rating > 0;
-  const reviewCount = room.reviewCount ?? room.rating?.count;
-  const location = [room.location?.address, room.location?.city].filter(Boolean).join(", ");
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
+  const [sharing, setSharing] = useState(false);
+  const isHourlyRoomCollection = room.pricePerHour != null || room.location?.address;
+  const wishlisted = isWishlisted(room._id);
+  const firstImage = room.images?.[0];
+  const location = isHourlyRoomCollection
+    ? [room.location?.address, room.location?.city].filter(Boolean).join(", ")
+    : room.location;
+  const slab = (room.hourlySlabs || [])
+    .filter((item) => Number(item.hours) > 0 && Number(item.price) > 0)
+    .sort((first, second) => Number(first.hours) - Number(second.hours))[0];
+  const detailPath = isHourlyRoomCollection
+    ? `/hourly-rooms/${room.slug || room._id}`
+    : room.property?._id
+      ? `/property/${room.property.slug || room.property._id}${room.sharingType && room.sharingType !== "Other"
+      ? `?sharing=${encodeURIComponent(room.sharingType.toLowerCase())}`
+      : ""}`
+      : roomPath(room);
+
+  const toggleWishlist = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!user) {
+      toast.error("Please login to add to wishlist");
+      navigate("/login");
+      return;
+    }
+    if (wishlisted) {
+      await removeFromWishlist(room._id);
+    } else {
+      await addToWishlist(room._id);
+    }
+  };
+
+  const shareListing = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const url = `${window.location.origin}${detailPath}`;
+    if (sharing) return;
+    setSharing(true);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: room.title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied");
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied");
+      } catch {
+        toast.error("Could not share listing link");
+      }
+    } finally {
+      setSharing(false);
+    }
+  };
 
   return (
-    <Link
-      to={`/hourly-rooms/${room.slug || room.title}`}
-      className="room-card hourly-air-card"
-      aria-label={`View ${room.title}`}
-    >
-      <span className="hourly-air-image-link" aria-hidden="true">
-        {firstImage ? (
-          <img
-            src={optimizeCloudinaryImage(firstImage, 640)}
-            alt={room.title}
-            className="hourly-air-image"
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <span className="hourly-air-image hourly-air-image-placeholder" role="img" aria-label="No room photo available" />
-        )}
-      </span>
-
-      <div className="hourly-air-content">
-        <div className="hourly-air-title-row">
-          <h3>{room.title}</h3>
-          {hasRating && (
-            <span className="hourly-air-rating" aria-label={`${rating.toFixed(1)} out of 5`}>
-              <Star size={14} fill="currentColor" aria-hidden="true" />
-              {rating.toFixed(1)}
-              {reviewCount != null && <small>({reviewCount})</small>}
-            </span>
-          )}
+    <article className="hourly-listing-card">
+      <div className="hourly-listing-photo">
+        <Link to={detailPath} aria-label={`View ${room.title}`}>
+          {firstImage
+            ? <img src={optimizeCloudinaryImage(firstImage, 520)} alt={room.title} loading="lazy" decoding="async" />
+            : <span className="hourly-listing-photo-empty" />}
+        </Link>
+        <div className="hourly-listing-actions">
+          <button type="button" onClick={toggleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}>
+            <Heart size={19} fill={wishlisted ? "currentColor" : "none"} />
+          </button>
+          <button type="button" onClick={shareListing} aria-label="Share listing" disabled={sharing}>
+            <Share2 size={18} />
+          </button>
         </div>
-        {location && (
-          <p className="hourly-air-location">
-            <MapPin size={14} aria-hidden="true" />
-            <span>{location}</span>
-          </p>
-        )}
-        {room.pricePerHour != null && Number.isFinite(Number(room.pricePerHour)) && (
-          <p className="hourly-air-price">
-            <strong>₹{Number(room.pricePerHour).toLocaleString("en-IN")}</strong>
-            <span><Clock3 size={13} aria-hidden="true" /> / hour</span>
-          </p>
-        )}
       </div>
-    </Link>
+      <div className="hourly-listing-info">
+        <Link className="hourly-listing-name" to={detailPath}>{room.property?.name || room.title}</Link>
+        {isHourlyRoomCollection ? (
+          <p className="hourly-listing-price">₹{Number(room.pricePerHour).toLocaleString("en-IN")} / hour</p>
+        ) : slab && (
+          <p className="hourly-listing-price">
+            From ₹{Number(slab.price).toLocaleString("en-IN")} / {slab.hours} hrs
+          </p>
+        )}
+        <p className="hourly-listing-location"><MapPin size={13} />{location}</p>
+        <span className="hourly-listing-badge">Hourly</span>
+      </div>
+    </article>
   );
 }
 

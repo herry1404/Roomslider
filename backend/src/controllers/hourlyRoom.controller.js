@@ -2,6 +2,18 @@ const safeMsg = require("../utils/safeMsg");
 const HourlyRoom = require("../models/HourlyRoom.model");
 const { createUniqueSlug, ensurePublicSlugs } = require("../utils/publicSlug");
 
+function parseAmenities(value) {
+  if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+  if (typeof value !== "string" || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.map((item) => String(item).trim()).filter(Boolean);
+  } catch {
+    // Legacy admin clients submitted comma-separated amenities.
+  }
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
+}
+
 // Admin: create hourly room directly
 const createHourlyRoom = async (req, res) => {
   try {
@@ -9,6 +21,7 @@ const createHourlyRoom = async (req, res) => {
 
     const roomData = {
       ...req.body,
+      amenities: parseAmenities(req.body.amenities),
       images,
       approvedByAdmin: req.user?._id,
       status: "approved",
@@ -72,6 +85,9 @@ const getPublicHourlyRoomById = async (req, res) => {
 const updateHourlyRoom = async (req, res) => {
   try {
     const updateData = { ...req.body };
+    if (updateData.amenities !== undefined) {
+      updateData.amenities = parseAmenities(updateData.amenities);
+    }
     if (updateData.title) {
       updateData.slug = await createUniqueSlug(HourlyRoom, updateData.title, req.params.id);
     }

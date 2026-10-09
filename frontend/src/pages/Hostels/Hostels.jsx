@@ -11,7 +11,7 @@ function Hostels() {
   const fetchRooms = async () => {
     try {
       const response = await api.get("/rooms", {
-        params: { category: "Hostel" },
+        params: { category: "Hostel", hourly: "false" },
       });
       setRooms(response.data.rooms);
     } catch (error) {

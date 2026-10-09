@@ -36,6 +36,7 @@ const getMyProfile = async (req, res) => {
     const user = userDocument.toObject();
     delete user.password;
     delete user.wishlist;
+    delete user.villaWishlist;
     delete user.bloodRequestsBlocked;
     res.json({ success: true, user });
   } catch (error) {

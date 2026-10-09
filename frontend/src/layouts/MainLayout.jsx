@@ -20,6 +20,12 @@ function MainLayout({ children }) {
     return () => window.removeEventListener("scroll", update);
   }, []);
 
+  useEffect(() => {
+    const closeAssistant = () => setAssistantStarted(false);
+    window.addEventListener("roomslider:assistant-close", closeAssistant);
+    return () => window.removeEventListener("roomslider:assistant-close", closeAssistant);
+  }, []);
+
   return (
     <>
       <Navbar />

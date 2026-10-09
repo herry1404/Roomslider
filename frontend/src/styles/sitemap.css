@@ -1,0 +1,121 @@
+.site-map-page {
+  min-height: 60vh;
+  padding: 40px 20px 64px;
+  color: var(--text-primary, #172033);
+  background: var(--bg-primary, #fff);
+}
+
+.site-map-hero,
+.site-map-content {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+}
+
+.site-map-hero {
+  padding: 36px clamp(20px, 5vw, 56px);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #eef6ff, #f4f2ff);
+}
+
+.site-map-eyebrow {
+  margin: 0 0 10px;
+  color: #5365d8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.site-map-hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.site-map-hero > p:last-child {
+  max-width: 720px;
+  margin: 14px 0 0;
+  color: #526078;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.site-map-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 28px;
+}
+
+.site-map-section {
+  padding: 22px;
+  border: 1px solid #e5eaf2;
+  border-radius: 16px;
+  background: var(--surface, #fff);
+}
+
+.site-map-section h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.site-map-section > p {
+  margin: 8px 0 14px;
+  color: #687386;
+  line-height: 1.55;
+}
+
+.site-map-section ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-map-section a,
+.site-map-xml a {
+  color: #3156c8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-map-section a:hover,
+.site-map-section a:focus-visible,
+.site-map-xml a:hover,
+.site-map-xml a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-map-section a:focus-visible,
+.site-map-xml a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.site-map-xml {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #687386;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .site-map-page {
+    padding: 24px 16px 48px;
+  }
+
+  .site-map-hero {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+
+  .site-map-content {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 18px;
+  }
+
+  .site-map-section {
+    padding: 18px;
+  }
+}

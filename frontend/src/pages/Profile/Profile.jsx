@@ -6,13 +6,17 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/ui/RoomCard";
+import VillaCard from "../../components/home/VillaCard";
+import CategorySection from "../../components/home/CategorySection";
+import useRecentlyViewedListings from "../../hooks/useRecentlyViewedListings";
 import Skeleton from "../../components/ui/Skeleton";
 import { useNotifications } from "../../context/useNotifications";
 import roommateNotificationLink from "../../utils/roommateNotificationLink";
 import "../../styles/profile.css";
 
 const TABS = [
-  { key: "saved", label: "Saved" },
+  { key: "saved", label: "Wishlist" },
+  { key: "recent", label: "Recently viewed" },
   { key: "activity", label: "Activity" },
   { key: "updates", label: "Updates" },
   { key: "notifications", label: "Notifications" },
@@ -42,6 +46,7 @@ function Profile() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { unreadCount: notificationUnread, markRead: markNotificationRead } = useNotifications();
+  const recentlyViewed = useRecentlyViewedListings();
   const requestedTab = searchParams.get("tab");
   const tab = TABS.some((item) => item.key === requestedTab) ? requestedTab : "saved";
 
@@ -230,6 +235,14 @@ function Profile() {
       return <div className="profile-empty">Updates jald aa rahe hain.</div>;
     }
 
+    if (tab === "recent") {
+      if (recentlyViewed.loading) return <div className="profile-empty">Loading...</div>;
+      if (!recentlyViewed.rooms.length) {
+        return <div className="profile-empty">Abhi koi listing nahi dekhi.</div>;
+      }
+      return <CategorySection title="Recently viewed listings" viewAllPath="/rooms" rooms={recentlyViewed.rooms} />;
+    }
+
     if (tabLoading || tabData[tab] === null) {
       return <div className="profile-empty">Loading...</div>;
     }
@@ -245,7 +258,9 @@ function Profile() {
       return (
         <div className="profile-saved-grid">
           {tabData.saved.map((room) => (
-            <RoomCard key={room._id} room={room} />
+            room.listingType === "villa"
+              ? <VillaCard key={room._id} villa={room} />
+              : <RoomCard key={room._id} room={room} />
           ))}
         </div>
       );

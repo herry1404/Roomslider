@@ -7,7 +7,6 @@ import ExploreTeaser from "../../components/home/ExploreTeaser";
 import CategorySection from "../../components/home/CategorySection";
 import HomeBanner from "../../components/home/HomeBanner";
 import HomeRentalSection from "../../components/home/HomeRentalSection";
-import RecentlyViewedSection from "../../components/home/RecentlyViewedSection";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import api from "../../api/axios";
 
@@ -21,7 +20,7 @@ const DEFAULT_SECTIONS = [
   { _id: "d-flats", type: "listings", title: "Flats", config: { category: "Flat", limit: 10, viewAllPath: "/flats" } },
   { _id: "d-pg", type: "listings", title: "PG", config: { category: "PG", limit: 10, viewAllPath: "/pg" } },
   { _id: "d-hostels", type: "listings", title: "Hostels", config: { category: "Hostel", limit: 10, viewAllPath: "/hostels" } },
-  { _id: "d-hourly-rooms", type: "hourlyRooms", title: "Hourly Rooms" },
+  { _id: "d-hourly-rooms", type: "hourlyRooms", title: "Hourly / Short Stay" },
   { _id: "d-villas", type: "villas", title: "Villas for Stays & Events" },
   { _id: "d-explore", type: "explore" },
 ];
@@ -84,7 +83,7 @@ function Home() {
     const fetchRooms = async () => {
       try {
         const res = await api.get("/rooms", {
-          params: { grouped: "true" },
+          params: { grouped: "true", hourly: "false" },
           signal: controller.signal,
         });
         setRooms(res.data?.rooms || []);
@@ -132,10 +131,10 @@ function Home() {
       case "categories":
         return <Categories key={s._id} />;
       case "explore":
-        return <ExploreTeaser key={s._id} />;
+        return <ExploreTeaser key={s._id} section={s} />;
       case "hourlyRooms":
       case "villas":
-        return <HomeRentalSection key={s._id} type={s.type} title={s.title || (s.type === "villas" ? "Villas" : "Hourly Rooms")} />;
+        return <HomeRentalSection key={s._id} type={s.type} title={s.title || (s.type === "villas" ? "Villas" : "Hourly / Short Stay")} />;
       case "banner":
         return <HomeBanner key={s._id} section={s} />;
       case "listings": {
@@ -175,10 +174,8 @@ function Home() {
         {sections.map((section) => (
           <Fragment key={section._id}>
             {renderSection(section)}
-            {section.type === "hero" && <RecentlyViewedSection />}
           </Fragment>
         ))}
-        {!sections.some((section) => section.type === "hero") && <RecentlyViewedSection />}
       </div>
     </>
   );

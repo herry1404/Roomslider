@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
+  Clock3,
+  Home,
   LoaderCircle,
   MapPin,
   Shirt,
@@ -18,17 +20,23 @@ import { roomPath } from "../../utils/roomUrl";
 import "./AIAssistant.css";
 
 const EXAMPLES = [
+  "Room near Vijay Nagar",
   "PG under 6000",
-  "Mess near my college",
+  "Villa near Vijay Nagar",
+  "Villa for party",
+  "Hourly stay",
+  "Mess near Vijay Nagar",
+  "Car rental",
+  "Bike under 500",
   "Laundry service",
+  "Tiffin near Palasia",
   "Wi-Fi / RO",
-  "Student loan",
 ];
 
 const WELCOME_MESSAGE = {
   id: "welcome",
   role: "assistant",
-  text: "Namaste! Room, mess, laundry ya kisi service ke baare mein poochiye.",
+  text: "Namaste! Room, villa, hourly stay, mess, car-bike ya laundry dhoondhiye. Area ya budget bhi likh sakte hain, jaise “villa near Vijay Nagar under 10000”.",
   results: [],
   cards: [],
 };
@@ -38,6 +46,8 @@ const serviceIcons = {
   laundry: Shirt,
   service: Wifi,
   room: Bot,
+  hourly: Clock3,
+  villa: Home,
 };
 
 const comingSoonTitles = [
@@ -69,10 +79,23 @@ function AssistantResultCard({ result }) {
   const Icon = serviceIcons[result.type] || Sparkles;
   const image = result.image || result.images?.[0];
   const comingSoon = isComingSoonService(result);
-  const price = result.price == null ? null : Number(result.price);
+  const hourlySlab = result.hourlyEnabled
+    ? (result.hourlySlabs || []).filter((slab) => Number(slab.hours) > 0 && Number(slab.price) > 0)
+      .sort((first, second) => Number(first.hours) - Number(second.hours))[0]
+    : null;
+  const price = hourlySlab ? Number(hourlySlab.price) : result.price == null ? null : Number(result.price);
+  const closeAssistant = () => window.dispatchEvent(new CustomEvent("roomslider:assistant-close"));
+
+  if (comingSoon) {
+    return (
+      <p className="ai-assistant-coming-soon-message">
+        {result.title}. <Link to="/explore" onClick={closeAssistant}>Explore services</Link>
+      </p>
+    );
+  }
 
   return (
-    <Link to={resultLink(result)} className={`ai-assistant-result-card is-${result.type || "service"}`}>
+    <Link to={resultLink(result)} onClick={closeAssistant} className={`ai-assistant-result-card is-${result.type || "service"}`}>
       {image ? (
         <img
           src={optimizeCloudinaryImage(image, 240)}
@@ -91,7 +114,12 @@ function AssistantResultCard({ result }) {
           {result.category && <span className="ai-assistant-category">{result.category}</span>}
           {comingSoon && <span className="ai-assistant-coming-soon">Coming Soon</span>}
           {Number.isFinite(price) && (
-            <span className="ai-assistant-result-price">₹{price.toLocaleString("en-IN")}</span>
+            <span className="ai-assistant-result-price">
+              ₹{price.toLocaleString("en-IN")}{hourlySlab
+                ? ` / ${hourlySlab.hours} hrs`
+                : result.type === "hourly" ? " / hour"
+                  : result.type === "villa" ? (result.subtitle === "per day" ? " / day" : " / night") : ""}
+            </span>
           )}
         </span>
         {result.location
@@ -153,10 +181,14 @@ function appendMessages(previous, next) {
 
 function AssistantMessage({ item }) {
   const results = item.results || [];
+  const groups = item.groups?.length
+    ? item.groups
+    : results.length ? [{ label: "Results", results }] : [];
   const showEmpty = item.role === "assistant"
     && item.intent
-    && ["room_search", "mess_search", "laundry_search"].includes(item.intent)
-    && results.length === 0;
+    && ["room_search", "villas_search", "hourly_search", "mess_search", "laundry_search", "service_search", "vehicle_search"].includes(item.intent)
+    && groups.every((group) => group.results.length === 0);
+  const closeAssistant = () => window.dispatchEvent(new CustomEvent("roomslider:assistant-close"));
 
   return (
     <div className={`ai-assistant-message-row ${item.role === "user" ? "is-user" : ""}`}>
@@ -166,15 +198,25 @@ function AssistantMessage({ item }) {
         </span>
       )}
       {item.text && <div className={`ai-assistant-bubble ${item.error ? "is-error" : ""}`}>{item.text}</div>}
-      {results.length > 0 && (
+      {item.suggestion?.link?.startsWith("/") && (
+        <Link className="ai-assistant-view-all" to={item.suggestion.link} onClick={closeAssistant}>
+          {item.suggestion.label || "Explore"}
+        </Link>
+      )}
+      {groups.length > 0 && (
         <>
-          <div className="ai-assistant-results" aria-label="Search results">
-            {results.map((result, index) => (
-              <AssistantResultCard key={`${result.type}-${result.title}-${index}`} result={result} />
-            ))}
-          </div>
+          {groups.map((group, groupIndex) => group.results.length > 0 && (
+            <section className="ai-assistant-result-group" key={`${group.label}-${groupIndex}`}>
+              <h3>{group.label}</h3>
+              <div className="ai-assistant-results" aria-label={`${group.label} search results`}>
+                {group.results.map((result, index) => (
+                  <AssistantResultCard key={`${result.type}-${result.title}-${index}`} result={result} />
+                ))}
+              </div>
+            </section>
+          ))}
           {item.hasMore && (
-            <Link className="ai-assistant-view-all" to={item.viewAllLink || "/rooms"}>
+            <Link className="ai-assistant-view-all" to={item.viewAllLink || "/rooms"} onClick={closeAssistant}>
               View all on map / list
             </Link>
           )}
@@ -248,6 +290,12 @@ function AIAssistant({ initialOpen = false, onClose }) {
     try {
       const { data } = await api.post("/assistant", { message: text });
       const results = normalizeResults(data);
+      const groups = Array.isArray(data.groups)
+        ? data.groups.map((group) => ({
+            label: typeof group.label === "string" ? group.label : "Results",
+            results: normalizeResults({ results: group.results }),
+          }))
+        : [];
       if (import.meta.env.DEV) {
         console.debug("AI ASSISTANT API RESPONSE:", data);
         const rawResultCount = (Array.isArray(data.results) ? data.results.length : 0)
@@ -263,6 +311,10 @@ function AIAssistant({ initialOpen = false, onClose }) {
         text: data.reply || "Samajh gaya. Aap thoda aur detail bata sakte hain?",
         intent: data.intent,
         results,
+        groups,
+        suggestion: data.suggestion && typeof data.suggestion.link === "string" && data.suggestion.link.startsWith("/")
+          ? data.suggestion
+          : null,
         hasMore: data.hasMore === true || Number(data.total) > results.length,
         viewAllLink: typeof data.viewAllLink === "string" && data.viewAllLink.startsWith("/")
           ? data.viewAllLink
@@ -309,7 +361,7 @@ function AIAssistant({ initialOpen = false, onClose }) {
             </span>
             <span className="ai-assistant-heading">
               <strong>RoomSlider AI Assistant</strong>
-              <small>Rooms, food, laundry & more</small>
+              <small>Rooms, villas, services & more</small>
             </span>
             <button type="button" className="ai-assistant-clear" onClick={clearChat} aria-label="Clear chat">
               <Trash2 size={16} />
@@ -356,7 +408,7 @@ function AIAssistant({ initialOpen = false, onClose }) {
               ref={inputRef}
               value={message}
               onChange={(event) => setMessage(event.target.value.slice(0, 300))}
-              placeholder="Kuch bhi poochiye..."
+              placeholder="Room, villa, area ya budget likhein..."
               maxLength={300}
               aria-label="Ask RoomSlider AI Assistant"
             />

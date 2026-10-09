@@ -24,7 +24,7 @@ export function WishlistProvider({ children }) {
       const res = await api.get("/wishlist");
       console.log("Wishlist Response:", res.data);
 
-      const ids = (res.data.wishlist || []).map((room) => room._id);
+      const ids = (res.data.wishlist || []).map((listing) => listing._id);
       setWishlistIds(ids);
     } catch (error) {
       console.error("FETCH WISHLIST ERROR:", error);
@@ -36,7 +36,7 @@ export function WishlistProvider({ children }) {
 
   // refetch whenever the logged-in user changes (login/logout)
   useEffect(() => {
-    fetchWishlist();
+    Promise.resolve().then(fetchWishlist);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -53,11 +53,13 @@ export function WishlistProvider({ children }) {
       setWishlistIds((prev) => [...prev, roomId]);
 
       await api.post(`/wishlist/${roomId}`);
+      return true;
     } catch (error) {
       console.error("ADD WISHLIST ERROR:", error);
       // rollback on failure
       setWishlistIds((prev) => prev.filter((id) => id !== roomId));
       toast.error("Could not add to wishlist");
+      return false;
     }
   };
 
@@ -67,11 +69,13 @@ export function WishlistProvider({ children }) {
       setWishlistIds((prev) => prev.filter((id) => id !== roomId));
 
       await api.delete(`/wishlist/${roomId}`);
+      return true;
     } catch (error) {
       console.error("REMOVE WISHLIST ERROR:", error);
       // rollback on failure
       setWishlistIds((prev) => [...prev, roomId]);
       toast.error("Could not remove from wishlist");
+      return false;
     }
   };
 
@@ -100,6 +104,7 @@ export function WishlistProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWishlist() {
   return useContext(WishlistContext);
 }
