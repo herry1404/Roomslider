@@ -54,6 +54,13 @@ function SuggestPlace({ onClose }) {
   </form></div>;
 }
 
+function SupportContact() {
+  return <section className="sw-support-card">
+    <div><h2>Social Work &amp; Blood Donation Help &amp; Support</h2><p>For help with social work or blood requests, contact the in-charge.</p></div>
+    <div className="sw-support-contact"><strong>Aryan Choudhary</strong><span>Social Work &amp; Blood Request Management In-charge</span><a href="tel:+918109148408"><Phone size={15} /> 8109148408</a></div>
+  </section>;
+}
+
 function SocialWork() {
   const { category, slug } = useParams();
   const [places, setPlaces] = useState([]);
@@ -127,6 +134,7 @@ function SocialWork() {
   if (isLanding) return <>{seo}<main className="sw-page">
     <header className="sw-hero"><span className="sw-eyebrow">Indore community directory</span><h1>Social Work</h1><p>Find community services, support, and ways to help across Indore.</p></header>
     <div className="sw-category-grid">{CATEGORIES.map(({ value, title, icon: Icon, description }) => <Link key={value} to={`/social-work/${value}`} className="sw-category-card"><span className="sw-icon"><Icon size={22} /></span><strong>{title}</strong><span>{description}</span><span className="sw-arrow">Explore listings →</span></Link>)}</div>
+    <SupportContact />
     <p className="sw-disclaimer">{DISCLAIMER}</p>
     <p className="sw-last-verified">Last verified: {formatDate(latestVerified)}</p>
     <button className="sw-outline-button" onClick={() => setSuggesting(true)}>Suggest a place</button>
@@ -158,6 +166,7 @@ function SocialWork() {
     <Link to="/social-work" className="sw-back"><ArrowLeft size={16} /> Social Work</Link>
     <header className="sw-list-heading"><div><span className="sw-eyebrow">{label(category)}</span><h1>{selectedCategory.title}</h1><p>{selectedCategory.description}</p></div><button className="sw-outline-button" onClick={() => setSuggesting(true)}>Suggest a place</button></header>
     {category === "blood" && <p className="sw-blood-notice">In an emergency call 108 or visit the nearest blood bank.</p>}
+    {category === "blood" && <SupportContact />}
     <div className="sw-filter-panel">
       <label className="sw-search"><Search size={17} /><input placeholder="Search places" value={filters.search} onChange={(event) => updateFilter("search", event.target.value)} /></label>
       <select aria-label="Area" value={filters.area} onChange={(event) => updateFilter("area", event.target.value)}><option value="">All areas</option>{["Vijay Nagar", "Palasia", "Bhawarkuan", "Rajendra Nagar", "Sudama Nagar", "Bengali Square", "MG Road", "LIG Colony", "Rau", "Other"].map((area) => <option key={area}>{area}</option>)}</select>

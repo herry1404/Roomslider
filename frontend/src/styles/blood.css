@@ -10,6 +10,9 @@
 .blood-danger{color:#b91c1c;border-color:#b91c1c;background:transparent}
 .blood-primary:disabled,.blood-secondary:disabled,.blood-danger:disabled{opacity:.55;cursor:wait}
 .blood-disclaimer{margin:13px 0 18px;padding:12px 14px;border-left:3px solid #dc2626;border-radius:9px;background:color-mix(in srgb,#dc2626 8%,var(--color-surface));color:var(--color-text);font-size:12px;line-height:1.6}
+.blood-support{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0;padding:16px;border:1px solid var(--color-border);border-radius:14px;background:var(--color-surface)}
+.blood-support h2{margin:0;font-size:16px}.blood-support p{margin:5px 0 0;color:var(--color-text-light);font-size:13px;line-height:1.5}
+.blood-support-contact{display:grid;gap:4px;flex:none}.blood-support-contact strong{font-size:14px}.blood-support-contact span{color:var(--color-text-light);font-size:12px}.blood-support-contact a{display:inline-flex;align-items:center;gap:6px;margin-top:2px;color:#b91c1c;font-size:13px;font-weight:700;text-decoration:none}
 .blood-my-requests{margin-top:22px}
 .blood-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
 .blood-section-heading h2{font-size:20px;margin:0}
@@ -56,5 +59,5 @@
 .blood-detail-skeleton i{height:16px;border-radius:8px;background:color-mix(in srgb,var(--color-text-light) 12%,transparent);animation:blood-pulse 1.3s infinite}
 .blood-detail-skeleton i:first-child{width:40%;height:32px}
 @keyframes blood-pulse{50%{opacity:.45}}
-@media(max-width:600px){.blood-page{padding:18px 12px 40px}.blood-hero{padding-top:14px}.blood-form{padding:13px}.blood-request-card{align-items:flex-start;flex-wrap:wrap}.blood-request-info{flex-basis:calc(100% - 65px)}.blood-request-card .blood-status{margin-left:49px}.blood-helper-count{margin:5px 0 0 auto}}
+@media(max-width:600px){.blood-page{padding:18px 12px 40px}.blood-hero{padding-top:14px}.blood-form{padding:13px}.blood-request-card{align-items:flex-start;flex-wrap:wrap}.blood-request-info{flex-basis:calc(100% - 65px)}.blood-request-card .blood-status{margin-left:49px}.blood-helper-count{margin:5px 0 0 auto}.blood-support{align-items:flex-start;flex-direction:column}}
 @media(max-width:380px){.blood-form-grid{grid-template-columns:1fr}.blood-form-wide{grid-column:auto}.blood-detail{padding:13px}.blood-detail h1{font-size:21px}.blood-detail-grid{gap:7px}.blood-detail-grid>div{padding:8px}.blood-section-heading{align-items:flex-start;flex-direction:column}}
