@@ -18,11 +18,7 @@
           script.async = true;
           script.src = 'https://www.googletagmanager.com/gtag/js?id=G-MK0EESK0ER';
           document.head.appendChild(script);
-          window.removeEventListener('pointerdown', scheduleOnInteraction);
-          window.removeEventListener('keydown', scheduleOnInteraction);
-          window.removeEventListener('touchstart', scheduleOnInteraction);
         };
-        const scheduleOnInteraction = () => loadAnalytics();
         const schedule = () => {
           if (scheduled || loaded) return;
           scheduled = true;
@@ -34,14 +30,11 @@
         };
         if (document.readyState === 'complete') schedule();
         else window.addEventListener('load', schedule, { once: true });
-        window.addEventListener('pointerdown', scheduleOnInteraction, { once: true, passive: true });
-        window.addEventListener('keydown', scheduleOnInteraction, { once: true });
-        window.addEventListener('touchstart', scheduleOnInteraction, { once: true, passive: true });
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-    <link rel="preconnect" href="https://roomslider-api.onrender.com" crossorigin />
+    <link rel="preconnect" href="https://roomslider-api.onrender.com" crossorigin="anonymous" />
     <script>
       if (window.location.pathname === "/") {
         const configuredApiBase = __ROOMSLIDER_API_BASE__;
@@ -50,7 +43,8 @@
             ? "http://localhost:5000/api"
             : "https://roomslider-api.onrender.com/api")).replace(/\/+$/, "");
         window.__roomSliderHomeRoomsPromise = fetch(
-          `${apiBase}/rooms?grouped=true&hourly=false`
+          `${apiBase}/rooms?grouped=true&hourly=false`,
+          { mode: "cors", credentials: "omit" }
         )
           .then((response) => {
             if (!response.ok) {
@@ -89,7 +83,18 @@
       .section-header { min-height: 42px; margin-bottom: 14px; }
       .rooms-grid { display: flex; min-height: 240px; gap: 18px; overflow-x: auto; }
       .room-image-wrap, .rc-air .room-image-wrapper { aspect-ratio: 1; overflow: hidden; }
-      @media (max-width: 700px) { .hs-section { min-height: 230px; padding: 22px 0 14px; } }
+      .latest-rooms .room-card { flex: 0 0 calc((100% - 6 * 18px) / 7); min-width: 200px; }
+      .home-listings-loading .rooms-grid { min-height: 300px; }
+      .home-explore-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-auto-rows: 164px; gap: 12px; }
+      @media (max-width: 1100px) { .latest-rooms .room-card { flex-basis: calc((100% - 3 * 18px) / 4); } }
+      @media (max-width: 700px) {
+        .hs-section { min-height: 230px; padding: 22px 0 14px; }
+        .home-explore-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 164px; gap: 9px; }
+      }
+      @media (max-width: 576px) {
+        .latest-rooms .room-card { flex-basis: 160px; min-width: 0; }
+        .home-listings-loading .rooms-grid { min-height: 260px; }
+      }
     </style>
     <meta name="author" content="RoomSlider" />
     <title>PG, Hostel &amp; Flats for Rent in Indore | RoomSlider</title>

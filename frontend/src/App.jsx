@@ -11,7 +11,7 @@ import InstallPrompt from "./components/InstallPrompt";
 import PreferencesModal from "./components/onboarding/PreferencesModal";
 import { useAuth } from "./context/AuthContext";
 
-import Home from "./pages/Home/Home";
+const Home = lazy(() => import("./pages/Home/Home"));
 const About = lazy(() => import("./pages/About/About"));
 const Contact = lazy(() => import("./pages/Contact/Contact"));
 const Team = lazy(() => import("./pages/Team/Team"));

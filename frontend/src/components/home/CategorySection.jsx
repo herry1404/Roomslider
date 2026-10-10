@@ -105,7 +105,7 @@ function CategorySection({ title, viewAllPath, rooms, priority = false }) {
                       width="280"
                       height="280"
                       fetchPriority={priority && index === 0 ? "high" : undefined}
-                      loading={priority && index < 2 ? "eager" : "lazy"}
+                      loading={priority && index === 0 ? "eager" : "lazy"}
                       decoding="async"
                       alt={`${room.category || "Rental"} ${room.title} in ${room.location || "Indore"}`}
                       className="room-image"

@@ -29,6 +29,21 @@ const DEFAULT_SECTIONS = [
 
 const CATEGORY_PATH = { Room: "/rooms", PG: "/pg", Hostel: "/hostels", Flat: "/flats" };
 
+function readCachedSections() {
+  const cachedResponse = readApiCache("home-sections");
+  if (Array.isArray(cachedResponse?.sections) && cachedResponse.sections.length) {
+    return cachedResponse.sections;
+  }
+
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_SECTIONS;
+  } catch {
+    return DEFAULT_SECTIONS;
+  }
+}
+
 function ListingSectionSkeleton({ title, viewAllPath }) {
   return (
     <section className="latest-rooms home-listings-loading" aria-label={`Loading ${title}`}>
@@ -68,15 +83,7 @@ const matches = (room, cfg = {}) => {
 function Home() {
   const [rooms, setRooms] = useState(() => readApiCache(ROOMS_CACHE_KEY) || []);
   const [loading, setLoading] = useState(() => !readApiCache(ROOMS_CACHE_KEY)?.length);
-  const [sections, setSections] = useState(() => {
-    try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      const parsed = raw ? JSON.parse(raw) : null;
-      return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_SECTIONS;
-    } catch {
-      return DEFAULT_SECTIONS;
-    }
-  });
+  const [sections, setSections] = useState(readCachedSections);
 
   useEffect(() => {
     let active = true;
