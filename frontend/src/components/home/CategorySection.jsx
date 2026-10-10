@@ -7,6 +7,7 @@ import ShareButton from "../ui/ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { requestLogin } from "../../utils/loginPrompt";
 
 function thumb(url) {
   if (!url || !url.includes("/upload/")) return url;
@@ -28,7 +29,7 @@ function CategorySection({ title, viewAllPath, rooms }) {
 
   const toggleWishlist = async (roomId) => {
     if (!user) {
-      toast.error("Please login first");
+      requestLogin("Please login first");
       return;
     }
 

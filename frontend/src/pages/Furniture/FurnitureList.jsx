@@ -1,12 +1,12 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Search, ShoppingCart, X, Plus, Minus, MessageCircle, Sofa, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
+import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/furniture.css";
 
 const WA_NUMBER = "919131181848";
@@ -50,7 +50,6 @@ function Thumb({ src }) {
 }
 
 function FurnitureList() {
-  const navigate = useNavigate();
   const user = readUser();
   const loggedIn = Boolean(user && localStorage.getItem("token"));
 
@@ -245,8 +244,7 @@ function FurnitureList() {
 
   const sendRequest = async () => {
     if (!loggedIn) {
-      toast("Please login to send your request");
-      navigate("/login");
+      requestLogin("Please login to send your request");
       return;
     }
     if (cart.length === 0) return toast.error("Cart is empty");
@@ -331,7 +329,7 @@ function FurnitureList() {
             {!loggedIn ? (
               <>
                 <p className="fu-muted">Please login to send your request. Your name and phone will be filled automatically.</p>
-                <button type="button" className="fu-add" style={{ marginTop: 0 }} onClick={() => navigate("/login")}>
+                <button type="button" className="fu-add" style={{ marginTop: 0 }} onClick={() => requestLogin("Please login to send your request")}>
                   Login to continue
                 </button>
               </>

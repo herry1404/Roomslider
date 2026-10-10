@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -7,6 +7,7 @@ import {
   Eye,
   EyeOff,
   UserPlus,
+  X,
 } from "lucide-react";
 import { FaApple, FaFacebookF } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
@@ -14,7 +15,7 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import heroRoom from "../../assets/images/hero-room.webp";
 
-function Login() {
+function Login({ modal = false, onClose = () => {} }) {
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +29,15 @@ function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!modal) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modal, onClose]);
 
 
   const handleChange = (e) => {
@@ -43,6 +53,16 @@ function Login() {
   const goAfterLogin = (result) => {
 
     toast.success(result.message || "Login successful");
+
+    if (modal) {
+      onClose();
+      if (result.needsPhone) {
+        navigate("/complete-profile", { replace: true });
+      } else if (result.user?.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      }
+      return;
+    }
 
     if (result.needsPhone) {
 
@@ -186,24 +206,44 @@ function Login() {
 
 
       <section
-        className="login-page"
+        className={`login-page${modal ? " login-page--modal" : ""}`}
         style={{
           backgroundImage: `url(${heroRoom})`,
         }}
       >
 
 
-        <div className="login-overlay">
+        <div
+          className="login-overlay"
+          onMouseDown={(event) => {
+            if (modal && event.target === event.currentTarget) onClose();
+          }}
+        >
 
 
 
-          <div className="login-card">
+          <div
+            className="login-card"
+            role={modal ? "dialog" : undefined}
+            aria-modal={modal ? "true" : undefined}
+            aria-labelledby={modal ? "login-modal-title" : undefined}
+          >
 
+            {modal && (
+              <button
+                type="button"
+                className="login-modal-close"
+                aria-label="Close login"
+                onClick={onClose}
+              >
+                <X size={20} />
+              </button>
+            )}
 
 
             <div className="login-logo">
 
-              <h1>
+              <h1 id={modal ? "login-modal-title" : undefined}>
                 RoomSlider
               </h1>
 
@@ -277,14 +317,17 @@ function Login() {
                 />
 
 
-                <span
+                <button
+                  type="button"
+                  className="login-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
                   onClick={() => setShowPassword((prev) => !prev)}
-                  style={{ cursor: "pointer" }}
                 >
 
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
 
-                </span>
+                </button>
 
 
               </div>
@@ -295,6 +338,7 @@ function Login() {
 
                 <Link
                   to="/forgot-password"
+                  onClick={modal ? onClose : undefined}
                   style={{ fontSize: "13px", color: "#6b7280" }}
                 >
                   Forgot Password?
@@ -409,6 +453,7 @@ function Login() {
               <Link
 
                 to="/register"
+                onClick={modal ? onClose : undefined}
 
                 className="signup-btn"
 

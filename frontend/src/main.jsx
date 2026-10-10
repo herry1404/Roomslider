@@ -21,6 +21,7 @@ import "./styles/latest-rooms.css";
 import "./styles/footer.css";
 import "./styles/about.css";
 import "./styles/login.css";   // ✅ IMPORTANT
+import "./styles/login-modal.css";
 import "./styles/register.css";
 import "./styles/preferences-modal.css";
 

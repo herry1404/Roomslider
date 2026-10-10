@@ -151,6 +151,20 @@
 
 }
 
+.login-password-toggle{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    padding:6px;
+    border:0;
+    background:transparent;
+    color:var(--color-text-light);
+    cursor:pointer;
+
+}
+
 .login-btn{
 
     width:100%;

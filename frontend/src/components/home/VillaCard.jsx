@@ -1,15 +1,15 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Heart, MapPin, Share2, Star } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import shareVilla from "../../utils/shareVilla";
+import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/room-card.css";
 
 function VillaCard({ villa, distanceKm, onWishlistChange }) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [sharing, setSharing] = useState(false);
@@ -27,8 +27,7 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
     event.preventDefault();
     event.stopPropagation();
     if (!user) {
-      toast.error("Login to save this villa");
-      navigate("/login");
+      requestLogin("Login to save this villa");
       return;
     }
     try {

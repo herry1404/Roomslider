@@ -155,6 +155,19 @@
     font-size:12px;
 }
 
+.admin-alert-item .admin-alert-details{
+    display:grid;
+    gap:3px;
+    margin-top:3px;
+    padding:8px 10px;
+    border-radius:8px;
+    background:var(--color-background);
+}
+
+.admin-alert-item .admin-alert-details span{
+    overflow-wrap:anywhere;
+}
+
 .admin-alert-empty{
     margin:0;
     padding:20px 16px;

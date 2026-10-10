@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
@@ -114,6 +115,13 @@ import MessRoute from "./components/MessRoute";
 function App() {
 
   const { showPreferences, dismissPreferencesPrompt } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    const handleLoginRequired = () => setShowLoginModal(true);
+    window.addEventListener("roomslider:login-required", handleLoginRequired);
+    return () => window.removeEventListener("roomslider:login-required", handleLoginRequired);
+  }, []);
 
   return (
     <>
@@ -123,6 +131,9 @@ function App() {
       <PushPermissionPrompt />
       {showPreferences && (
         <PreferencesModal onClose={dismissPreferencesPrompt} />
+      )}
+      {showLoginModal && (
+        <Login modal onClose={() => setShowLoginModal(false)} />
       )}
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />

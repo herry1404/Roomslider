@@ -39,7 +39,7 @@ const categories = [
 
 function Categories() {
   return (
-    <section className="categories">
+    <section className="categories" data-tour="categories">
       <div className="container">
         <div className="categories-grid">
           {categories.map((item) => (

@@ -1,23 +1,20 @@
 import { useState } from "react";
 import { Flag, X } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/listing-report.css";
 
 export default function ReportListing({ roomId }) {
   const { user } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [sending, setSending] = useState(false);
 
   const openReport = () => {
     if (!user) {
-      toast.error("Please log in to report this listing");
-      navigate("/login", { state: { from: location.pathname } });
+      requestLogin("Please log in to report this listing");
       return;
     }
     setOpen(true);

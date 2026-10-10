@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Heart, MapPin, Share2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { roomPath } from "../../utils/roomUrl";
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
+import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/hourly-listings.css";
 
 function HourlyRoomCard({ room }) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [sharing, setSharing] = useState(false);
@@ -34,8 +34,7 @@ function HourlyRoomCard({ room }) {
     event.preventDefault();
     event.stopPropagation();
     if (!user) {
-      toast.error("Please login to add to wishlist");
-      navigate("/login");
+      requestLogin("Please login to add to wishlist");
       return;
     }
     if (wishlisted) {

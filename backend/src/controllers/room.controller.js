@@ -402,18 +402,35 @@ const recordListingInquiry = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid engagement type" });
     }
 
-    const room = await Room.findById(req.params.id).select("_id");
+    const room = await Room.findById(req.params.id).select(
+      "_id title category location ownerName"
+    );
     if (!room) {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
     const tracked = await recordListingEngagement(room._id, req, type);
     if (tracked) {
+      const contactMethod = {
+        call: "phone call",
+        whatsapp: "WhatsApp",
+        chat: "chat",
+      }[type];
       notifyAdmin({
         type: "contact_inquiry",
-        title: "New contact inquiry",
-        message: "A visitor contacted an owner about a room.",
+        title: `New ${contactMethod} inquiry`,
+        message: `${req.user?.name || "A visitor"} contacted the owner about a listing.`,
         link: `/admin/rooms/${room._id}`,
+        details: {
+          action: type,
+          visitorName: req.user?.name || "Guest visitor",
+          visitorPhone: req.user?.phone || "",
+          visitorEmail: req.user?.email || "",
+          listingTitle: room.title,
+          listingCategory: room.category,
+          listingLocation: room.location,
+          ownerName: room.ownerName,
+        },
       });
     }
     return res.status(200).json({ success: true, tracked });

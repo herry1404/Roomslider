@@ -3,6 +3,7 @@ const Room = require("../models/room.model");
 const Owner = require("../models/Owner");
 const SearchEvent = require("../models/SearchEvent");
 const PushHistory = require("../models/PushHistory");
+const ListingEngagement = require("../models/ListingEngagement");
 
 
 // ===============================
@@ -135,6 +136,23 @@ const getDashboard = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   try {
+    const indiaDateParts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const todayParts = Object.fromEntries(
+      indiaDateParts
+        .filter((part) => part.type !== "literal")
+        .map(({ type, value }) => [type, Number(value)])
+    );
+    const todayStart = new Date(Date.UTC(
+      todayParts.year,
+      todayParts.month - 1,
+      todayParts.day
+    ) - (5 * 60 + 30) * 60 * 1000);
+    const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
     const end = new Date();
     end.setUTCHours(23, 59, 59, 999);
     const start = new Date(end);
@@ -144,7 +162,7 @@ const getAnalytics = async (req, res) => {
     const dateGroup = {
       $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
     };
-    const [signups, searches, topAreas, listingsByCategory, pushSentCount] = await Promise.all([
+    const [signups, searches, topAreas, listingsByCategory, pushSentCount, todayViews] = await Promise.all([
       User.aggregate([
         { $match: { role: "user", createdAt: { $gte: start, $lte: end } } },
         { $group: { _id: dateGroup, count: { $sum: 1 } } },
@@ -163,6 +181,10 @@ const getAnalytics = async (req, res) => {
         { $sort: { count: -1, _id: 1 } },
       ]),
       PushHistory.countDocuments(),
+      ListingEngagement.countDocuments({
+        type: "view",
+        createdAt: { $gte: todayStart, $lt: tomorrowStart },
+      }),
     ]);
 
     const signupCounts = new Map(signups.map((item) => [item._id, item.count]));
@@ -189,6 +211,7 @@ const getAnalytics = async (req, res) => {
           count: item.count,
         })),
         pushSentCount,
+        todayViews,
       },
     });
   } catch (error) {

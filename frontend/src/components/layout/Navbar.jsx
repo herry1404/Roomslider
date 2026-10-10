@@ -127,14 +127,6 @@ function Navbar() {
 
           <div className="navbar-mobile-actions">
             {user && <NotificationBell mobile />}
-            <SearchPill
-              searchOpen={searchOpen}
-              setSearchOpen={setSearchOpen}
-              searchValue={searchValue}
-              setSearchValue={setSearchValue}
-              handleSearchSubmit={handleSearchSubmit}
-              closeSearch={closeSearch}
-            />
           </div>
         </div>
       </Container>

@@ -79,6 +79,7 @@ function ProfileMenu({ variant, active = false }) {
     <div className={variant === "bottom" ? "profile-menu bottom-profile-menu" : "profile-menu"} ref={menuRef}>
       <button
         className={`profile-btn${active ? " active" : ""}`}
+        data-tour="account"
         aria-label="Account Menu"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}

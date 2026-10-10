@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BarChart3, Megaphone } from "lucide-react";
+import { BarChart3, Eye, Megaphone } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import "../../styles/admin/theme.css";
@@ -40,6 +40,13 @@ function AdminAnalytics() {
       </header>
 
       <div className="admin-stats-grid">
+        <article className="admin-stat-card">
+          <div className="admin-stat-top">
+            <span className="admin-stat-label">Today&apos;s listing views</span>
+            <Eye size={20} />
+          </div>
+          <h2 className="admin-stat-value">{(analytics.todayViews || 0).toLocaleString("en-IN")}</h2>
+        </article>
         <article className="admin-stat-card">
           <div className="admin-stat-top">
             <span className="admin-stat-label">Push campaigns sent</span>

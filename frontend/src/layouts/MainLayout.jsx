@@ -1,9 +1,11 @@
 import { Suspense, lazy } from "react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import BottomNav from "../components/layout/BottomNav";
+import FirstVisitTour from "../components/onboarding/FirstVisitTour";
 
 const AIAssistant = lazy(() => import("../components/assistant/AIAssistant"));
 
@@ -29,6 +31,7 @@ function MainLayout({ children }) {
   return (
     <>
       <Navbar />
+      {pathname === "/" && <FirstVisitTour />}
 
       <main style={{ minHeight: "calc(100vh - var(--navbar-height))" }}>
         {children}
@@ -43,13 +46,7 @@ function MainLayout({ children }) {
           aria-label="Open AI Room Finder"
           onClick={() => setAssistantStarted(true)}
         >
-          <img
-            src="/ai-avatar.webp"
-            alt=""
-            width="44"
-            height="44"
-            decoding="async"
-          />
+          <MessageCircle size={27} strokeWidth={2.4} aria-hidden="true" />
         </button>
       )}
       {assistantStarted && (

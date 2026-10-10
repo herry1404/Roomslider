@@ -57,6 +57,19 @@ api.interceptors.response.use(
   (response) => response,
 
   (error) => {
+    if (error.response?.status === 401) {
+      const requestUrl = error.config?.url || "";
+      const isLoginRequest = /\/(?:auth\/(?:login|google|register)|owners\/login|mess\/login|hourly-managers\/login)(?:\?|$)/.test(requestUrl);
+
+      if (!isLoginRequest) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.dispatchEvent(new CustomEvent("roomslider:session-expired"));
+        window.dispatchEvent(new CustomEvent("roomslider:login-required", {
+          detail: { message: error.response.data?.message },
+        }));
+      }
+    }
 
     return Promise.reject(error);
 

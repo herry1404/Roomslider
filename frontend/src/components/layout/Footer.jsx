@@ -61,18 +61,7 @@ function Footer() {
             </div>
           </div>
 
-          {/* Explore */}
-          <div className="footer-links">
-            <h4>Explore</h4>
-            <ul>
-              <li><Link to="/rooms">Rooms</Link></li>
-              <li><Link to="/pg">PG</Link></li>
-              <li><Link to="/hostels">Hostels</Link></li>
-              <li><Link to="/flats">Flats</Link></li>
-            </ul>
-          </div>
-
-          {/* Company + Contact combined */}
+          {/* Company + Contact */}
           <div className="footer-links">
             <h4>Company</h4>
             <ul>

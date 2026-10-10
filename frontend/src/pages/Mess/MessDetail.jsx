@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import api from "../../api/axios";
 import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
 import { useAuth } from "../../context/AuthContext";
+import { requestLogin } from "../../utils/loginPrompt";
 import { reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/mess.css";
 
@@ -152,7 +153,7 @@ function MessDetail() {
 
   const handleOrder = async () => {
     if (!user) {
-      toast.error("Please log in before placing an order.");
+      requestLogin("Please log in before placing an order.");
       return;
     }
     if (

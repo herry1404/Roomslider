@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { roomPath } from "../../utils/roomUrl";
 import VillaCard from "../../components/home/VillaCard";
+import { requestLogin } from "../../utils/loginPrompt";
 
 import "../../styles/wishlist.css";
 
@@ -29,7 +30,7 @@ function Wishlist() {
 
       if(!user){
 
-        toast.error("Please login first");
+        requestLogin("Please login first");
         setLoading(false);
         return;
 

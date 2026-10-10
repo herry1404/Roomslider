@@ -131,6 +131,26 @@ function AdminAlertBell() {
                   >
                     <strong>{alert.title}</strong>
                     <span>{alert.message}</span>
+                    {alert.details && (
+                      <span className="admin-alert-details">
+                        {alert.details.visitorName && <span>Visitor: {alert.details.visitorName}</span>}
+                        {alert.details.visitorPhone && <span>Phone: {alert.details.visitorPhone}</span>}
+                        {alert.details.visitorEmail && <span>Email: {alert.details.visitorEmail}</span>}
+                        {alert.details.action && (
+                          <span>
+                            Contact method: {{
+                              call: "Phone call",
+                              whatsapp: "WhatsApp",
+                              chat: "Chat",
+                            }[alert.details.action] || alert.details.action}
+                          </span>
+                        )}
+                        {alert.details.listingTitle && <span>Listing: {alert.details.listingTitle}</span>}
+                        {alert.details.listingCategory && <span>Type: {alert.details.listingCategory}</span>}
+                        {alert.details.listingLocation && <span>Location: {alert.details.listingLocation}</span>}
+                        {alert.details.ownerName && <span>Owner: {alert.details.ownerName}</span>}
+                      </span>
+                    )}
                     <time>{new Date(alert.createdAt).toLocaleString()}</time>
                   </button>
                 ))}

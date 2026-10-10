@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
+import { requestLogin } from "../../utils/loginPrompt";
 
 function MobileContactBar({ price, showCall, showWhatsApp, loginHref, onCall, onWhatsApp }) {
   if (!showCall && !showWhatsApp) return null;
@@ -13,10 +13,10 @@ function MobileContactBar({ price, showCall, showWhatsApp, loginHref, onCall, on
         </div>
       )}
       {showCall && (loginHref
-        ? <Link className="pd-mobile-call" to={loginHref} state={{ from: window.location.pathname }}><Phone size={17} /> Contact</Link>
+        ? <button className="pd-mobile-call" type="button" onClick={() => requestLogin("Log in to contact the owner")}><Phone size={17} /> Contact</button>
         : <button className="pd-mobile-call" type="button" onClick={onCall}><Phone size={17} /> Call</button>)}
       {showWhatsApp && (loginHref
-        ? <Link className="pd-mobile-whatsapp" to={loginHref} state={{ from: window.location.pathname }} aria-label="Log in to contact on WhatsApp">WA</Link>
+        ? <button className="pd-mobile-whatsapp" type="button" onClick={() => requestLogin("Log in to contact the owner on WhatsApp")} aria-label="Log in to contact on WhatsApp">WA</button>
         : <button className="pd-mobile-whatsapp" type="button" onClick={onWhatsApp} aria-label="Contact on WhatsApp">WA</button>)}
     </div>
   );

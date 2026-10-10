@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 
 import api from "../api/axios";
 import { useAuth } from "./AuthContext";
+import { requestLogin } from "../utils/loginPrompt";
 
 const WishlistContext = createContext(null);
 
@@ -44,7 +45,7 @@ export function WishlistProvider({ children }) {
 
   const addToWishlist = async (roomId) => {
     if (!user) {
-      toast.error("Please login to add to wishlist");
+      requestLogin("Please login to add to wishlist");
       return;
     }
 

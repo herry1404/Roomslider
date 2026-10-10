@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Home, MapPin, Search } from "lucide-react";
+import { Compass, Home, MapPin } from "lucide-react";
 import ProfileMenu from "./ProfileMenu";
 
 function BottomNav() {
@@ -22,11 +22,12 @@ function BottomNav() {
       </NavLink>
 
       <NavLink
-        to="/rooms"
-        className={() => isActive("/rooms") ? "bottom-nav-item active" : "bottom-nav-item"}
+        to="/explore"
+        data-tour="explore"
+        className={() => isActive("/explore") ? "bottom-nav-item active" : "bottom-nav-item"}
       >
-        <Search size={19} />
-        <span>Search</span>
+        <Compass size={19} />
+        <span>Explore</span>
       </NavLink>
 
       <button

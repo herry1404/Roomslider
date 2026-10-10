@@ -32,7 +32,7 @@ router.get("/", optionalAuth, getRooms);
 // Get single room
 router.get("/:id", optionalAuth, getSingleRoom);
 router.get("/:id/contact", protect, getRoomContact);
-router.post("/:id/engagement", optionalAuth, recordListingInquiry);
+router.post("/:id/engagement", protect, recordListingInquiry);
 router.get("/:id/payments/:paymentId/receipt", protect, getRentReceipt);
 
 // Get other rooms in the same area (any category)

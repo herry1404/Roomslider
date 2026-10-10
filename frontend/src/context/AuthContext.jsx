@@ -48,6 +48,12 @@ export function AuthProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const handleSessionExpired = () => setUser(null);
+    window.addEventListener("roomslider:session-expired", handleSessionExpired);
+    return () => window.removeEventListener("roomslider:session-expired", handleSessionExpired);
+  }, []);
+
   const saveSession = (token, userData) => {
     console.log("TOKEN:", token);
     console.log("USER:", userData);

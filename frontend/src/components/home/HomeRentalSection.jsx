@@ -31,7 +31,7 @@ function HomeRentalSection({ type, title }) {
   }, [type, isVilla]);
 
   return (
-    <section className="latest-rooms">
+    <section className="latest-rooms" data-tour={!isVilla ? "hourly-stays" : undefined}>
       <div className="container">
         <div className="section-header">
           <h2>{isVilla ? title : "Hourly / Short Stay"}</h2>

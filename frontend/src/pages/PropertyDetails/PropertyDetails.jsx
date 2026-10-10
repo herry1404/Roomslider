@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { idFromParam, roomPath } from "../../utils/roomUrl";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { requestLogin } from "../../utils/loginPrompt";
 import { useWishlist } from "../../context/WishlistContext";
 import ReportListing from "../../components/property/ReportListing";
 import PhotoGallery from "../../components/property/PhotoGallery";
@@ -56,8 +57,7 @@ function PropertyDetails() {
 
   const toggleWishlist = async () => {
     if (!user) {
-      toast.error("Please log in to save this listing");
-      navigate("/login", { state: { from: window.location.pathname } });
+      requestLogin("Please log in to save this listing");
       return;
     }
 

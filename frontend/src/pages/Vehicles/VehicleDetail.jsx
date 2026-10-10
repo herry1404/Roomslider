@@ -6,6 +6,7 @@ import { ArrowLeft, Bike, CalendarDays, Fuel, MapPin, ShieldCheck, UsersRound } 
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { requestLogin } from "../../utils/loginPrompt";
 import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/vehicles.css";
 
@@ -156,7 +157,7 @@ function VehicleDetail() {
   const requestRental = async (event) => {
     event.preventDefault();
     if (!user) {
-      navigate("/login", { state: { from: `/vehicles/${id}` } });
+      requestLogin("Please log in to request this vehicle");
       return;
     }
     if (!user.phone || String(user.phone).replace(/\D/g, "").slice(-10).length !== 10) {
@@ -267,7 +268,7 @@ function VehicleDetail() {
             <p className="vehicle-request-price"><strong>{formatPrice(vehicle.pricePerDay)}</strong> / day</p>
             <p className="vehicle-request-hint">No payment now. Submit a rental request and continue on WhatsApp.</p>
             <form onSubmit={requestRental}>
-              {user ? <p className="vehicle-account-info">Requesting as <strong>{user.name}</strong><br /><span>{user.phone || "Phone number missing from profile"}</span></p> : <button type="button" className="vehicle-login-note" onClick={() => navigate("/login", { state: { from: `/vehicles/${id}` } })}>Login to request this vehicle</button>}
+              {user ? <p className="vehicle-account-info">Requesting as <strong>{user.name}</strong><br /><span>{user.phone || "Phone number missing from profile"}</span></p> : <button type="button" className="vehicle-login-note" onClick={() => requestLogin("Please log in to request this vehicle")}>Login to request this vehicle</button>}
               <label>Pickup date<input type="date" min={toLocalDate(new Date())} required value={form.pickupDate} onChange={updateForm("pickupDate")} /></label>
               <label>Return date<input type="date" min={form.pickupDate} required value={form.returnDate} onChange={updateForm("returnDate")} /></label>
               <label>Price period<select value={form.durationType} onChange={updateForm("durationType")}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label>

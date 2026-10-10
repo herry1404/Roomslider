@@ -118,9 +118,9 @@ async function sendWhatsAppAlert(alert) {
   if (!response.ok) throw new Error(`WhatsApp API HTTP ${response.status}`);
 }
 
-async function notifyAdmin({ type, title, message, link }) {
+async function notifyAdmin({ type, title, message, link, details }) {
   try {
-    const alert = await AdminAlert.create({ type, title, message, link, isRead: false });
+    const alert = await AdminAlert.create({ type, title, message, link, details, isRead: false });
     const results = await Promise.allSettled([
       sendAdminPush(alert),
       sendTelegramAlert(alert),

@@ -11,6 +11,7 @@ import ShareButton from "./ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { requestLogin } from "../../utils/loginPrompt";
 
 import "../../styles/room-card.css";
 
@@ -68,8 +69,7 @@ function RoomCard({ room, onWishlistChange }) {
     e.stopPropagation();
 
     if (!user) {
-      toast.error("Wishlist ke liye pehle login karo", { id: "login-first" });
-      navigate("/login");
+      requestLogin("Wishlist ke liye pehle login karo");
       return;
     }
 
@@ -125,6 +125,7 @@ function RoomCard({ room, onWishlistChange }) {
 
         <button
           className={`wishlist-icon ${wishlisted ? "active" : ""} ${burst ? "burst" : ""}`}
+          data-tour="wishlist"
           type="button"
           title="Add to wishlist"
           onClick={handleWishlist}

@@ -8,6 +8,7 @@ import api from "../../api/axios";
 import confirmAction from "../../utils/confirmAction";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/useNotifications";
+import { requestLogin } from "../../utils/loginPrompt";
 import RoommateSubnav from "./RoommateSubnav";
 import "../../styles/roommate-chat.css";
 
@@ -99,7 +100,7 @@ function RoommateFinder() {
         <div className="roommate-hub-empty">
           <h1>Discover roommates</h1>
           <p>Log in to see roommate suggestions that match your preferences.</p>
-          <button className="roommate-primary-action" type="button" onClick={() => navigate("/login")}>Log in</button>
+          <button className="roommate-primary-action" type="button" onClick={() => requestLogin("Log in to see roommate suggestions.")}>Log in</button>
         </div>
       </main>
     );
