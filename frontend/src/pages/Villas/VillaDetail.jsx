@@ -2,13 +2,14 @@ import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MapPin, CheckCircle2, Heart, Share2 } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import shareVilla from "../../utils/shareVilla";
+import { loadRazorpay } from "../../utils/loadRazorpay";
 import NearbyVillas from "../../components/home/NearbyVillas";
+import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/villas.css";
 
 const localDate = (date) => {
@@ -115,6 +116,7 @@ function VillaDetail() {
         guestCount: Number(form.guestCount),
       });
       const { bookingId, orderId, amount, currency, key } = orderResponse.data;
+      await loadRazorpay();
 
       const checkout = new window.Razorpay({
         key,
@@ -166,6 +168,12 @@ function VillaDetail() {
     ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([villa.address, villa.area, villa.city].filter(Boolean).join(", "))}`;
   const location = [villa.address, villa.area, villa.city].filter(Boolean).join(", ");
+  const detailPath = `/villas/${villa.slug || id}`;
+  const villaDescription = `${villa.name} in ${location || "Indore"}. Compare photos, facilities${villa.maxGuests ? ` and capacity for ${villa.maxGuests} guests` : ""}${villa.nightlyRate != null ? `, with stays from ₹${Number(villa.nightlyRate).toLocaleString("en-IN")} per night` : ""}. Check availability on RoomSlider.`;
+  const villaRate = [villa.nightlyRate, villa.eventRate].filter((rate) => rate != null).map(Number);
+  const villaPriceRange = villaRate.length
+    ? `₹${Math.min(...villaRate).toLocaleString("en-IN")}–₹${Math.max(...villaRate).toLocaleString("en-IN")}`
+    : undefined;
   const wishlisted = isWishlisted(villa._id);
   const toggleWishlist = async () => {
     if (!user) {
@@ -185,10 +193,34 @@ function VillaDetail() {
 
   return (
     <main className="container villa-detail-page">
-      <Helmet>
-        <title>{villa.name} | {villa.area}, {villa.city} | RoomSlider</title>
-        <meta name="description" content={`${villa.name} in ${villa.area}, ${villa.city}. View photos, amenities, guest capacity and real rates before booking.`} />
-      </Helmet>
+      <SEO
+        title={`${villa.name} in ${villa.area || villa.city || "Indore"}, Indore | Short Stay | RoomSlider`}
+        description={villaDescription}
+        path={detailPath}
+        image={images[0]}
+        type="product"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Short Stays in Indore", path: "/hourly-rooms" },
+          { name: villa.name, path: detailPath },
+        ]}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "LodgingBusiness",
+          name: villa.name,
+          description: villaDescription,
+          url: `${SITE_URL}${detailPath}`,
+          ...(images[0] ? { image: images[0] } : {}),
+          address: {
+            "@type": "PostalAddress",
+            ...(villa.address ? { streetAddress: villa.address } : {}),
+            addressLocality: villa.area || villa.city || "Indore",
+            addressRegion: "Madhya Pradesh",
+            addressCountry: "IN",
+          },
+          ...(villaPriceRange ? { priceRange: villaPriceRange } : {}),
+        }}
+      />
       <div className="villa-detail-top">
         <div className="villa-detail-heading">
           <h1>{villa.name}</h1>
@@ -210,7 +242,7 @@ function VillaDetail() {
         {images.length ? (
           <>
             <div className="villa-detail-gallery-main">
-              <img src={optimizeCloudinaryImage(images[activeImage], 1600)} alt={`${villa.name}, photo ${activeImage + 1}`} loading="eager" />
+              <img src={optimizeCloudinaryImage(images[activeImage], 1600)} alt={`${villa.name} villa in ${villa.area || villa.city || "Indore"}, photo ${activeImage + 1}`} width="1600" height="1200" loading="eager" />
             </div>
             {images.length > 1 && (
               <div className="villa-detail-gallery-thumbnails">

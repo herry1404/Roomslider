@@ -1,6 +1,6 @@
-import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import "../../styles/sitemap.css";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 const sections = [
   {
@@ -56,6 +56,7 @@ const sections = [
     links: [
       ["Home", "/"],
       ["About RoomSlider", "/about"],
+      ["Contact RoomSlider", "/contact"],
       ["Our team", "/team"],
       ["Terms of use", "/terms"],
       ["Privacy policy", "/privacy"],
@@ -66,14 +67,10 @@ const sections = [
 function Sitemap() {
   return (
     <div className="site-map-page">
-      <Helmet>
-        <title>Site Map | Rooms, PGs, Hostels & Services in Indore | RoomSlider</title>
-        <meta
-          name="description"
-          content="Browse the RoomSlider site map to find rooms for rent, PGs, hostels, flats, hourly stays, mess, local services and community listings in Indore."
-        />
-        <link rel="canonical" href="https://roomslider.in/sitemap" />
-      </Helmet>
+      <SEO
+        {...PAGE_SEO.sitemap}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Sitemap", path: "/sitemap" }]}
+      />
 
       <header className="site-map-hero">
         <p className="site-map-eyebrow">ROOMSLIDER DIRECTORY</p>

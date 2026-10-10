@@ -61,8 +61,17 @@ function FirstVisitTour() {
 
   useEffect(() => {
     if (localStorage.getItem(TOUR_KEY)) return undefined;
-    const timeoutId = window.setTimeout(() => setActive(true), 900);
-    return () => window.clearTimeout(timeoutId);
+    let timeoutId;
+    const activate = () => setActive(true);
+    const idleId = window.requestIdleCallback
+      ? window.requestIdleCallback(activate, { timeout: 2500 })
+      : (timeoutId = window.setTimeout(activate, 1200));
+    return () => {
+      if (window.cancelIdleCallback && window.requestIdleCallback) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {

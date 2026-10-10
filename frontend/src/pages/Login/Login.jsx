@@ -1,3 +1,5 @@
+import "../../styles/login.css";
+import "../../styles/login-modal.css";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useLocation } from "react-router-dom";

@@ -2,9 +2,10 @@ import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Clock3, MapPin, ShieldCheck, UserRound } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { loadRazorpay } from "../../utils/loadRazorpay";
+import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/hourly-detail.css";
 
 function toLocalInputValue(date) {
@@ -115,6 +116,7 @@ function HourlyRoomDetail() {
 
       const orderResponse = await api.post("/hourly-bookings/create-order", data);
       const { bookingId, orderId, amount, currency, key } = orderResponse.data;
+      await loadRazorpay();
       const checkout = new window.Razorpay({
         key,
         amount,
@@ -170,16 +172,38 @@ function HourlyRoomDetail() {
 
   const location = [room.location?.address, room.location?.city].filter(Boolean).join(", ");
   const price = Number(room.pricePerHour);
+  const detailPath = `/hourly-rooms/${room.slug || id}`;
+  const description = `${room.title} in ${location || "Indore"} for ₹${price}/hour. View photos, facilities and availability, then reserve this short stay directly on RoomSlider.`;
 
   return (
     <main className="container hourly-detail-page">
-      <Helmet>
-        <title>{room.title} | Hourly / Short Stay | RoomSlider</title>
-        <meta
-          name="description"
-          content={`${room.title}${location ? ` in ${location}` : ""}. View room details and hourly price on RoomSlider.`}
-        />
-      </Helmet>
+      <SEO
+        title={`${room.title} in ${location || "Indore"} | Short Stay | RoomSlider`}
+        description={description}
+        path={detailPath}
+        image={room.images?.[0]}
+        type="product"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Short Stays in Indore", path: "/hourly-rooms" },
+          { name: room.title, path: detailPath },
+        ]}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Accommodation",
+          name: room.title,
+          description,
+          url: `${SITE_URL}${detailPath}`,
+          ...(room.images?.[0] ? { image: room.images[0] } : {}),
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: room.location?.city || "Indore",
+            addressRegion: "Madhya Pradesh",
+            addressCountry: "IN",
+          },
+          ...(Number.isFinite(price) && price > 0 ? { priceRange: `₹${price} per hour` } : {}),
+        }}
+      />
 
       <button type="button" className="hourly-detail-back" onClick={() => navigate(-1)}>
         <ArrowLeft size={18} /> Back
@@ -193,7 +217,7 @@ function HourlyRoomDetail() {
       <div className="hourly-detail-layout">
         <article className="hourly-detail-main">
           {room.images?.[0] ? (
-            <img className="hourly-detail-image" src={optimizeCloudinaryImage(room.images[0], 1600)} alt={room.title} loading="eager" />
+            <img className="hourly-detail-image" src={optimizeCloudinaryImage(room.images[0], 1600)} alt={`${room.title} short stay in ${location || "Indore"}`} width="1600" height="1200" loading="eager" />
           ) : (
             <div className="hourly-detail-image hourly-detail-image-placeholder" role="img" aria-label="No room photo available" />
           )}

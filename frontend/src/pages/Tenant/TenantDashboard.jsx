@@ -1,10 +1,11 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { X, Wallet, Sparkles, ShoppingBasket, Wrench } from "lucide-react";
 
 import api from "../../api/axios";
+import { loadRazorpay } from "../../utils/loadRazorpay";
 
 import "../../styles/tenant/dashboard.css";
 
@@ -36,7 +37,7 @@ function TenantDashboard() {
   const [myRequests, setMyRequests] = useState([]);
   const [requestsLoaded, setRequestsLoaded] = useState(false);
 
-  const fetchTenancy = async () => {
+  const fetchTenancy = useCallback(async () => {
     try {
       const res = await api.get("/auth/my-tenancy");
 
@@ -63,12 +64,14 @@ function TenantDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
-    fetchTenancy();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const timer = window.setTimeout(() => {
+      fetchTenancy();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchTenancy]);
 
   const handlePayRent = async () => {
     try {
@@ -86,6 +89,7 @@ function TenantDashboard() {
         type: "rent",
         billId: payBillId,
       });
+      await loadRazorpay();
 
       const { orderId, amount, currency, key } = orderRes.data;
 

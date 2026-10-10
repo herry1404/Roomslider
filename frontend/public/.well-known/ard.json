@@ -1,0 +1,22 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "RoomSlider",
+    "identifier": "did:web:www.roomslider.in",
+    "documentationUrl": "https://www.roomslider.in/about"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:roomslider.in:catalog:room-listings",
+      "displayName": "RoomSlider Indore room listings",
+      "type": "text/html",
+      "url": "https://www.roomslider.in/rooms",
+      "description": "Browse rooms, PGs, hostels, and flats for rent in Indore.",
+      "tags": ["housing", "rentals", "Indore"],
+      "representativeQueries": [
+        "Find a room for rent in Indore",
+        "Browse verified PGs and hostels in Indore"
+      ]
+    }
+  ]
+}

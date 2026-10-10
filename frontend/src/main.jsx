@@ -3,8 +3,6 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "react-hot-toast";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import GoogleOneTap from "./components/auth/GoogleOneTap";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -12,17 +10,12 @@ import { NotificationProvider } from "./context/NotificationContext";
 import ConfirmModalHost from "./components/ui/ConfirmModal";
 
 import "./index.css";
-import "./styles/leaflet-theme.css";
 
 import "./styles/navbar.css";
 import "./styles/hero.css";
 import "./styles/categories.css";
 import "./styles/latest-rooms.css";
 import "./styles/footer.css";
-import "./styles/about.css";
-import "./styles/login.css";   // ✅ IMPORTANT
-import "./styles/login-modal.css";
-import "./styles/register.css";
 import "./styles/preferences-modal.css";
 
 import App from "./App";
@@ -32,16 +25,33 @@ import { initializeSentry } from "./utils/sentry";
 
 const sentryEnabled = initializeSentry();
 
+const registerServiceWorkerWhenIdle = () => {
+  const register = () => {
+    import("virtual:pwa-register")
+      .then(({ registerSW }) => registerSW({ immediate: true }))
+      .catch((error) => console.error("Service worker registration failed:", error));
+  };
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(register, { timeout: 3000 });
+  } else {
+    window.setTimeout(register, 1000);
+  }
+};
+
+if (document.readyState === "complete") {
+  registerServiceWorkerWhenIdle();
+} else {
+  window.addEventListener("load", registerServiceWorkerWhenIdle, { once: true });
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
+    <BrowserRouter>
         <HelmetProvider>
           <AuthProvider>
             <WishlistProvider>
               <ThemeProvider>
                 <NotificationProvider>
-                  <GoogleOneTap />
                   {sentryEnabled ? (
                     <Sentry.ErrorBoundary fallback={<p role="alert">Something went wrong. Please reload the page.</p>}>
                       <App />
@@ -70,6 +80,5 @@ createRoot(document.getElementById("root")).render(
           </AuthProvider>
         </HelmetProvider>
       </BrowserRouter>
-    </GoogleOAuthProvider>
   </StrictMode>
 );

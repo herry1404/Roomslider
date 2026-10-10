@@ -1,0 +1,15 @@
+# RoomSlider
+
+RoomSlider helps people find verified rooms, PGs, hostels, and flats for rent in Indore, India, and explore local services.
+
+## Main pages
+
+- [Home](https://www.roomslider.in/)
+- [Rooms](https://www.roomslider.in/rooms)
+- [Hostels](https://www.roomslider.in/hostels)
+- [Flats](https://www.roomslider.in/flats)
+- [PG](https://www.roomslider.in/pg)
+- [Explore](https://www.roomslider.in/explore)
+- [About](https://www.roomslider.in/about)
+- [Contact](https://www.roomslider.in/contact)
+- [Sitemap](https://www.roomslider.in/sitemap)

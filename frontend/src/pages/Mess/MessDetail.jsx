@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import { loadRazorpay } from "../../utils/loadRazorpay";
 import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
 import { useAuth } from "../../context/AuthContext";
 import { requestLogin } from "../../utils/loginPrompt";
@@ -177,6 +178,7 @@ function MessDetail() {
       });
 
       const { orderId, amount, currency, key } = orderRes.data;
+      await loadRazorpay();
       const options = {
         key,
         amount,

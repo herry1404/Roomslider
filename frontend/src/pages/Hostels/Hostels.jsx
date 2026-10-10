@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
@@ -39,18 +39,25 @@ function Hostels() {
 
   return (
     <>
-      <Helmet>
-        <title>Hostels in Indore | RoomSlider</title>
-        <meta name="description" content="Comfortable and affordable hostel stays in Indore. Browse verified hostel listings with RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/hostels" />
-      </Helmet>
-
     <section className="container" style={{ padding: "40px 0" }}>
-      <h1>Hostels</h1>
-      <p>Comfortable and affordable hostel stays.</p>
+      <SEO
+        {...PAGE_SEO.hostels}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Hostels in Indore", path: "/hostels" }]}
+      />
+      <h1>Hostels in Indore for Students</h1>
+      <p>
+        Compare student hostels in Indore by location, rent, facilities and
+        room photos before arranging a visit. Browse options around Vijay
+        Nagar, Bhawarkua, Vishnupuri, Indrapuri, Sarvanand Nagar and Vidhya
+        Nagar, including places convenient to DAVV, IIM Indore, Medicaps, IPS
+        Academy and Holkar College. Listings may suit students and working
+        professionals looking for girls' or boys' accommodation. Check the
+        details that matter to you, then contact the property owner directly
+        through RoomSlider.
+      </p>
 
       {rooms.length === 0 ? (
-        <h3 style={{ marginTop: "30px" }}>No listings available yet</h3>
+        <h2 style={{ marginTop: "30px" }}>No listings available yet</h2>
       ) : (
         <div className="listing-grid">
           {rooms.map((room) => (

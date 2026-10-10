@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
@@ -39,18 +39,24 @@ function PG() {
 
   return (
     <>
-      <Helmet>
-        <title>PG Accommodations in Indore | RoomSlider</title>
-        <meta name="description" content="Find verified PG accommodations in Indore for students and professionals. Affordable, safe and hassle-free PG listings on RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/pg" />
-      </Helmet>
-
     <section className="container" style={{ padding: "40px 0" }}>
-      <h1>PG Accommodations</h1>
-      <p>Verified PGs for students and professionals.</p>
+      <SEO
+        {...PAGE_SEO.pg}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "PG in Indore", path: "/pg" }]}
+      />
+      <h1>PG in Indore for Boys and Girls</h1>
+      <p>
+        Find a PG in Indore that fits your routine, budget and preferred sharing
+        style. Students and working professionals can compare stays with food,
+        WiFi, air conditioning and other facilities. Explore popular rental
+        areas such as Vijay Nagar, Bhawarkua, Vishnupuri, Indrapuri, Sarvanand
+        Nagar and Vidhya Nagar, with options near DAVV, IIM Indore, Medicaps,
+        IPS Academy and Holkar College. Review listing photos and monthly rent
+        before contacting an owner directly through RoomSlider.
+      </p>
 
       {rooms.length === 0 ? (
-        <h3 style={{ marginTop: "30px" }}>No listings available yet</h3>
+        <h2 style={{ marginTop: "30px" }}>No listings available yet</h2>
       ) : (
         <div className="listing-grid">
           {rooms.map((room) => (

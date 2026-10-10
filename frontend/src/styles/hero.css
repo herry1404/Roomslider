@@ -2,12 +2,6 @@
    HOME HERO (search + intro)
 ========================================== */
 
-@property --hs-angle{
-  syntax:"<angle>";
-  initial-value:0deg;
-  inherits:false;
-}
-
 .hs-section{
   position:relative;
   isolation:isolate;
@@ -58,10 +52,18 @@
   border:1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
 .hs-dot{
+  position:relative;
   width:8px;
   height:8px;
   border-radius:50%;
   background:#10b981;
+}
+.hs-dot::after{
+  position:absolute;
+  inset:0;
+  border:2px solid #10b981;
+  border-radius:50%;
+  content:"";
   animation:hsPulse 1.8s ease-out infinite;
 }
 
@@ -82,7 +84,6 @@
   background-clip:text;
   -webkit-text-fill-color:transparent;
   color:transparent;
-  animation:hsShine 4s linear infinite;
 }
 .hs-sub{
   max-width:520px;
@@ -106,7 +107,6 @@
   border:1px solid transparent;
   border-radius:999px;
   box-shadow:0 10px 30px rgba(0,0,0,.18);
-  transition:box-shadow .25s ease;
 }
 .hs-pill::before{
   content:"";
@@ -114,11 +114,10 @@
   inset:-1px;
   padding:1.5px;
   border-radius:999px;
-  background:conic-gradient(from var(--hs-angle), transparent 0 55%, #10b981 75%, #6ee7b7 85%, transparent 100%);
+  background:conic-gradient(transparent 0 55%, #10b981 75%, #6ee7b7 85%, transparent 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation:hsSpin 4s linear infinite;
   pointer-events:none;
 }
 .hs-pill:focus-within{
@@ -133,7 +132,6 @@
   padding:14px 30px;
   border-radius:999px;
   cursor:text;
-  transition:background .25s ease;
 }
 .hs-field + .hs-field::before{
   content:"";
@@ -184,7 +182,7 @@
   cursor:pointer;
   background:linear-gradient(135deg,#10b981,#059669);
   box-shadow:0 6px 16px rgba(16,185,129,.35);
-  transition:transform .2s ease, box-shadow .2s ease;
+  transition:transform .2s ease;
 }
 .hs-go:hover{ transform:scale(1.08); box-shadow:0 10px 22px rgba(16,185,129,.45); }
 .hs-go:active{ transform:scale(.92); }
@@ -212,7 +210,7 @@
   background:color-mix(in srgb, var(--color-surface) 80%, transparent);
   border:1px solid var(--color-border);
   cursor:pointer;
-  transition:transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  transition:transform .2s ease;
 }
 .hs-chip:hover{
   transform:translateY(-2px);
@@ -244,11 +242,9 @@
 
 /* ===== animations ===== */
 @keyframes hsRise{ to{ opacity:1; transform:none; } }
-@keyframes hsSpin{ to{ --hs-angle:360deg; } }
-@keyframes hsShine{ from{ background-position:200% 0; } to{ background-position:-20% 0; } }
 @keyframes hsPulse{
-  0%{ box-shadow:0 0 0 0 rgba(16,185,129,.55); }
-  100%{ box-shadow:0 0 0 10px rgba(16,185,129,0); }
+  0%{ opacity:.65; transform:scale(1); }
+  100%{ opacity:0; transform:scale(2.8); }
 }
 
 /* ===== mobile ===== */
@@ -279,6 +275,6 @@
 @media (prefers-reduced-motion:reduce){
   .hs-rise{ animation:none; opacity:1; transform:none; }
   .hs-dot,
-  .hs-grad,
   .hs-pill::before{ animation:none; }
+  .hs-dot::after{ animation:none; }
 }

@@ -6,36 +6,40 @@ import HourlyRoomCard from "../ui/HourlyRoomCard";
 import SkeletonRoomCard from "../ui/SkeletonRoomCard";
 import VillaCard from "./VillaCard";
 import "../../styles/villas.css";
+import { cachedApiRequest, readApiCache } from "../../utils/cachedApiRequest";
 
 function HomeRentalSection({ type, title }) {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const isVilla = type === "villas";
+  const endpoint = isVilla ? "/villas/public" : "/hourly-rooms/public";
+  const cacheKey = `home:${endpoint}`;
+  const initialItems = readApiCache(cacheKey);
+  const [items, setItems] = useState(initialItems || []);
+  const [loading, setLoading] = useState(initialItems === null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const request = isVilla
-      ? api.get("/villas/public", { signal: controller.signal })
-      : api.get("/hourly-rooms/public", { signal: controller.signal });
-    request
-      .then((response) => setItems(isVilla ? response.data.villas || [] : response.data || []))
+    let active = true;
+    cachedApiRequest(cacheKey, () => api.get(endpoint)
+      .then((response) => isVilla ? response.data.villas || [] : response.data || []))
+      .then((data) => {
+        if (active) setItems(data);
+      })
       .catch((error) => {
-        if (!controller.signal.aborted) {
+        if (active) {
           console.error(`LOAD ${type.toUpperCase()} HOME SECTION ERROR:`, error);
         }
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (active) setLoading(false);
       });
-    return () => controller.abort();
-  }, [type, isVilla]);
+    return () => { active = false; };
+  }, [cacheKey, endpoint, isVilla, type]);
 
   return (
     <section className="latest-rooms" data-tour={!isVilla ? "hourly-stays" : undefined}>
       <div className="container">
         <div className="section-header">
           <h2>{isVilla ? title : "Hourly / Short Stay"}</h2>
-          {!loading && <Link className="view-all" to={isVilla ? "/villas" : "/hourly-rooms"}>
+          {!loading && <Link className="view-all" to={isVilla ? "/villas" : "/hourly-rooms"} aria-label={isVilla ? "View all villas" : "View all hourly rooms"}>
             View All <ArrowRight size={16} />
           </Link>}
         </div>

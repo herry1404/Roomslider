@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { idFromParam, roomPath } from "../../utils/roomUrl";
 import api from "../../api/axios";
@@ -23,6 +22,7 @@ import NearbyStays from "../../components/property/NearbyStays";
 import PropertyDetailsSkeleton from "../../components/property/PropertyDetailsSkeleton";
 import shareProperty from "../../utils/shareProperty";
 import { recordRecentlyViewed } from "../../utils/recentlyViewed";
+import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/property-details.css";
 
 function PropertyDetails() {
@@ -124,26 +124,41 @@ function PropertyDetails() {
       : `${room.location}, Indore`
     : "";
   const detailHeading = [room.category, detailLocation].filter(Boolean).join(" in ");
+  const detailPath = roomPath(room);
+  const area = (room.location || "Indore").replace(/,?\s*Indore$/i, "") || "Indore";
+  const rent = Number(room.price);
+  const amenities = Array.isArray(room.amenities) ? room.amenities.slice(0, 3).join(", ") : "";
+  const description = `${room.category || "Rental room"} in ${area}, Indore for ₹${rent.toLocaleString("en-IN")}/month.${amenities ? ` Facilities include ${amenities}.` : ""} View photos and contact the owner directly on RoomSlider.`;
 
   return (
     <main className="pd-root">
-      <Helmet>
-        <title>{`${room.title}, Indore | RoomSlider`}</title>
-        <meta
-          name="description"
-          content={`${room.title} - ${room.category || "rental"} for rent in ${room.location || "Indore"}. View photos, rent, amenities and contact the owner on RoomSlider.`}
-        />
-        <link rel="canonical" href={`https://roomslider.in${roomPath(room)}`} />
-        <meta property="og:type" content="product" />
-        <meta property="og:title" content={`${room.title} | RoomSlider`} />
-        <meta property="og:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
-        <meta property="og:url" content={`https://roomslider.in${roomPath(room)}`} />
-        <meta property="og:image" content={room.images?.[0] || "https://roomslider.in/og-image.jpg"} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${room.title} | RoomSlider`} />
-        <meta name="twitter:description" content={`${room.title} in ${room.location || "Indore"} for ₹${Number(room.price || 0).toLocaleString("en-IN")} per month.`} />
-        <meta name="twitter:image" content={room.images?.[0] || "https://roomslider.in/og-image.jpg"} />
-      </Helmet>
+      <SEO
+        title={`${room.title} in ${area}, Indore - ₹${rent.toLocaleString("en-IN")}/month | RoomSlider`}
+        description={description}
+        path={detailPath}
+        image={room.images?.[0]}
+        type="product"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: `${room.category || "Rooms"} in Indore`, path: `/${room.category === "PG" ? "pg" : room.category === "Hostel" ? "hostels" : room.category === "Flat" ? "flats" : "rooms"}` },
+          { name: room.title, path: detailPath },
+        ]}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Accommodation",
+          name: room.title,
+          description,
+          url: `${SITE_URL}${detailPath}`,
+          ...(room.images?.[0] ? { image: room.images[0] } : {}),
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: area,
+            addressRegion: "Madhya Pradesh",
+            addressCountry: "IN",
+          },
+          ...(Number.isFinite(rent) && rent > 0 ? { priceRange: `₹${rent.toLocaleString("en-IN")} per month` } : {}),
+        }}
+      />
 
       <PropertyHeader room={room} wishlisted={wishlisted} onSave={toggleWishlist} />
       <PhotoGallery

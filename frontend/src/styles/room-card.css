@@ -9,9 +9,7 @@
   box-shadow:
   0 12px 35px rgba(0,0,0,0.08);
 
-  transition:
-  transform 0.35s ease,
-  box-shadow 0.35s ease;
+  transition:transform 0.35s ease;
 
   cursor: pointer;
 
@@ -111,7 +109,7 @@
   box-shadow: none;
 
 
-  transition:0.3s ease;
+  transition:transform 0.2s ease;
 
 }
 
@@ -444,7 +442,7 @@
   font-size:14px;
   font-weight:600;
   cursor:pointer;
-  transition:background var(--transition-fast), transform var(--transition-fast);
+  transition:transform var(--transition-fast);
 }
 .hourly-book-btn:hover{background:var(--color-primary-hover)}
 .hourly-book-btn:active{transform:scale(.98)}
@@ -735,7 +733,7 @@
 /* ===== STEP 2: premium polish for listing-page cards ===== */
 .rc-air .room-image-wrapper{
   box-shadow:0 8px 22px rgba(0,0,0,.18);
-  transition:transform .3s ease, box-shadow .3s ease;
+  transition:transform .3s ease;
 }
 .rc-air .room-image-wrapper::before{
   content:"";
@@ -773,7 +771,7 @@
   z-index:1;
   pointer-events:none;
   background:linear-gradient(105deg, transparent 20%, rgba(255,255,255,.28) 50%, transparent 80%);
-  transform:skewX(-18deg);
+  transform:translateX(0) skewX(-18deg);
   opacity:0;
 }
 @media (hover:hover){
@@ -790,6 +788,15 @@
   }
 }
 @keyframes rcShine{
-  from{ left:-80%; }
-  to{ left:140%; }
+  from{ transform:translateX(0) skewX(-18deg); }
+  to{ transform:translateX(440%) skewX(-18deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .room-card,
+  .room-image,
+  .wishlist-icon{ transition:none; }
+  .rc-air:hover .room-image-wrapper::after{ animation:none; }
+  .wishlist-icon.burst,
+  .sparkle{ animation:none; }
 }

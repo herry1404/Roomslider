@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 
 import Hero from "../../components/home/Hero";
 import Categories from "../../components/home/Categories";
@@ -9,8 +8,11 @@ import HomeBanner from "../../components/home/HomeBanner";
 import HomeRentalSection from "../../components/home/HomeRentalSection";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import api from "../../api/axios";
+import { cachedApiRequest, readApiCache } from "../../utils/cachedApiRequest";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 const CACHE_KEY = "homeSectionsV1";
+const ROOMS_CACHE_KEY = "home-rooms-grouped";
 
 // Backend na chale ya list abhi na aaye to yahi layout dikhta hai
 const DEFAULT_SECTIONS = [
@@ -45,16 +47,6 @@ function ListingSectionSkeleton({ title, viewAllPath }) {
   );
 }
 
-const readCache = () => {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    const parsed = raw ? JSON.parse(raw) : null;
-    return Array.isArray(parsed) && parsed.length ? parsed : null;
-  } catch {
-    return null;
-  }
-};
-
 const matches = (room, cfg = {}) => {
   if (cfg.category && room.category !== cfg.category) return false;
 
@@ -74,55 +66,70 @@ const matches = (room, cfg = {}) => {
 };
 
 function Home() {
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sections, setSections] = useState(() => readCache() || DEFAULT_SECTIONS);
+  const [rooms, setRooms] = useState(() => readApiCache(ROOMS_CACHE_KEY) || []);
+  const [loading, setLoading] = useState(() => !readApiCache(ROOMS_CACHE_KEY)?.length);
+  const [sections, setSections] = useState(() => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_SECTIONS;
+    } catch {
+      return DEFAULT_SECTIONS;
+    }
+  });
 
   useEffect(() => {
-    const controller = new AbortController();
-    const fetchRooms = async () => {
-      try {
-        const res = await api.get("/rooms", {
+    let active = true;
+    const prefetched = window.__roomSliderHomeRoomsPromise;
+    const request = prefetched
+      ? prefetched.then((result) => {
+          if (!result?.error) return result;
+          console.error("Home listings prefetch failed; retrying:", result.error);
+          return cachedApiRequest(ROOMS_CACHE_KEY, () => api.get("/rooms", {
+            params: { grouped: "true", hourly: "false" },
+          }).then((response) => response.data?.rooms || []));
+        })
+      : cachedApiRequest(ROOMS_CACHE_KEY, () => api.get("/rooms", {
           params: { grouped: "true", hourly: "false" },
-          signal: controller.signal,
-        });
-        setRooms(res.data?.rooms || []);
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("Home Rooms Error:", error);
-        }
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
-      }
-    };
-
-    fetchRooms();
-    return () => controller.abort();
+        }).then((response) => response.data?.rooms || []));
+    request
+      .then((data) => {
+        if (active) setRooms(data);
+      })
+      .catch((error) => {
+        if (active) console.error("Home Rooms Error:", error);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
     let active = true;
 
-    api
-      .get("/home-sections")
+    cachedApiRequest("home-sections", () => api.get("/home-sections")
+      .then((response) => response.data))
       .then((res) => {
-        const list = res.data?.sections;
+        const list = res?.sections;
         if (!active || !Array.isArray(list) || list.length === 0) return;
         setSections(list);
         try {
           localStorage.setItem(CACHE_KEY, JSON.stringify(list));
         } catch {
-          // storage full ya band, koi baat nahi
+          // The in-memory layout remains available when storage is unavailable.
         }
       })
-      .catch(() => {
-        // default ya cached layout hi dikhta rahega
+      .catch((error) => {
+        console.error("Home Sections Error:", error);
       });
 
     return () => {
       active = false;
     };
   }, []);
+
+  const firstListingsId = sections.find((section) => section.type === "listings")?._id;
 
   const renderSection = (s) => {
     switch (s.type) {
@@ -151,6 +158,7 @@ function Home() {
             title={title}
             viewAllPath={viewAllPath}
             rooms={list}
+            priority={s._id === firstListingsId}
           />
         );
       }
@@ -161,14 +169,7 @@ function Home() {
 
   return (
     <>
-      <Helmet>
-        <title>RoomSlider - Verified Rooms, PG, Hostels & Flats in Indore</title>
-        <meta
-          name="description"
-          content="Find verified rooms, PG, hostels and flats for rent in Indore. Trusted listings, simple search and a hassle-free renting experience with RoomSlider."
-        />
-        <link rel="canonical" href="https://roomslider.in/" />
-      </Helmet>
+      <SEO {...PAGE_SEO.home} />
 
       <div className="home-page">
         {sections.map((section) => (

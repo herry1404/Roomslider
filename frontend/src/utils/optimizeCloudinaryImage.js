@@ -1,4 +1,4 @@
-export function optimizeCloudinaryImage(url, width = 960, height) {
+export function optimizeCloudinaryImage(url, width = 960, height, cropToFill = false) {
   if (typeof url !== "string" || !url.includes("/image/upload/")) return url;
 
   const uploadMarker = "/image/upload/";
@@ -18,10 +18,13 @@ export function optimizeCloudinaryImage(url, width = 960, height) {
     : oldWidth > 0 && oldHeight > 0
       ? Math.max(1, Math.round((oldHeight * targetWidth) / oldWidth))
       : oldHeight || undefined;
-  const preservedOptions = options.filter((item) => !/^(?:w_|h_|q_|f_)/.test(item));
+  const preservedOptions = options.filter((item) =>
+    !/^(?:w_|h_|q_|f_)/.test(item) && !(cropToFill && item.startsWith("c_"))
+  );
   const transforms = [
     `w_${targetWidth}`,
     ...(targetHeight ? [`h_${targetHeight}`] : []),
+    ...(cropToFill ? ["c_fill"] : []),
     ...preservedOptions,
     "q_auto",
     "f_auto",
@@ -31,4 +34,15 @@ export function optimizeCloudinaryImage(url, width = 960, height) {
   const suffix = queryIndex === -1 ? "" : path.slice(queryIndex);
 
   return `${prefix}${transforms.join(",")}/${imagePath}${suffix}`;
+}
+
+export function cloudinaryUrl(url, width) {
+  return optimizeCloudinaryImage(url, width, width, true);
+}
+
+export function cloudinarySrcSet(url, widths = [280, 420, 560]) {
+  if (typeof url !== "string" || !url.includes("/image/upload/")) return undefined;
+  return widths
+    .map((width) => `${cloudinaryUrl(url, width)} ${width}w`)
+    .join(", ");
 }

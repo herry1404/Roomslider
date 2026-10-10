@@ -33,7 +33,6 @@
   border-radius: 14px;
   box-shadow: 0 0 0 4px rgb(16 185 129 / 90%), 0 0 22px rgb(16 185 129 / 65%);
   pointer-events: none;
-  transition: left 180ms ease, top 180ms ease, width 180ms ease, height 180ms ease;
 }
 
 .first-visit-tour-card {

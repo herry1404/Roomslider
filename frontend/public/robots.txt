@@ -1,4 +1,23 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /owner
+Disallow: /login
+Disallow: /register
+Disallow: /settings
+Disallow: /wishlist
+Disallow: /profile
+Disallow: /my-place
+Disallow: /notifications
+Disallow: /recently-viewed
+Disallow: /mess/login
+Disallow: /mess/dashboard
+Disallow: /hourly-manager
+Disallow: /hourly-bookings
+Disallow: /hourly-rooms/*/book
+Disallow: /roommates/profile
+Disallow: /roommates/requests
+Disallow: /roommates/messages
+Disallow: /roommates/chat
 
-Sitemap: https://roomslider.in/sitemap.xml
+Sitemap: https://www.roomslider.in/sitemap.xml

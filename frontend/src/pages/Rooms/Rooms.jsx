@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
@@ -7,6 +6,7 @@ import RoomCard from "../../components/ui/RoomCard";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import EmptyState from "../../components/ui/EmptyState";
 import { distanceKm, findIndorePlace, normalizePlaceName } from "../../utils/indoreLocation";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 const NEARBY_RADIUS_KM = 8;
 
@@ -92,14 +92,14 @@ function Rooms() {
 
   return (
     <>
-      <Helmet>
-        <title>{search ? `${search} Rooms in Indore | RoomSlider` : "Rooms for Rent in Indore | RoomSlider"}</title>
-        <meta name="description" content="Find available rooms near your preferred area in Indore. Browse nearby options, compare prices and contact owners." />
-        <link rel="canonical" href="https://roomslider.in/rooms" />
-      </Helmet>
+      <SEO
+        {...PAGE_SEO.rooms}
+        noindex={Boolean(search)}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Rooms in Indore", path: "/rooms" }]}
+      />
 
       <section className="container rooms-search-page">
-        <h1>{search ? `Rooms near ${search}` : "Available Rooms"}</h1>
+        <h1>{search ? `Rooms for Rent near ${search}, Indore` : "Rooms for Rent in Indore"}</h1>
         {nearbyOnly ? (
           <div className="rooms-nearby-notice" role="status">
             <strong>{place.name} mein abhi rooms available nahi hain.</strong>
@@ -110,9 +110,21 @@ function Rooms() {
             </span>
           </div>
         ) : (
-          <p>{search ? `${rooms.length} available listing${rooms.length === 1 ? "" : "s"} found` : "Find your perfect accommodation."}</p>
+          <p>{search ? `${rooms.length} available listing${rooms.length === 1 ? "" : "s"} found` : "Find single and shared accommodation across Indore."}</p>
         )}
 
+        {!search && (
+          <p>
+            Compare single and shared rooms for rent across Indore, with photos,
+            monthly prices and locations to help narrow your search. Explore
+            areas including Vijay Nagar, Bhawarkua, Vishnupuri, Indrapuri,
+            Sarvanand Nagar and Vidhya Nagar, or look near DAVV, IIM Indore,
+            Medicaps, IPS Academy and Holkar College. Each listing includes
+            details supplied by the owner, so review facilities and availability
+            before you enquire. RoomSlider helps students and professionals
+            contact owners directly and find a room that suits their budget.
+          </p>
+        )}
         {rooms.length === 0 ? (
           <EmptyState
             title="No available rooms yet"

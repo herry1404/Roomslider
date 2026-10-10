@@ -4,6 +4,7 @@ import { Locate } from "lucide-react";
 import toast from "react-hot-toast";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "../../styles/leaflet-theme.css";
 import { getCurrentPosition } from "../../utils/deviceLocation";
 
 const icon = L.icon({

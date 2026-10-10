@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
-import LocationPicker from "../../components/map/LocationPicker";
+import LocationPicker from "../../components/map/LazyLocationPicker";
 import AmenitiesInput from "../../components/forms/AmenitiesInput";
 import HourlySlabsInput from "../../components/forms/HourlySlabsInput";
 

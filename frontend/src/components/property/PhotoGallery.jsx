@@ -15,6 +15,8 @@ function Photo({ src, alt, className = "", loading = "lazy" }) {
       className={className}
       src={optimizeCloudinaryImage(src, 1600)}
       alt={alt}
+      width="1600"
+      height="1200"
       draggable={false}
       loading={loading}
       onError={() => setFailed(true)}

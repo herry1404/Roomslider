@@ -1,4 +1,4 @@
-import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
+import { cloudinarySrcSet, cloudinaryUrl } from "../../utils/optimizeCloudinaryImage";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MapPin, Share2, Star } from "lucide-react";
@@ -58,13 +58,23 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
       <div className="room-image-wrapper villa-image-wrapper">
         <Link className="villa-card-main-link" to={detailPath} aria-label={`View ${villa.name}`}>
           {villa.images?.[0] ? (
-            <img className="room-image" src={optimizeCloudinaryImage(villa.images[0], 640)} alt={villa.name} loading="lazy" decoding="async" />
+            <img
+              className="room-image"
+              src={cloudinaryUrl(villa.images[0], 280)}
+              srcSet={cloudinarySrcSet(villa.images[0])}
+              sizes="(max-width:600px) 50vw, 280px"
+              width="280"
+              height="280"
+              alt={`${villa.name} villa in ${villa.area || villa.city || "Indore"}`}
+              loading="lazy"
+              decoding="async"
+            />
           ) : (
             <span className="villa-card-placeholder" role="img" aria-label="No villa photo available">Villa</span>
           )}
         </Link>
         <div className="villa-card-actions">
-          <button className={`wishlist-icon${wishlisted ? " active" : ""}`} type="button" onClick={toggleWishlist} aria-label={wishlisted ? "Remove villa from wishlist" : "Add villa to wishlist"}>
+          <button className={`wishlist-icon${wishlisted ? " active" : ""}`} type="button" onClick={toggleWishlist} aria-label={`${wishlisted ? "Remove" : "Add"} ${villa.name} ${wishlisted ? "from" : "to"} wishlist`} aria-pressed={wishlisted}>
             <Heart size={18} fill={wishlisted ? "currentColor" : "none"} />
           </button>
           <button className="share-btn share-btn--card villa-share-btn" type="button" onClick={share} aria-label="Share villa" disabled={sharing}>

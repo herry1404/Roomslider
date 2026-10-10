@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { ArrowLeft, ArrowUpRight, Bath, BedDouble, Building2 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -13,6 +12,7 @@ import HostRow from "../../components/property/HostRow";
 import Amenities from "../../components/property/Amenities";
 import LocationSection from "../../components/property/LocationSection";
 import PropertyDetailsSkeleton from "../../components/property/PropertyDetailsSkeleton";
+import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/property-details.css";
 
 const propertyCategoryPath = {
@@ -114,25 +114,42 @@ function PropertyPage() {
   const backPath = propertyCategoryPath[property.propertyType] || "/rooms";
   const ownerName = property.owner?.name;
   const availableCount = visibleRooms.length;
+  const detailPath = `/property/${property.slug || id}`;
+  const prices = visibleRooms.map((room) => Number(room.price)).filter((price) => Number.isFinite(price) && price > 0);
+  const priceRange = prices.length
+    ? `₹${Math.min(...prices).toLocaleString("en-IN")}–₹${Math.max(...prices).toLocaleString("en-IN")} per month`
+    : undefined;
+  const description = `${property.name}, a ${property.propertyType.toLowerCase()} in ${property.area}, Indore. Compare available room options${priceRange ? ` from ${priceRange}` : ""}, photos and facilities, then contact the owner on RoomSlider.`;
 
   return (
     <main className="pd-root pd-grouped-property">
-      <Helmet>
-        <title>{title}</title>
-        <meta
-          name="description"
-          content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`}
-        />
-        <meta property="og:type" content="product" />
-        <meta property="og:title" content={`${property.name} | RoomSlider`} />
-        <meta property="og:description" content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`} />
-        <meta property="og:url" content={`https://roomslider.in/property/${property.slug || id}`} />
-        <meta property="og:image" content={galleryImages[0] || "https://roomslider.in/og-image.jpg"} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${property.name} | RoomSlider`} />
-        <meta name="twitter:description" content={`${property.name} in ${property.area}, Indore. See sharing options, prices and vacant rooms.`} />
-        <meta name="twitter:image" content={galleryImages[0] || "https://roomslider.in/og-image.jpg"} />
-      </Helmet>
+      <SEO
+        title={title}
+        description={description}
+        path={detailPath}
+        image={galleryImages[0]}
+        type="product"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: `${property.propertyType} in Indore`, path: backPath },
+          { name: property.name, path: detailPath },
+        ]}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Accommodation",
+          name: property.name,
+          description,
+          url: `${SITE_URL}${detailPath}`,
+          ...(galleryImages[0] ? { image: galleryImages[0] } : {}),
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: property.area,
+            addressRegion: "Madhya Pradesh",
+            addressCountry: "IN",
+          },
+          ...(priceRange ? { priceRange } : {}),
+        }}
+      />
 
       <Link className="pd-grouped-back" to={backPath}>
         <ArrowLeft size={16} /> Back to {property.propertyType}

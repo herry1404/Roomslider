@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import HourlyRoomCard from "../../components/ui/HourlyRoomCard";
 import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 function HourlyRooms() {
   const [rooms, setRooms] = useState([]);
@@ -42,18 +42,25 @@ function HourlyRooms() {
 
   return (
     <>
-      <Helmet>
-        <title>Hourly / Short Stay in Indore | RoomSlider</title>
-        <meta name="description" content="Book rooms by the hour in Indore. Verified hourly rooms with RoomSlider." />
-        <link rel="canonical" href="https://roomslider.in/hourly-rooms" />
-      </Helmet>
+      <SEO
+        {...PAGE_SEO.shortStays}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Short Stays in Indore", path: "/hourly-rooms" }]}
+      />
 
       <section className="container hourly-rooms-page">
-        <h1>Hourly / Short Stay</h1>
-        <p>Ghante ke hisaab se book karo — verified rooms Indore mein.</p>
+        <h1>Hourly Rooms and Short Stays in Indore</h1>
+        <p>
+          Find a short stay in Indore for a few hours or overnight, with rooms
+          that show their location, facilities and booking details. Compare
+          options near Vijay Nagar, Bhawarkua, Vishnupuri, Indrapuri, Sarvanand
+          Nagar and Vidhya Nagar, or places convenient to DAVV, IIM Indore,
+          Medicaps, IPS Academy and Holkar College. Check the photos and hourly
+          rates on each listing, then confirm availability for your dates
+          before booking through RoomSlider.
+        </p>
 
         {rooms.length === 0 ? (
-          <h3 className="hourly-rooms-empty">No listings found</h3>
+          <h2 className="hourly-rooms-empty">No listings found</h2>
         ) : (
           <div className="hourly-rooms-grid">
             {rooms.map((room) => (

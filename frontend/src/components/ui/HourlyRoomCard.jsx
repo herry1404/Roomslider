@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { roomPath } from "../../utils/roomUrl";
-import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
+import { cloudinarySrcSet, cloudinaryUrl } from "../../utils/optimizeCloudinaryImage";
 import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/hourly-listings.css";
 
@@ -75,11 +75,25 @@ function HourlyRoomCard({ room }) {
       <div className="hourly-listing-photo">
         <Link to={detailPath} aria-label={`View ${room.title}`}>
           {firstImage
-            ? <img src={optimizeCloudinaryImage(firstImage, 520)} alt={room.title} loading="lazy" decoding="async" />
+            ? <img
+                src={cloudinaryUrl(firstImage, 280)}
+                srcSet={cloudinarySrcSet(firstImage)}
+                sizes="(max-width:600px) 50vw, 280px"
+                alt={`${room.title} short stay in ${location || "Indore"}`}
+                width="280"
+                height="280"
+                loading="lazy"
+                decoding="async"
+              />
             : <span className="hourly-listing-photo-empty" />}
         </Link>
         <div className="hourly-listing-actions">
-          <button type="button" onClick={toggleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}>
+          <button
+            type="button"
+            onClick={toggleWishlist}
+            aria-label={`${wishlisted ? "Remove" : "Add"} ${room.title} ${wishlisted ? "from" : "to"} wishlist`}
+            aria-pressed={wishlisted}
+          >
             <Heart size={19} fill={wishlisted ? "currentColor" : "none"} />
           </button>
           <button type="button" onClick={shareListing} aria-label="Share listing" disabled={sharing}>

@@ -11,6 +11,7 @@ import { useNotifications } from "../../context/useNotifications";
 import { requestLogin } from "../../utils/loginPrompt";
 import RoommateSubnav from "./RoommateSubnav";
 import "../../styles/roommate-chat.css";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 const formatSeeking = (value) => ({
   room: "Looking for a room",
@@ -96,9 +97,14 @@ function RoommateFinder() {
   if (!user) {
     return (
       <main className="roommate-hub-page">
+        <SEO
+          {...PAGE_SEO.roommates}
+          noindex
+          breadcrumbs={[{ name: "Home", path: "/" }, { name: "Roommates in Indore", path: "/roommates" }]}
+        />
         <RoommateSubnav active="discover" />
         <div className="roommate-hub-empty">
-          <h1>Discover roommates</h1>
+          <h1>Find Roommates in Indore</h1>
           <p>Log in to see roommate suggestions that match your preferences.</p>
           <button className="roommate-primary-action" type="button" onClick={() => requestLogin("Log in to see roommate suggestions.")}>Log in</button>
         </div>
@@ -110,10 +116,15 @@ function RoommateFinder() {
 
   return (
     <main className="roommate-hub-page">
+      <SEO
+        {...PAGE_SEO.roommates}
+        noindex
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Roommates in Indore", path: "/roommates" }]}
+      />
       <RoommateSubnav active="discover" />
       <header className="roommate-hub-heading">
         <p className="roommate-hub-eyebrow">Roommate Finder</p>
-        <h1>Discover</h1>
+        <h1>Find Roommates in Indore</h1>
         <p>Explore compatible roommate profiles. Your contact details stay private.</p>
       </header>
 

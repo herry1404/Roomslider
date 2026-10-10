@@ -1,5 +1,5 @@
 import { MapPin } from "lucide-react";
-import RoomMap from "../map/RoomMap";
+import RoomMap from "../map/LazyRoomMap";
 
 function LocationSection({ location, latitude, longitude, title, nearby = [] }) {
   if (!location && (latitude == null || longitude == null) && !nearby.length) return null;

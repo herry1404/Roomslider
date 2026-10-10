@@ -47,7 +47,7 @@
     font-size:14px;
     font-weight:700;
 
-    transition:.3s;
+    transition:transform .2s ease, opacity .2s ease;
 
     text-decoration:none;
 
@@ -55,11 +55,6 @@
 
 
 
-.view-all:hover{
-
-    gap:12px;
-
-}
 
 
 
@@ -123,7 +118,7 @@
     0 10px 30px rgba(0,0,0,.07);
 
 
-    transition:.35s ease;
+    transition:transform .35s ease;
 
     cursor:pointer;
 
@@ -169,12 +164,9 @@
 .room-image{
 
     width:100%;
-
     height:100%;
-
     object-fit:cover;
-
-    transition:.4s ease;
+    transition:transform .4s ease;
 
 }
 
@@ -232,7 +224,7 @@
     color:#374151;
 
 
-    transition:.3s;
+    transition:transform .2s ease;
 
 }
 
@@ -521,7 +513,7 @@
   border: 1px solid var(--color-border);
   border-radius: 16px;
   cursor: pointer;
-  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  transition: transform .18s ease, opacity .18s ease;
 }
 
 .home-explore-tile:hover {
@@ -682,9 +674,11 @@
   height:3px;
   border-radius:3px;
   background:linear-gradient(90deg,#10b981,#6ee7b7);
-  transition:width .3s ease;
+  transform:scaleX(1);
+  transform-origin:left;
+  transition:transform .3s ease;
 }
-.section-header:hover h2::after{ width:56px; }
+.section-header:hover h2::after{ transform:scaleX(1.75); }
 
 .view-all{
   padding:7px 14px;
@@ -692,11 +686,10 @@
   font-size:13px;
   border:1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
   background:color-mix(in srgb, var(--color-primary) 8%, transparent);
-  transition:background .25s ease, gap .25s ease, transform .2s ease;
+  transition:transform .2s ease, opacity .2s ease;
 }
 .view-all:hover{
-  gap:10px;
-  background:color-mix(in srgb, var(--color-primary) 16%, transparent);
+  transform:translateY(-1px);
 }
 .view-all:active{ transform:scale(.96); }
 
@@ -706,7 +699,7 @@
 /* image: soft gradient so icons stay readable + lift on hover */
 .latest-rooms .room-image-wrap{
   box-shadow:0 8px 22px rgba(0,0,0,.18);
-  transition:transform .3s ease, box-shadow .3s ease;
+  transition:transform .3s ease;
 }
 .latest-rooms .room-image-wrap::before{
   content:"";
@@ -757,7 +750,7 @@
   z-index:1;
   pointer-events:none;
   background:linear-gradient(105deg, transparent 20%, rgba(255,255,255,.28) 50%, transparent 80%);
-  transform:skewX(-18deg);
+  transform:translateX(0) skewX(-18deg);
   opacity:0;
 }
 @media (hover:hover){
@@ -774,8 +767,18 @@
   }
 }
 @keyframes rcShine{
-  from{ left:-80%; }
-  to{ left:140%; }
+  from{ transform:translateX(0) skewX(-18deg); }
+  to{ transform:translateX(440%) skewX(-18deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .latest-rooms .room-card,
+  .latest-rooms .room-image,
+  .latest-rooms .room-image-wrap,
+  .wishlist-btn,
+  .view-all,
+  .section-header h2::after{ transition:none; }
+  .latest-rooms .room-card:hover .room-image-wrap::after{ animation:none; }
 }
 
 .home-listings-loading .section-header h2 {

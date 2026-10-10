@@ -1,14 +1,13 @@
-import { Helmet } from "react-helmet-async";
 import "./Privacy.css";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 
 export default function Privacy() {
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy | RoomSlider</title>
-        <meta name="description" content="How RoomSlider collects, uses and protects your personal data on roomslider.in." />
-        <link rel="canonical" href="https://roomslider.in/privacy" />
-      </Helmet>
+      <SEO
+        {...PAGE_SEO.privacy}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Privacy Policy", path: "/privacy" }]}
+      />
     <div className="legal-page">
       <div className="legal-container">
         <h1>Privacy Policy</h1>

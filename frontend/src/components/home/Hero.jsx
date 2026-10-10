@@ -30,7 +30,7 @@ function Hero() {
         </span>
 
         <h1 className="hs-title hs-rise" style={{ "--d": ".08s" }}>
-          Find a place that feels <span className="hs-grad">like home</span>
+          Find PGs, hostels &amp; flats for rent in <span className="hs-grad">Indore</span>
         </h1>
 
         <p className="hs-sub hs-rise" style={{ "--d": ".16s" }}>

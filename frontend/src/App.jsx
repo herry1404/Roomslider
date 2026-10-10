@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import MainLayout from "./layouts/MainLayout";
 import MapLayout from "./layouts/MapLayout";
@@ -10,107 +12,117 @@ import PreferencesModal from "./components/onboarding/PreferencesModal";
 import { useAuth } from "./context/AuthContext";
 
 import Home from "./pages/Home/Home";
-import About from "./pages/About/About";
-import Team from "./pages/Team/Team";
-import Login from "./pages/Login/Login";
-import Register from "./pages/Register/Register";
-import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
-import CompleteProfile from "./pages/CompleteProfile/CompleteProfile";
-import Settings from "./pages/Settings/Settings";
-import Wishlist from "./pages/Wishlist/Wishlist";
-import TenantDashboard from "./pages/Tenant/TenantDashboard";
-import RecentlyViewed from "./pages/RecentlyViewed/RecentlyViewed";
-import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
-import MapView from "./pages/MapView/MapView";
-import Explore from "./pages/Explore/Explore";
-import VehicleList from "./pages/Vehicles/VehicleList";
-import VehicleDetail from "./pages/Vehicles/VehicleDetail";
-import ManageVehicles from "./pages/Admin/ManageVehicles";
-import AddVehicle from "./pages/Admin/AddVehicle";
-import ManageVehicleRequests from "./pages/Admin/ManageVehicleRequests";
-import ManageServices from "./pages/Admin/ManageServices";
-import ServiceRequests from "./pages/Admin/ServiceRequests";
-import ManageHomeLayout from "./pages/Admin/ManageHomeLayout";
-import AddService from "./pages/Admin/AddService";
-import ManageFurniture from "./pages/Admin/ManageFurniture";
-import FurnitureList from "./pages/Furniture/FurnitureList";
-import AddFurniture from "./pages/Admin/AddFurniture";
-import ManageFurnitureRequests from "./pages/Admin/ManageFurnitureRequests";
-import ServiceList from "./pages/Services/ServiceList";
-import OwnerProfile from "./pages/OwnerProfile/OwnerProfile";
-import PropertyPage from "./pages/PropertyPage/PropertyPage";
-import Profile from "./pages/Profile/Profile";
-import ProfileEdit from "./pages/Profile/ProfileEdit";
-import Terms from "./pages/Terms/Terms";
-import Privacy from "./pages/Privacy/Privacy";
-import RoommateFinder from "./pages/Roommates/RoommateFinder";
-import MyRoommateProfile from "./pages/Roommates/MyRoommateProfile";
-import RoommateRequests from "./pages/Roommates/RoommateRequests";
-import RoommateMessages from "./pages/Roommates/RoommateMessages";
-import RoommateProfilePage from "./pages/Roommates/RoommateProfilePage";
-import RoommateChatPage from "./pages/Roommates/RoommateChatPage";
-import Notifications from "./pages/Notifications/Notifications";
-import Sitemap from "./pages/Sitemap/Sitemap";
-
-import Rooms from "./pages/Rooms/Rooms";
-import HourlyRooms from "./pages/Rooms/HourlyRooms";
-import HourlyRoomDetail from "./pages/Rooms/HourlyRoomDetail";
-import LaundryList from "./pages/Laundry/LaundryList";
-import LaundryDetail from "./pages/Laundry/LaundryDetail";
-import VillaList from "./pages/Villas/VillaList";
-import VillaDetail from "./pages/Villas/VillaDetail";
-import MessList from "./pages/Mess/MessList";
-import MessDetail from "./pages/Mess/MessDetail";
-import PG from "./pages/PG/PG";
-import Hostels from "./pages/Hostels/Hostels";
-import Flats from "./pages/Flats/Flats";
-
-import AdminLogin from "./pages/Admin/AdminLogin";
-import OwnerLogin from "./pages/Owner/OwnerLogin";
-import HourlyManagerLogin from "./pages/HourlyManager/HourlyManagerLogin";
-import HourlyManagerDashboard from "./pages/HourlyManager/HourlyManagerDashboard";
-import HourlyRoomCheckout from "./pages/Rooms/HourlyRoomCheckout";
-import OwnerDashboard from "./pages/Owner/OwnerDashboard";
-import OwnerAddRoom from "./pages/Owner/OwnerAddRoom";
-import OwnerRoomDetail from "./pages/Owner/OwnerRoomDetail";
-import OwnerElectricity from "./pages/Owner/OwnerElectricity";
-import OwnerExpenses from "./pages/Owner/OwnerExpenses";
-import OwnerReminders from "./pages/Owner/OwnerReminders";
-import OwnerMaintenance from "./pages/Owner/OwnerMaintenance";
-import MessLogin from "./pages/Mess/MessLogin";
-import MessOwnerDashboard from "./pages/Mess/MessOwnerDashboard";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
-import AddRoom from "./pages/Admin/AddRoom";
-import EditRoom from "./pages/Admin/EditRoom";
-import ManageRooms from "./pages/Admin/ManageRooms";
-import ManageUsers from "./pages/Admin/ManageUsers";
-import ManageOwners from "./pages/Admin/ManageOwners";
-import ManageLaundryVendors from "./pages/Admin/ManageLaundryVendors";
-import ManageLoans from "./pages/Admin/ManageLoans";
-import ManageMess from "./pages/Admin/ManageMess";
-import ManageHourlyRooms from "./pages/Admin/ManageHourlyRooms";
-import ManageVillas from "./pages/Admin/ManageVillas";
-import ManageNotifications from "./pages/Admin/ManageNotifications";
-import OwnerDetail from "./pages/Admin/OwnerDetail";
-import HourlyBookingReceipt from "./pages/Rooms/HourlyBookingReceipt";
-import SocialWork from "./pages/SocialWork/SocialWork";
-import ManageSocial from "./pages/Admin/ManageSocial";
-import AddSocial from "./pages/Admin/AddSocial";
-import Donate from "./pages/Donate/Donate";
-import BloodHome from "./pages/Blood/BloodHome";
-import BloodRequestForm from "./pages/Blood/BloodRequestForm";
-import BloodRequestDetail from "./pages/Blood/BloodRequestDetail";
-import ManageBloodRequests from "./pages/Admin/ManageBloodRequests";
-import ManageRoommateReports from "./pages/Admin/ManageRoommateReports";
-import PushNotifications from "./pages/Admin/PushNotifications";
-import AdminAnalytics from "./pages/Admin/AdminAnalytics";
-import ManageListingReports from "./pages/Admin/ManageListingReports";
+const About = lazy(() => import("./pages/About/About"));
+const Contact = lazy(() => import("./pages/Contact/Contact"));
+const Team = lazy(() => import("./pages/Team/Team"));
+const Login = lazy(() => import("./pages/Login/Login"));
+const Register = lazy(() => import("./pages/Register/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword/ForgotPassword"));
+const CompleteProfile = lazy(() => import("./pages/CompleteProfile/CompleteProfile"));
+const Settings = lazy(() => import("./pages/Settings/Settings"));
+const Wishlist = lazy(() => import("./pages/Wishlist/Wishlist"));
+const TenantDashboard = lazy(() => import("./pages/Tenant/TenantDashboard"));
+const RecentlyViewed = lazy(() => import("./pages/RecentlyViewed/RecentlyViewed"));
+const PropertyDetails = lazy(() => import("./pages/PropertyDetails/PropertyDetails"));
+const MapView = lazy(() => import("./pages/MapView/MapView"));
+const Explore = lazy(() => import("./pages/Explore/Explore"));
+const VehicleList = lazy(() => import("./pages/Vehicles/VehicleList"));
+const VehicleDetail = lazy(() => import("./pages/Vehicles/VehicleDetail"));
+const ManageVehicles = lazy(() => import("./pages/Admin/ManageVehicles"));
+const AddVehicle = lazy(() => import("./pages/Admin/AddVehicle"));
+const ManageVehicleRequests = lazy(() => import("./pages/Admin/ManageVehicleRequests"));
+const ManageServices = lazy(() => import("./pages/Admin/ManageServices"));
+const ServiceRequests = lazy(() => import("./pages/Admin/ServiceRequests"));
+const ManageHomeLayout = lazy(() => import("./pages/Admin/ManageHomeLayout"));
+const AddService = lazy(() => import("./pages/Admin/AddService"));
+const ManageFurniture = lazy(() => import("./pages/Admin/ManageFurniture"));
+const FurnitureList = lazy(() => import("./pages/Furniture/FurnitureList"));
+const AddFurniture = lazy(() => import("./pages/Admin/AddFurniture"));
+const ManageFurnitureRequests = lazy(() => import("./pages/Admin/ManageFurnitureRequests"));
+const ServiceList = lazy(() => import("./pages/Services/ServiceList"));
+const OwnerProfile = lazy(() => import("./pages/OwnerProfile/OwnerProfile"));
+const PropertyPage = lazy(() => import("./pages/PropertyPage/PropertyPage"));
+const Profile = lazy(() => import("./pages/Profile/Profile"));
+const ProfileEdit = lazy(() => import("./pages/Profile/ProfileEdit"));
+const Terms = lazy(() => import("./pages/Terms/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy/Privacy"));
+const RoommateFinder = lazy(() => import("./pages/Roommates/RoommateFinder"));
+const MyRoommateProfile = lazy(() => import("./pages/Roommates/MyRoommateProfile"));
+const RoommateRequests = lazy(() => import("./pages/Roommates/RoommateRequests"));
+const RoommateMessages = lazy(() => import("./pages/Roommates/RoommateMessages"));
+const RoommateProfilePage = lazy(() => import("./pages/Roommates/RoommateProfilePage"));
+const RoommateChatPage = lazy(() => import("./pages/Roommates/RoommateChatPage"));
+const Notifications = lazy(() => import("./pages/Notifications/Notifications"));
+const Sitemap = lazy(() => import("./pages/Sitemap/Sitemap"));
+const Rooms = lazy(() => import("./pages/Rooms/Rooms"));
+const HourlyRooms = lazy(() => import("./pages/Rooms/HourlyRooms"));
+const HourlyRoomDetail = lazy(() => import("./pages/Rooms/HourlyRoomDetail"));
+const LaundryList = lazy(() => import("./pages/Laundry/LaundryList"));
+const LaundryDetail = lazy(() => import("./pages/Laundry/LaundryDetail"));
+const VillaList = lazy(() => import("./pages/Villas/VillaList"));
+const VillaDetail = lazy(() => import("./pages/Villas/VillaDetail"));
+const MessList = lazy(() => import("./pages/Mess/MessList"));
+const MessDetail = lazy(() => import("./pages/Mess/MessDetail"));
+const PG = lazy(() => import("./pages/PG/PG"));
+const Hostels = lazy(() => import("./pages/Hostels/Hostels"));
+const Flats = lazy(() => import("./pages/Flats/Flats"));
+const AdminLogin = lazy(() => import("./pages/Admin/AdminLogin"));
+const OwnerLogin = lazy(() => import("./pages/Owner/OwnerLogin"));
+const HourlyManagerLogin = lazy(() => import("./pages/HourlyManager/HourlyManagerLogin"));
+const HourlyManagerDashboard = lazy(() => import("./pages/HourlyManager/HourlyManagerDashboard"));
+const HourlyRoomCheckout = lazy(() => import("./pages/Rooms/HourlyRoomCheckout"));
+const OwnerDashboard = lazy(() => import("./pages/Owner/OwnerDashboard"));
+const OwnerAddRoom = lazy(() => import("./pages/Owner/OwnerAddRoom"));
+const OwnerRoomDetail = lazy(() => import("./pages/Owner/OwnerRoomDetail"));
+const OwnerElectricity = lazy(() => import("./pages/Owner/OwnerElectricity"));
+const OwnerExpenses = lazy(() => import("./pages/Owner/OwnerExpenses"));
+const OwnerReminders = lazy(() => import("./pages/Owner/OwnerReminders"));
+const OwnerMaintenance = lazy(() => import("./pages/Owner/OwnerMaintenance"));
+const MessLogin = lazy(() => import("./pages/Mess/MessLogin"));
+const MessOwnerDashboard = lazy(() => import("./pages/Mess/MessOwnerDashboard"));
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
+const AddRoom = lazy(() => import("./pages/Admin/AddRoom"));
+const EditRoom = lazy(() => import("./pages/Admin/EditRoom"));
+const ManageRooms = lazy(() => import("./pages/Admin/ManageRooms"));
+const ManageUsers = lazy(() => import("./pages/Admin/ManageUsers"));
+const ManageOwners = lazy(() => import("./pages/Admin/ManageOwners"));
+const ManageLaundryVendors = lazy(() => import("./pages/Admin/ManageLaundryVendors"));
+const ManageLoans = lazy(() => import("./pages/Admin/ManageLoans"));
+const ManageMess = lazy(() => import("./pages/Admin/ManageMess"));
+const ManageHourlyRooms = lazy(() => import("./pages/Admin/ManageHourlyRooms"));
+const ManageVillas = lazy(() => import("./pages/Admin/ManageVillas"));
+const ManageNotifications = lazy(() => import("./pages/Admin/ManageNotifications"));
+const OwnerDetail = lazy(() => import("./pages/Admin/OwnerDetail"));
+const HourlyBookingReceipt = lazy(() => import("./pages/Rooms/HourlyBookingReceipt"));
+const SocialWork = lazy(() => import("./pages/SocialWork/SocialWork"));
+const ManageSocial = lazy(() => import("./pages/Admin/ManageSocial"));
+const AddSocial = lazy(() => import("./pages/Admin/AddSocial"));
+const Donate = lazy(() => import("./pages/Donate/Donate"));
+const BloodHome = lazy(() => import("./pages/Blood/BloodHome"));
+const BloodRequestForm = lazy(() => import("./pages/Blood/BloodRequestForm"));
+const BloodRequestDetail = lazy(() => import("./pages/Blood/BloodRequestDetail"));
+const ManageBloodRequests = lazy(() => import("./pages/Admin/ManageBloodRequests"));
+const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateReports"));
+const PushNotifications = lazy(() => import("./pages/Admin/PushNotifications"));
+const AdminAnalytics = lazy(() => import("./pages/Admin/AdminAnalytics"));
+const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 
-import AdminRoute from "./components/AdminRoute";
-import AdminLayout from "./components/admin/AdminLayout";
+const AdminRoute = lazy(() => import("./components/AdminRoute"));
 import OwnerRoute from "./components/OwnerRoute";
 import MessRoute from "./components/MessRoute";
+
+const PRIVATE_PATH = /^\/(?:admin(?:\/|$)|owner(?:\/|$)|mess\/(?:login|dashboard)(?:\/|$)|hourly-manager(?:\/|$)|login(?:\/|$)|register(?:\/|$)|complete-profile(?:\/|$)|forgot-password(?:\/|$)|settings(?:\/|$)|wishlist(?:\/|$)|profile(?:\/|$)|my-place(?:\/|$)|recently-viewed(?:\/|$)|notifications(?:\/|$)|hourly-bookings(?:\/|$)|hourly-rooms\/[^/]+\/book(?:\/|$)|roommates(?:\/(?:profile|requests|messages|chat)(?:\/|$))?|roommates\/profile\/[^/]+)$/i;
+
+function PrivateRouteRobots() {
+  const { pathname } = useLocation();
+  if (!PRIVATE_PATH.test(pathname)) return null;
+  return (
+    <Helmet>
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
+  );
+}
 
 function App() {
 
@@ -125,6 +137,7 @@ function App() {
 
   return (
     <>
+      <PrivateRouteRobots />
       <ScrollToTop />
       <BackToTop />
       <InstallPrompt />
@@ -133,11 +146,17 @@ function App() {
         <PreferencesModal onClose={dismissPreferencesPrompt} />
       )}
       {showLoginModal && (
-        <Login modal onClose={() => setShowLoginModal(false)} />
+        <Suspense fallback={<div className="route-loading" role="status">Loading sign-in…</div>}>
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <Login modal onClose={() => setShowLoginModal(false)} />
+          </GoogleOAuthProvider>
+        </Suspense>
       )}
+      <Suspense fallback={<div className="route-loading" role="status">Loading page…</div>}>
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+        <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
         <Route path="/team" element={<MainLayout><Team /></MainLayout>} />
         <Route path="/rooms" element={<MainLayout><Rooms /></MainLayout>} />
         <Route path="/hourly-rooms" element={<MainLayout><HourlyRooms /></MainLayout>} />
@@ -178,8 +197,8 @@ function App() {
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />
         <Route path="/flats" element={<MainLayout><Flats /></MainLayout>} />
-        <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
-        <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+        <Route path="/login" element={<MainLayout><GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}><Login /></GoogleOAuthProvider></MainLayout>} />
+        <Route path="/register" element={<MainLayout><GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}><Register /></GoogleOAuthProvider></MainLayout>} />
         <Route path="/complete-profile" element={<MainLayout><CompleteProfile /></MainLayout>} />
         <Route path="/forgot-password" element={<MainLayout><ForgotPassword /></MainLayout>} />
         <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
@@ -243,7 +262,7 @@ function App() {
         <Route path="/admin/notifications" element={<AdminRoute><ManageNotifications /></AdminRoute>} />
         <Route path="/admin/push" element={<AdminRoute><PushNotifications /></AdminRoute>} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
-        <Route path="/admin/settings" element={<AdminRoute><AdminLayout><Settings /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><Settings /></AdminRoute>} />
 
         <Route
           path="/admin/wishlist"
@@ -256,6 +275,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </>
   );
 }

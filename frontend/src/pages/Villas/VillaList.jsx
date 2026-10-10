@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { MapPin, Search, X } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import VillaCard from "../../components/home/VillaCard";
+import SEO from "../../components/SEO";
 import { distanceKm, findIndorePlace, normalizePlaceName } from "../../utils/indoreLocation";
 import "../../styles/villas.css";
 
@@ -120,12 +120,29 @@ function VillaList() {
 
   return (
     <main className="container villa-list-page">
-      <Helmet>
-        <title>{search ? `Villas near ${search} | RoomSlider` : "Book Villas for Stays & Events | RoomSlider"}</title>
-        <meta name="description" content="Browse villas for overnight stays and private events, compare real prices, and find stays near your preferred place." />
-      </Helmet>
+      <SEO
+        title={search ? `Villas near ${search} in Indore | RoomSlider` : "Villas and Short Stays in Indore | RoomSlider"}
+        description={search
+          ? `Browse villas and short stays near ${search}, Indore. Compare photos, guest capacity, facilities and rates, then check available dates on RoomSlider.`
+          : "Find villas and short stays in Indore for overnight visits, family stays and events. Compare photos, facilities, guest capacity and rates before checking availability."}
+        path="/villas"
+        noindex={Boolean(search)}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "Villas in Indore", path: "/villas" }]}
+      />
       <header className="villa-page-heading">
-        <h1>{search ? `Villas near ${search}` : "Villas for stays & events"}</h1>
+        <h1>{search ? `Villas near ${search}, Indore` : "Villas and Short Stays in Indore"}</h1>
+        {!search && (
+          <p>
+            Explore villas in Indore for overnight stays, group visits and
+            private events. Compare the location, guest capacity, available
+            facilities, photos and rates listed by each host before checking
+            dates. Browse options around Vijay Nagar, Bhawarkua, Vishnupuri,
+            Indrapuri, Sarvanand Nagar and Vidhya Nagar, with access to DAVV,
+            IIM Indore, Medicaps, IPS Academy and Holkar College. RoomSlider
+            helps you review the details and contact the host before making
+            plans.
+          </p>
+        )}
         <p><MapPin size={15} /> {nearby ? `No villas listed in ${result.placeName}; showing nearby stays` : search ? "Search available villas by area" : "Browse available villas"}</p>
       </header>
 

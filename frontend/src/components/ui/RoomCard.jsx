@@ -1,4 +1,4 @@
-import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
+import { cloudinarySrcSet, cloudinaryUrl } from "../../utils/optimizeCloudinaryImage";
 import { roomPath } from "../../utils/roomUrl";
 import { useState } from "react";
 import {
@@ -14,12 +14,6 @@ import { useWishlist } from "../../context/WishlistContext";
 import { requestLogin } from "../../utils/loginPrompt";
 
 import "../../styles/room-card.css";
-
-// Cloudinary on-the-fly thumbnail (small image for cards)
-function getThumbnailUrl(url) {
-  if (!url || !url.includes("/upload/")) return url;
-  return url.replace("/upload/", "/upload/w_600,h_600,c_fill,q_auto,f_auto/");
-}
 
 function amenityIcon(amenity) {
   const value = String(amenity).toLowerCase();
@@ -96,7 +90,7 @@ function RoomCard({ room, onWishlistChange }) {
     }
   };
 
-  const firstImage = getThumbnailUrl(room.images?.[0]);
+  const firstImage = room.images?.[0];
   const genderLabel = { Male: "Boys", Female: "Girls" }[room.gender];
   const sharingLabel = { Single: "Single Room", Double: "Double Sharing", Triple: "Triple Sharing" }[room.sharingType] || room.category;
   const typeLine = [sharingLabel, genderLabel].filter(Boolean).join(" · ");
@@ -111,8 +105,12 @@ function RoomCard({ room, onWishlistChange }) {
     <div className="room-card rc-air" onClick={handleDetails} style={{ cursor: "pointer" }}>
       <div className="room-image-wrapper">
         <img
-          src={optimizeCloudinaryImage(firstImage || "data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27600%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23e5e7eb%27/></svg>", 640)}
-          alt={room.title}
+          src={cloudinaryUrl(firstImage, 280) || "data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%27280%27 height=%27280%27><rect width=%27100%25%27 height=%27100%25%27 fill=%27%23e5e7eb%27/></svg>"}
+          srcSet={firstImage ? cloudinarySrcSet(firstImage) : undefined}
+          sizes="(max-width:600px) 50vw, 280px"
+          width="280"
+          height="280"
+          alt={`${room.category || "Rental"} ${room.title} in ${room.location || "Indore"}`}
           className="room-image"
           loading="lazy"
           decoding="async"
@@ -127,7 +125,8 @@ function RoomCard({ room, onWishlistChange }) {
           className={`wishlist-icon ${wishlisted ? "active" : ""} ${burst ? "burst" : ""}`}
           data-tour="wishlist"
           type="button"
-          title="Add to wishlist"
+          aria-label={`${wishlisted ? "Remove" : "Add"} ${room.property?.name || room.title} ${wishlisted ? "from" : "to"} wishlist`}
+          aria-pressed={wishlisted}
           onClick={handleWishlist}
           disabled={loading}
         >

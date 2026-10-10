@@ -63,7 +63,7 @@ function Footer() {
 
           {/* Company + Contact */}
           <div className="footer-links">
-            <h4>Company</h4>
+            <h2>Company</h2>
             <ul>
               <li><Link to="/about">About</Link></li>
               <li><Link to="/contact">Contact</Link></li>

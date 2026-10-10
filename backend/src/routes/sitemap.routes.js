@@ -13,7 +13,7 @@ const SocialPlace = require("../models/SocialPlace");
 const { ensureMessSlugs } = require("../utils/messSlug");
 const { ensurePublicSlugs } = require("../utils/publicSlug");
 
-const SITE_URL = "https://roomslider.in";
+const SITE_URL = "https://www.roomslider.in";
 
 const slugify = (text = "") =>
   text
@@ -35,9 +35,9 @@ router.get("/", async (req, res) => {
   try {
     const [rooms, messes, owners, vehicles, villas, vendors, hourlyRooms, properties, socialPlaces] = await Promise.all([
       Room.find({ status: "vacant" }, "_id title slug category property updatedAt"),
-      Mess.find({}, "_id name slug updatedAt"),
+      Mess.find({ isActive: true }, "_id name slug updatedAt"),
       Owner.find({}, "_id name propertyName slug updatedAt"),
-      Vehicle.find({ isVisible: true, brand: { $exists: true } }, "_id name brand slug updatedAt"),
+      Vehicle.find({ isVisible: true, isAvailable: true, brand: { $exists: true } }, "_id name brand slug updatedAt"),
       Villa.find({ isActive: true }, "_id name slug updatedAt"),
       LaundryVendor.find({ isActive: true }, "_id vendorName slug updatedAt"),
       HourlyRoom.find({ isActive: true, status: "approved" }, "_id title slug updatedAt"),
@@ -62,6 +62,7 @@ router.get("/", async (req, res) => {
       { loc: "/hostels", priority: "0.9", changefreq: "daily" },
       { loc: "/flats", priority: "0.9", changefreq: "daily" },
       { loc: "/hourly-rooms", priority: "0.8", changefreq: "daily" },
+      { loc: "/villas", priority: "0.8", changefreq: "daily" },
       { loc: "/mess", priority: "0.8", changefreq: "daily" },
       { loc: "/vehicles", priority: "0.7", changefreq: "weekly" },
       { loc: "/furniture", priority: "0.6", changefreq: "weekly" },
@@ -74,6 +75,8 @@ router.get("/", async (req, res) => {
       { loc: "/social-work", priority: "0.7", changefreq: "weekly" },
       { loc: "/map", priority: "0.6", changefreq: "weekly" },
       { loc: "/about", priority: "0.5", changefreq: "monthly" },
+      { loc: "/contact", priority: "0.5", changefreq: "monthly" },
+      { loc: "/sitemap", priority: "0.3", changefreq: "monthly" },
       { loc: "/team", priority: "0.4", changefreq: "monthly" },
       { loc: "/terms", priority: "0.3", changefreq: "monthly" },
       { loc: "/privacy", priority: "0.3", changefreq: "monthly" },

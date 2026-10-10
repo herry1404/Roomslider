@@ -1,4 +1,5 @@
-import { Helmet } from "react-helmet-async";
+import "../../styles/about.css";
+import SEO, { PAGE_SEO } from "../../components/SEO";
 import {
   Users,
   GraduationCap,
@@ -12,9 +13,10 @@ import "../../styles/about.css";
 function About() {
   return (
     <>
-      <Helmet>
-        <title>About Us | RoomSlider</title>
-      </Helmet>
+      <SEO
+        {...PAGE_SEO.about}
+        breadcrumbs={[{ name: "Home", path: "/" }, { name: "About RoomSlider", path: "/about" }]}
+      />
 
       <section className="about-page">
 

@@ -1,90 +1,168 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MK0EESK0ER"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-MK0EESK0ER');
+      (() => {
+        let scheduled = false;
+        let loaded = false;
+        const loadAnalytics = () => {
+          if (loaded) return;
+          loaded = true;
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { window.dataLayer.push(arguments); };
+          window.gtag('js', new Date());
+          window.gtag('config', 'G-MK0EESK0ER');
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-MK0EESK0ER';
+          document.head.appendChild(script);
+          window.removeEventListener('pointerdown', scheduleOnInteraction);
+          window.removeEventListener('keydown', scheduleOnInteraction);
+          window.removeEventListener('touchstart', scheduleOnInteraction);
+        };
+        const scheduleOnInteraction = () => loadAnalytics();
+        const schedule = () => {
+          if (scheduled || loaded) return;
+          scheduled = true;
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(loadAnalytics, { timeout: 3000 });
+          } else {
+            window.setTimeout(loadAnalytics, 1000);
+          }
+        };
+        if (document.readyState === 'complete') schedule();
+        else window.addEventListener('load', schedule, { once: true });
+        window.addEventListener('pointerdown', scheduleOnInteraction, { once: true, passive: true });
+        window.addEventListener('keydown', scheduleOnInteraction, { once: true });
+        window.addEventListener('touchstart', scheduleOnInteraction, { once: true, passive: true });
+      })();
     </script>
-
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="preconnect" href="https://roomslider-api.onrender.com" crossorigin />
+    <script>
+      if (window.location.pathname === "/") {
+        const configuredApiBase = __ROOMSLIDER_API_BASE__;
+        const apiBase = (configuredApiBase ||
+          (window.location.hostname === "localhost"
+            ? "http://localhost:5000/api"
+            : "https://roomslider-api.onrender.com/api")).replace(/\/+$/, "");
+        window.__roomSliderHomeRoomsPromise = fetch(
+          `${apiBase}/rooms?grouped=true&hourly=false`
+        )
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Home listings request failed with status ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const rooms = data?.rooms || [];
+            try {
+              localStorage.setItem("roomslider:api-cache:home-rooms-grouped", JSON.stringify({
+                data: rooms,
+                cachedAt: Date.now(),
+              }));
+            } catch {
+              // The current page can still use the response when storage is unavailable.
+            }
+            return rooms;
+          })
+          .catch((error) => ({ error }));
+      }
+    </script>
+    <link rel="ard" href="/.well-known/ard.json" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light" />
-
-    <meta name="keywords" content="rooms in Indore, PG in Indore, hostels in Indore, flats for rent Indore, mess in Indore, laundry service Indore, PG near DAVV, hostel near IIM Indore, room near Medicaps University, PG near IPS Academy, hostel near Holkar College, room near Acropolis Institute, PG near Rau Indore, girls hostel Indore, boys PG Indore, rooms in Vijay Nagar, PG in Bhawarkuan, flats in Palasia, hostel in Bengali Square, room in Rajwada, PG in Nipania, hostel in Bicholi, verified rooms Indore, student accommodation Indore, working professional PG Indore" />
+    <meta name="theme-color" content="#16a34a" />
+    <style>
+      :root { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+      body { min-height: 100vh; margin: 0; background: #f8fafc; color: #0f172a; }
+      #root { min-height: 100vh; }
+      .hs-section { min-height: 280px; padding: 38px 0 26px; }
+      .hs-title { max-width: 760px; margin: 0 auto 12px; font-size: clamp(28px, 5.2vw, 52px); line-height: 1.1; }
+      .latest-rooms { padding: 10px 0 40px; }
+      .section-header { min-height: 42px; margin-bottom: 14px; }
+      .rooms-grid { display: flex; min-height: 240px; gap: 18px; overflow-x: auto; }
+      .room-image-wrap, .rc-air .room-image-wrapper { aspect-ratio: 1; overflow: hidden; }
+      @media (max-width: 700px) { .hs-section { min-height: 230px; padding: 22px 0 14px; } }
+    </style>
     <meta name="author" content="RoomSlider" />
+    <title>PG, Hostel &amp; Flats for Rent in Indore | RoomSlider</title>
+    <meta name="description" content="Find verified PGs, hostels, flats and rooms in Indore near colleges. Compare rent, photos and locations, and contact owners directly on RoomSlider." />
+    <link rel="canonical" href="https://www.roomslider.in/" />
 
     <!-- Open Graph / WhatsApp / Facebook preview -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://roomslider.in/" />
-    <meta property="og:title" content="RoomSlider | Rooms, PG, Hostels, Flats & Mess in Indore" />
-    <meta property="og:description" content="RoomSlider - Find verified rooms, PG, hostels, flats, mess and laundry services in Indore near DAVV, IIM Indore, Medicaps, IPS Academy, Holkar College, Rau, Vijay Nagar, Bhawarkuan and more." />
-    <meta property="og:image" content="https://roomslider.in/og-image.jpg" />
+    <meta property="og:url" content="https://www.roomslider.in/" />
+    <meta property="og:title" content="PG, Hostel &amp; Flats for Rent in Indore | RoomSlider" />
+    <meta property="og:description" content="Find verified PGs, hostels, flats and rooms in Indore near colleges. Compare rent, photos and locations, and contact owners directly on RoomSlider." />
+    <meta property="og:image" content="https://www.roomslider.in/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="RoomSlider" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="RoomSlider | Rooms, PG, Hostels, Flats & Mess in Indore" />
-    <meta name="twitter:description" content="RoomSlider - Find verified rooms, PG, hostels, flats, mess and laundry services in Indore near DAVV, IIM Indore, Medicaps, IPS Academy, Holkar College, Rau, Vijay Nagar, Bhawarkuan and more." />
-    <meta name="twitter:image" content="https://roomslider.in/og-image.jpg" />
+    <meta name="twitter:title" content="PG, Hostel &amp; Flats for Rent in Indore | RoomSlider" />
+    <meta name="twitter:description" content="Find verified PGs, hostels, flats and rooms in Indore near colleges. Compare rent, photos and locations, and contact owners directly on RoomSlider." />
+    <meta name="twitter:image" content="https://www.roomslider.in/og-image.jpg" />
 
     <!-- Site name for Google -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "RoomSlider",
-      "alternateName": ["Room Slider", "roomslider.in"],
-      "url": "https://roomslider.in/",
-      "inLanguage": "en-IN"
-    }
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "RoomSlider",
+  "url": "https://www.roomslider.in/",
+  "inLanguage": "en-IN"
+}
     </script>
 
     <!-- Structured Data for Google -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "RealEstateAgent",
-      "alternateName": ["Room Slider", "roomslider.in"],
-      "name": "RoomSlider",
-      "url": "https://roomslider.in",
-      "logo": "https://roomslider.in/favicon.svg",
-      "image": "https://roomslider.in/og-image.jpg",
-      "description": "RoomSlider is Indore's trusted online platform for finding verified rooms, PGs, hostels, and flats for rent. We connect tenants with property owners through a simple, hassle-free search experience.",
-      "areaServed": {
-        "@type": "City",
-        "name": "Indore"
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Indore",
-        "addressRegion": "Madhya Pradesh",
-        "addressCountry": "IN"
-      },
-      "telephone": "+91-9131181848",
-      "priceRange": "₹₹",
-      "email": "roomslider.in@gmail.com",
-      "foundingDate": "2026-08-10",
-      "founder": {
-        "@type": "Person",
-        "name": "Hariom",
-        "jobTitle": "CEO & Founder"
-      },
-      "sameAs": [
-        "https://instagram.com/roomslider",
-        "https://facebook.com/roomslider"
-      ]
-    }
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "alternateName": [
+    "Room Slider",
+    "roomslider.in"
+  ],
+  "name": "RoomSlider",
+  "url": "https://www.roomslider.in/",
+  "logo": "https://www.roomslider.in/favicon.svg",
+  "image": "https://www.roomslider.in/og-image.jpg",
+  "description": "RoomSlider is Indore's trusted online platform for finding verified rooms, PGs, hostels, and flats for rent. We connect tenants with property owners through a simple, hassle-free search experience.",
+  "areaServed": {
+    "@type": "City",
+    "name": "Indore"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Indore",
+    "addressRegion": "Madhya Pradesh",
+    "addressCountry": "IN"
+  },
+  "telephone": "+91-9131181848",
+  "priceRange": "₹₹",
+  "email": "roomslider.in@gmail.com",
+  "foundingDate": "2026-08-10",
+  "founder": {
+    "@type": "Person",
+    "name": "Hariom",
+    "jobTitle": "CEO & Founder"
+  },
+  "sameAs": [
+    "https://instagram.com/roomslider",
+    "https://facebook.com/roomslider"
+  ]
+}
     </script>
-
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
   <body>
     <div id="root"></div>
