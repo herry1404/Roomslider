@@ -3,10 +3,12 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Owner = require("../models/Owner");
+const Follow = require("../models/Follow");
 const Room = require("../models/room.model");
 const ListingEngagement = require("../models/ListingEngagement");
 const { createUniqueSlug } = require("../utils/publicSlug");
 const { notifyAdmin } = require("../services/adminAlert.service");
+const { ownerUpdateSchema } = require("../validators/owner.validator");
 
 const createOwnerToken = (owner) => {
   if (!process.env.JWT_SECRET) {
@@ -171,11 +173,18 @@ const getSingleOwner = async (req, res) => {
 // ===============================
 const updateOwner = async (req, res) => {
   try {
-    const { name, propertyName } = req.body;
+    const validation = ownerUpdateSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({
+        message: "Invalid owner profile",
+        errors: validation.error.issues.map((issue) => issue.message),
+      });
+    }
+
     const owner = await Owner.findByIdAndUpdate(
       req.params.id,
-      { name, propertyName },
-      { new: true }
+      validation.data,
+      { new: true, runValidators: true }
     ).select("-password");
 
     if (!owner) return res.status(404).json({ message: "Owner not found" });
@@ -248,7 +257,7 @@ const getPublicOwnerProfile = async (req, res) => {
     const idOrSlug = req.params.id;
     const query = /^[0-9a-fA-F]{24}$/.test(idOrSlug) ? { _id: idOrSlug } : { slug: idOrSlug };
     const owner = await Owner.findOne(query).select(
-      "name propertyName slug instagram facebook youtube createdAt isVerified"
+      "name propertyName slug instagram facebook youtube createdAt isVerified bio photo area"
     );
     if (!owner) return res.status(404).json({ message: "Owner not found" });
     if (!owner.slug) {
@@ -264,9 +273,37 @@ const getPublicOwnerProfile = async (req, res) => {
   }
 };
 
+const getOwnerProfileBySlug = async (req, res) => {
+  try {
+    const owner = await Owner.findOne({ slug: req.params.slug }).select(
+      "name propertyName slug bio photo area isVerified"
+    );
+    if (!owner) return res.status(404).json({ success: false, message: "Owner not found" });
+
+    const [listingsCount, followersCount, isFollowing] = await Promise.all([
+      Room.countDocuments({ owner: owner._id, status: "vacant" }),
+      Follow.countDocuments({ owner: owner._id }),
+      ["user", "admin"].includes(req.user?.role)
+        ? Follow.exists({ owner: owner._id, follower: req.user._id })
+        : Promise.resolve(false),
+    ]);
+
+    res.json({
+      success: true,
+      owner,
+      listingsCount,
+      followersCount,
+      isFollowing: Boolean(isFollowing),
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: safeMsg(error) });
+  }
+};
+
 module.exports = {
   createOwner,
   getPublicOwnerProfile,
+  getOwnerProfileBySlug,
   ownerLogin,
   getAllOwners,
   getSingleOwner,

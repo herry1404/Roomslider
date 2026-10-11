@@ -40,7 +40,7 @@ const FurnitureList = lazy(() => import("./pages/Furniture/FurnitureList"));
 const AddFurniture = lazy(() => import("./pages/Admin/AddFurniture"));
 const ManageFurnitureRequests = lazy(() => import("./pages/Admin/ManageFurnitureRequests"));
 const ServiceList = lazy(() => import("./pages/Services/ServiceList"));
-const OwnerProfile = lazy(() => import("./pages/OwnerProfile/OwnerProfile"));
+const OwnerPublicProfile = lazy(() => import("./pages/OwnerPublicProfile/OwnerPublicProfile"));
 const PropertyPage = lazy(() => import("./pages/PropertyPage/PropertyPage"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const ProfileEdit = lazy(() => import("./pages/Profile/ProfileEdit"));
@@ -192,7 +192,8 @@ function App() {
         <Route path="/pg/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/hostels/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
         <Route path="/flats/:id" element={<MainLayout><PropertyDetails /></MainLayout>} />
-        <Route path="/owners/:id" element={<MainLayout><OwnerProfile /></MainLayout>} />
+        <Route path="/owners/:slug" element={<MainLayout><OwnerPublicProfile /></MainLayout>} />
+        <Route path="/owner/:slug" element={<MainLayout><OwnerPublicProfile /></MainLayout>} />
         <Route path="/property/:id" element={<MainLayout><PropertyPage /></MainLayout>} />
         <Route path="/pg" element={<MainLayout><PG /></MainLayout>} />
         <Route path="/hostels" element={<MainLayout><Hostels /></MainLayout>} />

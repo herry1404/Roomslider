@@ -4,6 +4,9 @@ const slugify = require('slugify');
 
 const ownerSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  bio: { type: String, trim: true, maxlength: 150, default: "" },
+  photo: { type: String, trim: true, default: "" },
+  area: { type: String, trim: true, maxlength: 100, default: "" },
   phone: {
     type: String,
     required: true,

@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { protect } = require("../middleware/auth.middleware");
+const { protect, optionalAuth } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
 
 const {
   createOwner,
   getPublicOwnerProfile,
+  getOwnerProfileBySlug,
   ownerLogin,
   getAllOwners,
   getSingleOwner,
@@ -35,7 +36,8 @@ router.get("/", protect, adminOnly, getAllOwners);
 // ===============================
 router.get("/public/:id", getPublicOwnerProfile);
 router.get("/me", protect, getMyRooms);
-router.get("/:id", protect, adminOnly, getSingleOwner);
+router.get("/admin/:id", protect, adminOnly, getSingleOwner);
+router.get("/:slug", optionalAuth, getOwnerProfileBySlug);
 
 // ===============================
 // Update Owner

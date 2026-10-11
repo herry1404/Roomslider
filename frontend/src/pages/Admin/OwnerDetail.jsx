@@ -17,7 +17,7 @@ function OwnerDetail() {
   useEffect(() => {
     const fetchOwner = async () => {
       try {
-        const res = await api.get(`/owners/${id}`);
+        const res = await api.get(`/owners/admin/${id}`);
         setOwner(res.data.owner);
         setRooms(res.data.rooms || []);
       } catch (error) {
