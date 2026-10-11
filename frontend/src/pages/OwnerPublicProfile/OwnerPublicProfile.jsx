@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
@@ -14,6 +14,8 @@ function OwnerPublicProfile() {
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("reels");
   const [rooms, setRooms] = useState([]);
+  const [reels, setReels] = useState([]);
+  const [reelsLoading, setReelsLoading] = useState(false);
   const [roomsLoaded, setRoomsLoaded] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(false);
   const [following, setFollowing] = useState(false);
@@ -30,15 +32,28 @@ function OwnerPublicProfile() {
       setError("");
       setRooms([]);
       setRoomsLoaded(false);
+      setReels([]);
       try {
         const { data } = await api.get(`/owners/${encodeURIComponent(slug)}`);
         if (cancelled) return;
         setProfile(data.owner);
         setFollowing(data.isFollowing);
         setFollowersCount(data.followersCount);
+        setReelsLoading(true);
+        api.get(`/owners/${encodeURIComponent(slug)}/reels`)
+          .then((reelsResponse) => {
+            if (!cancelled) setReels(reelsResponse.data.reels || []);
+          })
+          .catch((reelsError) => {
+            if (!cancelled) setError(reelsError.response?.data?.message || "Unable to load reels.");
+          })
+          .finally(() => {
+            if (!cancelled) setReelsLoading(false);
+          });
       } catch (fetchError) {
         if (cancelled) return;
         setProfile(null);
+        setReels([]);
         setError(fetchError.response?.data?.message || "Unable to load this owner profile.");
       } finally {
         if (!cancelled) setLoading(false);
@@ -171,7 +186,20 @@ function OwnerPublicProfile() {
 
       <section className="owner-public-content">
         {activeTab === "reels" ? (
-          <div className="owner-public-empty">No reels yet.</div>
+            reelsLoading ? (
+              <div className="owner-public-empty" role="status">Loading reels…</div>
+            ) : reels.length ? (
+              <div className="owner-reel-grid">
+                {reels.map((reel) => (
+                  <Link className="owner-reel-tile" to="/reels" key={reel._id}>
+                    <img src={reel.thumbnailUrl} alt={reel.caption || `${displayName} room reel`} loading="lazy" />
+                    {reel.caption && <span>{reel.caption}</span>}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="owner-public-empty">No reels yet.</div>
+            )
         ) : roomsLoading ? (
           <div className="owner-public-empty" role="status">Loading listings…</div>
         ) : rooms.length ? (

@@ -13,6 +13,7 @@ const assistantRoutes = require("./routes/assistant.routes");
 const adminRoutes = require("./routes/admin.routes"); // ✅ Added
 const ownerRoutes = require("./routes/owner.routes"); // ✅ Added for Owner Portal
 const followRoutes = require("./routes/follow.routes");
+const reelRoutes = require("./routes/reel.routes");
 const electricityRoutes = require("./routes/electricity.routes");
 const expenseRoutes = require("./routes/expense.routes");
 const notificationRoutes = require("./routes/notification.routes");
@@ -257,6 +258,7 @@ app.use(
 );
 
 app.use("/api/follow", followRoutes);
+app.use("/api/reels", reelRoutes);
 
 
 // ✅ MESS ROUTES

@@ -15,6 +15,7 @@ const {
   updateOwner,
   deleteOwner,
 } = require("../controllers/owner.controller");
+const { getOwnerReels } = require("../controllers/reel.controller");
 
 // ===============================
 // Owner Login (public)
@@ -37,6 +38,7 @@ router.get("/", protect, adminOnly, getAllOwners);
 router.get("/public/:id", getPublicOwnerProfile);
 router.get("/me", protect, getMyRooms);
 router.get("/admin/:id", protect, adminOnly, getSingleOwner);
+router.get("/:slug/reels", getOwnerReels);
 router.get("/:slug", optionalAuth, getOwnerProfileBySlug);
 
 // ===============================

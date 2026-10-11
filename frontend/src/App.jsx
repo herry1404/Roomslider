@@ -106,6 +106,9 @@ const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateRep
 const PushNotifications = lazy(() => import("./pages/Admin/PushNotifications"));
 const AdminAnalytics = lazy(() => import("./pages/Admin/AdminAnalytics"));
 const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
+const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
+const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
+const Reels = lazy(() => import("./pages/Reels/Reels"));
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 
 const AdminRoute = lazy(() => import("./components/AdminRoute"));
@@ -170,6 +173,7 @@ function App() {
         <Route path="/mess/dashboard" element={<MessRoute><MessOwnerDashboard /></MessRoute>} />
         <Route path="/mess/:id" element={<MainLayout><MessDetail /></MainLayout>} />
         <Route path="/explore" element={<MainLayout><Explore /></MainLayout>} />
+        <Route path="/reels" element={<MainLayout><Reels /></MainLayout>} />
         <Route path="/social-work" element={<MainLayout><SocialWork /></MainLayout>} />
         <Route path="/social-work/:category" element={<MainLayout><SocialWork /></MainLayout>} />
         <Route path="/social-work/:category/:slug" element={<MainLayout><SocialWork /></MainLayout>} />
@@ -219,6 +223,7 @@ function App() {
         <Route path="/hourly-rooms/:id/book" element={<HourlyRoomCheckout />} />
         <Route path="/hourly-bookings/:id/receipt" element={<HourlyBookingReceipt />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
+        <Route path="/owner/reels" element={<OwnerRoute><OwnerReels /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />
         <Route path="/owner/electricity" element={<OwnerRoute><OwnerElectricity /></OwnerRoute>} />
@@ -230,6 +235,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+        <Route path="/admin/reels" element={<AdminRoute><ManageReels /></AdminRoute>} />
         <Route path="/admin/rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />
         <Route path="/admin/rooms/add" element={<AdminRoute><AddRoom /></AdminRoute>} />
         <Route path="/admin/rooms/edit/:id" element={<AdminRoute><EditRoom /></AdminRoute>} />

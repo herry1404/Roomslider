@@ -24,6 +24,7 @@ import {
   Droplet,
   ShieldAlert,
   BarChart3,
+  Clapperboard,
 } from "lucide-react";
 
 import { Link, NavLink } from "react-router-dom";
@@ -51,6 +52,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
         { title: "Hourly / Short Stay", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
+        { title: "Reels", icon: <Clapperboard size={18} />, path: "/admin/reels" },
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Push Notifications", icon: <Megaphone size={18} />, path: "/admin/push" },
