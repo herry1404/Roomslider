@@ -75,7 +75,7 @@ const getMenuUrl = (ad) => {
   if (ad.targetBy === "location") return null;
   const cafe = ad.cafe || "";
   if (!cafe || cafe === "all") return null;
-  const knownLocations = { wowpav: "bhawarkua", "htl-cafe": "indrapuri", htlcafe: "indrapuri", biryanikendra: "sapnasangeeta" };
+  const knownLocations = { wowpav: "bhawarkua", waffleo: "bhawarkua", yuvanamritulya: "vishnupuri", "htl-cafe": "indrapuri", htlcafe: "indrapuri", biryanikendra: "sapnasangeeta" };
   const cafePath = cafe === "htlcafe" ? "htl-cafe" : cafe;
   const location = ad.location || knownLocations[cafe];
   return location ? `https://roomslider.in/cafe/${location}/${cafePath}` : null;

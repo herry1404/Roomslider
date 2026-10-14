@@ -1,7 +1,8 @@
 (function () {
   var body = document.body;
   var params = new URLSearchParams(window.location.search);
-  var cafe = params.get("cafe") || body.dataset.cafe;
+  var pathCafe = window.location.pathname.replace(/\/+$/, "").split("/").pop();
+  var cafe = params.get("cafe") || (pathCafe === "waffleo" ? "waffleo" : body.dataset.cafe);
   var location = params.get("location") || body.dataset.location;
   if (!cafe || !location) return;
 

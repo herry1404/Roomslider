@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>श्री युवान अमृततुल्य – Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8D3BC; --card:#FCE4D4; --ink:#1F1B18; --muted:#6B5446; --line:#D9A98C;
+  --black:#1C1A19; --cream:#FBE6D6; --accent:#B8321F;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind',system-ui,sans-serif;font-size:17px;line-height:1.45}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 48px}
+header{text-align:center;padding:12px 0 28px}
+header h1{font-family:'Baloo 2','Hind',sans-serif;font-weight:800;font-size:clamp(2.6rem,9vw,4.6rem);line-height:1.05;margin:0;color:var(--black)}
+header p{margin:0;font-family:'Baloo 2','Hind',sans-serif;font-weight:700;font-size:clamp(1.3rem,4.5vw,2rem);color:var(--accent)}
+header span{display:block;margin-top:10px;color:var(--muted);font-size:.95rem}
+.grid{display:grid;gap:26px;grid-template-columns:1fr}
+@media(min-width:800px){.grid{grid-template-columns:1fr 1.15fr;align-items:start}}
+.col{display:grid;gap:26px}
+section{padding:0}
+h2{font-family:'Baloo 2','Hind',sans-serif;font-weight:600;font-size:1.5rem;line-height:1.2;margin:0 0 8px;padding:6px 44px 6px 16px;color:var(--cream);background:var(--black);clip-path:polygon(0 0,100% 0,calc(100% - 28px) 100%,0 100%);display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,360px)}
+.hero h2{width:min(100%,300px)}
+.sizes{display:flex;gap:6px;font-family:'Hind',sans-serif;font-weight:500;font-size:.75rem;color:#D9B8A3}
+.sizes b{width:2.8rem;text-align:right;font-weight:500}
+ul{list-style:none;margin:0;padding:0 4px}
+li{display:flex;align-items:baseline;gap:10px;padding:9px 0}
+.name{font-weight:600}
+.dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:12px}
+.p{display:flex;gap:6px;font-weight:700;font-variant-numeric:tabular-nums}
+.p i{font-style:normal;width:2.8rem;text-align:right}
+.price{font-weight:700;font-variant-numeric:tabular-nums}
+.hero .price{background:var(--black);color:var(--cream);padding:1px 11px;border-radius:6px}
+.note{margin-top:30px;background:#FFFDF9;border:3px solid var(--accent);border-radius:10px;padding:16px 20px;text-align:center;max-width:560px;margin-left:auto;margin-right:auto}
+.note p{margin:0;font-weight:500}
+.note .hi{font-weight:700;color:var(--accent)}
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px;padding:12px}
+.footer-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin:12px 0}
+.footer-contact a{color:var(--accent)}
+.room-link{display:block;margin-top:14px;color:var(--accent);font-weight:700;text-decoration:none}
+.adtop,.adbot{max-width:980px;margin:10px auto;padding:0 18px}
+.adtop-inner,.adbot a{display:block;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);overflow:hidden;text-decoration:none}
+.adtop-inner{display:flex;align-items:center;gap:10px;padding:9px 12px}
+.adtop img{width:32px;height:32px;object-fit:contain}
+.adtop small,.adbot small{font-size:.65rem;opacity:.7}
+.adtop small{margin-left:auto}
+.adbot img{display:block;width:100%;height:auto}
+.adbot span{display:block;padding:10px 12px}
+.adbot small{display:block;text-align:right;padding:0 12px 6px}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body data-cafe="yuvanamritulya" data-location="vishnupuri">
+<div class="adtop" id="adtop" hidden><a class="adtop-inner" id="adtopa" target="_blank" rel="noopener sponsored"><img id="adtopimg" alt=""><span id="adtoptext"></span><small>Ad</small></a></div>
+<div class="wrap">
+  <header>
+    <h1>श्री युवान</h1>
+    <p>अमृततुल्य</p>
+    <span>Chai · Coffee · Vada Pav · Shakes</span>
+    <span>📍 Vishnupuri</span>
+  </header>
+
+  <main class="grid">
+    <div class="col">
+      <section aria-labelledby="tea">
+        <h2 id="tea">Tea <span class="sizes"><b>Small</b><b>Large</b></span></h2>
+        <ul>
+          <li><span class="name">Jaggery Tea</span><span class="dots"></span><span class="p"><i>₹10</i><i>₹20</i></span></li>
+          <li><span class="name">Ginger Tea</span><span class="dots"></span><span class="p"><i>₹10</i><i>₹20</i></span></li>
+          <li><span class="name">Kesar Elaichi</span><span class="dots"></span><span class="p"><i>₹10</i><i>₹20</i></span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="coffee">
+        <h2 id="coffee">Coffee <span class="sizes"><b>Small</b><b>Large</b></span></h2>
+        <ul>
+          <li><span class="name">Hot Coffee</span><span class="dots"></span><span class="p"><i>₹15</i><i>₹25</i></span></li>
+          <li><span class="name">Black Coffee</span><span class="dots"></span><span class="p"><i></i><i>₹15</i></span></li>
+          <li><span class="name">Cold Coffee</span><span class="dots"></span><span class="p"><i></i><i>₹40</i></span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="shakes">
+        <h2 id="shakes">Milk Shakes</h2>
+        <ul>
+          <li><span class="name">Strawberry Shake</span><span class="dots"></span><span class="price">₹40</span></li>
+          <li><span class="name">Butter Scotch Shake</span><span class="dots"></span><span class="price">₹40</span></li>
+          <li><span class="name">Chocolate Shake</span><span class="dots"></span><span class="price">₹40</span></li>
+          <li><span class="name">Oreo Shake</span><span class="dots"></span><span class="price">₹50</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="hero" aria-labelledby="vp">
+      <h2 id="vp">Vada Pav</h2>
+      <ul>
+        <li><span class="name">Butter Vada Pav</span><span class="dots"></span><span class="price">₹25</span></li>
+        <li><span class="name">Masala Vada Pav</span><span class="dots"></span><span class="price">₹35</span></li>
+        <li><span class="name">Tandoori Vada Pav</span><span class="dots"></span><span class="price">₹35</span></li>
+        <li><span class="name">Churra Vada Pav</span><span class="dots"></span><span class="price">₹35</span></li>
+        <li><span class="name">Mayo Vada Pav</span><span class="dots"></span><span class="price">₹35</span></li>
+        <li><span class="name">Ulta Vada Pav</span><span class="dots"></span><span class="price">₹45</span></li>
+        <li><span class="name">Cheese Vada Pav</span><span class="dots"></span><span class="price">₹45</span></li>
+        <li><span class="name">Double Cheese Vada Pav</span><span class="dots"></span><span class="price">₹60</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <div class="note">
+    <p>कृपया कप ट्रे में और प्लेट डस्टबिन में डालें।</p>
+    <p class="hi">अपनी सभ्यता का परिचय दें। धन्यवाद 🙂</p>
+  </div>
+  <div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
+  <footer>
+    <div>All prices in ₹</div>
+    <div class="footer-contact"><strong>Need your own QR menu? Contact us</strong><a href="tel:+918889631476">+91 8889631476</a><a href="tel:+919131181848">+91 9131181848</a><a href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a></div>
+    <a class="room-link" href="https://roomslider.in/">Searching for a room? Visit Roomslider.in</a>
+  </footer>
+</div>
+<script>
+(function(){
+ function ok(url){try{return new URL(url).protocol==='https:'}catch(error){return false}}
+ try{
+  var controller=window.AbortController?new AbortController():null;
+  var timeout=setTimeout(function(){if(controller)controller.abort()},4000);
+  fetch('https://roomslider-api.onrender.com/api/ads?cafe=yuvanamritulya&location=vishnupuri',{signal:controller?controller.signal:undefined,credentials:'omit'})
+   .then(function(response){if(!response.ok)throw new Error('Ad request failed');return response.json()})
+   .then(function(data){
+    clearTimeout(timeout);
+    var top=data&&data.top;
+    if(top&&top.text){
+     var topLink=document.getElementById('adtopa'),topImage=document.getElementById('adtopimg');
+     topLink.href=ok(top.url)?top.url:'#';if(top.id)topLink.dataset.adId=top.id;
+     document.getElementById('adtoptext').textContent=String(top.text).slice(0,120);
+     if(ok(top.logo)){topImage.src=top.logo;topImage.onerror=function(){topImage.hidden=true}}else topImage.hidden=true;
+     document.getElementById('adtop').hidden=false;
+    }
+    var bottom=data&&data.bottom;
+    if(bottom&&(bottom.image||bottom.text)){
+     var bottomLink=document.getElementById('adbota'),bottomImage=document.getElementById('adbotimg');
+     bottomLink.href=ok(bottom.url)?bottom.url:'#';if(bottom.id)bottomLink.dataset.adId=bottom.id;
+     if(ok(bottom.image)){bottomImage.src=bottom.image;bottomImage.onerror=function(){document.getElementById('adbot').hidden=true}}else bottomImage.hidden=true;
+     document.getElementById('adbott').textContent=bottom.text?String(bottom.text).slice(0,160):'';
+     document.getElementById('adbot').hidden=false;
+    }
+   })
+   .catch(function(){clearTimeout(timeout)});
+ }catch(error){}
+})();
+</script>
+<script src="/cafe-analytics.js" defer></script>
+</body>
+</html>

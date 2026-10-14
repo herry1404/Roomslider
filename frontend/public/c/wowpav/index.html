@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wow Pav & Waffleo – Menu</title>
+<title>Wow Pav – Menu</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fff8ef;--card:#fff;--tx:#2a1a12;--mut:#7a6558;--ac:#d92b1f;--ac2:#f5a623;--bd:#f0dfcc}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15100d;--card:#221915;--tx:#f7ece2;--mut:#b9a698;--ac:#ff5a47;--ac2:#ffc247;--bd:#3a2c25}}
@@ -42,6 +42,8 @@ h1{font-size:2rem;margin-top:8px;letter-spacing:1px;animation:up .8s .3s both}
 .tabs{display:flex;gap:8px;justify-content:center;padding:10px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
 .tabs button{border:2px solid var(--ac);background:none;color:var(--tx);padding:9px 18px;border-radius:30px;font-weight:700;font-size:1rem;cursor:pointer;transition:.25s}
 .tabs button.on{background:var(--ac);color:#fff;transform:scale(1.06)}
+.tabs a{border:2px solid var(--ac);background:none;color:var(--tx);padding:9px 18px;border-radius:30px;font-weight:700;font-size:1rem;text-decoration:none;transition:.25s}
+.tabs a.on{background:var(--ac);color:#fff;transform:scale(1.06)}
 .bar{display:flex;gap:8px;padding:0 12px 8px;max-width:900px;margin:auto}
 .bar input{flex:1;padding:11px 16px;border-radius:30px;border:2px solid var(--bd);background:var(--card);color:var(--tx);font-size:1rem}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 10px;max-width:900px;margin:auto;scrollbar-width:none}
@@ -58,6 +60,9 @@ h2{font-size:1.15rem;color:var(--ac);margin-bottom:8px;display:flex;align-items:
 .combo h2,.combo .it b{color:#fff}
 .combo small{display:block;opacity:.9}
 footer{text-align:center;color:var(--mut);padding:20px 16px 30px;font-size:.9rem}
+.ft-contact{margin:16px auto 8px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px 14px}
+.ft-contact a{color:var(--ac)}
+.ft-room{display:block;margin-top:12px;font-weight:700;color:var(--ac);text-decoration:none}
 .hide{display:none}
 @media (prefers-reduced-motion:reduce){.ticker-track{animation:none;width:100%}.ticker-group[aria-hidden="true"]{display:none}.ticker-group:not([aria-hidden="true"]){flex-wrap:wrap;width:100%}}
 </style>
@@ -73,12 +78,12 @@ footer{text-align:center;color:var(--mut);padding:20px 16px 30px;font-size:.9rem
 <div class="ticker hide" id="ticker" aria-label="Combo Offers">
  <div class="ticker-track" id="tickerTrack"></div>
 </div>
-<div class="tabs"><button id="b0" class="on">🍔 Wow Pav</button><button id="b1">🧇 Waffleo</button></div>
+<nav class="tabs" aria-label="Cafe menus"><a id="b0" href="/cafe/bhawarkua/wowpav">🍔 Wow Pav</a><a id="b1" href="/cafe/bhawarkua/waffleo">🧇 Waffleo</a></nav>
 <div class="bar"><input id="q" type="search" placeholder="Search… pizza, momos, waffle"></div>
 <div class="chips" id="chips"></div>
 <main id="m"></main>
 <div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
-<footer id="ft"></footer>
+<footer><span id="ft"></span><div class="ft-contact"><strong>Need your own QR menu? Contact us</strong><a href="tel:+918889631476">+91 8889631476</a><a href="tel:+919131181848">+91 9131181848</a><a href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a></div><a class="ft-room" href="https://roomslider.in/">Searching for a room? Visit Roomslider.in</a></footer>
 <script>
 var LOGO=[
 '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#d92b1f"/><circle cx="60" cy="60" r="56" fill="none" stroke="#f5a623" stroke-width="4"/><path d="M22 62a38 30 0 0 1 76 0z" fill="#f5a623"/><circle cx="46" cy="46" r="2.5" fill="#fff3"/><circle cx="62" cy="40" r="2.5" fill="#fff3"/><circle cx="76" cy="48" r="2.5" fill="#fff3"/><rect x="24" y="64" width="72" height="6" rx="3" fill="#5aa832"/><rect x="26" y="70" width="68" height="7" rx="3" fill="#7a3a1a"/><path d="M24 78h72a6 6 0 0 1-6 10H30a6 6 0 0 1-6-10z" fill="#f5a623"/><text x="60" y="108" text-anchor="middle" font-size="15" font-weight="900" fill="#fff" font-family="Georgia,serif">WOW PAV</text></svg>',
@@ -116,14 +121,17 @@ var D=[[
 ["Refreshers","🍹","Mojito Mint 140|Blue Curaçao (Blue Lagoon) 150|Green Apple 150|Watermelon 150|Strawberry 150|Passion Fruit & Peach 150|Indian Fusion (Jamun & Ginger) 150"]
 ]];
 var INFO=[["WOW PAV","Good Food. Good Mood.","📍 Shop No. 1, Siddharth Nagar, Vishnupuri, Bhawarkuan (opposite Tealogy) · ₹2000+ order par 1 saal ki Membership Card free!"],["WAFFLEO","Crafted for Cravings. Made for Moments.","Freshly made every time · Premium ingredients"]];
-var cur=0,m=document.getElementById('m'),io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.08});
+var cur=location.pathname.replace(/\/+$/,'').endsWith('/waffleo')?1:0,m=document.getElementById('m'),io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.08});
 function row(s){var i=s.lastIndexOf(' ');return '<div class="it"><span>'+s.slice(0,i)+'</span><i></i><b>'+(isNaN(s.slice(i+1))?'ask':'₹'+s.slice(i+1))+'</b></div>'}
 function render(){
- document.getElementById('logo').innerHTML=LOGO[cur];
+ document.getElementById('logo').innerHTML='<img src="'+(cur?'/wa.png':'/wo.png')+'" alt="'+INFO[cur][0]+' logo" style="width:100%;height:100%;object-fit:contain">';
  document.getElementById('ttl').textContent=INFO[cur][0];
  document.getElementById('tag').textContent=INFO[cur][1];
  document.getElementById('ft').textContent=INFO[cur][2];
+ document.title=INFO[cur][0]+' – Menu';
  document.documentElement.dataset.theme=cur?'waffle':'';
+ document.getElementById('b0').className=cur?'':'on';document.getElementById('b1').className=cur?'on':'';
+ document.body.dataset.cafe=cur?'waffleo':'wowpav';
  var h='',c='';
  D[cur].forEach(function(s,n){
   c+='<a href="#s'+n+'">'+s[1]+' '+s[0]+'</a>';
@@ -144,7 +152,6 @@ function render(){
  m.querySelectorAll('section').forEach(function(x){io.observe(x)});
  document.getElementById('q').value='';
 }
-[0,1].forEach(function(n){document.getElementById('b'+n).onclick=function(){cur=n;document.getElementById('b0').className=n?'':'on';document.getElementById('b1').className=n?'on':'';render()}});
 document.getElementById('q').oninput=function(){var v=this.value.toLowerCase();m.querySelectorAll('section').forEach(function(s){var any=0;s.querySelectorAll('.it').forEach(function(r){var ok=!v||r.textContent.toLowerCase().indexOf(v)>-1||s.querySelector('h2').textContent.toLowerCase().indexOf(v)>-1;r.classList.toggle('hide',!ok);if(ok)any=1});s.classList.toggle('hide',!any);if(any)s.classList.add('in')})};
 render();
 (function(){
@@ -153,7 +160,7 @@ render();
   var ctl=window.AbortController?new AbortController():null;
   var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
   var adQuery=new URLSearchParams(window.location.search);
-  var adCafe=adQuery.get('cafe')||'wowpav',adLocation=adQuery.get('location')||'bhawarkua';
+  var adCafe=adQuery.get('cafe')||document.body.dataset.cafe,adLocation=adQuery.get('location')||'bhawarkua';
   fetch("https://roomslider-api.onrender.com/api/ads?cafe="+encodeURIComponent(adCafe)+"&location="+encodeURIComponent(adLocation),{signal:ctl?ctl.signal:undefined,credentials:'omit'})
    .then(function(r){if(!r.ok)throw 0;return r.json()})
    .then(function(d){
