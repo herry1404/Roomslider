@@ -46,6 +46,7 @@ const socialRoutes = require("./routes/social.routes");
 const donationRoutes = require("./routes/donation.routes");
 const bloodRequestRoutes = require("./routes/bloodRequest.routes");
 const telegramWebhookRoutes = require("./routes/telegramWebhook.routes");
+const adRoutes = require("./routes/ad.routes");
 
 
 const {
@@ -138,6 +139,7 @@ app.use(
 
 
       if(
+        origin === "https://roomslider.in" ||
         origin.includes("roomslider.in")
       ){
 
@@ -224,6 +226,7 @@ app.use(
   authRoutes
 );
 
+app.use("/api/ads", adRoutes);
 
 
 app.use(

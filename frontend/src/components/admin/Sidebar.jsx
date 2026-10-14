@@ -67,6 +67,7 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Vehicle Requests", icon: <ClipboardList size={18} />, path: "/admin/vehicle-requests" },
         { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
+        { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
         { title: "Service Requests", icon: <ClipboardList size={18} />, path: "/admin/service-requests", badge: newServiceRequests },
         { title: "Social Work", icon: <HeartPulse size={18} />, path: "/admin/social" },

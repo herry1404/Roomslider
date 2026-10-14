@@ -2,6 +2,8 @@
   "rewrites": [
     { "source": "/sitemap", "destination": "/index.html" },
     { "source": "/sitemap.xml", "destination": "https://roomslider-api.onrender.com/sitemap.xml" },
+    { "source": "/cafe/indrapuri/htl-cafe/:path*", "destination": "/c/htlcafe/index.html" },
+    { "source": "/htlcafe/:path*", "destination": "/c/htlcafe/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

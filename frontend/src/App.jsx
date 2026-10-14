@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -87,6 +87,7 @@ const ManageRooms = lazy(() => import("./pages/Admin/ManageRooms"));
 const ManageUsers = lazy(() => import("./pages/Admin/ManageUsers"));
 const ManageOwners = lazy(() => import("./pages/Admin/ManageOwners"));
 const ManageLaundryVendors = lazy(() => import("./pages/Admin/ManageLaundryVendors"));
+const ManageAds = lazy(() => import("./pages/Admin/ManageAds"));
 const ManageLoans = lazy(() => import("./pages/Admin/ManageLoans"));
 const ManageMess = lazy(() => import("./pages/Admin/ManageMess"));
 const ManageHourlyRooms = lazy(() => import("./pages/Admin/ManageHourlyRooms"));
@@ -127,6 +128,23 @@ function PrivateRouteRobots() {
   );
 }
 
+function PublicCafeMenu({ legacy = false }) {
+  const { cafeSlug, location } = useParams();
+  const menuSlug = legacy || cafeSlug === "htl-cafe" ? "htlcafe" : cafeSlug;
+  const query = new URLSearchParams({
+    cafe: menuSlug,
+    location: legacy ? "indrapuri" : location,
+  });
+
+  return (
+    <iframe
+      title="Cafe menu"
+      src={`/c/${encodeURIComponent(menuSlug)}/index.html?${query}`}
+      style={{ position: "fixed", inset: 0, width: "100%", height: "100%", border: 0 }}
+    />
+  );
+}
+
 function App() {
 
   const { showPreferences, dismissPreferencesPrompt } = useAuth();
@@ -157,6 +175,8 @@ function App() {
       )}
       <Suspense fallback={<div className="route-loading" role="status">Loading page…</div>}>
       <Routes>
+        <Route path="/htlcafe" element={<PublicCafeMenu legacy />} />
+        <Route path="/cafe/:location/:cafeSlug" element={<PublicCafeMenu />} />
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
         <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
@@ -243,6 +263,7 @@ function App() {
         <Route path="/admin/users" element={<AdminRoute><ManageUsers /></AdminRoute>} />
         <Route path="/admin/owners" element={<AdminRoute><ManageOwners /></AdminRoute>} />
         <Route path="/admin/laundry-vendors" element={<AdminRoute><ManageLaundryVendors /></AdminRoute>} />
+        <Route path="/admin/ads" element={<AdminRoute><ManageAds /></AdminRoute>} />
         <Route path="/admin/loans" element={<AdminRoute><ManageLoans /></AdminRoute>} />
         <Route path="/admin/vehicles" element={<AdminRoute><ManageVehicles /></AdminRoute>} />
         <Route path="/admin/vehicles/add" element={<AdminRoute><AddVehicle /></AdminRoute>} />
