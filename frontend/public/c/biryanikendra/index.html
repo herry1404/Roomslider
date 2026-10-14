@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2b2380">
+<title>Biryani Kendra – Menu</title>
+<meta name="description" content="Biryani Kendra – menu with prices.">
+<link rel="icon" type="image/webp" href="/c/biryanikendra/bk-logo.webp">
+<script>
+(function(){var t=null;try{t=localStorage.getItem('bk-theme')}catch(e){}
+if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<style>
+:root{--bg:#e8e4f8;--hero:#2b2380;--hero-ink:#fff;--ink:#2b2380;--accent:#3f2f9a;--green:#16a34a;--card:#faf9ff;--surface:#fff;--line:rgba(43,35,128,0.18);--dot:rgba(43,35,128,0.3);--tl:#e8e4f8;--clear:transparent;--glow:rgba(255,196,60,.22);--shadow:rgba(0,0,0,.45);--hero-wash:rgba(255,255,255,.12);--hero-edge:rgba(255,255,255,.25);--toggle-edge:rgba(255,255,255,.3);--toggle-hover:rgba(255,255,255,.22);--footer-line:rgba(255,255,255,.18);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0b24;--hero:#17123f;--hero-ink:#fff;--ink:#ece9ff;--accent:#b3a8ff;--green:#22c55e;--card:#1a1642;--surface:#241f58;--line:rgba(190,180,255,0.2);--dot:rgba(190,180,255,0.35);--tl:#d9d3ff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e0b24;--hero:#17123f;--hero-ink:#fff;--ink:#ece9ff;--accent:#b3a8ff;--green:#22c55e;--card:#1a1642;--surface:#241f58;--line:rgba(190,180,255,0.2);--dot:rgba(190,180,255,0.35);--tl:#d9d3ff;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari","Noto Sans",sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+body,.hero,.bar,.cat,.chip,.v,.note,.adtop,.adbot a,.bar input,.em,.it,footer{transition:background-color .45s ease,color .45s ease,border-color .45s ease}
+a{color:inherit}
+.adtop{display:flex;align-items:center;gap:10px;background:var(--surface);border-bottom:1px solid var(--line);padding:6px 12px;font-size:.85rem}
+.adtop img{width:28px;height:28px;object-fit:contain;border-radius:6px;flex:none}
+.adtop a{text-decoration:none;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adtop small{margin-left:auto;font-size:.65rem;opacity:.55;flex:none}
+.hero{position:relative;background:var(--hero);color:var(--hero-ink);text-align:center;padding:30px 18px 26px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 50% 35%,var(--glow),var(--clear) 45%);animation:glow 6s ease-in-out infinite alternate;pointer-events:none}
+@keyframes glow{from{transform:scale(.9);opacity:.6}to{transform:scale(1.1);opacity:1}}
+.hero>*{position:relative}
+.logo{display:block;width:min(46vw,170px);height:auto;margin:0 auto 10px;filter:drop-shadow(0 8px 18px var(--shadow));animation:pop .9s cubic-bezier(.2,1.4,.4,1) both,float 4.5s ease-in-out .9s infinite}
+@keyframes pop{from{opacity:0;transform:scale(.6) rotate(-6deg)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.tag{display:inline-block;font-size:.85rem;background:var(--hero-wash);border:1px solid var(--hero-edge);padding:3px 12px;border-radius:999px;margin-bottom:10px}
+h1{font-size:clamp(2.6rem,13vw,4.5rem);line-height:1;font-weight:800;letter-spacing:-.02em}
+.tl{margin-top:8px;font-size:1.25rem;color:var(--tl);font-weight:600}
+.tg{position:absolute;top:12px;right:12px;z-index:3;width:42px;height:42px;border-radius:50%;border:1px solid var(--toggle-edge);background:var(--hero-wash);color:var(--hero-ink);font-size:1.2rem;cursor:pointer;display:grid;place-items:center;transition:transform .5s cubic-bezier(.3,1.5,.5,1),background-color .45s ease}
+.tg:hover{background:var(--toggle-hover)}
+.tg:active{transform:rotate(180deg) scale(.9)}
+.tg:focus-visible,.chip:focus-visible,.bar input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.tg span{display:block;animation:spin .5s ease}
+@keyframes spin{from{transform:rotate(-120deg) scale(.3);opacity:0}to{transform:none;opacity:1}}
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.bar input{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font:inherit;color:var(--ink);outline:0}
+.bar input:focus{border-color:var(--accent)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;text-decoration:none;font-weight:600;font-size:.9rem;border:1.5px solid var(--line);background:var(--surface);padding:5px 13px;border-radius:999px;transition:background .25s,color .25s,transform .25s}
+.chip.on{background:var(--green);border-color:var(--green);color:var(--hero-ink);transform:translateY(-1px)}
+main{max-width:1000px;margin:0 auto;padding:16px 14px 24px}
+.grid{display:grid;gap:14px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 8px;animation:rise .6s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.cat header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.em{width:38px;height:38px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-size:1.3rem;flex:none}
+h2{font-size:1.3rem;color:var(--ink);line-height:1.1}
+ul{list-style:none}
+.it{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-radius:8px;transition:background-color .45s ease,padding .25s}
+.it+.it{border-top:1px dashed var(--line)}
+.it:hover{background:var(--bg);padding-left:6px;padding-right:6px}
+.it .d{flex:1;min-width:10px;border-bottom:2px dotted var(--dot);transform:translateY(-4px)}
+.p{font-weight:700;color:var(--accent);white-space:nowrap}
+.p small{font-size:.8em;margin-right:1px}
+.empty{display:none;text-align:center;padding:30px 10px;opacity:.75}
+.adbot{max-width:1000px;margin:0 auto 20px;padding:0 14px}
+.adbot a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;text-align:center}
+.adbot img{display:block;width:100%;height:auto}
+.adbot span{display:block;padding:10px 12px;font-weight:600}
+.adbot small{display:block;text-align:right;font-size:.65rem;opacity:.5;padding:0 12px 6px}
+footer{background:var(--hero);color:var(--tl);text-align:center;padding:26px 18px 32px}
+footer .lg{width:64px;height:auto;margin:0 auto 6px;display:block}
+footer .nm{color:var(--hero-ink);font-size:1.4rem;font-weight:800}
+footer p{margin-top:4px}
+footer .by{margin-top:18px;padding-top:14px;border-top:1px solid var(--footer-line);font-weight:600;color:var(--hero-ink)}
+footer .ct{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center}
+footer .ct a{color:var(--tl)}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="adtop" id="adtop" hidden><img id="adtopimg" alt="" width="28" height="28"><a id="adtopa" target="_blank" rel="noopener sponsored"></a><small>Ad</small></div>
+<header class="hero">
+  <button class="tg" id="tg" type="button" aria-label="Dark / Light mode badlo"><span id="tgi">🌙</span></button>
+  <img class="logo" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="220" height="294">
+  <span class="tag">Pure Veg</span>
+  <h1>Biryani Kendra</h1>
+  <div class="tl">Pioneer of Veg Biryani</div>
+</header>
+<nav class="bar" aria-label="Menu">
+  <input id="q" type="search" placeholder="Search menu… (jaise: pizza, maggie)" aria-label="Search menu" autocomplete="off">
+  <div class="chips" id="chips"><a class="chip" href="#c-biryani" data-id="c-biryani">Biryani</a><a class="chip" href="#c-south-indian" data-id="c-south-indian">South Indian</a><a class="chip" href="#c-dessert-coffee" data-id="c-dessert-coffee">Dessert &amp; Coffee</a></div>
+</nav>
+<main>
+  <div class="grid" id="grid"><section class="cat" id="c-biryani" data-t="biryani"><header><span class="em" aria-hidden="true">🍛</span><div><h2>Biryani</h2></div></header><ul><li class="it" data-n="awadhi veg biryani"><span class="n">Awadhi Veg Biryani</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="veg dum biryani"><span class="n">Veg Dum Biryani</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-south-indian" data-t="south indian"><header><span class="em" aria-hidden="true">🍽️</span><div><h2>South Indian</h2></div></header><ul><li class="it" data-n="idli sambhar"><span class="n">Idli Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="vada sambhar"><span class="n">Vada Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="upma"><span class="n">Upma</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="idiyappam"><span class="n">Idiyappam</span><span class="d"></span><span class="p"><small>₹</small>50</span></li><li class="it" data-n="puttu"><span class="n">Puttu</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-dessert-coffee" data-t="dessert &amp; coffee"><header><span class="em" aria-hidden="true">🍮</span><div><h2>Dessert &amp; Coffee</h2></div></header><ul><li class="it" data-n="fruit custard"><span class="n">Fruit Custard</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="filter coffee"><span class="n">Filter Coffee</span><span class="d"></span><span class="p"><small>₹</small>20</span></li></ul></section></div>
+  <p class="empty" id="empty">Kuch nahi mila. Koi aur naam try karo.</p>
+</main>
+<div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
+<footer>
+  <img class="lg" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="64" height="86">
+  <div class="nm">Biryani Kendra</div>
+  <p>Pioneer of Veg Biryani</p>
+  <p class="by">Managed and designed by Tvarise</p>
+  <p>Need your own QR menu? Contact us</p>
+  <div class="ct">
+    <a href="tel:+918889631476">+91 8889631476</a>
+    <a href="tel:+919131181848">+91 9131181848</a>
+    <a href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a>
+  </div>
+</footer>
+<script>
+(function(){
+/* Theme: system default (auto), manual toggle saved in localStorage */
+var root=document.documentElement,tg=document.getElementById('tg'),tgi=document.getElementById('tgi'),mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':!!(mq&&mq.matches)}
+function paint(){tgi.textContent=isDark()?'☀️':'🌙';tgi.style.animation='none';void tgi.offsetWidth;tgi.style.animation='';
+  var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',isDark()?'#17123f':'#2b2380')}
+tg.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('bk-theme',n)}catch(e){}paint()});
+if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(!root.getAttribute('data-theme'))paint()});
+paint();
+
+var q=document.getElementById('q'),empty=document.getElementById('empty'),chips=document.getElementById('chips');
+var secs=[].slice.call(document.querySelectorAll('.cat'));
+secs.forEach(function(s,i){s.style.animationDelay=(i*.12)+'s'});
+q.addEventListener('input',function(){
+  var f=q.value.trim().toLowerCase(),shown=0;
+  secs.forEach(function(s){
+    var catMatch=f&&s.getAttribute('data-t').indexOf(f)>-1,any=false;
+    [].forEach.call(s.querySelectorAll('.it'),function(li){
+      var m=!f||catMatch||li.getAttribute('data-n').indexOf(f)>-1;
+      li.hidden=!m;if(m)any=true;
+    });
+    s.hidden=!any;if(any)shown++;
+  });
+  empty.style.display=shown?'none':'block';
+  chips.style.display=f?'none':'flex';
+});
+if('IntersectionObserver' in window){
+  var on=function(id){[].forEach.call(chips.children,function(c){c.classList.toggle('on',c.getAttribute('data-id')===id)})};
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)on(e.target.id)})},{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(function(s){io.observe(s)});
+}
+/* Ads: alag endpoint se. Fail/timeout/empty ho to strips hidden hi rehti hain. */
+function ok(u){return typeof u==='string'&&/^https:\/\//i.test(u)}
+function show(id){document.getElementById(id).hidden=false}
+try{
+  var ctl=window.AbortController?new AbortController():null;
+  var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
+  fetch("https://roomslider-api.onrender.com/api/ads?cafe=biryanikendra",{signal:ctl?ctl.signal:undefined,credentials:'omit'})
+    .then(function(r){if(!r.ok)throw 0;return r.json()})
+    .then(function(d){
+      clearTimeout(tm);
+      var a=d&&d.top;
+      if(a&&a.text){
+        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);
+        if(ok(a.url))el.href=a.url;
+        var im=document.getElementById('adtopimg');
+        if(ok(a.logo))im.src=a.logo;else im.hidden=true;
+        show('adtop');
+      }
+      var b=d&&d.bottom;
+      if(b&&(b.image||b.text)){
+        var l=document.getElementById('adbota');if(ok(b.url))l.href=b.url;
+        var bi=document.getElementById('adbotimg');
+        if(ok(b.image))bi.src=b.image;else bi.hidden=true;
+        document.getElementById('adbott').textContent=b.text?String(b.text).slice(0,160):'';
+        show('adbot');
+      }
+    })
+    .catch(function(){});
+}catch(e){}
+})();
+</script>
+</body>
+</html>

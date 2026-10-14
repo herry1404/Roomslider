@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/sitemap", "destination": "/index.html" },
     { "source": "/sitemap.xml", "destination": "https://roomslider-api.onrender.com/sitemap.xml" },
+    { "source": "/cafe/sapnasangeeta/biryanikendra/:path*", "destination": "/c/biryanikendra/index.html" },
     { "source": "/cafe/indrapuri/htl-cafe/:path*", "destination": "/c/htlcafe/index.html" },
     { "source": "/htlcafe/:path*", "destination": "/c/htlcafe/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
