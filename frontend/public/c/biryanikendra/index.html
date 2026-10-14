@@ -20,10 +20,10 @@ html{scroll-behavior:smooth;scroll-padding-top:120px}
 body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari","Noto Sans",sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
 body,.hero,.bar,.cat,.chip,.v,.note,.adtop,.adbot a,.bar input,.em,.it,footer{transition:background-color .45s ease,color .45s ease,border-color .45s ease}
 a{color:inherit}
-.adtop{display:flex;align-items:center;gap:10px;background:var(--surface);border-bottom:1px solid var(--line);padding:6px 12px;font-size:.85rem}
-.adtop img{width:28px;height:28px;object-fit:contain;border-radius:6px;flex:none}
-.adtop a{text-decoration:none;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.adtop small{margin-left:auto;font-size:.65rem;opacity:.55;flex:none}
+.adtop{display:flex;align-items:center;gap:12px;width:min(100% - 24px,1000px);margin:12px auto 0;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;font-size:.92rem;box-shadow:0 5px 18px var(--line)}
+.adtop img{width:48px;height:48px;object-fit:contain;border-radius:10px;flex:none;background:var(--bg)}
+.adtop a{flex:1;min-width:0;text-decoration:none;font-weight:700;overflow-wrap:anywhere}
+.adtop small,.adbot small{flex:none;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--bg);border-radius:999px;padding:4px 8px}
 .hero{position:relative;background:var(--hero);color:var(--hero-ink);text-align:center;padding:30px 18px 26px;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 50% 35%,var(--glow),var(--clear) 45%);animation:glow 6s ease-in-out infinite alternate;pointer-events:none}
 @keyframes glow{from{transform:scale(.9);opacity:.6}to{transform:scale(1.1);opacity:1}}
@@ -63,15 +63,18 @@ ul{list-style:none}
 .p{font-weight:700;color:var(--accent);white-space:nowrap}
 .p small{font-size:.8em;margin-right:1px}
 .empty{display:none;text-align:center;padding:30px 10px;opacity:.75}
-.adbot{max-width:1000px;margin:0 auto 20px;padding:0 14px}
-.adbot a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;text-align:center}
-.adbot img{display:block;width:100%;height:auto}
-.adbot span{display:block;padding:10px 12px;font-weight:600}
-.adbot small{display:block;text-align:right;font-size:.65rem;opacity:.5;padding:0 12px 6px}
+.adbot{max-width:1000px;margin:0 auto 24px;padding:0 14px}
+.adbot a{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;text-align:left;box-shadow:0 8px 24px var(--line)}
+.adbot img{grid-column:1/-1;display:block;width:100%;max-height:300px;aspect-ratio:16/7;object-fit:cover;background:var(--bg)}
+.adbot span{display:block;min-width:0;padding:14px 16px;font-weight:700;overflow-wrap:anywhere}
+.adbot .adcta{white-space:nowrap;color:var(--accent);font-size:.82rem;padding:8px 12px;border:1px solid var(--line);border-radius:999px;margin-right:14px}
+.adbot small{position:absolute;top:10px;right:10px;background:var(--surface);box-shadow:0 2px 8px var(--shadow)}
+@media(max-width:420px){.adtop{gap:8px;padding:9px 10px}.adtop img{width:40px;height:40px}.adbot a{grid-template-columns:1fr}.adbot .adcta{justify-self:start;margin:0 16px 14px}.adbot img{aspect-ratio:4/3}}
 footer{background:var(--hero);color:var(--tl);text-align:center;padding:26px 18px 32px}
 footer .lg{width:64px;height:auto;margin:0 auto 6px;display:block}
 footer .nm{color:var(--hero-ink);font-size:1.4rem;font-weight:800}
 footer p{margin-top:4px}
+footer .loc{font-size:.95rem;margin-top:6px;color:var(--tl);text-align:center;line-height:1.4;overflow-wrap:anywhere}
 footer .by{margin-top:18px;padding-top:14px;border-top:1px solid var(--footer-line);font-weight:600;color:var(--hero-ink)}
 footer .ct{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center}
 footer .ct a{color:var(--tl)}
@@ -86,7 +89,6 @@ footer .ct a{color:var(--tl)}
   <img class="logo" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="220" height="294">
   <span class="tag">Pure Veg</span>
   <h1>Biryani Kendra</h1>
-  <div class="tl">Pioneer of Veg Biryani</div>
 </header>
 <nav class="bar" aria-label="Menu">
   <input id="q" type="search" placeholder="Search menu… (jaise: pizza, maggie)" aria-label="Search menu" autocomplete="off">
@@ -96,11 +98,11 @@ footer .ct a{color:var(--tl)}
   <div class="grid" id="grid"><section class="cat" id="c-biryani" data-t="biryani"><header><span class="em" aria-hidden="true">🍛</span><div><h2>Biryani</h2></div></header><ul><li class="it" data-n="awadhi veg biryani"><span class="n">Awadhi Veg Biryani</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="veg dum biryani"><span class="n">Veg Dum Biryani</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-south-indian" data-t="south indian"><header><span class="em" aria-hidden="true">🍽️</span><div><h2>South Indian</h2></div></header><ul><li class="it" data-n="idli sambhar"><span class="n">Idli Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="vada sambhar"><span class="n">Vada Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="upma"><span class="n">Upma</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="idiyappam"><span class="n">Idiyappam</span><span class="d"></span><span class="p"><small>₹</small>50</span></li><li class="it" data-n="puttu"><span class="n">Puttu</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-dessert-coffee" data-t="dessert &amp; coffee"><header><span class="em" aria-hidden="true">🍮</span><div><h2>Dessert &amp; Coffee</h2></div></header><ul><li class="it" data-n="fruit custard"><span class="n">Fruit Custard</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="filter coffee"><span class="n">Filter Coffee</span><span class="d"></span><span class="p"><small>₹</small>20</span></li></ul></section></div>
   <p class="empty" id="empty">Kuch nahi mila. Koi aur naam try karo.</p>
 </main>
-<div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
+<div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><span class="adcta">Visit advertiser ↗</span><small>Ad</small></a></div>
 <footer>
   <img class="lg" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="64" height="86">
   <div class="nm">Biryani Kendra</div>
-  <p>Pioneer of Veg Biryani</p>
+  <p class="loc">📍 Behind Sapna Sangeeta, near Tower Square</p>
   <p class="by">Managed and designed by Tvarise</p>
   <p>Need your own QR menu? Contact us</p>
   <div class="ct">
@@ -143,33 +145,36 @@ if('IntersectionObserver' in window){
   secs.forEach(function(s){io.observe(s)});
 }
 /* Ads: alag endpoint se. Fail/timeout/empty ho to strips hidden hi rehti hain. */
-function ok(u){return typeof u==='string'&&/^https:\/\//i.test(u)}
+function ok(u){try{var x=new URL(u);return x.protocol==='https:'}catch(e){return false}}
 function show(id){document.getElementById(id).hidden=false}
 try{
   var ctl=window.AbortController?new AbortController():null;
   var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
-  fetch("https://roomslider-api.onrender.com/api/ads?cafe=biryanikendra",{signal:ctl?ctl.signal:undefined,credentials:'omit'})
+  fetch("https://roomslider-api.onrender.com/api/ads?cafe=biryanikendra&location=sapnasangeeta",{signal:ctl?ctl.signal:undefined,credentials:'omit',headers:{Accept:'application/json'}})
     .then(function(r){if(!r.ok)throw 0;return r.json()})
     .then(function(d){
       clearTimeout(tm);
       var a=d&&d.top;
-      if(a&&a.text){
+      if(a&&typeof a.text==='string'&&a.text.trim()&&ok(a.url)&&ok(a.logo)){
         var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);
-        if(ok(a.url))el.href=a.url;
+        el.href=a.url;
         var im=document.getElementById('adtopimg');
-        if(ok(a.logo))im.src=a.logo;else im.hidden=true;
+        im.src=a.logo;
+        im.onerror=function(){document.getElementById('adtop').hidden=true};
         show('adtop');
       }
       var b=d&&d.bottom;
-      if(b&&(b.image||b.text)){
-        var l=document.getElementById('adbota');if(ok(b.url))l.href=b.url;
+      if(b&&typeof b.text==='string'&&b.text.trim()&&ok(b.url)&&ok(b.image)){
+        var l=document.getElementById('adbota');l.href=b.url;
         var bi=document.getElementById('adbotimg');
-        if(ok(b.image))bi.src=b.image;else bi.hidden=true;
-        document.getElementById('adbott').textContent=b.text?String(b.text).slice(0,160):'';
+        bi.src=b.image;
+        bi.alt=String(b.text).slice(0,120);
+        bi.onerror=function(){document.getElementById('adbot').hidden=true};
+        document.getElementById('adbott').textContent=String(b.text).slice(0,120);
         show('adbot');
       }
     })
-    .catch(function(){});
+    .catch(function(){clearTimeout(tm)});
 }catch(e){}
 })();
 </script>

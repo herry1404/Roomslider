@@ -74,17 +74,26 @@ const getPublicAds = async (req, res) => {
     const ads = await Ad.find({
       slot: { $in: ["top", "bottom"] },
       active: true,
-      startsAt: { $lte: now },
-      $and: [{ $or: targetMatches }],
-      $or: [{ endsAt: null }, { endsAt: { $gt: now } }],
+      $and: [
+        { $or: targetMatches },
+        { $or: [{ startsAt: { $lte: now } }, { startsAt: { $exists: false } }, { startsAt: null }] },
+        { $or: [{ endsAt: null }, { endsAt: { $gt: now } }] },
+      ],
     })
       .select("slot targetBy cafe location text logoUrl imageUrl linkUrl createdAt")
       .sort({ createdAt: -1, _id: -1 })
       .lean();
 
     const result = { top: null, bottom: null };
+    const priorities = { top: 0, bottom: 0 };
     for (const ad of ads) {
-      if (result[ad.slot]) continue;
+      const priority = ad.targetBy === "cafe" || (!ad.targetBy && ad.cafe !== "all")
+        ? 3
+        : ad.targetBy === "location"
+          ? 2
+          : 1;
+      if (priority <= priorities[ad.slot]) continue;
+      priorities[ad.slot] = priority;
       result[ad.slot] = ad.slot === "top"
         ? { logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
         : { image: ad.imageUrl, text: ad.text, url: ad.linkUrl };
