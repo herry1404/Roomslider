@@ -1,11 +1,46 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import fs from "node:fs";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
+let cafeSlugLock = {};
+try {
+  cafeSlugLock = JSON.parse(
+    fs.readFileSync(path.resolve(rootDir, "../cafes/slugs.lock.json"), "utf8")
+  );
+} catch {
+  cafeSlugLock = {};
+}
+
+const cafePathDenylist = [];
+const addCafePath = (value) => {
+  if (typeof value !== "string" || !value.trim()) return;
+  const slug = value.trim().replace(/^\/+|\/+$/g, "");
+  const escapedSlug = slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (escapedSlug) cafePathDenylist.push(new RegExp("^/" + escapedSlug + "(/|$)"));
+};
+const visitCafeLock = (value, keyHint) => {
+  if (Array.isArray(value)) {
+    value.forEach((entry) => visitCafeLock(entry));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  if (typeof value.slug === "string") {
+    addCafePath(value.slug);
+    if (Array.isArray(value.redirects)) value.redirects.forEach(addCafePath);
+  } else if (keyHint && Array.isArray(value.redirects)) {
+    addCafePath(keyHint);
+    value.redirects.forEach(addCafePath);
+  }
+  Object.entries(value).forEach(([key, entry]) => visitCafeLock(entry, key));
+};
+visitCafeLock(cafeSlugLock);
+// Keep the currently served cafe menu excluded if this checkout has no slug lock.
+addCafePath("htlcafe");
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, rootDir, "");
@@ -58,7 +93,15 @@ export default defineConfig(({ mode }) => {
       workbox: {
         importScripts: ["/push-sw.js"],
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/\.well-known\//, /^\/llms\.txt$/],
+        navigateFallbackDenylist: [
+          ...cafePathDenylist,
+          /^\/c\//,
+          /^\/cafe\//,
+          /^\/api\//,
+          /^\/api/,
+          /^\/\.well-known\//,
+          /^\/llms\.txt$/,
+        ],
         globIgnores: ["**/*.map"],
         runtimeCaching: [
           {
