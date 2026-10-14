@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wow Pav & Waffleo – Menu</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fff8ef;--card:#fff;--tx:#2a1a12;--mut:#7a6558;--ac:#d92b1f;--ac2:#f5a623;--bd:#f0dfcc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15100d;--card:#221915;--tx:#f7ece2;--mut:#b9a698;--ac:#ff5a47;--ac2:#ffc247;--bd:#3a2c25}}
+:root[data-theme="dark"]{--bg:#15100d;--card:#221915;--tx:#f7ece2;--mut:#b9a698;--ac:#ff5a47;--ac2:#ffc247;--bd:#3a2c25}
+:root[data-theme="waffle"]{--ac:#8a5a2b;--ac2:#f5b700}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:100%;overflow-x:hidden}
+header{text-align:center;padding:28px 16px 12px;position:relative;overflow:hidden}
+.logo{width:120px;height:120px;margin:0 auto;animation:pop 1s cubic-bezier(.2,1.6,.4,1) both,bob 3s 1s ease-in-out infinite}
+@keyframes pop{from{transform:scale(0) rotate(-180deg);opacity:0}}
+@keyframes bob{50%{transform:translateY(-8px) rotate(3deg)}}
+h1{font-size:2rem;margin-top:8px;letter-spacing:1px;animation:up .8s .3s both}
+.tag{color:var(--mut);animation:up .8s .5s both}
+@keyframes up{from{opacity:0;transform:translateY(20px)}}
+.fl{position:absolute;font-size:28px;opacity:.5;animation:fly 6s ease-in-out infinite}
+@keyframes fly{50%{transform:translateY(-18px) rotate(20deg)}}
+.ticker{width:100%;overflow:hidden;padding:8px 0;background:var(--bg)}
+.ticker-track{display:flex;width:max-content;animation:ticker-scroll 28s linear infinite}
+.ticker:hover .ticker-track,.ticker:active .ticker-track,.ticker:focus-within .ticker-track{animation-play-state:paused}
+.ticker-group{display:flex;flex:none;gap:10px;padding-right:10px}
+.ticker-pill{display:flex;align-items:center;gap:6px;white-space:nowrap;border-radius:999px;padding:9px 16px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:.9rem;font-weight:700}
+.ticker-pill b{color:#fff}
+@keyframes ticker-scroll{to{transform:translateX(-50%)}}
+.adtop,.adbot{max-width:900px;margin:10px auto;padding:0 12px}
+.adtop-inner,.adbot a{display:block;border:1px solid var(--bd);border-radius:14px;background:var(--card);color:var(--tx);overflow:hidden;text-decoration:none}
+.adtop-inner{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.adtop img{width:32px;height:32px;object-fit:contain}
+.adtop small,.adbot small{font-size:.65rem;opacity:.6}
+.adtop small{margin-left:auto}
+.adbot{margin-bottom:20px}
+.adbot img{display:block;width:100%;height:auto}
+.adbot span{display:block;padding:10px 12px;font-weight:600}
+.adbot small{display:block;text-align:right;padding:0 12px 6px}
+[hidden]{display:none!important}
+.tabs{display:flex;gap:8px;justify-content:center;padding:10px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.tabs button{border:2px solid var(--ac);background:none;color:var(--tx);padding:9px 18px;border-radius:30px;font-weight:700;font-size:1rem;cursor:pointer;transition:.25s}
+.tabs button.on{background:var(--ac);color:#fff;transform:scale(1.06)}
+.bar{display:flex;gap:8px;padding:0 12px 8px;max-width:900px;margin:auto}
+.bar input{flex:1;padding:11px 16px;border-radius:30px;border:2px solid var(--bd);background:var(--card);color:var(--tx);font-size:1rem}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 10px;max-width:900px;margin:auto;scrollbar-width:none}
+.chips a{white-space:nowrap;padding:6px 12px;border-radius:20px;background:var(--card);border:1px solid var(--bd);color:var(--tx);text-decoration:none;font-size:.85rem}
+main{max-width:900px;margin:auto;padding:8px 12px 40px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+section{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;opacity:0;transform:translateY(30px);transition:.6s}
+section.in{opacity:1;transform:none}
+h2{font-size:1.15rem;color:var(--ac);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.it{display:flex;align-items:baseline;gap:6px;padding:7px 4px;border-radius:8px;transition:.2s}
+.it:hover{background:var(--bg);transform:translateX(5px)}
+.it i{flex:1;border-bottom:1px dotted var(--mut);opacity:.4;min-width:10px}
+.it b{color:var(--ac)}
+.combo{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.combo h2,.combo .it b{color:#fff}
+.combo small{display:block;opacity:.9}
+footer{text-align:center;color:var(--mut);padding:20px 16px 30px;font-size:.9rem}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none;width:100%}.ticker-group[aria-hidden="true"]{display:none}.ticker-group:not([aria-hidden="true"]){flex-wrap:wrap;width:100%}}
+</style>
+</head>
+<body data-cafe="wowpav" data-location="bhawarkua">
+<div class="adtop" id="adtop" hidden><a class="adtop-inner" id="adtopa" target="_blank" rel="noopener sponsored"><img id="adtopimg" alt=""><span id="adtoptext"></span><small>Ad</small></a></div>
+<header>
+<span class="fl" style="left:8%;top:30px">🍔</span><span class="fl" style="right:8%;top:50px;animation-delay:1s">🧇</span><span class="fl" style="left:14%;top:130px;animation-delay:2s">🍕</span><span class="fl" style="right:15%;top:140px;animation-delay:3s">☕</span>
+<div class="logo" id="logo"></div>
+<h1 id="ttl"></h1>
+<p class="tag" id="tag"></p>
+</header>
+<div class="ticker hide" id="ticker" aria-label="Combo Offers">
+ <div class="ticker-track" id="tickerTrack"></div>
+</div>
+<div class="tabs"><button id="b0" class="on">🍔 Wow Pav</button><button id="b1">🧇 Waffleo</button></div>
+<div class="bar"><input id="q" type="search" placeholder="Search… pizza, momos, waffle"></div>
+<div class="chips" id="chips"></div>
+<main id="m"></main>
+<div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
+<footer id="ft"></footer>
+<script>
+var LOGO=[
+'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#d92b1f"/><circle cx="60" cy="60" r="56" fill="none" stroke="#f5a623" stroke-width="4"/><path d="M22 62a38 30 0 0 1 76 0z" fill="#f5a623"/><circle cx="46" cy="46" r="2.5" fill="#fff3"/><circle cx="62" cy="40" r="2.5" fill="#fff3"/><circle cx="76" cy="48" r="2.5" fill="#fff3"/><rect x="24" y="64" width="72" height="6" rx="3" fill="#5aa832"/><rect x="26" y="70" width="68" height="7" rx="3" fill="#7a3a1a"/><path d="M24 78h72a6 6 0 0 1-6 10H30a6 6 0 0 1-6-10z" fill="#f5a623"/><text x="60" y="108" text-anchor="middle" font-size="15" font-weight="900" fill="#fff" font-family="Georgia,serif">WOW PAV</text></svg>',
+'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#2b2420"/><circle cx="60" cy="60" r="56" fill="none" stroke="#f5b700" stroke-width="4"/><rect x="30" y="22" width="60" height="52" rx="14" fill="#f5b700"/><path d="M30 22h60M30 39h60M30 56h60M50 22v52M70 22v52" stroke="#2b2420" stroke-width="4" fill="none"/><path d="M62 18a14 14 0 0 1 28 4l-10 9-6-8-6 8z" fill="#5b2e14"/><text x="60" y="96" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" font-family="Impact,sans-serif" letter-spacing="1">WAFFLEO</text><text x="60" y="108" text-anchor="middle" font-size="6" fill="#f5b700" letter-spacing="1">MADE FOR MOMENTS</text></svg>'];
+var D=[[
+["Burger","🍔","Aloo Tikki Burger 65|Aloo Tikki Cheese Burger 80|Veg Burger 80|Veg Cheese Burger 95|Double Tikki Burger 110|Double Tikki Double Cheese Burger 140|Maharaja Full Loaded Burger 180"],
+["Pizza","🍕","Onion Pizza 80|Margherita Pizza 100|Tomato Pizza 110|Capsicum Pizza 110|Corn Cheese Pizza 120|Onion Tomato Pizza 140|Onion Capsicum Pizza 140|Tomato Capsicum Pizza 140|Makhni Corn Pizza 150|Veg Cheese Pizza 150|Paneer Capsicum Pizza 160|Corn Paneer Pizza 160|Veg Tandoori Pizza 180|Cheesy Cheese Pizza 180|Veg Peri-Peri Pizza 180|Farm House Pizza 200|Add-on: Extra Cheese 25|Add-on: Any Veggie 20"],
+["Veg Masala Sandwich","🥪","Masala Sandwich 75|Veg Sandwich 80|Masala Cheese Sandwich 85|Veg Cheese Sandwich 100|Masala Paneer Sandwich 120|Veg Paneer Sandwich 150|Cheese Chutney Sandwich 100|Cheese Corn Sandwich 110"],
+["Pizza Sandwich","🥪","Pizza Sandwich 110|Mexican Pizza Sandwich 120|Schezwan Pizza Sandwich 130"],
+["Club Sandwich","🥪","Veg Cheese Club 160|Mexican Cheese Club 180|Tandoori Cheese Club 180|Paneer Cheese Club 220|Wow Pav Special Club 250"],
+["Sweet Sandwich","🍯","Jam Butter Sandwich 100|Jam Cheese Sandwich 120|Nutella Sandwich 150|Rasmalai Sandwich 180"],
+["Shakes & Refreshers","🥤","Cold Coffee 75|Cold Coffee with Icecream 90|Red Rose Shake 80|Chocolate Shake 110|Oreo Shake 120|KitKat Shake 130|Brownie Shake 150|Mojito Mint 140|Blue Curaçao (Blue Lagoon) 150|Green Apple 150|Watermelon 150|Strawberry 150|Passion Fruit & Peach 150|Indian Fusion (Jamun & Ginger) 150"],
+["Patties","🥔","Butter Pav Patties 90|Paneer Pav Patties 100|Cheese Pav Patties 130|Extra Butter Pav 15"],
+["Vada Pav","🌶️","Butter Vada Pav 30|Cheese Vada Pav 50|Paneer Vada Pav 60|Tandoori Vada Pav 60|Makhni Cheese Vada Pav 60"],
+["Dabeli","🍞","Butter Dabeli 60|Paneer Dabeli 70|Cheese Dabeli 80"],
+["Pav Bhaji","🍛","Butter Pav Bhaji 110|Butter Masala Pav Bhaji 120|Cheese Pav Bhaji 160|Extra Pav 15|Masala Pav 20"],
+["Chole Kulche","🫓","Butter Chole Kulcha (2pc) 120|Paneer Chole Kulcha (2pc) 140|Cheese Chole Kulcha (2pc) 160|Extra Butter Kulcha 30"],
+["Rolls","🌯","Veg Roll 130|Veg Cheese Roll 150|Veg Noodle Cheese Roll 150|Manchurian Cheese Roll 150|Maggie Roll 150|Maggie Cheese Roll 170|Chilly Paneer Roll 170|Chilly Paneer Cheese Roll 190"],
+["Hot","☕","Chai 20|Coffee 50|Hot Chocolate 100"],
+["Noodles","🍜","Veg Noodles 100|Hakka Noodles 120|Shezwan Noodles 125|Manchurian Noodles 140|Singapoori Noodles 160"],
+["Chilli","🌶️","Chilly Paneer Dry 150|Chilli Paneer Semi Gravy 170|Chilli Paneer Gravy 180|Crispy Corn 220|Chilli Potato 160|Honey Chilly Potato 170"],
+["Manchurian","🥟","Manchurian Dry 110|Manchurian Semi Gravy 125|Manchurian Gravy 150"],
+["Rice","🍚","Fried Rice 110|Shezwan Rice 120|Manchurian Rice 140"],
+["Pasta","🍝","White Sauce Pasta 180|Red Sauce Pasta 160|Pink Sauce Pasta 180|Extra Cheese 30"],
+["Maggi","🍜","Plain Maggie 70|Veg Maggie 90|Cheese Maggi 120|Veg Cheese Maggi 140|Double Masala Maggi 90"],
+["Momos","🥟","Veg Steam Momos 70|Paneer Steam Momos 80|Cheese Corn Steam Momos 100|Veg Fried Momos 90|Paneer Fried Momos 100|Cheese Corn Fried Momos 120"],
+["Fries","🍟","Plain Salted Fries 80|Salt and Pepper Fries 90|Peri-Peri Fries 110|Cheese Salted Fries 110|Cheese Peri-Peri Fries 130|Cheese Tandoori Fries ask"],
+["Combo Offers","🎁","Pizza Combo: Margherita + Corn Cheese + Farm House Pizza 389|Burger Combo: 2 Aloo Tikki Cheese Burger + Peri-Peri Fries + 2 Cold Coffee 399|Chinese Combo: Veg Noodle + Veg Manchurian Gravy + Fried Rice 299|Party Combo: Farm House + Corn Cheese Pizza + 2 Aloo Tikki Burger + Pizza Sandwich + Peri-Peri Fries + 2 Cold Coffee 777",1]
+],[
+["Waffles","🧇","Chocolate Waffle 149|Dark Chocolate Waffle 179|Triple Chocolate Waffle 199|Oreo Waffle 220|KitKat Waffle 220|Dairy Milk Waffle 250|Five Star Waffle 250|Gems Waffle 220|Choco Chip Waffle 199|Strawberry Waffle 250|Banana Chocolate Waffle 220|Nutella Waffle 220"],
+["Indian Waffles","🪔","Gulab Jamun Waffle 250|Kesar Pista Waffle 280|Rasmalai Waffle 250|Rabri Waffle 280|Dry Fruit Waffle 280"],
+["Waffle Sticks","🍫","Chocolate Stick 129|Oreo Stick 159|KitKat Stick 179|Nutella Stick 179"],
+["Waffle Cakes","🎂","Chocolate Waffle Cake 280|Oreo Waffle Cake 340|KitKat Waffle Cake 320|Dairy Milk Waffle Cake 320|Choco Chip Waffle Cake 340|Strawberry Waffle Cake 370|Banana Chocolate Cake 350|Nutella Waffle Cake 370|Triple Chocolate Cake 350|Ice Cream Waffle Cake 380"],
+["Coffee","☕","Cold Coffee 190|Irish Cold Coffee 150|Creamy Frappe Cold Coffee 220|Nutella Cold Coffee 220|Lemon Iced Americano 180|Brownie Frappe 250"],
+["Refreshers","🍹","Mojito Mint 140|Blue Curaçao (Blue Lagoon) 150|Green Apple 150|Watermelon 150|Strawberry 150|Passion Fruit & Peach 150|Indian Fusion (Jamun & Ginger) 150"]
+]];
+var INFO=[["WOW PAV","Good Food. Good Mood.","📍 Shop No. 1, Siddharth Nagar, Vishnupuri, Bhawarkuan (opposite Tealogy) · ₹2000+ order par 1 saal ki Membership Card free!"],["WAFFLEO","Crafted for Cravings. Made for Moments.","Freshly made every time · Premium ingredients"]];
+var cur=0,m=document.getElementById('m'),io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.08});
+function row(s){var i=s.lastIndexOf(' ');return '<div class="it"><span>'+s.slice(0,i)+'</span><i></i><b>'+(isNaN(s.slice(i+1))?'ask':'₹'+s.slice(i+1))+'</b></div>'}
+function render(){
+ document.getElementById('logo').innerHTML=LOGO[cur];
+ document.getElementById('ttl').textContent=INFO[cur][0];
+ document.getElementById('tag').textContent=INFO[cur][1];
+ document.getElementById('ft').textContent=INFO[cur][2];
+ document.documentElement.dataset.theme=cur?'waffle':'';
+ var h='',c='';
+ D[cur].forEach(function(s,n){
+  c+='<a href="#s'+n+'">'+s[1]+' '+s[0]+'</a>';
+  h+='<section id="s'+n+'"'+(s[3]?' class="combo"':'')+'><h2>'+s[1]+' '+s[0]+'</h2>'+s[2].split('|').map(row).join('')+'</section>';
+ });
+ m.innerHTML=h;document.getElementById('chips').innerHTML=c;
+ var ticker=document.getElementById('ticker'),tickerTrack=document.getElementById('tickerTrack');
+ var combos=D[0].filter(function(s){return s[3]});
+ tickerTrack.innerHTML=combos.map(function(s){
+  return '<div class="ticker-group">'+s[2].split('|').map(function(item){
+   var i=item.lastIndexOf(' ');
+   return '<div class="ticker-pill">🎁 <span>'+item.slice(0,i)+'</span> <b>₹'+item.slice(i+1)+'</b></div>';
+  }).join('')+'</div>';
+ }).join('');
+ var firstGroup=tickerTrack.firstElementChild;
+ if(firstGroup){var duplicate=firstGroup.cloneNode(true);duplicate.setAttribute('aria-hidden','true');tickerTrack.appendChild(duplicate)}
+ ticker.classList.toggle('hide',cur!==0||!combos.length);
+ m.querySelectorAll('section').forEach(function(x){io.observe(x)});
+ document.getElementById('q').value='';
+}
+[0,1].forEach(function(n){document.getElementById('b'+n).onclick=function(){cur=n;document.getElementById('b0').className=n?'':'on';document.getElementById('b1').className=n?'on':'';render()}});
+document.getElementById('q').oninput=function(){var v=this.value.toLowerCase();m.querySelectorAll('section').forEach(function(s){var any=0;s.querySelectorAll('.it').forEach(function(r){var ok=!v||r.textContent.toLowerCase().indexOf(v)>-1||s.querySelector('h2').textContent.toLowerCase().indexOf(v)>-1;r.classList.toggle('hide',!ok);if(ok)any=1});s.classList.toggle('hide',!any);if(any)s.classList.add('in')})};
+render();
+(function(){
+ function ok(u){try{return new URL(u).protocol==='https:'}catch(e){return false}}
+ try{
+  var ctl=window.AbortController?new AbortController():null;
+  var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
+  var adQuery=new URLSearchParams(window.location.search);
+  var adCafe=adQuery.get('cafe')||'wowpav',adLocation=adQuery.get('location')||'bhawarkua';
+  fetch("https://roomslider-api.onrender.com/api/ads?cafe="+encodeURIComponent(adCafe)+"&location="+encodeURIComponent(adLocation),{signal:ctl?ctl.signal:undefined,credentials:'omit'})
+   .then(function(r){if(!r.ok)throw 0;return r.json()})
+   .then(function(d){
+    clearTimeout(tm);
+    var a=d&&d.top;
+    if(a&&typeof a.text==='string'&&a.text.trim()){
+     var el=document.getElementById('adtopa'),img=document.getElementById('adtopimg');
+     el.href=ok(a.url)?a.url:'#';if(a.id)el.dataset.adId=a.id;
+     document.getElementById('adtoptext').textContent=a.text.slice(0,120);
+     if(ok(a.logo)){img.src=a.logo;img.onerror=function(){img.hidden=true}}
+     else img.hidden=true;
+     document.getElementById('adtop').hidden=false;
+    }
+    var b=d&&d.bottom;
+    if(b&&(ok(b.image)||typeof b.text==='string'&&b.text.trim())){
+     var link=document.getElementById('adbota'),bi=document.getElementById('adbotimg');
+     link.href=ok(b.url)?b.url:'#';if(b.id)link.dataset.adId=b.id;
+     if(ok(b.image)){bi.src=b.image;bi.onerror=function(){document.getElementById('adbot').hidden=true}}
+     else bi.hidden=true;
+     document.getElementById('adbott').textContent=b.text?String(b.text).slice(0,160):'';
+     document.getElementById('adbot').hidden=false;
+    }
+   })
+   .catch(function(){clearTimeout(tm)});
+ }catch(e){}
+})();
+</script>
+<script src="/cafe-analytics.js" defer></script>
+</body>
+</html>

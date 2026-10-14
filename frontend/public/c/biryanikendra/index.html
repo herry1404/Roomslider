@@ -82,7 +82,7 @@ footer .ct a{color:var(--tl)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
-<body>
+<body data-cafe="biryanikendra" data-location="sapnasangeeta">
 <div class="adtop" id="adtop" hidden><img id="adtopimg" alt="" width="28" height="28"><a id="adtopa" target="_blank" rel="noopener sponsored"></a><small>Ad</small></div>
 <header class="hero">
   <button class="tg" id="tg" type="button" aria-label="Dark / Light mode badlo"><span id="tgi">🌙</span></button>
@@ -156,7 +156,7 @@ try{
       clearTimeout(tm);
       var a=d&&d.top;
       if(a&&typeof a.text==='string'&&a.text.trim()&&ok(a.url)&&ok(a.logo)){
-        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);
+        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);el.dataset.adId=a._id||a.id||'';
         el.href=a.url;
         var im=document.getElementById('adtopimg');
         im.src=a.logo;
@@ -165,7 +165,7 @@ try{
       }
       var b=d&&d.bottom;
       if(b&&typeof b.text==='string'&&b.text.trim()&&ok(b.url)&&ok(b.image)){
-        var l=document.getElementById('adbota');l.href=b.url;
+        var l=document.getElementById('adbota');l.href=b.url;l.dataset.adId=b._id||b.id||'';
         var bi=document.getElementById('adbotimg');
         bi.src=b.image;
         bi.alt=String(b.text).slice(0,120);
@@ -178,5 +178,6 @@ try{
 }catch(e){}
 })();
 </script>
+<script src="/cafe-analytics.js" defer></script>
 </body>
 </html>

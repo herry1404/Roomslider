@@ -63,11 +63,16 @@ const getPublicAds = async (req, res) => {
 
   try {
     const now = new Date();
+    const cafeSlugs = cafe?.success && cafe.data === "htl-cafe"
+      ? ["htl-cafe", "htlcafe"]
+      : cafe?.success
+          ? [cafe.data]
+          : [];
     const targetMatches = [
       { targetBy: "all", cafe: "all" },
       ...(cafe ? [
-        { targetBy: "cafe", cafe: cafe.data },
-        { targetBy: { $exists: false }, cafe: { $in: [cafe.data, "all"] } },
+          { targetBy: "cafe", cafe: { $in: cafeSlugs } },
+          { targetBy: { $exists: false }, cafe: { $in: [...cafeSlugs, "all"] } },
       ] : []),
       ...(location ? [{ targetBy: "location", location: location.data }] : []),
     ];
@@ -95,8 +100,8 @@ const getPublicAds = async (req, res) => {
       if (priority <= priorities[ad.slot]) continue;
       priorities[ad.slot] = priority;
       result[ad.slot] = ad.slot === "top"
-        ? { logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
-        : { image: ad.imageUrl, text: ad.text, url: ad.linkUrl };
+        ? { id: ad._id, logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
+        : { id: ad._id, image: ad.imageUrl, text: ad.text, url: ad.linkUrl };
     }
     return res.status(200).json(result);
   } catch (error) {

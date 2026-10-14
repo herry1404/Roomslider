@@ -65,7 +65,7 @@ footer .fine{margin-top:12px;font-size:.8rem;opacity:.7}
 [hidden]{display:none!important}
 </style>
 </head>
-<body>
+<body data-cafe="htl-cafe" data-location="indrapuri">
 <div class="adtop" id="adtop" hidden><img id="adtopimg" alt="" width="28" height="28"><a id="adtopa" target="_blank" rel="noopener sponsored"></a><small>Ad</small></div>
 <header class="hero">
   <span class="tag">Chai • Coffee • Snacks</span>
@@ -132,14 +132,14 @@ try{
   var ctl=window.AbortController?new AbortController():null;
   var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
   var adQuery=new URLSearchParams(window.location.search);
-  var adCafe=adQuery.get('cafe')||'htlcafe',adLocation=adQuery.get('location')||'indrapuri';
+  var adCafe=adQuery.get('cafe')||'htl-cafe',adLocation=adQuery.get('location')||'indrapuri';
   fetch("https://roomslider-api.onrender.com/api/ads?cafe="+encodeURIComponent(adCafe)+"&location="+encodeURIComponent(adLocation),{signal:ctl?ctl.signal:undefined,credentials:'omit'})
     .then(function(r){if(!r.ok)throw 0;return r.json()})
     .then(function(d){
       clearTimeout(tm);
       var a=d&&d.top;
       if(a&&a.text){
-        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);
+        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);if(a.id)el.dataset.adId=a.id;
         if(ok(a.url))el.href=a.url;
         var im=document.getElementById('adtopimg');
         if(ok(a.logo))im.src=a.logo;else im.hidden=true;
@@ -147,7 +147,7 @@ try{
       }
       var b=d&&d.bottom;
       if(b&&(b.image||b.text)){
-        var l=document.getElementById('adbota');if(ok(b.url))l.href=b.url;
+        var l=document.getElementById('adbota');if(ok(b.url))l.href=b.url;if(b.id)l.dataset.adId=b.id;
         var bi=document.getElementById('adbotimg');
         if(ok(b.image))bi.src=b.image;else bi.hidden=true;
         document.getElementById('adbott').textContent=b.text?String(b.text).slice(0,160):'';
@@ -158,5 +158,6 @@ try{
 }catch(e){}
 })();
 </script>
+<script src="/cafe-analytics.js" defer></script>
 </body>
 </html>

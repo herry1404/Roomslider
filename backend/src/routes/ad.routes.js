@@ -10,6 +10,10 @@ const {
   toggleAd,
   deleteAd,
 } = require("../controllers/ad.controller");
+const {
+  trackCafeMenuEvent,
+  getCafeMenuAnalytics,
+} = require("../controllers/cafeMenuAnalytics.controller");
 
 const router = express.Router();
 const publicAdLimiter = rateLimit({
@@ -21,7 +25,9 @@ const publicAdLimiter = rateLimit({
 });
 
 router.get("/", publicAdLimiter, getPublicAds);
+router.post("/analytics", publicAdLimiter, trackCafeMenuEvent);
 router.get("/admin", protect, adminOnly, listAds);
+router.get("/admin/analytics", protect, adminOnly, getCafeMenuAnalytics);
 router.post("/admin", protect, adminOnly, createAd);
 router.put("/admin/:id", protect, adminOnly, updateAd);
 router.patch("/admin/:id/active", protect, adminOnly, toggleAd);
