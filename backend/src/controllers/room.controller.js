@@ -787,6 +787,13 @@ const assignTenant = async (req, res) => {
       });
     }
 
+    if (room.status === "occupied" || room.currentTenantUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Vacate the current tenant before assigning someone else.",
+      });
+    }
+
     const { name, phone, moveInDate, advanceAmount, tenantEmail, tenantPhone } = req.body;
 
     if (!name) {

@@ -92,7 +92,7 @@ const ManageLoans = lazy(() => import("./pages/Admin/ManageLoans"));
 const ManageMess = lazy(() => import("./pages/Admin/ManageMess"));
 const ManageHourlyRooms = lazy(() => import("./pages/Admin/ManageHourlyRooms"));
 const ManageVillas = lazy(() => import("./pages/Admin/ManageVillas"));
-const ManageNotifications = lazy(() => import("./pages/Admin/ManageNotifications"));
+const NotificationsCenter = lazy(() => import("./pages/Admin/NotificationsCenter"));
 const OwnerDetail = lazy(() => import("./pages/Admin/OwnerDetail"));
 const HourlyBookingReceipt = lazy(() => import("./pages/Rooms/HourlyBookingReceipt"));
 const SocialWork = lazy(() => import("./pages/SocialWork/SocialWork"));
@@ -104,7 +104,6 @@ const BloodRequestForm = lazy(() => import("./pages/Blood/BloodRequestForm"));
 const BloodRequestDetail = lazy(() => import("./pages/Blood/BloodRequestDetail"));
 const ManageBloodRequests = lazy(() => import("./pages/Admin/ManageBloodRequests"));
 const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateReports"));
-const PushNotifications = lazy(() => import("./pages/Admin/PushNotifications"));
 const AdminAnalytics = lazy(() => import("./pages/Admin/AdminAnalytics"));
 const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
 const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
@@ -289,8 +288,8 @@ function App() {
         <Route path="/admin/mess" element={<AdminRoute><ManageMess /></AdminRoute>} />
         <Route path="/admin/hourly-rooms" element={<AdminRoute><ManageHourlyRooms /></AdminRoute>} />
         <Route path="/admin/villas" element={<AdminRoute><ManageVillas /></AdminRoute>} />
-        <Route path="/admin/notifications" element={<AdminRoute><ManageNotifications /></AdminRoute>} />
-        <Route path="/admin/push" element={<AdminRoute><PushNotifications /></AdminRoute>} />
+        <Route path="/admin/notifications" element={<AdminRoute><NotificationsCenter /></AdminRoute>} />
+        <Route path="/admin/push" element={<Navigate to="/admin/notifications" replace />} />
         <Route path="/admin/owners/:id" element={<AdminRoute><OwnerDetail /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><Settings /></AdminRoute>} />
 

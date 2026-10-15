@@ -328,7 +328,11 @@ const getMyTenancy = async (req, res) => {
       "name email propertyName"
     );
 
-    if (!room || room.status !== "occupied") {
+    if (
+      !room ||
+      room.status !== "occupied" ||
+      room.currentTenantUser?.toString() !== user._id.toString()
+    ) {
 
       // Data got out of sync somehow — clean it up rather than error out
       user.activeRoom = null;
@@ -426,7 +430,12 @@ const giveVacateNotice = async (req, res) => {
     const Room = require("../models/room.model");
     const room = await Room.findById(user.activeRoom);
 
-    if (!room || room.status !== "occupied") {
+    if (
+      !room ||
+      room.status !== "occupied" ||
+      room.currentTenantUser?.toString() !== user._id.toString() ||
+      !room.currentTenant
+    ) {
       return res.status(400).json({
         success: false,
         message: "No active tenancy found",
@@ -485,8 +494,15 @@ const cancelVacateNotice = async (req, res) => {
     const Room = require("../models/room.model");
     const room = await Room.findById(user.activeRoom);
 
-    if (!room) {
-      return res.status(404).json({ success: false, message: "Room not found" });
+    if (
+      !room ||
+      room.status !== "occupied" ||
+      room.currentTenantUser?.toString() !== user._id.toString() ||
+      !room.currentTenant
+    ) {
+      user.activeRoom = null;
+      await user.save();
+      return res.status(404).json({ success: false, message: "Active tenancy not found" });
     }
 
     room.currentTenant.vacateNoticeDate = null;

@@ -7,7 +7,7 @@ import EmptyState from "../../components/ui/EmptyState";
 import "../../styles/notifications.css";
 import "../../styles/admin/push-notifications.css";
 
-function PushNotifications() {
+function PushNotifications({ embedded = false }) {
   const [form, setForm] = useState({
     title: "", message: "", hiTitle: "", hiMessage: "", link: "/", audience: "all",
   });
@@ -59,11 +59,13 @@ function PushNotifications() {
   };
 
   return (
-    <main className="admin-page">
-      <header className="admin-page-header">
-        <div><h1>Push Notifications</h1><p>Send a browser notification to a selected audience.</p></div>
-        <BellRing size={26} />
-      </header>
+    <div className={`admin-page ${embedded ? "push-admin-embedded" : ""}`}>
+      {!embedded && (
+        <header className="admin-page-header">
+          <div><h1>Notifications</h1><p>Send a browser notification to a selected audience.</p></div>
+          <BellRing size={26} />
+        </header>
+      )}
 
       <section className="push-admin-card">
         <form className="push-admin-form" onSubmit={send}>
@@ -99,7 +101,7 @@ function PushNotifications() {
           </article>
         ))}
       </section>
-    </main>
+    </div>
   );
 }
 

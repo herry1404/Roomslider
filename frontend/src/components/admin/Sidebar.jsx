@@ -27,7 +27,7 @@ import {
   Clapperboard,
 } from "lucide-react";
 
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -37,6 +37,7 @@ import "../../styles/admin/sidebar.css";
 function Sidebar({ open, closeSidebar }) {
 
   const { logout } = useAuth();
+  const location = useLocation();
   const [newServiceRequests, setNewServiceRequests] = useState(0);
   const [pendingBloodRequests, setPendingBloodRequests] = useState(0);
   useEffect(() => {
@@ -49,14 +50,15 @@ function Sidebar({ open, closeSidebar }) {
       label: "Housing",
       items: [
         { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
+        { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
+        { title: "Ads Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics#cafe-ads", activeHash: "#cafe-ads" },
+        { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
         { title: "Hourly / Short Stay", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
         { title: "Reels", icon: <Clapperboard size={18} />, path: "/admin/reels" },
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
-        { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
-        { title: "Push Notifications", icon: <Megaphone size={18} />, path: "/admin/push" },
-        { title: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
+        { title: "All Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics", excludeHash: "#cafe-ads" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],
     },
@@ -67,7 +69,6 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Vehicle Requests", icon: <ClipboardList size={18} />, path: "/admin/vehicle-requests" },
         { title: "Mess Vendors", icon: <UtensilsCrossed size={18} />, path: "/admin/mess" },
         { title: "Laundry Vendors", icon: <Shirt size={18} />, path: "/admin/laundry-vendors" },
-        { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
         { title: "Other Services", icon: <Sparkles size={18} />, path: "/admin/services" },
         { title: "Service Requests", icon: <ClipboardList size={18} />, path: "/admin/service-requests", badge: newServiceRequests },
         { title: "Social Work", icon: <HeartPulse size={18} />, path: "/admin/social" },
@@ -147,9 +148,11 @@ function Sidebar({ open, closeSidebar }) {
                   key={item.title}
                   to={item.path}
                   onClick={closeSidebar}
-                  className={({ isActive }) =>
-                    isActive ? "side-link active" : "side-link"
-                  }
+                  className={({ isActive }) => {
+                    const hashMatches = !item.activeHash || location.hash === item.activeHash;
+                    const hashExcluded = item.excludeHash && location.hash === item.excludeHash;
+                    return isActive && hashMatches && !hashExcluded ? "side-link active" : "side-link";
+                  }}
                 >
                   {item.icon}
                   <span>{item.title}{item.badge > 0 && <span className="admin-badge green" style={{ marginLeft: 8, padding: "2px 7px" }}>{item.badge}</span>}</span>

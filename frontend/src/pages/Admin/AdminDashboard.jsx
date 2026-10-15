@@ -13,8 +13,11 @@ import {
 } from "lucide-react";
 import {
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -43,11 +46,13 @@ const formatDay = (date) => new Date(`${date}T00:00:00`).toLocaleDateString("en-
   day: "numeric",
   month: "short",
 });
+const PIE_COLORS = ["#34d399", "#38bdf8", "#a78bfa", "#f59e0b", "#fb7185", "#22d3ee"];
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ totalRooms: 0, totalUsers: 0 });
   const [traffic, setTraffic] = useState(null);
+  const [cafe, setCafe] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -79,12 +84,26 @@ function AdminDashboard() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    api.get("/ads/admin/analytics", { params: { days: 7 } })
+      .then(({ data }) => {
+        if (active) setCafe(data.analytics);
+      })
+      .catch((error) => console.error("Cafe dashboard analytics fetch error:", error));
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const quickActions = [
     { label: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
     { label: "Manage Users", icon: <Users size={18} />, path: "/admin/users" },
     { label: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
-    { label: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
+    { label: "Ads Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics#cafe-ads" },
+    { label: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
+    { label: "All Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
   ];
 
   return (
@@ -117,6 +136,8 @@ function AdminDashboard() {
           <StatCard label="Unique sessions today" value={traffic?.summary.uniqueVisitors} icon={<Users size={18} />} accent="#22c55e" />
           <StatCard label="Active in last 30 min" value={traffic?.summary.activeVisitors} icon={<Activity size={18} />} accent="#f59e0b" />
           <StatCard label="Room listings" value={stats.totalRooms} icon={<Building2 size={18} />} accent="#a78bfa" />
+          <StatCard label="Cafe menu views · 7 days" value={cafe?.summary.menuViews} icon={<Megaphone size={18} />} accent="#34d399" />
+          <StatCard label="Cafe ad clicks · 7 days" value={cafe?.summary.adClicks} icon={<Eye size={18} />} accent="#fb7185" />
         </div>
       </section>
 
@@ -186,6 +207,48 @@ function AdminDashboard() {
           )}
         </section>
       </div>
+
+      <section className="dashboard-section dashboard-cafe-overview">
+        <div className="dashboard-section-heading">
+          <div><h3>Cafe ads · last 7 days</h3><p>Menu views and audience breakdown</p></div>
+          <button type="button" className="dashboard-text-link" onClick={() => navigate("/admin/analytics#cafe-ads")}>View ad analytics</button>
+        </div>
+        <div className="dashboard-cafe-grid">
+          <div className="dashboard-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={cafe?.dailyViews || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
+                <XAxis dataKey="date" tickFormatter={formatDay} minTickGap={20} stroke="var(--admin-muted)" fontSize={11} />
+                <YAxis allowDecimals={false} stroke="var(--admin-muted)" fontSize={11} />
+                <Tooltip
+                  labelFormatter={formatDay}
+                  contentStyle={{
+                    background: "var(--admin-card)",
+                    border: "1px solid var(--admin-border)",
+                    borderRadius: 10,
+                    color: "var(--admin-text)",
+                  }}
+                />
+                <Line type="monotone" dataKey="views" name="Menu views" stroke="#34d399" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="uniqueVisitors" name="Unique sessions" stroke="#38bdf8" strokeWidth={2.5} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="dashboard-cafe-pie">
+            <h4>Visitors by platform</h4>
+            {cafe?.byPlatform?.some((item) => item.views > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={cafe.byPlatform} dataKey="views" nameKey="platform" innerRadius={48} outerRadius={76} paddingAngle={3}>
+                    {cafe.byPlatform.map((item, index) => <Cell key={item.platform} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: "var(--admin-card)", border: "1px solid var(--admin-border)", color: "var(--admin-text)" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : <p className="dashboard-visits-empty">Cafe traffic will appear here.</p>}
+          </div>
+        </div>
+      </section>
 
       <div className="dashboard-columns dashboard-lower">
         <section className="dashboard-section">

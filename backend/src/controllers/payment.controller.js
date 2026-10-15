@@ -15,6 +15,16 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+const hasValidPaymentSignature = (orderId, paymentId, signature) => {
+  if (typeof signature !== "string" || !/^[a-f\d]{64}$/i.test(signature)) return false;
+  const expected = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(`${orderId}|${paymentId}`)
+    .digest();
+  const supplied = Buffer.from(signature, "hex");
+  return supplied.length === expected.length && crypto.timingSafeEqual(expected, supplied);
+};
+
 // Create a Razorpay order. Amount is always derived server-side, never
 // trusted from the client, to prevent tampering.
 const createOrder = async (req, res) => {
@@ -37,12 +47,29 @@ const createOrder = async (req, res) => {
       });
     }
 
+    if (
+      room.status !== "occupied" ||
+      room.currentTenantUser?.toString() !== req.user._id.toString() ||
+      req.user.activeRoom?.toString() !== room._id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the current tenant can pay for this room",
+      });
+    }
+
     let amount = room.price;
+    let bill = null;
 
     if (billId) {
-      const bill = await ElectricityBill.findById(billId);
+      bill = await ElectricityBill.findOne({
+        _id: billId,
+        room: room._id,
+        tenantUser: req.user._id,
+        status: "pending",
+      });
 
-      if (!bill || bill.room.toString() !== roomId || bill.status !== "pending") {
+      if (!bill) {
         return res.status(400).json({
           success: false,
           message: "Invalid or already-paid electricity bill",
@@ -56,6 +83,11 @@ const createOrder = async (req, res) => {
       amount: Math.round(amount * 100), // paise
       currency: "INR",
       receipt: `r_${roomId.slice(-8)}_${Date.now()}`.slice(0, 40),
+      notes: {
+        roomId: room._id.toString(),
+        tenantUserId: req.user._id.toString(),
+        billId: bill?._id.toString() || "",
+      },
     });
 
     res.status(200).json({
@@ -94,12 +126,7 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
-
-    if (expectedSignature !== razorpay_signature) {
+    if (!hasValidPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature)) {
       return res.status(400).json({
         success: false,
         message: "Payment verification failed",
@@ -113,12 +140,67 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    if (!mongoose.isValidObjectId(roomId)) {
+      return res.status(400).json({ success: false, message: "Invalid room" });
+    }
+
     const room = await Room.findById(roomId);
 
     if (!room) {
       return res.status(404).json({
         success: false,
         message: "Room not found",
+      });
+    }
+
+    if (
+      room.status !== "occupied" ||
+      room.currentTenantUser?.toString() !== req.user._id.toString() ||
+      req.user.activeRoom?.toString() !== room._id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the current tenant can confirm payment for this room",
+      });
+    }
+
+    let bill = null;
+    if (billId) {
+      bill = await ElectricityBill.findOne({
+        _id: billId,
+        room: room._id,
+        tenantUser: req.user._id,
+        status: "pending",
+      });
+      if (!bill) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid or already-paid electricity bill",
+        });
+      }
+    }
+
+    const expectedAmount = Math.round((Number(room.price) + Number(bill?.amount || 0)) * 100);
+    const [gatewayOrder, gatewayPayment] = await Promise.all([
+      razorpay.orders.fetch(razorpay_order_id),
+      razorpay.payments.fetch(razorpay_payment_id),
+    ]);
+    if (
+      gatewayOrder.id !== razorpay_order_id ||
+      gatewayOrder.amount !== expectedAmount ||
+      gatewayOrder.currency !== "INR" ||
+      gatewayOrder.notes?.roomId !== room._id.toString() ||
+      gatewayOrder.notes?.tenantUserId !== req.user._id.toString() ||
+      gatewayOrder.notes?.billId !== (bill?._id.toString() || "") ||
+      gatewayPayment.id !== razorpay_payment_id ||
+      gatewayPayment.order_id !== razorpay_order_id ||
+      gatewayPayment.amount !== expectedAmount ||
+      gatewayPayment.currency !== "INR" ||
+      gatewayPayment.status !== "captured"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment does not match this room, tenant, and amount",
       });
     }
 
@@ -133,42 +215,79 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    const amount = room.price;
-
-    openEntry.payments.push({
-      amount: Number(amount),
-      date: new Date(),
+    const amount = Number(room.price);
+    const baseDate = room.currentTenant?.nextDueDate || new Date();
+    const paymentDate = new Date();
+    const paymentRecord = {
+      amount,
+      date: paymentDate,
       method: "razorpay",
       type: "rent",
-    });
-    const payment = openEntry.payments[openEntry.payments.length - 1];
-    openEntry.totalPaid = (openEntry.totalPaid || 0) + Number(amount);
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+    };
+    const updateResult = await Room.updateOne(
+      {
+        _id: room._id,
+        status: "occupied",
+        currentTenantUser: req.user._id,
+        occupancyHistory: {
+          $elemMatch: {
+            _id: openEntry._id,
+            endDate: null,
+            "payments.razorpayOrderId": { $ne: razorpay_order_id },
+          },
+        },
+      },
+      {
+        $push: { "occupancyHistory.$[entry].payments": paymentRecord },
+        $inc: { "occupancyHistory.$[entry].totalPaid": amount },
+        $set: {
+          "currentTenant.nextDueDate": addOneMonth(baseDate),
+          paymentStatus: "paid",
+        },
+      },
+      { arrayFilters: [{ "entry._id": openEntry._id, "entry.endDate": null }] }
+    );
+    if (!updateResult.modifiedCount) {
+      return res.status(409).json({
+        success: false,
+        message: "This payment was already recorded or the tenancy has changed",
+      });
+    }
 
-    const baseDate = room.currentTenant?.nextDueDate || new Date();
-    room.currentTenant.nextDueDate = addOneMonth(baseDate);
-    room.paymentStatus = "paid";
-
-    await room.save();
+    const updatedRoom = await Room.findById(room._id);
+    const updatedEntry = [...updatedRoom.occupancyHistory]
+      .reverse()
+      .find((entry) => !entry.endDate);
+    const payment = updatedEntry?.payments.find(
+      (entry) => entry.razorpayOrderId === razorpay_order_id
+    );
 
     let receiptAvailable = false;
     try {
-      payment.receiptUrl = await uploadRentReceipt(room, payment, openEntry.tenantName);
-      await room.save();
+      payment.receiptUrl = await uploadRentReceipt(updatedRoom, payment, updatedEntry.tenantName);
+      await Room.updateOne(
+        { _id: room._id },
+        { $set: { "occupancyHistory.$[entry].payments.$[payment].receiptUrl": payment.receiptUrl } },
+        {
+          arrayFilters: [
+            { "entry._id": updatedEntry._id },
+            { "payment.razorpayOrderId": razorpay_order_id },
+          ],
+        }
+      );
       receiptAvailable = true;
     } catch (receiptError) {
       console.error("RENT RECEIPT GENERATION ERROR:", receiptError);
     }
 
-    let bill = null;
-
     if (billId) {
-      bill = await ElectricityBill.findById(billId);
-
-      if (bill && bill.room.toString() === roomId && bill.status !== "paid") {
-        bill.status = "paid";
-        bill.paidAt = new Date();
-        await bill.save();
-      }
+      bill = await ElectricityBill.findOneAndUpdate(
+        { _id: bill._id, room: room._id, tenantUser: req.user._id, status: "pending" },
+        { $set: { status: "paid", paidAt: paymentDate } },
+        { new: true }
+      );
     }
 
     try {
@@ -206,7 +325,7 @@ const verifyPayment = async (req, res) => {
         ? "Payment verified and recorded. Your receipt is ready."
         : "Payment verified and recorded. The receipt is not available yet.",
       receiptAvailable,
-      room,
+      room: updatedRoom,
       bill,
     });
   } catch (error) {

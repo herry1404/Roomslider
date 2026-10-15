@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarClock,
+  BarChart3,
   Check,
-  Eye,
-  MousePointerClick,
   ExternalLink,
   Image,
   MapPin,
@@ -18,17 +17,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import confirmAction from "../../utils/confirmAction";
@@ -93,10 +82,6 @@ function ManageAds() {
   const [search, setSearch] = useState("");
   const [slotFilter, setSlotFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [analytics, setAnalytics] = useState(null);
-  const [analyticsDays, setAnalyticsDays] = useState(30);
-  const [analyticsRefresh, setAnalyticsRefresh] = useState(0);
-  const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
   const fetchAds = useCallback(async (showLoader = true) => {
     try {
@@ -124,24 +109,6 @@ function ManageAds() {
       });
     return () => { active = false; };
   }, []);
-
-  useEffect(() => {
-    let active = true;
-    api.get("/ads/admin/analytics", { params: { days: analyticsDays } })
-      .then(({ data }) => {
-        if (active) setAnalytics(data.analytics);
-      })
-      .catch((error) => {
-        if (active) {
-          setAnalytics(null);
-          toast.error(error.response?.data?.message || "Cafe analytics could not be loaded.");
-        }
-      })
-      .finally(() => {
-        if (active) setAnalyticsLoading(false);
-      });
-    return () => { active = false; };
-  }, [analyticsDays, analyticsRefresh]);
 
   const counts = useMemo(() => ads.reduce((result, ad) => {
     const status = getStatus(ad);
@@ -304,6 +271,9 @@ function ManageAds() {
           <p>Create and schedule the ads that appear on public cafe menu pages.</p>
         </div>
         <div className="ads-header-actions">
+          <Link to="/admin/analytics#cafe-ads" className="admin-btn secondary">
+            <BarChart3 size={16} /> Ads analytics
+          </Link>
           <button type="button" className="admin-btn secondary ads-refresh" onClick={() => fetchAds()} disabled={loading} aria-label="Refresh ads">
             <RefreshCw size={16} className={loading ? "ads-spinning" : ""} /> Refresh
           </button>
@@ -318,145 +288,6 @@ function ManageAds() {
         <div><span>Live now</span><strong>{counts.live}</strong></div>
         <div><span>Scheduled</span><strong>{counts.scheduled}</strong></div>
       </div>
-
-      <section className="ads-analytics" aria-labelledby="ads-analytics-title">
-        <div className="ads-analytics-heading">
-          <div>
-            <span className="ads-eyebrow"><Eye size={14} /> MENU + AD PERFORMANCE</span>
-            <h2 id="ads-analytics-title">Cafe traffic analytics</h2>
-            <p>Menu visits, audience by cafe and location, plus ad views and clicks.</p>
-          </div>
-          <label className="ads-range">
-            <span>Reporting period</span>
-            <select value={analyticsDays} onChange={(event) => {
-              setAnalytics(null);
-              setAnalyticsLoading(true);
-              setAnalyticsDays(Number(event.target.value));
-            }}>
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-            </select>
-          </label>
-        </div>
-
-        {analyticsLoading && !analytics ? (
-          <div className="ads-analytics-loading">Loading traffic analytics…</div>
-        ) : analytics ? (
-          <>
-            <div className="ads-metric-grid">
-              <article><span><Eye size={15} /> Menu views</span><strong>{(analytics.summary.menuViews || 0).toLocaleString("en-IN")}</strong></article>
-              <article><span><Store size={15} /> Unique sessions</span><strong>{(analytics.summary.uniqueVisitors || 0).toLocaleString("en-IN")}</strong></article>
-              <article><span><Image size={15} /> Ad impressions</span><strong>{(analytics.summary.adImpressions || 0).toLocaleString("en-IN")}</strong></article>
-              <article><span><MousePointerClick size={15} /> Ad clicks</span><strong>{(analytics.summary.adClicks || 0).toLocaleString("en-IN")}</strong></article>
-              <article><span>Ad click rate</span><strong>{analytics.summary.clickRate || 0}%</strong></article>
-            </div>
-            {!analytics.summary.menuViews && (
-              <p className="ads-analytics-note">Traffic tracking is live for cafe menu pages. New activity will appear here as visitors open menus.</p>
-            )}
-            <div className="ads-analytics-grid">
-              <article className="ads-chart-card">
-                <h3>Daily menu views</h3>
-                <div className="ads-chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={analytics.dailyViews || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis dataKey="date" tickFormatter={(date) => new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} minTickGap={25} stroke="#94a3b8" />
-                      <YAxis allowDecimals={false} stroke="#94a3b8" />
-                      <Tooltip labelFormatter={(date) => new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
-                      <Line type="monotone" dataKey="views" name="Menu views" stroke="#4ade80" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="uniqueVisitors" name="Unique visits" stroke="#38bdf8" strokeWidth={2} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-              <article className="ads-chart-card">
-                <h3>Menu views by location</h3>
-                <div className="ads-chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.byLocation || []} layout="vertical" margin={{ left: 14, right: 12 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis type="number" allowDecimals={false} stroke="#94a3b8" />
-                      <YAxis type="category" dataKey="location" width={100} stroke="#94a3b8" />
-                      <Tooltip contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
-                      <Bar dataKey="views" name="Menu views" fill="#4ade80" radius={[0, 5, 5, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-              <article className="ads-chart-card">
-                <h3>Where visitors came from</h3>
-                <div className="ads-chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.bySource || []} layout="vertical" margin={{ left: 14, right: 12 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis type="number" allowDecimals={false} stroke="#94a3b8" />
-                      <YAxis type="category" dataKey="source" width={110} stroke="#94a3b8" />
-                      <Tooltip contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
-                      <Bar dataKey="views" name="Menu views" fill="#a78bfa" radius={[0, 5, 5, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-              <article className="ads-chart-card">
-                <h3>Visitors by device platform</h3>
-                <div className="ads-chart">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.byPlatform || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis dataKey="platform" stroke="#94a3b8" />
-                      <YAxis allowDecimals={false} stroke="#94a3b8" />
-                      <Tooltip contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
-                      <Bar dataKey="views" name="Menu views" fill="#38bdf8" radius={[5, 5, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-            </div>
-
-            <div className="ads-report-grid">
-              <article className="ads-report-card">
-                <h3>Traffic by cafe and location</h3>
-                {(analytics.byCafe || []).length ? (
-                  <div className="ads-report-table-wrap">
-                    <table className="ads-report-table">
-                      <thead><tr><th>Cafe</th><th>Location</th><th>Views</th><th>Unique sessions</th></tr></thead>
-                      <tbody>{analytics.byCafe.map((row) => (
-                        <tr key={`${row.cafe}-${row.location}`}>
-                          <td>{row.cafe}</td><td>{row.location}</td>
-                          <td>{row.views.toLocaleString("en-IN")}</td>
-                          <td>{row.uniqueVisitors.toLocaleString("en-IN")}</td>
-                        </tr>
-                      ))}</tbody>
-                    </table>
-                  </div>
-                ) : <p className="ads-report-empty">No menu visits in this period yet.</p>}
-              </article>
-              <article className="ads-report-card">
-                <h3>Ad performance</h3>
-                {(analytics.adPerformance || []).length ? (
-                  <div className="ads-performance-list">{analytics.adPerformance.map((row) => (
-                    <div className="ads-performance-row" key={`${row.adId}-${row.cafe}-${row.location}`}>
-                      <div><strong>{row.text}</strong><small>{row.cafe} · {row.location} · {row.slot || "ad"}</small></div>
-                      <span>{row.impressions.toLocaleString("en-IN")} views</span>
-                      <span>{row.clicks.toLocaleString("en-IN")} clicks</span>
-                      <b>{row.clickRate}% CTR</b>
-                    </div>
-                  ))}</div>
-                ) : <p className="ads-report-empty">Ad impressions and clicks will show here once ads are viewed.</p>}
-              </article>
-            </div>
-          </>
-        ) : (
-          <div className="ads-analytics-error">
-            <p>Analytics are temporarily unavailable.</p>
-            <button type="button" className="admin-btn secondary" onClick={() => {
-              setAnalyticsLoading(true);
-              setAnalyticsRefresh((value) => value + 1);
-            }}>Retry</button>
-          </div>
-        )}
-      </section>
 
       {formOpen && (
         <form className="ads-form admin-analytics-card" onSubmit={submitAd}>
@@ -641,35 +472,6 @@ function ManageAds() {
         .ads-summary>div{padding:15px 17px;border:1px solid var(--admin-border);border-radius:14px;background:var(--admin-card)}
         .ads-summary span{display:block;color:var(--admin-muted);font-size:12px}
         .ads-summary strong{display:block;margin-top:6px;font-size:23px}
-        .ads-analytics{margin:0 0 20px;padding:16px;border:1px solid var(--admin-border);border-radius:16px;background:linear-gradient(145deg,#1e293b,#172235)}
-        .ads-analytics-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}
-        .ads-analytics-heading h2{margin:0;color:var(--admin-text);font-size:18px}
-        .ads-analytics-heading p{margin-top:4px;color:var(--admin-muted);font-size:12px}
-        .ads-range{display:grid;gap:5px;color:var(--admin-muted);font-size:10px}
-        .ads-range select{min-height:36px;padding:7px 9px;border:1px solid var(--admin-border);border-radius:9px;background:var(--admin-bg);color:var(--admin-text)}
-        .ads-metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
-        .ads-metric-grid article{min-width:0;padding:11px;border:1px solid var(--admin-border);border-radius:11px;background:#0f172a55}
-        .ads-metric-grid article>span{display:flex;align-items:center;gap:5px;color:var(--admin-muted);font-size:10px}
-        .ads-metric-grid strong{display:block;margin-top:7px;color:var(--admin-text);font-size:19px}
-        .ads-analytics-note,.ads-analytics-loading,.ads-analytics-error{padding:13px;color:var(--admin-muted);font-size:12px}
-        .ads-analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
-        .ads-chart-card,.ads-report-card{min-width:0;padding:12px;border:1px solid var(--admin-border);border-radius:12px;background:#0f172a55}
-        .ads-chart-card h3,.ads-report-card h3{margin:0 0 10px;color:var(--admin-text);font-size:13px}
-        .ads-chart{width:100%;height:220px}
-        .ads-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
-        .ads-report-table-wrap{overflow-x:auto}
-        .ads-report-table{width:100%;border-collapse:collapse;font-size:11px}
-        .ads-report-table th,.ads-report-table td{padding:8px 6px;border-bottom:1px solid var(--admin-border);text-align:left;white-space:nowrap}
-        .ads-report-table th{color:var(--admin-muted);font-weight:600}
-        .ads-report-table td{color:var(--admin-text)}
-        .ads-report-empty{padding:10px 0;color:var(--admin-muted);font-size:11px}
-        .ads-performance-list{display:grid;gap:8px}
-        .ads-performance-row{display:grid;grid-template-columns:minmax(100px,1fr) auto auto auto;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--admin-border);font-size:10px}
-        .ads-performance-row>div{display:grid;gap:3px;min-width:0}
-        .ads-performance-row strong{overflow:hidden;color:var(--admin-text);text-overflow:ellipsis;white-space:nowrap;font-size:11px}
-        .ads-performance-row small,.ads-performance-row span{color:var(--admin-muted)}
-        .ads-performance-row b{color:#4ade80;white-space:nowrap}
-        .ads-analytics-error{display:flex;align-items:center;justify-content:space-between;gap:10px}
         .ads-form{margin:0 0 20px}
         .ads-form-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
         .ads-form-heading h2{margin:0 0 4px;font-size:19px}
@@ -736,8 +538,6 @@ function ManageAds() {
           .ads-summary{gap:7px}
           .ads-summary>div{padding:12px}
           .ads-summary strong{font-size:20px}
-          .ads-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-          .ads-analytics-grid,.ads-report-grid{grid-template-columns:1fr}
           .ads-toolbar{flex-wrap:wrap}
           .ads-search{flex-basis:100%}
           .ads-toolbar select{flex:1;min-width:0}
@@ -749,13 +549,6 @@ function ManageAds() {
           .ads-header{align-items:flex-start}
           .ads-header-actions{width:100%}
           .ads-header-actions .admin-btn{flex:1;justify-content:center}
-          .ads-analytics{padding:12px}
-          .ads-analytics-heading{align-items:flex-start;flex-direction:column}
-          .ads-range{width:100%}
-          .ads-range select{width:100%}
-          .ads-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-          .ads-chart{height:200px}
-          .ads-performance-row{grid-template-columns:minmax(110px,1fr) auto}
           .ads-form-grid{grid-template-columns:1fr}
           .ads-wide,.ads-active{grid-column:auto}
           .ads-card-topline{flex-wrap:wrap}

@@ -209,6 +209,8 @@ const roomSchema = new mongoose.Schema(
             method: String,
             type: { type: String, enum: ["rent", "advance"], default: "rent" },
             receiptUrl: { type: String, default: "" },
+            razorpayOrderId: { type: String, default: "" },
+            razorpayPaymentId: { type: String, default: "" },
           },
         ],
       },

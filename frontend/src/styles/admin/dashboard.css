@@ -67,7 +67,7 @@
 }
 
 .dashboard-stats {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 0;
 }
 
@@ -94,6 +94,31 @@
 .dashboard-chart {
   width: 100%;
   height: 260px;
+}
+
+.dashboard-cafe-overview {
+  margin-top: 18px;
+}
+
+.dashboard-cafe-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, .8fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.dashboard-cafe-pie {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  height: 220px;
+}
+
+.dashboard-cafe-pie h4 {
+  justify-self: start;
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 13px;
 }
 
 .dashboard-traffic-breakdown {
@@ -255,6 +280,14 @@
 
   .dashboard-chart {
     height: 220px;
+  }
+
+  .dashboard-cafe-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-cafe-pie {
+    height: 200px;
   }
 
   .dashboard-traffic-breakdown {
