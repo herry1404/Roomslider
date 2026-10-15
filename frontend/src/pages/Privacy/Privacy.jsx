@@ -21,7 +21,7 @@ export default function Privacy() {
         <ul>
           <li>Name, phone number, email address</li>
           <li>Login credentials (password stored in encrypted/hashed form)</li>
-          <li>Device/browser information, IP address, usage logs</li>
+          <li>Device/browser information, IP address, usage logs, and anonymous page-view analytics (page path, referrer or campaign source, and broad device platform)</li>
         </ul>
         <p><strong>From Tenants:</strong></p>
         <ul>
@@ -80,10 +80,10 @@ export default function Privacy() {
         <p>To exercise these rights, contact us at roomslider.in@gmail.com.</p>
 
         <h2>6. Data Retention</h2>
-        <p>We retain personal data for as long as your account is active or as needed to provide services (e.g., tenancy history, payment records for accounting/legal purposes). Data may be retained longer where required by law.</p>
+        <p>We retain personal data for as long as your account is active or as needed to provide services (e.g., tenancy history, payment records for accounting/legal purposes). Anonymous website page-view records expire within 6 months; cafe-menu and ad performance events expire within approximately 13 months. Data may be retained longer where required by law.</p>
 
         <h2>7. Cookies & Tracking</h2>
-        <p>The Platform may use cookies or local storage to keep you logged in and improve your experience. You can disable cookies in your browser, though this may affect Platform functionality.</p>
+        <p>The Platform may use cookies or local storage to keep you logged in and improve your experience. Anonymous page-view analytics use a temporary session identifier to count visits, along with the page path, referring domain or campaign source, and broad device platform. We do not store full referrer URLs or use this identifier to identify you. You can disable cookies in your browser, though this may affect Platform functionality.</p>
 
         <h2>8. Children's Privacy</h2>
         <p>The Platform is not intended for individuals under 18 years of age. We do not knowingly collect data from minors.</p>

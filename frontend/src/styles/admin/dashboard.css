@@ -17,6 +17,198 @@
   color: var(--admin-text);
 }
 
+.dashboard-live {
+  padding: 20px;
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--admin-card), rgba(15, 23, 42, 0.92));
+}
+
+.dashboard-live-heading,
+.dashboard-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dashboard-live-heading {
+  margin-bottom: 16px;
+}
+
+.dashboard-live-heading h2 {
+  margin: 5px 0 0;
+  color: var(--admin-text);
+  font-size: 19px;
+}
+
+.dashboard-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--admin-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.dashboard-live-indicator i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.14);
+}
+
+.dashboard-updated,
+.dashboard-section-heading p {
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.dashboard-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.dashboard-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.dashboard-section {
+  min-width: 0;
+}
+
+.dashboard-section-heading {
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.dashboard-section-heading h3 {
+  margin-bottom: 4px;
+}
+
+.dashboard-chart {
+  width: 100%;
+  height: 260px;
+}
+
+.dashboard-traffic-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.dashboard-traffic-breakdown > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.dashboard-traffic-breakdown strong {
+  color: var(--admin-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dashboard-traffic-breakdown span {
+  overflow: hidden;
+  color: var(--admin-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-text-link {
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: #4ade80;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dashboard-visits {
+  display: grid;
+}
+
+.dashboard-visit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.dashboard-visit:last-child {
+  border-bottom: 0;
+}
+
+.dashboard-visit-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+}
+
+.dashboard-visit-info {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.dashboard-visit-info strong {
+  overflow: hidden;
+  color: var(--admin-text);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-visit-info small,
+.dashboard-visit time {
+  color: var(--admin-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.dashboard-visits-empty {
+  padding: 24px 8px;
+  color: var(--admin-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.dashboard-lower {
+  margin-top: 2px;
+}
+
+.dashboard-lower .dashboard-section {
+  overflow: hidden;
+}
+
+.dashboard-lower .quick-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 /* ===========================
    QUICK ACTIONS
 =========================== */
@@ -41,5 +233,39 @@
 @media (max-width: 600px) {
   .quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-live {
+    padding: 14px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .dashboard-stats .admin-stat-card {
+    padding: 13px;
+  }
+
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .dashboard-chart {
+    height: 220px;
+  }
+
+  .dashboard-traffic-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-lower .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-live-heading {
+    align-items: flex-start;
   }
 }

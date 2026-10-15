@@ -26,6 +26,8 @@ const cafeMenuAnalyticsSchema = new mongoose.Schema(
       required: true,
       maxlength: 80,
     },
+    source: { type: String, trim: true, maxlength: 100, default: "Direct" },
+    platform: { type: String, trim: true, maxlength: 24, default: "Other" },
     adId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Ad",

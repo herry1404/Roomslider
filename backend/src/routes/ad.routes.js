@@ -2,6 +2,7 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
+const upload = require("../middleware/upload.middleware");
 const {
   getPublicAds,
   listAds,
@@ -28,6 +29,12 @@ router.get("/", publicAdLimiter, getPublicAds);
 router.post("/analytics", publicAdLimiter, trackCafeMenuEvent);
 router.get("/admin", protect, adminOnly, listAds);
 router.get("/admin/analytics", protect, adminOnly, getCafeMenuAnalytics);
+router.post("/admin/upload", protect, adminOnly, upload.single("image"), async (req, res) => {
+  if (!req.file?.path || !req.file.mimetype?.startsWith("image/")) {
+    return res.status(400).json({ success: false, message: "Choose a valid image file" });
+  }
+  return res.status(201).json({ success: true, imageUrl: req.file.path });
+});
 router.post("/admin", protect, adminOnly, createAd);
 router.put("/admin/:id", protect, adminOnly, updateAd);
 router.patch("/admin/:id/active", protect, adminOnly, toggleAd);

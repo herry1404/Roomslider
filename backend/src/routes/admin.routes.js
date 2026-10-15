@@ -18,6 +18,7 @@ const {
   getAllUsers,
   deleteUser,
 } = require("../controllers/admin.controller");
+const { getSiteTraffic } = require("../controllers/siteAnalytics.controller");
 const {
   getAdminAlerts,
   markAdminAlertRead,
@@ -38,6 +39,7 @@ router.get(
 );
 
 router.get("/analytics", protect, adminOnly, getAnalytics);
+router.get("/traffic", protect, adminOnly, getSiteTraffic);
 router.get("/alerts", protect, adminOnly, getAdminAlerts);
 router.patch("/alerts/read-all", protect, adminOnly, markAllAdminAlertsRead);
 router.patch("/alerts/:id/read", protect, adminOnly, markAdminAlertRead);

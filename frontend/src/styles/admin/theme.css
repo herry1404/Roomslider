@@ -50,6 +50,38 @@
   height: 300px;
 }
 
+.admin-traffic-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-traffic-page:last-child {
+  border-bottom: 0;
+}
+
+.admin-traffic-page span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-traffic-page strong {
+  color: var(--admin-text);
+}
+
+.admin-traffic-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
 @media (max-width: 520px) {
   .admin-analytics-chart {
     height: 250px;

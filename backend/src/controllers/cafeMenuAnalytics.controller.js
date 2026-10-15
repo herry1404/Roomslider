@@ -9,6 +9,8 @@ const trackSchema = z.object({
   cafe: slug,
   location: slug,
   visitorId: z.string().regex(/^[a-zA-Z0-9-]{16,80}$/),
+  source: z.string().trim().min(1).max(100).optional(),
+  platform: z.enum(["Android", "iOS", "Windows", "macOS", "Linux", "Other"]).optional(),
   adId: z.string().regex(/^[a-f\d]{24}$/i).optional(),
 }).superRefine((event, context) => {
   if (event.type !== "menu_view" && !event.adId) {
@@ -46,7 +48,7 @@ const getCafeMenuAnalytics = async (req, res) => {
     start.setUTCHours(0, 0, 0, 0);
     start.setUTCDate(start.getUTCDate() - days + 1);
     const match = { createdAt: { $gte: start } };
-    const [summaryRows, dailyRows, cafeRows, locationRows, adRows] = await Promise.all([
+    const [summaryRows, dailyRows, cafeRows, locationRows, adRows, sourceRows, platformRows] = await Promise.all([
       CafeMenuAnalytics.aggregate([
         { $match: match },
         {
@@ -98,6 +100,19 @@ const getCafeMenuAnalytics = async (req, res) => {
         { $sort: { impressions: -1, clicks: -1 } },
         { $limit: 100 },
       ]),
+      CafeMenuAnalytics.aggregate([
+        { $match: { ...match, type: "menu_view" } },
+        { $group: { _id: "$source", views: { $sum: 1 }, visitors: { $addToSet: "$visitorId" } } },
+        { $project: { source: { $ifNull: ["$_id", "Direct"] }, views: 1, uniqueVisitors: { $size: "$visitors" } } },
+        { $sort: { views: -1, source: 1 } },
+        { $limit: 10 },
+      ]),
+      CafeMenuAnalytics.aggregate([
+        { $match: { ...match, type: "menu_view" } },
+        { $group: { _id: "$platform", views: { $sum: 1 }, visitors: { $addToSet: "$visitorId" } } },
+        { $project: { platform: { $ifNull: ["$_id", "Other"] }, views: 1, uniqueVisitors: { $size: "$visitors" } } },
+        { $sort: { views: -1, platform: 1 } },
+      ]),
     ]);
 
     const adIds = [...new Set(adRows.map((row) => row._id.adId.toString()))]
@@ -119,6 +134,8 @@ const getCafeMenuAnalytics = async (req, res) => {
         dailyViews: dailyRows,
         byCafe: cafeRows,
         byLocation: locationRows,
+        bySource: sourceRows,
+        byPlatform: platformRows,
         adPerformance: adRows.map((row) => {
           const ad = adsById.get(row._id.adId.toString());
           return {

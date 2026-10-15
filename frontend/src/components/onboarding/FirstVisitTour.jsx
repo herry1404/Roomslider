@@ -22,11 +22,6 @@ function getSteps() {
   return [
     ...(isMobile ? [exploreStep, accountStep] : [accountStep, exploreStep]),
     {
-      target: '[data-tour="hourly-stays"]',
-      title: "Hourly and short stays",
-      description: "Scroll down to find rooms you can book by the hour or for a short stay.",
-    },
-    {
       target: '[data-tour="wishlist"]',
       title: "Save a listing",
       description: "Tap the heart on a listing to save it. Log in first, then find saved places in your account menu.",

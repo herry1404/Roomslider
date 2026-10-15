@@ -89,6 +89,7 @@ function ManageAds() {
   const [editingId, setEditingId] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [imageUploading, setImageUploading] = useState(false);
   const [search, setSearch] = useState("");
   const [slotFilter, setSlotFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -168,7 +169,7 @@ function ManageAds() {
   };
 
   const closeForm = () => {
-    if (saving) return;
+    if (saving || imageUploading) return;
     setEditingId(null);
     setForm(emptyForm());
     setFormOpen(false);
@@ -196,6 +197,11 @@ function ManageAds() {
 
   const submitAd = async (event) => {
     event.preventDefault();
+    const imageField = form.slot === "top" ? "logoUrl" : "imageUrl";
+    if (!form[imageField]) {
+      toast.error("Upload an ad image before publishing.");
+      return;
+    }
     const payload = {
       ...form,
       startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : undefined,
@@ -231,6 +237,34 @@ function ManageAds() {
       toast.error(error.response?.data?.message || "Could not save ad. Check the details and try again.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const uploadAdImage = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Choose a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be 5 MB or smaller.");
+      return;
+    }
+
+    const imageField = form.slot === "top" ? "logoUrl" : "imageUrl";
+    const data = new FormData();
+    data.append("image", file);
+    setImageUploading(true);
+    try {
+      const { data: result } = await api.post("/ads/admin/upload", data);
+      setForm((current) => ({ ...current, [imageField]: result.imageUrl }));
+      toast.success("Ad image uploaded.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Could not upload the ad image.");
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -350,6 +384,34 @@ function ManageAds() {
                   </ResponsiveContainer>
                 </div>
               </article>
+              <article className="ads-chart-card">
+                <h3>Where visitors came from</h3>
+                <div className="ads-chart">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.bySource || []} layout="vertical" margin={{ left: 14, right: 12 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis type="number" allowDecimals={false} stroke="#94a3b8" />
+                      <YAxis type="category" dataKey="source" width={110} stroke="#94a3b8" />
+                      <Tooltip contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
+                      <Bar dataKey="views" name="Menu views" fill="#a78bfa" radius={[0, 5, 5, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+              <article className="ads-chart-card">
+                <h3>Visitors by device platform</h3>
+                <div className="ads-chart">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.byPlatform || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="platform" stroke="#94a3b8" />
+                      <YAxis allowDecimals={false} stroke="#94a3b8" />
+                      <Tooltip contentStyle={{ background: "#0f172a", borderColor: "#334155", color: "#f8fafc" }} />
+                      <Bar dataKey="views" name="Menu views" fill="#38bdf8" radius={[5, 5, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
             </div>
 
             <div className="ads-report-grid">
@@ -404,7 +466,7 @@ function ManageAds() {
               <h2>{editingId ? "Edit cafe ad" : "Create a cafe ad"}</h2>
               <p>Choose where it appears, add the creative, and publish now or schedule it.</p>
             </div>
-            <button type="button" className="admin-icon-btn" onClick={closeForm} aria-label="Close ad form" disabled={saving}><X size={20} /></button>
+            <button type="button" className="admin-icon-btn" onClick={closeForm} aria-label="Close ad form" disabled={saving || imageUploading}><X size={20} /></button>
           </div>
 
           <div className="ads-form-grid">
@@ -452,19 +514,13 @@ function ManageAds() {
               <input required maxLength={120} placeholder="Short message customers will see" value={form.text} onChange={(event) => setForm({ ...form, text: event.target.value })} />
               <small>Up to 120 characters.</small>
             </label>
-            <label className="ads-wide">
-              <span><Image size={14} /> {form.slot === "top" ? "Logo image URL (HTTPS)" : "Banner image URL (HTTPS)"}</span>
-              <input
-                required
-                type="url"
-                placeholder="https://example.com/your-ad-image.jpg"
-                value={form.slot === "top" ? form.logoUrl : form.imageUrl}
-                onChange={(event) => setForm({
-                  ...form,
-                  [form.slot === "top" ? "logoUrl" : "imageUrl"]: event.target.value,
-                })}
-              />
-              <small>{form.slot === "top" ? "Square logo or brand mark." : "Wide banner image works best."} Image URL must start with https://.</small>
+            <label className="ads-wide ads-upload">
+              <span><Image size={14} /> {form.slot === "top" ? "Upload logo image" : "Upload banner image"}</span>
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadAdImage} disabled={imageUploading || saving} />
+              <small>{imageUploading ? "Uploading image…" : `${form.slot === "top" ? "Square logo or brand mark." : "Wide banner image works best."} JPG, PNG, or WebP · 5 MB max.`}</small>
+              {(form.slot === "top" ? form.logoUrl : form.imageUrl) && (
+                <span className="ads-uploaded"><Check size={14} /> Image ready to publish</span>
+              )}
             </label>
             <label className="ads-wide">
               <span><ExternalLink size={14} /> Click-through link (HTTPS)</span>
@@ -501,8 +557,8 @@ function ManageAds() {
           )}
 
           <div className="ads-form-actions">
-            <button type="button" className="admin-btn secondary" onClick={closeForm} disabled={saving}>Cancel</button>
-            <button type="submit" className="admin-btn" disabled={saving}>
+            <button type="button" className="admin-btn secondary" onClick={closeForm} disabled={saving || imageUploading}>Cancel</button>
+            <button type="submit" className="admin-btn" disabled={saving || imageUploading}>
               <Check size={16} /> {saving ? "Publishing..." : editingId ? "Save changes" : "Publish ad"}
             </button>
           </div>
@@ -625,6 +681,9 @@ function ManageAds() {
         .ads-form-grid input:not([type=checkbox]),.ads-form-grid select{box-sizing:border-box;width:100%;min-width:0;min-height:42px;padding:10px 12px;color:var(--admin-text);background:var(--admin-bg);border:1px solid var(--admin-border);border-radius:10px}
         .ads-form-grid input:focus,.ads-form-grid select:focus{outline:2px solid #16a34a55;border-color:#16a34a}
         .ads-form-grid small{color:var(--admin-muted);font-size:11px;line-height:1.45}
+        .ads-upload input[type=file]{box-sizing:border-box;width:100%;padding:9px 11px;color:var(--admin-text);background:var(--admin-bg);border:1px dashed var(--admin-border);border-radius:10px;font-size:12px}
+        .ads-upload input[type=file]::file-selector-button{margin-right:10px;padding:7px 10px;border:0;border-radius:7px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer}
+        .ads-upload .ads-uploaded{display:flex;align-items:center;gap:5px;color:#4ade80;font-size:11px}
         .ads-form-grid code{color:#86efac}
         .ads-wide{grid-column:1/-1}
         .ads-active{display:flex!important;grid-column:1/-1;align-items:center;gap:10px!important;padding:11px 12px;border:1px solid var(--admin-border);border-radius:10px}

@@ -7,7 +7,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
-let cafeSlugLock = {};
+let cafeSlugLock;
 try {
   cafeSlugLock = JSON.parse(
     fs.readFileSync(path.resolve(rootDir, "../cafes/slugs.lock.json"), "utf8")
@@ -38,7 +38,7 @@ const visitCafeLock = (value, keyHint) => {
   }
   Object.entries(value).forEach(([key, entry]) => visitCafeLock(entry, key));
 };
-visitCafeLock(cafeSlugLock);
+visitCafeLock(cafeSlugLock || {});
 // Keep the currently served cafe menu excluded if this checkout has no slug lock.
 addCafePath("htlcafe");
 
@@ -105,7 +105,11 @@ export default defineConfig(({ mode }) => {
         globIgnores: ["**/*.map"],
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.mode === "navigate",
+              urlPattern: ({ request, url }) =>
+                request.mode === "navigate" &&
+                !url.pathname.startsWith("/c/") &&
+                !url.pathname.startsWith("/cafe/") &&
+                !/^\/htlcafe(?:\/|$)/.test(url.pathname),
             handler: "NetworkFirst",
             options: {
               cacheName: "pages-cache",

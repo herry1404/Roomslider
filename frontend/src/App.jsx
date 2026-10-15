@@ -111,6 +111,7 @@ const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
 const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
 const Reels = lazy(() => import("./pages/Reels/Reels"));
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
+import SiteAnalyticsTracker from "./components/SiteAnalyticsTracker";
 
 const AdminRoute = lazy(() => import("./components/AdminRoute"));
 import OwnerRoute from "./components/OwnerRoute";
@@ -158,6 +159,7 @@ function App() {
 
   return (
     <>
+      <SiteAnalyticsTracker />
       <PrivateRouteRobots />
       <ScrollToTop />
       <BackToTop />
