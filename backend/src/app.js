@@ -47,6 +47,7 @@ const donationRoutes = require("./routes/donation.routes");
 const bloodRequestRoutes = require("./routes/bloodRequest.routes");
 const telegramWebhookRoutes = require("./routes/telegramWebhook.routes");
 const adRoutes = require("./routes/ad.routes");
+const cafeMenuSearchRoutes = require("./routes/cafeMenuSearch.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 
 
@@ -229,6 +230,7 @@ app.use(
 
 app.use("/api/ads", adRoutes);
 app.use("/api/promo-listings", adRoutes);
+app.use("/api/cafe-menu-search", cafeMenuSearchRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 

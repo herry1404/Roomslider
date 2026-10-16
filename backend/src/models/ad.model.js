@@ -25,6 +25,12 @@ const adSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    cafes: {
+      type: [String],
+      default: undefined,
+      lowercase: true,
+      trim: true,
+    },
     location: {
       type: String,
       default: "",
@@ -66,6 +72,7 @@ const adSchema = new mongoose.Schema(
 );
 
 adSchema.index({ slot: 1, cafe: 1, active: 1 });
+adSchema.index({ slot: 1, cafes: 1, active: 1 });
 adSchema.index({ slot: 1, location: 1, active: 1 });
 
 module.exports = mongoose.model("Ad", adSchema);

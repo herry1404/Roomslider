@@ -25,7 +25,11 @@ test("public cafe ads return up to ten ads from the most specific target per pla
     lean: async () => records,
   };
   const originalFind = Ad.find;
-  Ad.find = () => query;
+  let queryFilter;
+  Ad.find = (filter) => {
+    queryFilter = filter;
+    return query;
+  };
 
   const response = {
     statusCode: 0,
@@ -41,6 +45,8 @@ test("public cafe ads return up to ten ads from the most specific target per pla
   }
 
   assert.equal(response.statusCode, 200);
+  const cafeTarget = queryFilter.$and[0].$or.find((target) => target.targetBy === "cafe");
+  assert.deepEqual(cafeTarget.$or[1].cafes.$in, ["wowpav"]);
   assert.equal(response.payload.top.length, 10);
   assert.deepEqual(response.payload.top.map((ad) => ad.id), cafeTopAds.slice(0, 10).map((ad) => ad._id));
   assert.deepEqual(response.payload.bottom.map((ad) => ad.id), ["location-bottom"]);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarClock,
   BarChart3,
@@ -20,13 +20,14 @@ import {
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
+import cafes from "../../data/cafes";
 import confirmAction from "../../utils/confirmAction";
 import "../../styles/admin/theme.css";
 
 const emptyForm = () => ({
   slot: "top",
   targetBy: "cafe",
-  cafe: "wowpav",
+  cafes: ["wowpav"],
   location: "bhawarkua",
   text: "",
   logoUrl: "",
@@ -66,7 +67,11 @@ const loadAds = () => api.get("/promo-listings/admin").then(({ data }) => (
 const getTarget = (ad) => {
   const targetBy = ad.targetBy || (ad.cafe === "all" ? "all" : "cafe");
   if (targetBy === "location") return `Location · ${ad.location || "—"}`;
-  if (targetBy === "cafe") return `Cafe · ${ad.cafe || "—"}`;
+  if (targetBy === "cafe") {
+    const slugs = ad.cafes?.length ? ad.cafes : [ad.cafe].filter(Boolean);
+    const names = slugs.map((slug) => cafes.find((cafe) => cafe.id === slug || (slug === "htlcafe" && cafe.id === "htl-cafe"))?.name || slug);
+    return `Cafe${names.length > 1 ? "s" : ""} · ${names.join(", ") || "—"}`;
+  }
   return "All cafes";
 };
 
@@ -80,7 +85,7 @@ const getStatus = (ad) => {
 
 const getMenuUrl = (ad) => {
   if (ad.targetBy === "location") return null;
-  const cafe = ad.cafe || "";
+  const cafe = ad.cafes?.[0] || ad.cafe || "";
   if (!cafe || cafe === "all") return null;
   const knownLocations = { wowpav: "bhawarkua", waffleo: "bhawarkua", yuvanamritulya: "vishnupuri", "htl-cafe": "indrapuri", htlcafe: "indrapuri", biryanikendra: "sapnasangeeta" };
   const cafePath = cafe === "htlcafe" ? "htl-cafe" : cafe;
@@ -98,6 +103,7 @@ function ManageAds() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [imageUploading, setImageUploading] = useState(false);
+  const imageInputRef = useRef(null);
   const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
   const [slotFilter, setSlotFilter] = useState("all");
@@ -172,7 +178,7 @@ function ManageAds() {
     setForm({
       slot: ad.slot || "top",
       targetBy,
-      cafe: ad.cafe === "all" ? "" : ad.cafe || "",
+      cafes: ad.cafes?.length ? ad.cafes : ad.cafe && ad.cafe !== "all" ? [ad.cafe] : [],
       location: ad.location || "",
       text: ad.text || "",
       logoUrl: ad.logoUrl || "",
@@ -188,6 +194,10 @@ function ManageAds() {
 
   const submitAd = async (event) => {
     event.preventDefault();
+    if (form.targetBy === "cafe" && !form.cafes.length) {
+      toast.error("Choose at least one cafe for this ad.");
+      return;
+    }
     const imageField = form.slot === "top" ? "logoUrl" : "imageUrl";
     if (!form[imageField]) {
       toast.error("Upload an ad image before publishing.");
@@ -213,13 +223,16 @@ function ManageAds() {
       endsAt: form.endsAt ? new Date(form.endsAt).toISOString() : undefined,
     };
     if (form.targetBy === "cafe") {
-      payload.cafe = form.cafe.trim().toLowerCase();
+      payload.cafes = form.cafes;
+      payload.cafe = form.cafes[0];
       delete payload.location;
     } else if (form.targetBy === "location") {
       payload.location = form.location.trim().toLowerCase();
       delete payload.cafe;
+      delete payload.cafes;
     } else {
       delete payload.cafe;
+      delete payload.cafes;
       delete payload.location;
     }
     if (form.slot === "top") delete payload.imageUrl;
@@ -353,24 +366,40 @@ function ManageAds() {
               <select value={form.targetBy} onChange={(event) => setForm({
                 ...form,
                 targetBy: event.target.value,
-                cafe: event.target.value === "cafe" ? (form.cafe || "wowpav") : "",
+                cafes: event.target.value === "cafe" ? (form.cafes.length ? form.cafes : ["wowpav"]) : [],
                 location: event.target.value === "location" ? (form.location || "bhawarkua") : "",
               })}>
-                <option value="cafe">One cafe</option>
+                <option value="cafe">Selected cafes</option>
                 <option value="location">All cafes in one location</option>
                 <option value="all">All cafes and locations</option>
               </select>
               <small>
-                {form.targetBy === "cafe" ? "Best for a single cafe, e.g. Wow Pav." : form.targetBy === "location" ? "Matches the location in the menu URL, e.g. Bhawarkua." : "Use this for a promotion that applies everywhere."}
+                {form.targetBy === "cafe" ? "Choose one or more cafes from the list below." : form.targetBy === "location" ? "Matches the location in the menu URL, e.g. Bhawarkua." : "Use this for a promotion that applies everywhere."}
               </small>
             </label>
 
             {form.targetBy === "cafe" && (
-              <label>
-                <span><Store size={14} /> Cafe slug</span>
-                <input required maxLength={100} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="wowpav" value={form.cafe} onChange={(event) => setForm({ ...form, cafe: event.target.value.toLowerCase() })} />
-                <small>Use the cafe part of its public menu URL. Wow Pav is <code>wowpav</code>.</small>
-              </label>
+              <fieldset className="ads-cafe-picker ads-wide">
+                <legend><Store size={14} /> Choose cafes</legend>
+                <p>Select one or more cafes where this promotion should appear.</p>
+                <div className="ads-cafe-options">
+                  {cafes.map((cafe) => (
+                    <label className="ads-cafe-option" key={cafe.id}>
+                      <input
+                        type="checkbox"
+                        checked={form.cafes.includes(cafe.id)}
+                        onChange={(event) => setForm((current) => ({
+                          ...current,
+                          cafes: event.target.checked
+                            ? [...current.cafes, cafe.id]
+                            : current.cafes.filter((id) => id !== cafe.id),
+                        }))}
+                      />
+                      <span><strong>{cafe.name}</strong><small>{cafe.area}</small></span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
             )}
             {form.targetBy === "location" && (
               <label>
@@ -384,14 +413,22 @@ function ManageAds() {
               <input required maxLength={120} placeholder="Short message customers will see" value={form.text} onChange={(event) => setForm({ ...form, text: event.target.value })} />
               <small>Up to 120 characters.</small>
             </label>
-            <label className="ads-wide ads-upload">
-              <span><Image size={14} /> {form.slot === "top" ? "Upload logo image" : "Upload banner image"}</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadAdImage} disabled={imageUploading || saving} />
-              <small>{imageUploading ? "Uploading image…" : `${form.slot === "top" ? "Square logo or brand mark." : "Wide banner image works best."} JPG, PNG, or WebP · 5 MB max.`}</small>
-              {(form.slot === "top" ? form.logoUrl : form.imageUrl) && (
-                <span className="ads-uploaded"><Check size={14} /> Image ready to publish</span>
-              )}
-            </label>
+            <div className="ads-wide ads-upload">
+              <span><Image size={14} /> Ad image</span>
+              <input ref={imageInputRef} className="ads-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadAdImage} disabled={imageUploading || saving} />
+              <div className="ads-upload-control">
+                {(form.slot === "top" ? form.logoUrl : form.imageUrl) && <img src={form.slot === "top" ? form.logoUrl : form.imageUrl} alt="Ad image preview" />}
+                <div>
+                  <strong>{form.slot === "top" ? "Square logo or brand mark" : "Wide banner image"}</strong>
+                  <small>{imageUploading ? "Uploading image…" : "JPG, PNG, or WebP · 5 MB max"}</small>
+                </div>
+                <button type="button" className="admin-btn secondary" onClick={() => imageInputRef.current?.click()} disabled={imageUploading || saving}>
+                  <Image size={16} /> {imageUploading ? "Uploading…" : (form.slot === "top" ? form.logoUrl : form.imageUrl) ? "Change image" : "Upload image"}
+                </button>
+              </div>
+              {imageUploading && <span className="ads-uploaded"><RefreshCw size={14} className="ads-spinning" /> Uploading image…</span>}
+              {(form.slot === "top" ? form.logoUrl : form.imageUrl) && !imageUploading && <span className="ads-uploaded"><Check size={14} /> Image ready to preview</span>}
+            </div>
             <label className="ads-wide">
               <span><ExternalLink size={14} /> Ad ka link</span>
               <input required type="text" inputMode="url" autoComplete="url" placeholder="roomslider.in ya https://roomslider.in" value={form.linkUrl} onChange={(event) => setForm({ ...form, linkUrl: event.target.value })} onBlur={(event) => setForm((current) => ({ ...current, linkUrl: normalizeLinkUrl(event.target.value) }))} />
@@ -447,6 +484,7 @@ function ManageAds() {
               {form.slot === "bottom" && <img src={form.imageUrl} alt="" />}
               <div><small>ADVERTISEMENT</small><strong>{form.text}</strong><span>Visit advertiser ↗</span></div>
             </div>
+            <p className="ads-preview-destination">Shown on: <strong>{getTarget({ ...form, cafe: form.cafes[0] })}</strong></p>
             <p className="ads-preview-destination">Link: <strong>{normalizeLinkUrl(form.linkUrl)}</strong></p>
             <p className="ads-preview-destination">Placement: <strong>{form.slot === "top" ? "Above the menu search bar" : "Below the menu items"}</strong></p>
             <div className="ads-form-actions">
@@ -553,8 +591,24 @@ function ManageAds() {
         .ads-form-grid input:not([type=checkbox]),.ads-form-grid select{box-sizing:border-box;width:100%;min-width:0;min-height:42px;padding:10px 12px;color:var(--admin-text);background:var(--admin-bg);border:1px solid var(--admin-border);border-radius:10px}
         .ads-form-grid input:focus,.ads-form-grid select:focus{outline:2px solid #16a34a55;border-color:#16a34a}
         .ads-form-grid small{color:var(--admin-muted);font-size:11px;line-height:1.45}
-        .ads-upload input[type=file]{box-sizing:border-box;width:100%;padding:9px 11px;color:var(--admin-text);background:var(--admin-bg);border:1px dashed var(--admin-border);border-radius:10px;font-size:12px}
-        .ads-upload input[type=file]::file-selector-button{margin-right:10px;padding:7px 10px;border:0;border-radius:7px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer}
+        .ads-upload{display:grid;gap:8px;color:var(--admin-muted);font-size:12px}
+        .ads-upload>span{display:flex;align-items:center;gap:6px;color:var(--admin-text);font-size:13px;font-weight:700}
+        .ads-cafe-picker{min-width:0;margin:0;padding:14px;border:1px solid var(--admin-border);border-radius:12px}
+        .ads-cafe-picker legend{display:flex;align-items:center;gap:6px;padding:0 6px;color:var(--admin-text);font-size:13px;font-weight:700}
+        .ads-cafe-picker>p{margin:0 0 10px;color:var(--admin-muted);font-size:11px}
+        .ads-cafe-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+        .ads-cafe-option{display:flex!important;grid-template-columns:none!important;align-items:center;gap:9px!important;padding:10px;border:1px solid var(--admin-border);border-radius:10px;background:var(--admin-bg);cursor:pointer}
+        .ads-cafe-option:has(input:checked){border-color:#16a34a;background:#16a34a12}
+        .ads-cafe-option input{width:16px;height:16px;accent-color:#16a34a}
+        .ads-cafe-option span{display:grid;gap:2px}
+        .ads-cafe-option strong{color:var(--admin-text);font-size:12px}
+        .ads-cafe-option small{font-size:10px!important}
+        .ads-file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}
+        .ads-upload-control{display:flex;align-items:center;gap:12px;min-height:76px;padding:11px;border:1px dashed var(--admin-border);border-radius:12px;background:var(--admin-bg)}
+        .ads-upload-control>img{width:56px;height:56px;flex:none;border-radius:8px;object-fit:cover;background:var(--admin-card)}
+        .ads-upload-control>div{display:grid;flex:1;gap:4px;min-width:0}
+        .ads-upload-control strong{color:var(--admin-text);font-size:12px}
+        .ads-upload-control .admin-btn{white-space:nowrap}
         .ads-upload .ads-uploaded{display:flex;align-items:center;gap:5px;color:#4ade80;font-size:11px}
         .ads-form-grid code{color:#86efac}
         .ads-wide{grid-column:1/-1}
@@ -635,6 +689,9 @@ function ManageAds() {
           .ads-header-actions .admin-btn{flex:1;justify-content:center}
           .ads-form-grid{grid-template-columns:1fr}
           .ads-wide,.ads-active{grid-column:auto}
+          .ads-cafe-picker.ads-wide{grid-column:1/-1}
+          .ads-upload-control{flex-wrap:wrap}
+          .ads-upload-control .admin-btn{flex:1;justify-content:center}
           .ads-card-topline{flex-wrap:wrap}
           .ads-dates{line-height:1.5}
         }

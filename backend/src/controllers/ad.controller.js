@@ -13,6 +13,7 @@ const adSchema = z.object({
   slot: z.enum(["top", "bottom"]),
   targetBy: z.enum(["all", "cafe", "location"]).default("cafe"),
   cafe: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+  cafes: z.array(z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).optional(),
   location: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
   text: z.string().trim().min(1).max(120),
   logoUrl: httpsUrl.optional(),
@@ -22,8 +23,8 @@ const adSchema = z.object({
   startsAt: optionalDate,
   endsAt: optionalDate,
 }).superRefine((ad, context) => {
-  if (ad.targetBy === "cafe" && !ad.cafe) {
-    context.addIssue({ code: z.ZodIssueCode.custom, message: "A cafe slug is required for cafe targeting", path: ["cafe"] });
+  if (ad.targetBy === "cafe" && !ad.cafe && !ad.cafes?.length) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: "Choose at least one cafe", path: ["cafes"] });
   }
   if (ad.targetBy === "location" && !ad.location) {
     context.addIssue({ code: z.ZodIssueCode.custom, message: "A location slug is required for location targeting", path: ["location"] });
@@ -71,7 +72,10 @@ const getPublicAds = async (req, res) => {
     const targetMatches = [
       { targetBy: "all", cafe: "all" },
       ...(cafe ? [
-          { targetBy: "cafe", cafe: { $in: cafeSlugs } },
+          { targetBy: "cafe", $or: [
+            { cafe: { $in: cafeSlugs } },
+            { cafes: { $in: cafeSlugs } },
+          ] },
           { targetBy: { $exists: false }, cafe: { $in: [...cafeSlugs, "all"] } },
       ] : []),
       ...(location ? [{ targetBy: "location", location: location.data }] : []),
@@ -129,7 +133,13 @@ const createAd = async (req, res) => {
   const fields = parseOrRespond(adSchema, req.body, res);
   if (!fields) return;
   try {
-    const ad = await Ad.create(fields);
+    const ad = await Ad.create({
+      ...fields,
+      ...(fields.targetBy === "cafe" ? {
+        cafe: fields.cafes?.[0] || fields.cafe,
+        cafes: fields.cafes || [fields.cafe],
+      } : {}),
+    });
     return res.status(201).json({ success: true, ad });
   } catch (error) {
     console.error("CREATE AD ERROR:", error);
@@ -147,7 +157,8 @@ const updateAd = async (req, res) => {
     const ad = await Ad.findByIdAndUpdate(req.params.id, {
       $set: {
         ...fields,
-        cafe: fields.targetBy === "cafe" ? fields.cafe : "all",
+        cafe: fields.targetBy === "cafe" ? (fields.cafes?.[0] || fields.cafe) : "all",
+        cafes: fields.targetBy === "cafe" ? (fields.cafes || [fields.cafe]) : [],
         location: fields.targetBy === "location" ? fields.location : "",
       },
       $unset: { [fields.slot === "top" ? "imageUrl" : "logoUrl"]: 1 },

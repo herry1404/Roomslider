@@ -163,6 +163,7 @@ function render(){
 document.getElementById('q').oninput=function(){var v=this.value.toLowerCase();m.querySelectorAll('section').forEach(function(s){var any=0;s.querySelectorAll('.it').forEach(function(r){var ok=!v||r.textContent.toLowerCase().indexOf(v)>-1||s.querySelector('h2').textContent.toLowerCase().indexOf(v)>-1;r.classList.toggle('hide',!ok);if(ok)any=1});s.classList.toggle('hide',!any);if(any)s.classList.add('in')})};
 render();
 </script>
+<script src="/cafe-menu-ai.js" defer></script>
 <script src="/cafe-ads.js" defer></script>
 <script src="/cafe-analytics.js" defer></script>
 </body>

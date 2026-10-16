@@ -31,12 +31,17 @@ const EXAMPLES = [
   "Laundry service",
   "Tiffin near Palasia",
   "Wi-Fi / RO",
+  "Biryani near Bhawarkua",
 ];
+
+const isCafeMenuQuestion = (message) => (
+  /\b(menu|menus|cafe|cafes|biryani|chai|tea|coffee|pizza|burger|waffle|maggie|maggi|momos|pav|sandwich|shake|khichdi|fries|pasta|idli|vada|appe|corn|rice|noodles|dosa|paneer|rolls?)\b/i.test(message)
+);
 
 const WELCOME_MESSAGE = {
   id: "welcome",
   role: "assistant",
-  text: "Namaste! Room, villa, hourly stay, mess, car-bike ya laundry dhoondhiye. Area ya budget bhi likh sakte hain, jaise “villa near Vijay Nagar under 10000”.",
+  text: "Namaste! Room, villa, services ya cafe menu items dhoondhiye. Area bhi likh sakte hain, jaise “biryani near Bhawarkua”.",
   results: [],
   cards: [],
 };
@@ -288,7 +293,10 @@ function AIAssistant({ initialOpen = false, onClose }) {
     setLoading(true);
 
     try {
-      const { data } = await api.post("/assistant", { message: text });
+      const { data } = await api.post(
+        isCafeMenuQuestion(text) ? "/cafe-menu-search" : "/assistant",
+        { message: text },
+      );
       const results = normalizeResults(data);
       const groups = Array.isArray(data.groups)
         ? data.groups.map((group) => ({
@@ -361,7 +369,7 @@ function AIAssistant({ initialOpen = false, onClose }) {
             </span>
             <span className="ai-assistant-heading">
               <strong>RoomSlider AI Assistant</strong>
-              <small>Rooms, villas, services & more</small>
+              <small>Rooms, services, cafe menus & more</small>
             </span>
             <button type="button" className="ai-assistant-clear" onClick={clearChat} aria-label="Clear chat">
               <Trash2 size={16} />
