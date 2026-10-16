@@ -131,7 +131,7 @@ function AdminAnalytics() {
       getWithRetry("/admin/analytics"),
       getWithRetry("/admin/traffic", { params: { days: apiDays } }),
       getWithRetry("/admin/traffic", { params: { days: 90 } }),
-      getWithRetry("/ads/admin/analytics", { params: { days: apiDays } }),
+      getWithRetry("/promo-listings/admin/analytics", { params: { days: apiDays } }),
     ]);
     const labels = ["Listings and engagement", "Site traffic", "Traffic history", "Cafe menu and ad"];
     const rejected = results

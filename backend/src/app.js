@@ -228,6 +228,7 @@ app.use(
 );
 
 app.use("/api/ads", adRoutes);
+app.use("/api/promo-listings", adRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 

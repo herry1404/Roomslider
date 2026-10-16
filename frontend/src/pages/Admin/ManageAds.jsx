@@ -59,7 +59,7 @@ const getLoadError = (error) => {
   return error.response.data?.message || "Could not load ads. Please try again.";
 };
 
-const loadAds = () => api.get("/ads/admin").then(({ data }) => (
+const loadAds = () => api.get("/promo-listings/admin").then(({ data }) => (
   Array.isArray(data.ads) ? data.ads : []
 ));
 
@@ -228,10 +228,10 @@ function ManageAds() {
     try {
       setSaving(true);
       if (editingId) {
-        await api.put(`/ads/admin/${editingId}`, payload);
+        await api.put(`/promo-listings/admin/${editingId}`, payload);
         toast.success("Ad updated and published.");
       } else {
-        await api.post("/ads/admin", payload);
+        await api.post("/promo-listings/admin", payload);
         toast.success("Ad created and published.");
       }
       setEditingId(null);
@@ -264,7 +264,7 @@ function ManageAds() {
     data.append("image", file);
     setImageUploading(true);
     try {
-      const { data: result } = await api.post("/ads/admin/upload", data);
+      const { data: result } = await api.post("/promo-listings/admin/upload", data);
       setForm((current) => ({ ...current, [imageField]: result.imageUrl }));
       toast.success("Ad image uploaded.");
     } catch (error) {
@@ -277,7 +277,7 @@ function ManageAds() {
   const toggleAd = async (ad) => {
     setPendingId(ad._id);
     try {
-      await api.patch(`/ads/admin/${ad._id}/active`, { active: !ad.active });
+      await api.patch(`/promo-listings/admin/${ad._id}/active`, { active: !ad.active });
       setAds((current) => current.map((item) => item._id === ad._id ? { ...item, active: !ad.active } : item));
       toast.success(ad.active ? "Ad paused." : "Ad activated.");
     } catch (error) {
@@ -291,7 +291,7 @@ function ManageAds() {
     if (!await confirmAction(`Delete “${ad.text}”?`, { confirmText: "Delete" })) return;
     setPendingId(ad._id);
     try {
-      await api.delete(`/ads/admin/${ad._id}`);
+      await api.delete(`/promo-listings/admin/${ad._id}`);
       setAds((current) => current.filter((item) => item._id !== ad._id));
       toast.success("Ad deleted.");
     } catch (error) {
