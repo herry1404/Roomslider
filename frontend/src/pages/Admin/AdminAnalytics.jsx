@@ -49,6 +49,22 @@ const aggregateCafeViews = (rows) => Object.values((rows || []).reduce((result, 
 
 const periodText = (range) => range === "today" ? "Aaj" : `Pichhle ${range} din`;
 
+const getWithRetry = async (path, config) => {
+  try {
+    return await api.get(path, config);
+  } catch (error) {
+    if (error.response && error.response.status < 500) throw error;
+    await new Promise((resolve) => window.setTimeout(resolve, 900));
+    return api.get(path, config);
+  }
+};
+
+const getRequestError = (error) => {
+  if (error.response?.data?.message) return error.response.data.message;
+  if (!error.response) return "Server se connection nahi ho paaya. Thodi der baad dobara koshish karein.";
+  return "Server abhi jawab nahi de raha. Thodi der baad dobara koshish karein.";
+};
+
 function comparePercent(current, previous) {
   if (!previous || previous <= 0 || !current) return null;
   return ((current - previous) / previous) * 100;
@@ -112,14 +128,14 @@ function AdminAnalytics() {
     setError("");
     const apiDays = range === "today" ? 7 : Number(range);
     const results = await Promise.allSettled([
-      api.get("/admin/analytics"),
-      api.get("/admin/traffic", { params: { days: apiDays } }),
-      api.get("/admin/traffic", { params: { days: 90 } }),
-      api.get("/ads/admin/analytics", { params: { days: apiDays } }),
+      getWithRetry("/admin/analytics"),
+      getWithRetry("/admin/traffic", { params: { days: apiDays } }),
+      getWithRetry("/admin/traffic", { params: { days: 90 } }),
+      getWithRetry("/ads/admin/analytics", { params: { days: apiDays } }),
     ]);
     const labels = ["Listings and engagement", "Site traffic", "Traffic history", "Cafe menu and ad"];
     const rejected = results
-      .map((result, index) => result.status === "rejected" ? `${labels[index]}: ${result.reason.response?.data?.message || "load nahi ho paya."}` : "")
+      .map((result, index) => result.status === "rejected" ? `${labels[index]}: ${getRequestError(result.reason)}` : "")
       .filter(Boolean);
     const [analyticsResult, trafficResult, historyResult, cafeResult] = results;
     setAnalytics(analyticsResult.status === "fulfilled" ? analyticsResult.value.data.analytics : null);
