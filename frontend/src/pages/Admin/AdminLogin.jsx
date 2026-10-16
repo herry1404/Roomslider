@@ -42,7 +42,10 @@ function AdminLogin() {
     try {
       setLoading(true);
 
-      const result = await login(formData);
+      const result = await login({
+        identifier: formData.email.trim(),
+        password: formData.password,
+      });
 
       if (result.user.role !== "admin") {
         logout();
