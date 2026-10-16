@@ -89,7 +89,7 @@ const getPublicAds = async (req, res) => {
       .sort({ createdAt: -1, _id: -1 })
       .lean();
 
-    const result = { top: null, bottom: null };
+    const selected = { top: [], bottom: [] };
     const priorities = { top: 0, bottom: 0 };
     for (const ad of ads) {
       const priority = ad.targetBy === "cafe" || (!ad.targetBy && ad.cafe !== "all")
@@ -97,13 +97,18 @@ const getPublicAds = async (req, res) => {
         : ad.targetBy === "location"
           ? 2
           : 1;
-      if (priority <= priorities[ad.slot]) continue;
-      priorities[ad.slot] = priority;
-      result[ad.slot] = ad.slot === "top"
-        ? { id: ad._id, logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
-        : { id: ad._id, image: ad.imageUrl, text: ad.text, url: ad.linkUrl };
+      if (priority < priorities[ad.slot]) continue;
+      if (priority > priorities[ad.slot]) {
+        priorities[ad.slot] = priority;
+        selected[ad.slot] = [];
+      }
+      if (selected[ad.slot].length < 10) {
+        selected[ad.slot].push(ad.slot === "top"
+          ? { id: ad._id, logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
+          : { id: ad._id, image: ad.imageUrl, text: ad.text, url: ad.linkUrl });
+      }
     }
-    return res.status(200).json(result);
+    return res.status(200).json(selected);
   } catch (error) {
     console.error("GET PUBLIC ADS ERROR:", error);
     return res.status(500).json({ success: false, message: "Failed to fetch ads" });

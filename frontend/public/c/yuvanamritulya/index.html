@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>श्री युवान अमृततुल्य – Menu</title>
+<link rel="stylesheet" href="/cafe-ads.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -45,6 +46,11 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px;pad
 .footer-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin:12px 0}
 .footer-contact a{color:var(--accent)}
 .room-link{display:block;margin-top:14px;color:var(--accent);font-weight:700;text-decoration:none}
+.menu-search{max-width:620px;margin:0 auto 20px;padding:0 18px}
+.menu-search label{display:block;margin-bottom:5px;font-weight:700}
+.menu-search input{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit}
+.menu-search p{margin-top:10px;color:var(--muted);text-align:center}
+.cafe-details{text-align:center;color:var(--muted);font-weight:600;padding:0 18px 10px}
 .adtop,.adbot{max-width:980px;margin:10px auto;padding:0 18px}
 .adtop-inner,.adbot a{display:block;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);overflow:hidden;text-decoration:none}
 .adtop-inner{display:flex;align-items:center;gap:10px;padding:9px 12px}
@@ -59,7 +65,6 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px;pad
 </style>
 </head>
 <body data-cafe="yuvanamritulya" data-location="vishnupuri">
-<div class="adtop" id="adtop" hidden><a class="adtop-inner" id="adtopa" target="_blank" rel="noopener sponsored"><img id="adtopimg" alt=""><span id="adtoptext"></span><small>Ad</small></a></div>
 <div class="wrap">
   <header>
     <h1>श्री युवान</h1>
@@ -67,6 +72,15 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px;pad
     <span>Chai · Coffee · Vada Pav · Shakes</span>
     <span>📍 Vishnupuri</span>
   </header>
+  <section class="ad-carousel top" id="adtop" aria-label="Sponsored offers above the menu" hidden>
+    <div class="ad-carousel-track"></div>
+    <div class="ad-carousel-controls" hidden><button type="button" data-ad-previous aria-label="Previous ad">‹</button><span data-ad-count></span><button type="button" data-ad-next aria-label="Next ad">›</button></div>
+  </section>
+  <nav class="menu-search" aria-label="Search menu">
+    <label for="menu-search-input">Search menu items</label>
+    <input id="menu-search-input" type="search" placeholder="Search chai, coffee, vada pav…" autocomplete="off">
+    <p id="menu-search-empty" hidden>No menu items found. Try another name.</p>
+  </nav>
 
   <main class="grid">
     <div class="col">
@@ -118,44 +132,35 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px;pad
     <p>कृपया कप ट्रे में और प्लेट डस्टबिन में डालें।</p>
     <p class="hi">अपनी सभ्यता का परिचय दें। धन्यवाद 🙂</p>
   </div>
-  <div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><small>Ad</small></a></div>
+  <div class="cafe-details">📍 Vishnupuri · Indore</div>
+  <section class="ad-carousel bottom" id="adbot" aria-label="Sponsored offers below the menu" hidden>
+    <div class="ad-carousel-track"></div>
+    <div class="ad-carousel-controls" hidden><button type="button" data-ad-previous aria-label="Previous ad">‹</button><span data-ad-count></span><button type="button" data-ad-next aria-label="Next ad">›</button></div>
+  </section>
   <footer>
     <div>All prices in ₹</div>
-    <div class="footer-contact"><strong>Need your own QR menu? Contact us</strong><a href="tel:+918889631476">+91 8889631476</a><a href="tel:+919131181848">+91 9131181848</a><a href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a></div>
+    <div class="footer-contact"><strong>Need your own QR menu? Contact us</strong><a href="tel:+918889631476">+91 8889631476</a><a href="tel:+919131181848">+91 9131181848</a><a data-menu-whatsapp href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a></div>
     <a class="room-link" href="https://roomslider.in/">Searching for a room? Visit Roomslider.in</a>
   </footer>
 </div>
 <script>
 (function(){
- function ok(url){try{return new URL(url).protocol==='https:'}catch(error){return false}}
- try{
-  var controller=window.AbortController?new AbortController():null;
-  var timeout=setTimeout(function(){if(controller)controller.abort()},4000);
-  fetch('https://roomslider-api.onrender.com/api/ads?cafe=yuvanamritulya&location=vishnupuri',{signal:controller?controller.signal:undefined,credentials:'omit'})
-   .then(function(response){if(!response.ok)throw new Error('Ad request failed');return response.json()})
-   .then(function(data){
-    clearTimeout(timeout);
-    var top=data&&data.top;
-    if(top&&top.text){
-     var topLink=document.getElementById('adtopa'),topImage=document.getElementById('adtopimg');
-     topLink.href=ok(top.url)?top.url:'#';if(top.id)topLink.dataset.adId=top.id;
-     document.getElementById('adtoptext').textContent=String(top.text).slice(0,120);
-     if(ok(top.logo)){topImage.src=top.logo;topImage.onerror=function(){topImage.hidden=true}}else topImage.hidden=true;
-     document.getElementById('adtop').hidden=false;
-    }
-    var bottom=data&&data.bottom;
-    if(bottom&&(bottom.image||bottom.text)){
-     var bottomLink=document.getElementById('adbota'),bottomImage=document.getElementById('adbotimg');
-     bottomLink.href=ok(bottom.url)?bottom.url:'#';if(bottom.id)bottomLink.dataset.adId=bottom.id;
-     if(ok(bottom.image)){bottomImage.src=bottom.image;bottomImage.onerror=function(){document.getElementById('adbot').hidden=true}}else bottomImage.hidden=true;
-     document.getElementById('adbott').textContent=bottom.text?String(bottom.text).slice(0,160):'';
-     document.getElementById('adbot').hidden=false;
-    }
-   })
-   .catch(function(){clearTimeout(timeout)});
- }catch(error){}
+ var input=document.getElementById('menu-search-input'),empty=document.getElementById('menu-search-empty');
+ input.addEventListener('input',function(){
+  var query=input.value.trim().toLowerCase(),visible=0;
+  document.querySelectorAll('main.grid section').forEach(function(section){
+   var matches=0;
+   section.querySelectorAll('li').forEach(function(item){
+    var shown=!query||item.textContent.toLowerCase().indexOf(query)>-1||section.querySelector('h2').textContent.toLowerCase().indexOf(query)>-1;
+    item.hidden=!shown;if(shown)matches++;
+   });
+   section.hidden=matches===0;if(matches)visible+=matches;
+  });
+  empty.hidden=!query||visible>0;
+ });
 })();
 </script>
+<script src="/cafe-ads.js" defer></script>
 <script src="/cafe-analytics.js" defer></script>
 </body>
 </html>

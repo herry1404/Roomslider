@@ -7,6 +7,7 @@
 <title>Biryani Kendra – Menu</title>
 <meta name="description" content="Biryani Kendra – menu with prices.">
 <link rel="icon" type="image/webp" href="/c/biryanikendra/bk-logo.webp">
+<link rel="stylesheet" href="/cafe-ads.css">
 <script>
 (function(){var t=null;try{t=localStorage.getItem('bk-theme')}catch(e){}
 if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();
@@ -83,13 +84,16 @@ footer .ct a{color:var(--tl)}
 </style>
 </head>
 <body data-cafe="biryanikendra" data-location="sapnasangeeta">
-<div class="adtop" id="adtop" hidden><img id="adtopimg" alt="" width="28" height="28"><a id="adtopa" target="_blank" rel="noopener sponsored"></a><small>Ad</small></div>
 <header class="hero">
   <button class="tg" id="tg" type="button" aria-label="Dark / Light mode badlo"><span id="tgi">🌙</span></button>
   <img class="logo" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="220" height="294">
   <span class="tag">Pure Veg</span>
   <h1>Biryani Kendra</h1>
 </header>
+<section class="ad-carousel top" id="adtop" aria-label="Sponsored offers above the menu" hidden>
+  <div class="ad-carousel-track"></div>
+  <div class="ad-carousel-controls" hidden><button type="button" data-ad-previous aria-label="Previous ad">‹</button><span data-ad-count></span><button type="button" data-ad-next aria-label="Next ad">›</button></div>
+</section>
 <nav class="bar" aria-label="Menu">
   <input id="q" type="search" placeholder="Search menu… (jaise: pizza, maggie)" aria-label="Search menu" autocomplete="off">
   <div class="chips" id="chips"><a class="chip" href="#c-biryani" data-id="c-biryani">Biryani</a><a class="chip" href="#c-south-indian" data-id="c-south-indian">South Indian</a><a class="chip" href="#c-dessert-coffee" data-id="c-dessert-coffee">Dessert &amp; Coffee</a></div>
@@ -98,17 +102,18 @@ footer .ct a{color:var(--tl)}
   <div class="grid" id="grid"><section class="cat" id="c-biryani" data-t="biryani"><header><span class="em" aria-hidden="true">🍛</span><div><h2>Biryani</h2></div></header><ul><li class="it" data-n="awadhi veg biryani"><span class="n">Awadhi Veg Biryani</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="veg dum biryani"><span class="n">Veg Dum Biryani</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-south-indian" data-t="south indian"><header><span class="em" aria-hidden="true">🍽️</span><div><h2>South Indian</h2></div></header><ul><li class="it" data-n="idli sambhar"><span class="n">Idli Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="vada sambhar"><span class="n">Vada Sambhar</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="upma"><span class="n">Upma</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="idiyappam"><span class="n">Idiyappam</span><span class="d"></span><span class="p"><small>₹</small>50</span></li><li class="it" data-n="puttu"><span class="n">Puttu</span><span class="d"></span><span class="p"><small>₹</small>50</span></li></ul></section><section class="cat" id="c-dessert-coffee" data-t="dessert &amp; coffee"><header><span class="em" aria-hidden="true">🍮</span><div><h2>Dessert &amp; Coffee</h2></div></header><ul><li class="it" data-n="fruit custard"><span class="n">Fruit Custard</span><span class="d"></span><span class="p"><small>₹</small>30</span></li><li class="it" data-n="filter coffee"><span class="n">Filter Coffee</span><span class="d"></span><span class="p"><small>₹</small>20</span></li></ul></section></div>
   <p class="empty" id="empty">Kuch nahi mila. Koi aur naam try karo.</p>
 </main>
-<div class="adbot" id="adbot" hidden><a id="adbota" target="_blank" rel="noopener sponsored"><img id="adbotimg" alt="" loading="lazy"><span id="adbott"></span><span class="adcta">Visit advertiser ↗</span><small>Ad</small></a></div>
 <footer>
-  <img class="lg" src="/c/biryanikendra/bk-logo.webp" alt="Biryani Kendra logo" width="64" height="86">
-  <div class="nm">Biryani Kendra</div>
   <p class="loc">📍 Behind Sapna Sangeeta, near Tower Square</p>
+  <section class="ad-carousel bottom" id="adbot" aria-label="Sponsored offers below the menu" hidden>
+    <div class="ad-carousel-track"></div>
+    <div class="ad-carousel-controls" hidden><button type="button" data-ad-previous aria-label="Previous ad">‹</button><span data-ad-count></span><button type="button" data-ad-next aria-label="Next ad">›</button></div>
+  </section>
   <p class="by">Managed and designed by Tvarise</p>
   <p>Need your own QR menu? Contact us</p>
   <div class="ct">
     <a href="tel:+918889631476">+91 8889631476</a>
     <a href="tel:+919131181848">+91 9131181848</a>
-    <a href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a>
+    <a data-menu-whatsapp href="https://wa.me/918889631476" target="_blank" rel="noopener">WhatsApp</a>
     <a href="mailto:roomslider.in@gmail.com">roomslider.in@gmail.com</a>
   </div>
 </footer>
@@ -144,40 +149,9 @@ if('IntersectionObserver' in window){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)on(e.target.id)})},{rootMargin:'-30% 0px -60% 0px'});
   secs.forEach(function(s){io.observe(s)});
 }
-/* Ads: alag endpoint se. Fail/timeout/empty ho to strips hidden hi rehti hain. */
-function ok(u){try{var x=new URL(u);return x.protocol==='https:'}catch(e){return false}}
-function show(id){document.getElementById(id).hidden=false}
-try{
-  var ctl=window.AbortController?new AbortController():null;
-  var tm=setTimeout(function(){if(ctl)ctl.abort()},4000);
-  fetch("https://roomslider-api.onrender.com/api/ads?cafe=biryanikendra&location=sapnasangeeta",{signal:ctl?ctl.signal:undefined,credentials:'omit',headers:{Accept:'application/json'}})
-    .then(function(r){if(!r.ok)throw 0;return r.json()})
-    .then(function(d){
-      clearTimeout(tm);
-      var a=d&&d.top;
-      if(a&&typeof a.text==='string'&&a.text.trim()&&ok(a.url)&&ok(a.logo)){
-        var el=document.getElementById('adtopa');el.textContent=String(a.text).slice(0,120);el.dataset.adId=a._id||a.id||'';
-        el.href=a.url;
-        var im=document.getElementById('adtopimg');
-        im.src=a.logo;
-        im.onerror=function(){document.getElementById('adtop').hidden=true};
-        show('adtop');
-      }
-      var b=d&&d.bottom;
-      if(b&&typeof b.text==='string'&&b.text.trim()&&ok(b.url)&&ok(b.image)){
-        var l=document.getElementById('adbota');l.href=b.url;l.dataset.adId=b._id||b.id||'';
-        var bi=document.getElementById('adbotimg');
-        bi.src=b.image;
-        bi.alt=String(b.text).slice(0,120);
-        bi.onerror=function(){document.getElementById('adbot').hidden=true};
-        document.getElementById('adbott').textContent=String(b.text).slice(0,120);
-        show('adbot');
-      }
-    })
-    .catch(function(){clearTimeout(tm)});
-}catch(e){}
 })();
 </script>
+<script src="/cafe-ads.js" defer></script>
 <script src="/cafe-analytics.js" defer></script>
 </body>
 </html>

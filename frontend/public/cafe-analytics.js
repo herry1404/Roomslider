@@ -65,41 +65,47 @@
   track("menu_view");
   var impressionsSent = Object.create(null);
 
-  function observeAd(slot) {
-    var wrapper = document.getElementById(slot === "top" ? "adtop" : "adbot");
-    var anchor = document.getElementById(slot === "top" ? "adtopa" : "adbota");
-    if (!wrapper || !anchor || wrapper.hidden || !anchor.dataset.adId) return;
-    if (!("IntersectionObserver" in window)) {
-      track("ad_impression", anchor.dataset.adId);
-      return;
-    }
-    var observer = new IntersectionObserver(function (entries) {
+  var observedAds = new WeakSet();
+  var adObserver = "IntersectionObserver" in window
+    ? new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.25) {
-          observer.disconnect();
-          var adId = anchor.dataset.adId;
-          if (!impressionsSent[adId]) {
-            impressionsSent[adId] = true;
-            track("ad_impression", adId);
-          }
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.25) return;
+        adObserver.unobserve(entry.target);
+        var adId = entry.target.dataset.adId;
+        if (adId && !impressionsSent[adId]) {
+          impressionsSent[adId] = true;
+          track("ad_impression", adId);
         }
       });
-    }, { threshold: 0.25 });
-    observer.observe(wrapper);
+    }, { threshold: 0.25 })
+    : null;
+
+  function observeAds(wrapper) {
+    wrapper.querySelectorAll(".ad-card").forEach(function (anchor) {
+      if (observedAds.has(anchor) || !anchor.dataset.adId) return;
+      if (adObserver) {
+        observedAds.add(anchor);
+        adObserver.observe(anchor);
+      } else if (!wrapper.hidden && !anchor.hidden) {
+        observedAds.add(anchor);
+        track("ad_impression", anchor.dataset.adId);
+      }
+    });
   }
 
-  ["top", "bottom"].forEach(function (slot) {
-    observeAd(slot);
-    var wrapper = document.getElementById(slot === "top" ? "adtop" : "adbot");
-    if (wrapper && "MutationObserver" in window) {
+  ["adtop", "adbot"].forEach(function (id) {
+    var wrapper = document.getElementById(id);
+    if (!wrapper) return;
+    observeAds(wrapper);
+    if ("MutationObserver" in window) {
       new MutationObserver(function () {
-        observeAd(slot);
-      }).observe(wrapper, { attributes: true, attributeFilter: ["hidden"] });
+        observeAds(wrapper);
+      }).observe(wrapper, { childList: true, subtree: true, attributes: !adObserver, attributeFilter: ["hidden"] });
     }
   });
 
   document.addEventListener("click", function (event) {
-    var anchor = event.target.closest("#adtopa, #adbota");
+    var anchor = event.target.closest(".ad-card");
     if (anchor && anchor.dataset.adId) track("ad_click", anchor.dataset.adId);
   });
 })();

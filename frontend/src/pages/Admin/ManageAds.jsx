@@ -45,6 +45,24 @@ const toLocalDateTime = (value) => {
   return date.toISOString().slice(0, 16);
 };
 
+const normalizeLinkUrl = (value) => {
+  const link = value.trim();
+  if (!link) return "";
+  if (/^https?:\/\//i.test(link)) return link;
+  return `https://${link.replace(/^\/\//, "")}`;
+};
+
+const getLoadError = (error) => {
+  if (error.response?.status === 401) return "Your admin session has expired. Sign in again, then reload this page.";
+  if (error.response?.status === 403) return "This account does not have permission to manage ads.";
+  if (!error.response) return "Could not reach the server. Check your connection and try again.";
+  return error.response.data?.message || "Could not load ads. Please try again.";
+};
+
+const loadAds = () => api.get("/ads/admin").then(({ data }) => (
+  Array.isArray(data.ads) ? data.ads : []
+));
+
 const getTarget = (ad) => {
   const targetBy = ad.targetBy || (ad.cafe === "all" ? "all" : "cafe");
   if (targetBy === "location") return `Location · ${ad.location || "—"}`;
@@ -77,8 +95,10 @@ function ManageAds() {
   const [pendingId, setPendingId] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [imageUploading, setImageUploading] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
   const [slotFilter, setSlotFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -86,10 +106,10 @@ function ManageAds() {
   const fetchAds = useCallback(async (showLoader = true) => {
     try {
       if (showLoader) setLoading(true);
-      const { data } = await api.get("/ads/admin");
-      setAds(Array.isArray(data.ads) ? data.ads : []);
+      setAds(await loadAds());
+      setLoadError("");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Could not load ads. Please try again.");
+      setLoadError(getLoadError(error));
     } finally {
       setLoading(false);
     }
@@ -97,12 +117,15 @@ function ManageAds() {
 
   useEffect(() => {
     let active = true;
-    api.get("/ads/admin")
-      .then(({ data }) => {
-        if (active) setAds(Array.isArray(data.ads) ? data.ads : []);
+    loadAds()
+      .then((loadedAds) => {
+        if (active) {
+          setAds(loadedAds);
+          setLoadError("");
+        }
       })
       .catch((error) => {
-        if (active) toast.error(error.response?.data?.message || "Could not load ads. Please try again.");
+        if (active) setLoadError(getLoadError(error));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -137,6 +160,7 @@ function ManageAds() {
 
   const closeForm = () => {
     if (saving || imageUploading) return;
+    setPreviewOpen(false);
     setEditingId(null);
     setForm(emptyForm());
     setFormOpen(false);
@@ -169,8 +193,22 @@ function ManageAds() {
       toast.error("Upload an ad image before publishing.");
       return;
     }
+    const normalizedLink = normalizeLinkUrl(form.linkUrl);
+    try {
+      const parsedLink = new URL(normalizedLink);
+      if (parsedLink.protocol !== "https:" || !parsedLink.hostname) throw new Error("Invalid HTTPS URL");
+    } catch {
+      toast.error("Enter a valid website or offer link.");
+      return;
+    }
+    setForm((current) => ({ ...current, linkUrl: normalizedLink }));
+    setPreviewOpen(true);
+  };
+
+  const publishAd = async () => {
     const payload = {
       ...form,
+      linkUrl: normalizeLinkUrl(form.linkUrl),
       startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : undefined,
       endsAt: form.endsAt ? new Date(form.endsAt).toISOString() : undefined,
     };
@@ -199,6 +237,7 @@ function ManageAds() {
       setEditingId(null);
       setForm(emptyForm());
       setFormOpen(false);
+      setPreviewOpen(false);
       await fetchAds(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not save ad. Check the details and try again.");
@@ -307,7 +346,7 @@ function ManageAds() {
                 <option value="top">Top banner · Logo + short text</option>
                 <option value="bottom">Bottom banner · Image + text</option>
               </select>
-              <small>Choose the display format used on cafe menu pages.</small>
+              <small>Up to 10 active ads per placement rotate automatically. People can also swipe or tap the arrows.</small>
             </label>
             <label>
               <span>Show this ad on</span>
@@ -354,9 +393,9 @@ function ManageAds() {
               )}
             </label>
             <label className="ads-wide">
-              <span><ExternalLink size={14} /> Click-through link (HTTPS)</span>
-              <input required type="url" placeholder="https://your-offer-or-order-page.com" value={form.linkUrl} onChange={(event) => setForm({ ...form, linkUrl: event.target.value })} />
-              <small>Customers open this link when they tap the ad.</small>
+              <span><ExternalLink size={14} /> Ad ka link</span>
+              <input required type="text" inputMode="url" autoComplete="url" placeholder="roomslider.in ya https://roomslider.in" value={form.linkUrl} onChange={(event) => setForm({ ...form, linkUrl: event.target.value })} onBlur={(event) => setForm((current) => ({ ...current, linkUrl: normalizeLinkUrl(event.target.value) }))} />
+              <small>https:// khud lag jayega. Customer ad tap karke yahan jayega.</small>
             </label>
             <label>
               <span><CalendarClock size={14} /> Start date <em>Optional</em></span>
@@ -390,10 +429,34 @@ function ManageAds() {
           <div className="ads-form-actions">
             <button type="button" className="admin-btn secondary" onClick={closeForm} disabled={saving || imageUploading}>Cancel</button>
             <button type="submit" className="admin-btn" disabled={saving || imageUploading}>
-              <Check size={16} /> {saving ? "Publishing..." : editingId ? "Save changes" : "Publish ad"}
+              <Check size={16} /> Preview ad
             </button>
           </div>
         </form>
+      )}
+
+      {previewOpen && (
+        <div className="ads-preview-backdrop" role="presentation">
+          <section className="ads-preview-dialog admin-analytics-card" role="dialog" aria-modal="true" aria-labelledby="ads-preview-title">
+            <div className="ads-form-heading">
+              <div><span className="ads-eyebrow">CHECK BEFORE PUBLISHING</span><h2 id="ads-preview-title">Ad preview</h2><p>This is how the promotion will look on the menu.</p></div>
+              <button type="button" className="admin-icon-btn" onClick={() => setPreviewOpen(false)} aria-label="Close preview" disabled={saving}><X size={20} /></button>
+            </div>
+            <div className={`ads-customer-preview ${form.slot === "bottom" ? "wide" : ""}`}>
+              {form.slot === "top" && <img src={form.logoUrl} alt="" />}
+              {form.slot === "bottom" && <img src={form.imageUrl} alt="" />}
+              <div><small>ADVERTISEMENT</small><strong>{form.text}</strong><span>Visit advertiser ↗</span></div>
+            </div>
+            <p className="ads-preview-destination">Link: <strong>{normalizeLinkUrl(form.linkUrl)}</strong></p>
+            <p className="ads-preview-destination">Placement: <strong>{form.slot === "top" ? "Above the menu search bar" : "Below the menu items"}</strong></p>
+            <div className="ads-form-actions">
+              <button type="button" className="admin-btn secondary" onClick={() => setPreviewOpen(false)} disabled={saving}>Go back and edit</button>
+              <button type="button" className="admin-btn" onClick={publishAd} disabled={saving}>
+                <Check size={16} /> {saving ? "Publishing..." : editingId ? "Confirm changes" : "Publish ad"}
+              </button>
+            </div>
+          </section>
+        </div>
       )}
 
       <div className="ads-toolbar">
@@ -417,6 +480,13 @@ function ManageAds() {
 
       {loading ? (
         <div className="ads-state"><RefreshCw size={20} className="ads-spinning" /><p>Loading cafe ads…</p></div>
+      ) : loadError ? (
+        <div className="ads-state ads-error" role="alert">
+          <Megaphone size={28} />
+          <h2>Ads list could not load</h2>
+          <p>{loadError}</p>
+          <button type="button" className="admin-btn" onClick={() => fetchAds()}><RefreshCw size={16} /> Try again</button>
+        </div>
       ) : filteredAds.length === 0 ? (
         <div className="ads-state">
           <Megaphone size={28} />
@@ -501,6 +571,18 @@ function ManageAds() {
         .ads-live-preview small{color:var(--admin-muted);font-size:9px}
         .ads-live-preview .ads-bottom-preview{display:grid;gap:7px}
         .ads-live-preview .ads-bottom-preview img{width:100%;height:92px;object-fit:cover}
+        .ads-preview-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow-y:auto;padding:20px;background:#020617b8}
+        .ads-preview-dialog{width:min(100%,540px);max-height:calc(100vh - 40px);overflow-y:auto}
+        .ads-customer-preview{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--admin-border);border-radius:14px;background:var(--admin-bg)}
+        .ads-customer-preview>img{width:56px;height:56px;flex:none;object-fit:contain;border-radius:10px;background:#fff}
+        .ads-customer-preview>div{display:grid;gap:5px;min-width:0}
+        .ads-customer-preview small{color:var(--admin-muted);font-size:10px;font-weight:800;letter-spacing:.08em}
+        .ads-customer-preview strong{color:var(--admin-text);overflow-wrap:anywhere}
+        .ads-customer-preview span{color:#4ade80;font-size:12px;font-weight:700}
+        .ads-customer-preview.wide{display:grid;grid-template-columns:1fr}
+        .ads-customer-preview.wide>img{width:100%;height:180px;object-fit:cover}
+        .ads-preview-destination{margin-top:12px;color:var(--admin-muted);font-size:12px;overflow-wrap:anywhere}
+        .ads-preview-destination strong{color:var(--admin-text);font-weight:600}
         .ads-toolbar{display:flex;align-items:center;gap:9px;margin:20px 0 12px;padding:10px;border:1px solid var(--admin-border);border-radius:13px;background:var(--admin-card)}
         .ads-search{position:relative;display:flex;align-items:center;flex:1;min-width:160px;color:var(--admin-muted)}
         .ads-search svg{position:absolute;left:10px}
@@ -546,6 +628,8 @@ function ManageAds() {
           .ads-card-actions{grid-column:1/-1;justify-content:flex-end;border-top:1px solid var(--admin-border);padding-top:9px}
         }
         @media(max-width:520px){
+          .ads-preview-backdrop{align-items:end;padding:10px}
+          .ads-preview-dialog{max-height:calc(100vh - 20px)}
           .ads-header{align-items:flex-start}
           .ads-header-actions{width:100%}
           .ads-header-actions .admin-btn{flex:1;justify-content:center}

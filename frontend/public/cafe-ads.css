@@ -1,0 +1,157 @@
+.ad-carousel {
+  width: min(100% - 28px, 980px);
+  margin: 12px auto;
+  color: var(--ink, var(--tx, #241710));
+}
+
+.ad-carousel-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 12px;
+  border: 1px solid var(--line, var(--bd, rgba(0, 0, 0, .15)));
+  border-radius: 16px;
+  background: var(--surface, var(--card, #fff));
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+  touch-action: pan-y;
+}
+
+.ad-carousel-card[hidden] {
+  display: none;
+}
+
+.ad-carousel-card img {
+  display: block;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: var(--bg, #f5f5f5);
+}
+
+.ad-carousel-copy {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ad-carousel-copy strong {
+  overflow-wrap: anywhere;
+}
+
+.ad-carousel-copy small,
+.ad-carousel-label {
+  color: var(--accent, var(--ac, #2563eb));
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.ad-carousel-cta {
+  flex: none;
+  padding: 7px 10px;
+  border: 1px solid var(--line, var(--bd, rgba(0, 0, 0, .15)));
+  border-radius: 999px;
+  color: var(--accent, var(--ac, #2563eb));
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.ad-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 2px 0;
+  color: var(--muted, var(--mut, #74685e));
+  font-size: .78rem;
+}
+
+.ad-carousel-controls[hidden] {
+  display: none;
+}
+
+.ad-carousel-controls button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line, var(--bd, rgba(0, 0, 0, .15)));
+  border-radius: 50%;
+  background: var(--surface, var(--card, #fff));
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.ad-carousel.bottom .ad-carousel-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0;
+}
+
+.ad-carousel.bottom .ad-carousel-card img {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  aspect-ratio: 16 / 7;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.ad-carousel.bottom .ad-carousel-copy {
+  padding: 12px 14px;
+}
+
+.ad-carousel.bottom .ad-carousel-cta {
+  margin-right: 12px;
+}
+
+.ad-carousel-label {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: var(--surface, var(--card, #fff));
+}
+
+.ad-carousel.bottom .ad-carousel-card[hidden] {
+  display: none;
+}
+
+@media (max-width: 460px) {
+  .ad-carousel {
+    width: calc(100% - 20px);
+  }
+
+  .ad-carousel-card {
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .ad-carousel-card img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ad-carousel.bottom .ad-carousel-cta {
+    margin-right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-carousel-card,
+  .ad-carousel-controls button {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
