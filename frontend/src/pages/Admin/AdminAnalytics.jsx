@@ -1,272 +1,414 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import {
-  Activity,
-  BarChart3,
-  Eye,
-  Megaphone,
-  MousePointerClick,
-  Search,
-  Users,
-} from "lucide-react";
-import {
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import toast from "react-hot-toast";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BarChart3 } from "lucide-react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../api/axios";
 import "../../styles/admin/theme.css";
+import "./analytics/analytics.css";
+import {
+  AnalyticsEmptyState,
+  AnalyticsList,
+  AnalyticsSkeleton,
+  MetricCard,
+  TrendChart,
+} from "./analytics/AnalyticsComponents";
+import {
+  ANALYTICS_TABS,
+  DATE_RANGES,
+  formatCount,
+} from "./analytics/analyticsConfig";
 
-const PIE_COLORS = ["#34d399", "#38bdf8", "#a78bfa", "#f59e0b", "#fb7185", "#22d3ee", "#c084fc", "#f97316"];
-const chartStyle = {
-  background: "#0f172a",
-  border: "1px solid #334155",
-  borderRadius: 10,
-  color: "#f8fafc",
+const todayKey = () => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
+
+const yesterdayKey = () => {
+  const date = new Date(`${todayKey()}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
 };
 
-function StatCard({ label, value, icon: Icon, accent }) {
-  return (
-    <article className="admin-stat-card">
-      <div className="admin-stat-top">
-        <span className="admin-stat-label">{label}</span>
-        <span className="admin-stat-icon" style={{ color: accent, background: `${accent}22` }}><Icon size={18} /></span>
-      </div>
-      <h2 className="admin-stat-value">{typeof value === "string" ? value : (Number(value) || 0).toLocaleString("en-IN")}</h2>
-    </article>
-  );
-}
+const sumValues = (rows, key) => (rows || []).reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
 
-function PieCard({ title, data, nameKey, valueKey }) {
-  const rows = (data || []).filter((item) => Number(item[valueKey]) > 0);
-  return (
-    <article className="admin-analytics-card">
-      <h2>{title}</h2>
-      {rows.length ? (
-        <div className="admin-analytics-chart">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={rows} dataKey={valueKey} nameKey={nameKey} innerRadius={58} outerRadius={94} paddingAngle={3}>
-                {rows.map((item, index) => <Cell key={`${item[nameKey]}-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
-              </Pie>
-              <Tooltip contentStyle={chartStyle} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      ) : <p className="admin-analytics-empty">No data recorded for this period yet.</p>}
-    </article>
-  );
-}
+const formatMinutes = (seconds) => {
+  const minutes = Math.floor((Number(seconds) || 0) / 60);
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes ? `${hours} hr ${remainingMinutes} min` : `${hours} hr`;
+};
 
-const formatDay = (date) => new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
-  day: "numeric",
-  month: "short",
-});
-
-const aggregateCafeViews = (rows, key) => Object.values((rows || []).reduce((result, row) => {
-  const label = row[key] || "Unknown";
-  result[label] = result[label] || { [key]: label, views: 0 };
-  result[label].views += Number(row.views) || 0;
+const aggregateCafeViews = (rows) => Object.values((rows || []).reduce((result, row) => {
+  const name = row.cafe || "Unknown";
+  result[name] = result[name] || { cafe: name, views: 0 };
+  result[name].views += Number(row.views) || 0;
   return result;
 }, {})).sort((left, right) => right.views - left.views).slice(0, 8);
 
-function AdminAnalytics() {
-  const { hash } = useLocation();
-  const [analytics, setAnalytics] = useState(null);
-  const [traffic, setTraffic] = useState(null);
-  const [cafe, setCafe] = useState(null);
-  const [loading, setLoading] = useState(true);
+const periodText = (range) => range === "today" ? "Aaj" : `Pichhle ${range} din`;
 
-  useEffect(() => {
-    let active = true;
-    Promise.allSettled([
-      api.get("/admin/analytics"),
-      api.get("/admin/traffic", { params: { days: 30 } }),
-      api.get("/ads/admin/analytics", { params: { days: 30 } }),
-    ]).then(([analyticsResult, trafficResult, cafeResult]) => {
-      if (!active) return;
-      if (analyticsResult.status === "fulfilled") setAnalytics(analyticsResult.value.data.analytics);
-      else toast.error(analyticsResult.reason.response?.data?.message || "Site analytics could not be loaded");
-      if (trafficResult.status === "fulfilled") setTraffic(trafficResult.value.data.traffic);
-      else toast.error(trafficResult.reason.response?.data?.message || "Visitor analytics could not be loaded");
-      if (cafeResult.status === "fulfilled") setCafe(cafeResult.value.data.analytics);
-      else toast.error(cafeResult.reason.response?.data?.message || "Cafe ad analytics could not be loaded");
-    }).finally(() => {
-      if (active) setLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
+function comparePercent(current, previous) {
+  if (!previous || previous <= 0 || !current) return null;
+  return ((current - previous) / previous) * 100;
+}
 
-  useEffect(() => {
-    if (loading || hash !== "#cafe-ads") return;
-    document.getElementById("cafe-ads")?.scrollIntoView({ behavior: "smooth" });
-  }, [hash, loading]);
-
-  if (loading) return <main className="admin-page"><p>Loading analytics…</p></main>;
-  if (!analytics && !traffic && !cafe) {
-    return <main className="admin-page"><p>Analytics are temporarily unavailable.</p></main>;
-  }
-
-  const sourceData = traffic?.sources || [];
-  const platformData = traffic?.platforms || [];
+function Glossary() {
+  const terms = [
+    ["Visitors", "Alag log jo site ya menu dekhne aaye. Ek hi log alag din phir gine ja sakte hain."],
+    ["Page views", "Site par khole gaye kul pages."],
+    ["Sessions", "Ek baar site khol kar dekhne ka daura."],
+    ["Referrer", "Woh website ya app jahan se koi yahan aaya."],
+    ["Organic", "Search ya seedha visit se aaya hua traffic; paid ad se nahi."],
+    ["Ads/UTM", "Ad link ke tags, jinse pata chalta hai log kis campaign se aaye."],
+    ["Conversion", "Jab visitor koi kaam poora kare, jaise signup ya ad click."],
+  ];
 
   return (
-    <main className="admin-page admin-analytics">
-      <header className="admin-page-header">
+    <details className="analytics-glossary">
+      <summary>Ye words kya hain?</summary>
+      <dl>
+        {terms.map(([term, definition]) => (
+          <div key={term}><dt>{term}</dt><dd>{definition}</dd></div>
+        ))}
+      </dl>
+    </details>
+  );
+}
+
+function AdminAnalytics() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeTab = ANALYTICS_TABS.some(({ key }) => key === searchParams.get("tab"))
+    ? searchParams.get("tab")
+    : "overview";
+  const [range, setRange] = useState("7");
+  const [retry, setRetry] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [analytics, setAnalytics] = useState(null);
+  const [traffic, setTraffic] = useState(null);
+  const [history, setHistory] = useState(null);
+  const [cafe, setCafe] = useState(null);
+
+  const chooseTab = (key) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", key);
+    setSearchParams(next);
+  };
+
+  useEffect(() => {
+    if (location.hash === "#cafe-ads") {
+      navigate(`${location.pathname}?tab=listings`, { replace: true });
+    } else if (!searchParams.has("tab")) {
+      navigate(`${location.pathname}?tab=overview`, { replace: true });
+    }
+  }, [location.hash, location.pathname, navigate, searchParams]);
+
+  const fetchAnalytics = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    const apiDays = range === "today" ? 7 : Number(range);
+    const results = await Promise.allSettled([
+      api.get("/admin/analytics"),
+      api.get("/admin/traffic", { params: { days: apiDays } }),
+      api.get("/admin/traffic", { params: { days: 90 } }),
+      api.get("/ads/admin/analytics", { params: { days: apiDays } }),
+    ]);
+    const labels = ["Listings and engagement", "Site traffic", "Traffic history", "Cafe menu and ad"];
+    const rejected = results
+      .map((result, index) => result.status === "rejected" ? `${labels[index]}: ${result.reason.response?.data?.message || "load nahi ho paya."}` : "")
+      .filter(Boolean);
+    const [analyticsResult, trafficResult, historyResult, cafeResult] = results;
+    setAnalytics(analyticsResult.status === "fulfilled" ? analyticsResult.value.data.analytics : null);
+    setTraffic(trafficResult.status === "fulfilled" ? trafficResult.value.data.traffic : null);
+    setHistory(historyResult.status === "fulfilled" ? historyResult.value.data.traffic : null);
+    setCafe(cafeResult.status === "fulfilled" ? cafeResult.value.data.analytics : null);
+    setError(rejected.join(" "));
+    setLoading(false);
+  }, [range]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics, retry]);
+
+  const siteDays = useMemo(() => {
+    const rows = history?.daily || [];
+    return range === "today" ? rows.filter((row) => row.date === todayKey()) : rows.slice(-Number(range));
+  }, [history, range]);
+  const previousSiteDays = useMemo(() => {
+    if (range === "today") return (history?.daily || []).filter((row) => row.date === yesterdayKey());
+    const days = Number(range);
+    return (history?.daily || []).slice(-2 * days, -days);
+  }, [history, range]);
+  const pageViews = sumValues(siteDays, "pageViews");
+  const visitors = sumValues(siteDays, "uniqueVisitors");
+  const pageViewsChange = comparePercent(pageViews, sumValues(previousSiteDays, "pageViews"));
+  const visitorChange = comparePercent(visitors, sumValues(previousSiteDays, "uniqueVisitors"));
+  const activityRows = useMemo(() => {
+    const rows = analytics?.dailyActivity || [];
+    if (range === "today") return rows.filter((row) => row.date === todayKey());
+    return rows.slice(-Math.min(Number(range), 30));
+  }, [analytics, range]);
+  const cafeRows = useMemo(() => {
+    const rows = cafe?.dailyViews || [];
+    if (range === "today") return rows.filter((row) => row.date === todayKey());
+    return rows;
+  }, [cafe, range]);
+
+  const summaryText = pageViews > 0
+    ? `${periodText(range)} mein ${formatCount(pageViews)} pages khole gaye.${pageViewsChange !== null ? ` ${range === "today" ? "Kal" : "Pichhle period"} se ${Math.abs(pageViewsChange).toLocaleString("en-IN", { maximumFractionDigits: 1 })}% ${pageViewsChange >= 0 ? "zyada" : "kam"}.` : ""}`
+    : "Abhi koi data nahi. Jaise hi log site dekhenge yahan dikhega.";
+
+  return (
+    <main className="admin-page admin-analytics analytics-hub">
+      <header className="admin-page-header analytics-hub-header">
         <div>
-          <span className="admin-analytics-eyebrow"><BarChart3 size={14} /> PERFORMANCE OVERVIEW</span>
-          <h1>All analytics</h1>
-          <p>Website, listings, cafe menus, and ad performance · last 30 days.</p>
+          <span className="admin-analytics-eyebrow"><BarChart3 size={16} /> ROOMSLIDER KI REPORT</span>
+          <h1>Analytics</h1>
+          <p>Yahan site, cafe menus aur listings par log kya kar rahe hain, seedhe shabdon mein dekho.</p>
         </div>
       </header>
 
-      {traffic && (
-        <section className="admin-analytics-section">
-          <div className="admin-analytics-section-heading"><div><h2>Website traffic</h2><p>Audience and activity across RoomSlider.</p></div></div>
-          <div className="admin-stats-grid">
-            <StatCard label="Page views today" value={traffic.summary.pageViews} icon={Eye} accent="#38bdf8" />
-            <StatCard label="Unique sessions today" value={traffic.summary.uniqueVisitors} icon={Users} accent="#34d399" />
-            <StatCard label="Active in last 30 min" value={traffic.summary.activeVisitors} icon={Activity} accent="#f59e0b" />
-            <StatCard label="Listing views today" value={analytics?.todayViews} icon={Eye} accent="#a78bfa" />
-          </div>
-          {!traffic.daily.some((day) => day.pageViews > 0) && (
-            <p className="admin-analytics-note">Traffic reporting starts with this update; earlier visits are not available in these charts.</p>
+      <section className="analytics-date-filter" aria-label="Date range">
+        <h2>Kitne din ka data?</h2>
+        <div className="analytics-date-options">
+          {DATE_RANGES.map((item) => (
+            <button
+              type="button"
+              key={item.key}
+              className={range === item.key ? "selected" : ""}
+              aria-pressed={range === item.key}
+              onClick={() => setRange(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <nav className="analytics-tabs" aria-label="Analytics categories">
+        {ANALYTICS_TABS.map((tab) => (
+          <button
+            type="button"
+            key={tab.key}
+            className={activeTab === tab.key ? "active" : ""}
+            aria-current={activeTab === tab.key ? "page" : undefined}
+            onClick={() => chooseTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {activeTab === "overview" && (
+        <section className="analytics-tab-content">
+          <p className="analytics-summary" aria-live="polite">{summaryText}</p>
+          {loading ? <AnalyticsSkeleton /> : (
+            <>
+              {error && (
+                <div className="analytics-error" role="alert">
+                  <p>{error}</p>
+                  <button type="button" className="admin-btn secondary" onClick={() => setRetry((value) => value + 1)}>Dobara koshish karein</button>
+                </div>
+              )}
+              {history && (
+                <>
+                  <div className="admin-stats-grid analytics-stats-grid">
+                    <MetricCard metric="pageViews" value={pageViews} comparison={pageViewsChange} periodLabel={range === "today" ? "Kal" : "Pichhle period"} />
+                    <MetricCard metric="visitors" value={visitors} comparison={visitorChange} periodLabel={range === "today" ? "Kal" : "Pichhle period"} />
+                    {traffic && (
+                      <>
+                        <MetricCard metric="todayVisitors" value={traffic.summary.uniqueVisitors} />
+                        <MetricCard metric="activeVisitors" value={traffic.summary.activeVisitors} />
+                        <MetricCard
+                          metric="totalTime"
+                          value={(Number(traffic.summary.durationSeconds) || 0) / 60}
+                          displayValue={formatMinutes(traffic.summary.durationSeconds)}
+                        />
+                        <MetricCard
+                          metric="averageTime"
+                          value={traffic.summary.uniqueVisitors ? (Number(traffic.summary.durationSeconds) || 0) / traffic.summary.uniqueVisitors / 60 : 0}
+                          displayValue={formatMinutes(traffic.summary.uniqueVisitors ? (Number(traffic.summary.durationSeconds) || 0) / traffic.summary.uniqueVisitors : 0)}
+                        />
+                      </>
+                    )}
+                    {history?.tracked && (
+                      <MetricCard metric="trackedVisits" value={history.tracked.pageViews} />
+                    )}
+                    {analytics && (
+                      <MetricCard metric="listingViews" value={analytics.todayViews} />
+                    )}
+                  </div>
+                  <TrendChart
+                    title="Site par logon ki aamad"
+                    description="Page views = kitne pages khule. Visitors = har din aaye alag log; ek hi log dobara aa sakta hai."
+                    data={siteDays}
+                    lines={[
+                      { key: "pageViews", metric: "pageViews" },
+                      { key: "uniqueVisitors", metric: "visitors" },
+                    ]}
+                    emptyMessage="Jaise hi koi site dekhega, yahan roz ka graph dikhega."
+                  />
+                  <div className="admin-analytics-grid analytics-lists-grid">
+                    {traffic && (
+                      <>
+                        <AnalyticsList
+                          title="Log kahan se aaye?"
+                          description="Sabse zyada pages dekhne wale sources."
+                          rows={range === "today" ? [] : traffic.sources}
+                          labelKey="source"
+                          valueKey="pageViews"
+                          emptyMessage={range === "today" ? "Aaj ke source ka data abhi available nahi." : undefined}
+                        />
+                        <AnalyticsList
+                          title="Kaun se device par?"
+                          description="Phone ya computer se khole gaye pages."
+                          rows={range === "today" ? [] : traffic.platforms}
+                          labelKey="platform"
+                          valueKey="pageViews"
+                          emptyMessage={range === "today" ? "Aaj ke device ka data abhi available nahi." : undefined}
+                        />
+                        <AnalyticsList
+                          title="Sabse zyada dekhe gaye pages"
+                          description="Site ke popular pages aur unke views."
+                          rows={range === "today" ? [] : traffic.topPages}
+                          labelKey="path"
+                          valueKey="pageViews"
+                          emptyMessage={range === "today" ? "Aaj ke page breakdown ka data abhi available nahi." : undefined}
+                        />
+                      </>
+                    )}
+                    {traffic && <article className="admin-analytics-card analytics-list-card">
+                      <header className="analytics-chart-heading">
+                        <div><h2>Abhi-abhi site par aaye</h2><p>Recent page visits; koi personal jaankari nahi.</p></div>
+                      </header>
+                      {range !== "today" && traffic.recent?.length ? (
+                        <div className="analytics-list">
+                          {traffic.recent.slice(0, 8).map((visit, index) => (
+                            <div className="analytics-list-row analytics-recent-row" key={`${visit.createdAt}-${visit.path}-${index}`}>
+                              <span>{visit.path === "/" ? "Home page" : visit.path}<small>{visit.source} · {visit.platform}</small></span>
+                              <time dateTime={visit.createdAt}>{new Date(visit.createdAt).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}</time>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="admin-empty analytics-empty"><h3>Abhi koi data nahi</h3><p>{range === "today" ? "Aaj ki recent visits yahan dikhengi." : "Jaise hi log site dekhenge yahan dikhega."}</p></div>
+                      )}
+                    </article>}
+                  </div>
+                </>
+              )}
+            </>
           )}
-          <div className="admin-analytics-grid">
-            <article className="admin-analytics-card admin-analytics-card-wide">
-              <h2>Daily visits</h2>
-              <div className="admin-analytics-chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={traffic.daily}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" tickFormatter={formatDay} minTickGap={24} stroke="#94a3b8" />
-                    <YAxis allowDecimals={false} stroke="#94a3b8" />
-                    <Tooltip labelFormatter={formatDay} contentStyle={chartStyle} />
-                    <Legend />
-                    <Line type="monotone" dataKey="pageViews" name="Page views" stroke="#38bdf8" strokeWidth={2.5} dot={false} />
-                    <Line type="monotone" dataKey="uniqueVisitors" name="Unique sessions" stroke="#34d399" strokeWidth={2.5} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-            <PieCard title="Traffic sources" data={sourceData} nameKey="source" valueKey="pageViews" />
-            <PieCard title="Visitors by platform" data={platformData} nameKey="platform" valueKey="pageViews" />
-            <article className="admin-analytics-card">
-              <h2>Top pages</h2>
-              {(traffic.topPages || []).length ? traffic.topPages.map((page) => (
-                <div className="admin-traffic-page" key={page.path}>
-                  <span>{page.path === "/" ? "Home" : page.path}</span>
-                  <strong>{Number(page.pageViews || 0).toLocaleString("en-IN")}</strong>
-                </div>
-              )) : <p className="admin-analytics-empty">No website visits recorded in this period.</p>}
-            </article>
-          </div>
         </section>
       )}
 
-      {analytics && (
-        <section className="admin-analytics-section">
-          <div className="admin-analytics-section-heading"><div><h2>Listings and discovery</h2><p>Search activity, signups, and listing mix.</p></div></div>
-          <div className="admin-stats-grid">
-            <StatCard label="Push campaigns sent" value={analytics.pushSentCount} icon={Megaphone} accent="#f59e0b" />
-            <StatCard
-              label="New signups · 30 days"
-              value={analytics.dailyActivity.reduce((sum, day) => sum + day.signups, 0)}
-              icon={Users}
-              accent="#34d399"
-            />
-            <StatCard
-              label="Searches · 30 days"
-              value={analytics.dailyActivity.reduce((sum, day) => sum + day.searches, 0)}
-              icon={Search}
-              accent="#38bdf8"
-            />
-          </div>
-          <div className="admin-analytics-grid">
-            <article className="admin-analytics-card admin-analytics-card-wide">
-              <h2>Daily signups and searches</h2>
-              <div className="admin-analytics-chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analytics.dailyActivity}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" tickFormatter={formatDay} minTickGap={24} stroke="#94a3b8" />
-                    <YAxis allowDecimals={false} stroke="#94a3b8" />
-                    <Tooltip labelFormatter={formatDay} contentStyle={chartStyle} />
-                    <Legend />
-                    <Line type="monotone" dataKey="signups" name="Signups" stroke="#34d399" strokeWidth={2.5} dot={false} />
-                    <Line type="monotone" dataKey="searches" name="Searches" stroke="#38bdf8" strokeWidth={2.5} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
+      {activeTab === "site" && <AnalyticsEmptyState />}
+      {activeTab === "ads" && <AnalyticsEmptyState />}
+      {activeTab === "sources" && <AnalyticsEmptyState />}
+
+      {activeTab === "listings" && (
+        <section className="analytics-tab-content">
+          <p className="analytics-summary">Listings aur cafe menus par logon ki dilchaspi yahan dikhti hai.</p>
+          {loading ? <AnalyticsSkeleton /> : (
+            <>
+              {error && (
+                <div className="analytics-error" role="alert">
+                  <p>{error}</p>
+                  <button type="button" className="admin-btn secondary" onClick={() => setRetry((value) => value + 1)}>Dobara koshish karein</button>
+                </div>
+              )}
+              <div className="admin-stats-grid analytics-stats-grid">
+                <MetricCard metric="signups" value={sumValues(activityRows, "signups")} />
+                <MetricCard metric="searches" value={sumValues(activityRows, "searches")} />
+                {range === "today" && analytics && <MetricCard metric="listingViews" value={analytics.todayViews} />}
+                {cafe && range !== "today" && (
+                  <>
+                    <MetricCard metric="menuViews" value={cafe.summary.menuViews} />
+                    <MetricCard metric="cafeUniqueVisitors" value={cafe.summary.uniqueVisitors} />
+                    <MetricCard metric="adImpressions" value={cafe.summary.adImpressions} />
+                    <MetricCard metric="adClicks" value={cafe.summary.adClicks} />
+                    <MetricCard metric="adClickRate" value={cafe.summary.clickRate} suffix="%" />
+                  </>
+                )}
+                {cafe && range === "today" && (
+                  <>
+                    <MetricCard metric="menuViews" value={sumValues(cafeRows, "views")} />
+                    <MetricCard metric="menuVisitors" value={sumValues(cafeRows, "uniqueVisitors")} />
+                    <MetricCard metric="adImpressions" value={0} />
+                    <MetricCard metric="adClicks" value={0} />
+                  </>
+                )}
               </div>
-            </article>
-            <PieCard title="Listings by category" data={analytics.listingsByCategory} nameKey="category" valueKey="count" />
-            <PieCard title="Top listing areas" data={analytics.topAreas} nameKey="area" valueKey="count" />
-          </div>
+              {analytics && (
+                <TrendChart
+                  title="Naye accounts aur searches"
+                  description="Naye accounts = roz kitne logon ne signup kiya. Searches = site par roz kitni baar dhoonda."
+                  data={activityRows}
+                  lines={[
+                    { key: "signups", metric: "signups" },
+                    { key: "searches", metric: "searches" },
+                  ]}
+                  note={Number(range) > 30 ? "Is chart ke liye abhi sirf aakhri 30 din ka data milta hai." : undefined}
+                  emptyMessage="Signup aur search hote hi yahan unka roz ka graph dikhega."
+                />
+              )}
+              {cafe && (
+                <>
+                  <TrendChart
+                    title="Cafe menu kitni baar khule"
+                    description="Menu views = cafe ke online menu kitni baar khole gaye. Visitors = har din dekhne wale alag log."
+                    data={cafeRows}
+                    lines={[
+                      { key: "views", metric: "menuViews" },
+                      { key: "uniqueVisitors", metric: "menuVisitors" },
+                    ]}
+                    emptyMessage="Jaise hi koi cafe ka menu dekhega, yahan graph dikhega."
+                  />
+                  {range === "today" && (
+                    <p className="analytics-chart-note">Aaj ke ad impressions aur clicks ka daily data API mein nahi milta, isliye unka aaj ka number nahi dikhaya ja raha.</p>
+                  )}
+                  <div className="admin-analytics-grid analytics-lists-grid">
+                    <AnalyticsList title="Cafe ke hisaab se" description="Kaun se cafe menu zyada khule." rows={range === "today" ? [] : aggregateCafeViews(cafe.byCafe)} labelKey="cafe" valueKey="views" />
+                    <AnalyticsList title="Jagah ke hisaab se" description="Kaun si location ke menu zyada khule." rows={range === "today" ? [] : cafe.byLocation} labelKey="location" valueKey="views" />
+                    <AnalyticsList title="Menu par log kahan se aaye?" description="Cafe menu tak pahunchne ke sources." rows={range === "today" ? [] : cafe.bySource} labelKey="source" valueKey="views" />
+                    <AnalyticsList title="Cafe menu kis device par?" description="Phone ya computer se khole gaye menu." rows={range === "today" ? [] : cafe.byPlatform} labelKey="platform" valueKey="views" />
+                  </div>
+                  <AnalyticsList
+                    title="Cafe menu par dikhaye gaye ads"
+                    description="Impressions = ad kitni baar dikha. Clicks = ad kitni baar dabaya."
+                    rows={range === "today" ? [] : (cafe.adPerformance || []).map((item) => ({
+                      ad: `${item.text} · ${item.cafe} · ${item.location}`,
+                      result: `${formatCount(item.impressions)} dikhaye · ${formatCount(item.clicks)} clicks · ${item.clickRate || 0}%`,
+                    }))}
+                    labelKey="ad"
+                    valueKey="result"
+                    emptyMessage={range === "today" ? "Aaj ke ad ka hisaab is API mein nahi aata." : "Jab cafe ads dekhe ya click honge, unka hisaab yahan aayega."}
+                  />
+                </>
+              )}
+              {analytics && (
+                <div className="admin-analytics-grid analytics-lists-grid">
+                  <AnalyticsList title="Listings kis category mein hain?" description="Har category mein kitni listings hain." rows={analytics.listingsByCategory} labelKey="category" valueKey="count" />
+                  <AnalyticsList title="Listings kis area mein hain?" description="Zyada listings wale areas." rows={analytics.topAreas} labelKey="area" valueKey="count" />
+                  <article className="admin-analytics-card analytics-list-card">
+                    <header className="analytics-chart-heading"><div><h2>Baaki site activity</h2><p>Campaign aur aaj ke listing views.</p></div></header>
+                    <div className="analytics-list">
+                      <div className="analytics-list-row"><span>Aaj ke listing views</span><strong>{formatCount(analytics.todayViews)}</strong></div>
+                      <div className="analytics-list-row"><span>Bheje gaye push campaigns</span><strong>{formatCount(analytics.pushSentCount)}</strong></div>
+                    </div>
+                  </article>
+                </div>
+              )}
+            </>
+          )}
         </section>
       )}
 
-      {cafe && (
-        <section className="admin-analytics-section" id="cafe-ads">
-          <div className="admin-analytics-section-heading"><div><h2>Cafe ads and menu analytics</h2><p>Reach, engagement, and cafe audience.</p></div></div>
-          <div className="admin-stats-grid">
-            <StatCard label="Menu views" value={cafe.summary.menuViews} icon={Eye} accent="#34d399" />
-            <StatCard label="Unique sessions" value={cafe.summary.uniqueVisitors} icon={Users} accent="#38bdf8" />
-            <StatCard label="Ad impressions" value={cafe.summary.adImpressions} icon={Megaphone} accent="#a78bfa" />
-            <StatCard label="Ad clicks" value={cafe.summary.adClicks} icon={MousePointerClick} accent="#f59e0b" />
-            <StatCard label="Ad click rate" value={`${cafe.summary.clickRate || 0}%`} icon={Activity} accent="#fb7185" />
-          </div>
-          <div className="admin-analytics-grid">
-            <article className="admin-analytics-card admin-analytics-card-wide">
-              <h2>Daily cafe menu views</h2>
-              <div className="admin-analytics-chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={cafe.dailyViews || []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" tickFormatter={formatDay} minTickGap={24} stroke="#94a3b8" />
-                    <YAxis allowDecimals={false} stroke="#94a3b8" />
-                    <Tooltip labelFormatter={formatDay} contentStyle={chartStyle} />
-                    <Legend />
-                    <Line type="monotone" dataKey="views" name="Menu views" stroke="#34d399" strokeWidth={2.5} dot={false} />
-                    <Line type="monotone" dataKey="uniqueVisitors" name="Unique sessions" stroke="#38bdf8" strokeWidth={2.5} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-            <PieCard title="Menu views by cafe" data={aggregateCafeViews(cafe.byCafe, "cafe")} nameKey="cafe" valueKey="views" />
-            <PieCard title="Menu views by location" data={cafe.byLocation} nameKey="location" valueKey="views" />
-            <PieCard title="Cafe traffic sources" data={cafe.bySource} nameKey="source" valueKey="views" />
-            <PieCard title="Cafe visitors by platform" data={cafe.byPlatform} nameKey="platform" valueKey="views" />
-            <article className="admin-analytics-card">
-              <h2>Ad performance</h2>
-              {(cafe.adPerformance || []).length ? (
-                <div className="admin-analytics-table-wrap">
-                  <table className="admin-analytics-table">
-                    <thead><tr><th>Ad</th><th>Impressions</th><th>Clicks</th><th>CTR</th></tr></thead>
-                    <tbody>{cafe.adPerformance.map((row) => (
-                      <tr key={`${row.adId}-${row.cafe}-${row.location}`}>
-                        <td>{row.text}<small>{row.cafe} · {row.location}</small></td>
-                        <td>{Number(row.impressions || 0).toLocaleString("en-IN")}</td>
-                        <td>{Number(row.clicks || 0).toLocaleString("en-IN")}</td>
-                        <td>{row.clickRate || 0}%</td>
-                      </tr>
-                    ))}</tbody>
-                  </table>
-                </div>
-              ) : <p className="admin-analytics-empty">Ad impressions and clicks will appear here as people view cafe menus.</p>}
-            </article>
-          </div>
-        </section>
-      )}
+      <Glossary />
     </main>
   );
 }

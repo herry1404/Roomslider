@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { MapPin, X, LocateFixed } from "lucide-react";
 import api from "../../api/axios";
 import indoreColleges from "../../data/indoreColleges";
+import cafes from "../../data/cafes";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -78,9 +79,27 @@ const messPinSvg = `
   </g>
 </svg>`;
 
+const cafePinSvg = `
+<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17 0C7.6 0 0 7.6 0 17c0 11.5 17 27 17 27s17-15.5 17-27C34 7.6 26.4 0 17 0z" fill="#0d9488"/>
+  <circle cx="17" cy="17" r="11" fill="#ffffff"/>
+  <g stroke="#134e4a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M11 14h10v7a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z"/>
+    <path d="M21 16h1a2 2 0 0 1 0 4h-1M13 11c0-1 1-1 1-2M17 11c0-1 1-1 1-2"/>
+  </g>
+</svg>`;
+
 const messIcon = L.divIcon({
   className: "mess-marker",
   html: messPinSvg,
+  iconSize: [34, 44],
+  iconAnchor: [17, 44],
+  popupAnchor: [0, -40],
+});
+
+const cafeIcon = L.divIcon({
+  className: "cafe-marker",
+  html: cafePinSvg,
   iconSize: [34, 44],
   iconAnchor: [17, 44],
   popupAnchor: [0, -40],
@@ -368,6 +387,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
   const [userPos, setUserPos] = useState(null);
   const [showColleges, setShowColleges] = useState(false);
   const [showMess, setShowMess] = useState(false);
+  const [showCafes, setShowCafes] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [inViewCount, setInViewCount] = useState(0);
@@ -676,6 +696,7 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
           .rs-college svg { color: #a78bfa; flex-shrink: 0; }
           .leaflet-map-wrapper.rs-zoomed-out .rs-college span { display: none; }
           .leaflet-map-wrapper.rs-zoomed-out .rs-college { padding: 6px; border-radius: 8px; }
+          body.dark .map-fullscreen-wrap .leaflet-marker-icon.cafe-marker { filter: none; }
           .rs-cluster-big { background: #22c55e; color: #052e16; border-color: #22c55e; }
           .rs-cluster-big svg { color: #052e16; }
         `}</style>
@@ -716,6 +737,17 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
             }}
           >
             🍴 Mess
+          </button>
+          <button
+            onClick={() => setShowCafes((v) => !v)}
+            className="map-fullscreen-pill"
+            style={{
+              border: showCafes ? "none" : "1px solid var(--color-border)",
+              background: showCafes ? "#0d9488" : "var(--color-surface)",
+              color: showCafes ? "#fff" : "var(--color-text)",
+            }}
+          >
+            ☕ Cafes
           </button>
         </div>
 
@@ -802,6 +834,43 @@ function MapExplorer({ startExpanded = false, allowCollapse = true, fullscreen =
                 eventHandlers={{ click: () => selectRoom(room._id) }}
               />
             ))}
+            {showCafes &&
+              cafes
+                .filter(
+                  (cafe) =>
+                    Number.isFinite(cafe.latitude) &&
+                    Number.isFinite(cafe.longitude)
+                )
+                .map((cafe) => (
+                  <Marker
+                    key={cafe.id}
+                    position={[cafe.latitude, cafe.longitude]}
+                    icon={cafeIcon}
+                  >
+                    <Popup>
+                      <strong>{cafe.name}</strong>
+                      <br />
+                      {cafe.area}
+                      <br />
+                      <a
+                        href={cafe.menuUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-block",
+                          marginTop: "6px",
+                          padding: "5px 10px",
+                          borderRadius: "8px",
+                          background: "var(--color-primary)",
+                          color: "#fff",
+                          textDecoration: "none",
+                        }}
+                      >
+                        View Menu
+                      </a>
+                    </Popup>
+                  </Marker>
+                ))}
           </MarkerClusterGroup>
         </MapContainer>
 

@@ -48,10 +48,14 @@ function SiteAnalyticsTracker() {
     if (/^\/(?:cafe\/|htlcafe(?:\/|$))/.test(pathname)) return;
 
     const visitorId = getVisitorId();
+    const eventId = window.crypto?.randomUUID
+      ? window.crypto.randomUUID()
+      : `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
     const attribution = getAttribution();
     const device = window.matchMedia("(max-width: 767px)").matches ? "Mobile" : "Desktop";
     api.post("/analytics/page-view", {
       visitorId,
+      eventId,
       path: pathname.slice(0, 160),
       ...attribution,
       platform: getPlatform(),
@@ -59,6 +63,29 @@ function SiteAnalyticsTracker() {
     }).catch((error) => {
       console.error("Site analytics tracking failed:", error);
     });
+
+    const startedAt = Date.now();
+    let durationSent = false;
+    const sendDuration = () => {
+      if (durationSent) return;
+      durationSent = true;
+      const durationSeconds = Math.min(43200, Math.floor((Date.now() - startedAt) / 1000));
+      const url = `${api.defaults.baseURL}/analytics/page-view-duration`;
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId, durationSeconds }),
+        keepalive: true,
+      }).catch((error) => {
+        console.error("Site analytics duration tracking failed:", error);
+      });
+    };
+
+    window.addEventListener("pagehide", sendDuration);
+    return () => {
+      window.removeEventListener("pagehide", sendDuration);
+      sendDuration();
+    };
   }, [pathname]);
 
   return null;

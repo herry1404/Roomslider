@@ -23,7 +23,7 @@ import {
   HeartPulse,
   Droplet,
   ShieldAlert,
-  BarChart3,
+  LineChart,
   Clapperboard,
 } from "lucide-react";
 
@@ -51,14 +51,13 @@ function Sidebar({ open, closeSidebar }) {
       items: [
         { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
         { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
-        { title: "Ads Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics#cafe-ads", activeHash: "#cafe-ads" },
+        { title: "Analytics", icon: <LineChart size={18} />, path: "/admin/analytics" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
         { title: "Hourly / Short Stay", icon: <DoorOpen size={18} />, path: "/admin/hourly-rooms" },
         { title: "Reels", icon: <Clapperboard size={18} />, path: "/admin/reels" },
         { title: "Villas & Bookings", icon: <Castle size={18} />, path: "/admin/villas" },
-        { title: "All Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics", excludeHash: "#cafe-ads" },
         { title: "Manage Owners", icon: <UserCog size={18} />, path: "/admin/owners" },
       ],
     },

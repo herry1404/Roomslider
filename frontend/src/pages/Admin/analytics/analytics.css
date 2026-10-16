@@ -1,0 +1,435 @@
+.analytics-hub {
+  --analytics-min-text: 14px;
+}
+
+.analytics-hub-header {
+  margin-bottom: 14px;
+}
+
+.analytics-hub-header p,
+.analytics-chart-heading p,
+.analytics-chart-note,
+.analytics-summary,
+.analytics-comparison,
+.analytics-glossary dd,
+.analytics-error p {
+  font-size: var(--analytics-min-text);
+  line-height: 1.55;
+}
+
+.analytics-date-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: var(--admin-card);
+}
+
+.analytics-date-filter h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.analytics-date-options {
+  display: flex;
+  gap: 8px;
+}
+
+.analytics-date-options button,
+.analytics-tabs button {
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: var(--analytics-min-text);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.analytics-date-options button.selected,
+.analytics-tabs button.active {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent);
+  color: #062e22;
+}
+
+.analytics-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  padding: 2px 1px 10px;
+  scrollbar-width: thin;
+}
+
+.analytics-tabs button {
+  flex: 0 0 auto;
+}
+
+.analytics-summary {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--admin-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--admin-card);
+  color: var(--admin-text);
+  font-weight: 700;
+}
+
+.analytics-tab-content {
+  min-width: 0;
+}
+
+.analytics-stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.analytics-stat-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  border-top: 3px solid var(--metric-color);
+}
+
+.analytics-stat-card .admin-stat-label {
+  font-size: var(--analytics-min-text);
+}
+
+.analytics-metric-description {
+  display: block;
+  min-height: 42px;
+  margin-top: 8px;
+  color: var(--admin-muted);
+  font-size: var(--analytics-min-text);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.analytics-stat-card .admin-stat-value {
+  display: block;
+  max-width: 100%;
+  margin: 8px 0 0;
+  font-size: 30px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.analytics-comparison {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 22px;
+  margin-top: 8px;
+  color: var(--admin-muted);
+  line-height: 1.4;
+}
+
+.analytics-comparison.up {
+  color: #4ade80;
+}
+
+.analytics-comparison.down {
+  color: #fb7185;
+}
+
+.analytics-chart-card,
+.analytics-list-card {
+  margin-bottom: 18px;
+}
+
+.analytics-chart-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.analytics-chart-heading h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.analytics-chart-heading p,
+.analytics-chart-note {
+  margin: 0;
+  color: var(--admin-muted);
+}
+
+.analytics-chart-note {
+  margin: 10px 0;
+}
+
+.analytics-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.analytics-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 9px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: var(--analytics-min-text);
+  cursor: pointer;
+}
+
+.analytics-legend-item.hidden {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.analytics-legend-dot {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  border-radius: 50%;
+  background: var(--metric-color);
+}
+
+.analytics-chart {
+  height: 300px;
+  margin-top: 6px;
+}
+
+.analytics-tooltip {
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-card);
+  color: var(--admin-text);
+}
+
+.analytics-tooltip p {
+  margin: 5px 0 0;
+  font-size: var(--analytics-min-text);
+}
+
+.analytics-tooltip p::before {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--metric-color);
+  content: "";
+}
+
+.analytics-lists-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.analytics-list {
+  display: grid;
+}
+
+.analytics-list-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  font-size: var(--analytics-min-text);
+}
+
+.analytics-list-row:last-child {
+  border-bottom: 0;
+}
+
+.analytics-list-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.analytics-list-row strong {
+  flex: 0 0 auto;
+  max-width: 65%;
+  color: var(--admin-text);
+  text-align: right;
+}
+
+.analytics-recent-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: var(--analytics-min-text);
+}
+
+.analytics-recent-row time {
+  flex: 0 0 auto;
+  color: var(--admin-muted);
+}
+
+.analytics-empty {
+  padding: 28px 16px;
+}
+
+.analytics-empty h3,
+.analytics-tab-empty h2 {
+  font-size: 18px;
+}
+
+.analytics-empty p,
+.analytics-tab-empty p {
+  margin: 6px 0 0;
+  font-size: var(--analytics-min-text);
+  line-height: 1.5;
+}
+
+.analytics-tab-empty {
+  min-height: 200px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: 30px 18px;
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  background: var(--admin-card);
+}
+
+.analytics-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--admin-danger);
+  border-radius: 12px;
+  background: var(--admin-danger-soft);
+}
+
+.analytics-error p {
+  margin: 0;
+  color: var(--admin-text);
+}
+
+.analytics-skeleton {
+  display: grid;
+  gap: 16px;
+}
+
+.analytics-skeleton-bar,
+.analytics-skeleton-card,
+.analytics-skeleton-chart {
+  display: block;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--admin-card) 25%, var(--admin-hover) 50%, var(--admin-card) 75%);
+  background-size: 200% 100%;
+  animation: analytics-shimmer 1.4s ease-in-out infinite;
+}
+
+.analytics-skeleton-bar {
+  height: 52px;
+}
+
+.analytics-skeleton .admin-stats-grid {
+  margin: 0;
+}
+
+.analytics-skeleton-card {
+  min-height: 112px;
+}
+
+.analytics-skeleton-chart {
+  min-height: 300px;
+}
+
+.analytics-glossary {
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: var(--admin-card);
+}
+
+.analytics-glossary summary {
+  min-height: 28px;
+  color: var(--admin-text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.analytics-glossary dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 10px 18px;
+  margin: 16px 0 0;
+}
+
+.analytics-glossary dl > div {
+  padding: 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+}
+
+.analytics-glossary dt {
+  font-size: var(--analytics-min-text);
+  font-weight: 700;
+}
+
+.analytics-glossary dd {
+  margin: 4px 0 0;
+  color: var(--admin-muted);
+}
+
+@keyframes analytics-shimmer {
+  to { background-position: -200% 0; }
+}
+
+@media (max-width: 520px) {
+  .analytics-date-filter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analytics-date-options {
+    width: 100%;
+  }
+
+  .analytics-date-options button {
+    flex: 1 1 auto;
+    padding: 8px;
+  }
+
+  .analytics-chart {
+    height: 260px;
+  }
+
+  .analytics-chart-heading h2 {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analytics-skeleton-bar,
+  .analytics-skeleton-card,
+  .analytics-skeleton-chart {
+    animation: none;
+  }
+}

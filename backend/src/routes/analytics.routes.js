@@ -1,6 +1,6 @@
 const express = require("express");
 const rateLimit = require("express-rate-limit");
-const { trackPageView } = require("../controllers/siteAnalytics.controller");
+const { trackPageView, trackPageDuration } = require("../controllers/siteAnalytics.controller");
 
 const router = express.Router();
 const pageViewLimiter = rateLimit({
@@ -12,5 +12,6 @@ const pageViewLimiter = rateLimit({
 });
 
 router.post("/page-view", pageViewLimiter, trackPageView);
+router.post("/page-view-duration", pageViewLimiter, trackPageDuration);
 
 module.exports = router;

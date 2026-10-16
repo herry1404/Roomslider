@@ -271,7 +271,7 @@ function ManageAds() {
           <p>Create and schedule the ads that appear on public cafe menu pages.</p>
         </div>
         <div className="ads-header-actions">
-          <Link to="/admin/analytics#cafe-ads" className="admin-btn secondary">
+          <Link to="/admin/analytics?tab=listings" className="admin-btn secondary">
             <BarChart3 size={16} /> Ads analytics
           </Link>
           <button type="button" className="admin-btn secondary ads-refresh" onClick={() => fetchAds()} disabled={loading} aria-label="Refresh ads">
