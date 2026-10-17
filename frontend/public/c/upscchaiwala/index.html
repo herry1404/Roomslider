@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#78350f">
+  <meta name="description" content="UPSC Chai Wala, Bhawarkua, Indore — chai, coffee, shakes, snacks and student-friendly combos.">
+  <link rel="canonical" href="https://roomslider.in/cafe/bhawarkua/upscchaiwala">
+  <link rel="stylesheet" href="/cafe-ads.css">
+  <title>UPSC Chai Wala – Menu | Bhawarkua</title>
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("upsc-chai-wala-theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #fff8e9;
+      --surface: #fffdf7;
+      --ink: #38200f;
+      --muted: #795a40;
+      --accent: #9a4f12;
+      --accent-strong: #78350f;
+      --border: #ead8bd;
+      --chip: #fffdf7;
+      --hero-ink: #fffaf0;
+      --shadow: 0 12px 34px rgb(53 30 10 / 12%);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--page);
+      color: var(--ink);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --page: #17120d;
+        --surface: #241b13;
+        --ink: #fff4e4;
+        --muted: #d0b89c;
+        --accent: #f3ad62;
+        --accent-strong: #f9c27e;
+        --border: #483524;
+        --chip: #241b13;
+        --hero-ink: #fff8eb;
+        --shadow: 0 12px 34px rgb(0 0 0 / 25%);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --page: #17120d;
+      --surface: #241b13;
+      --ink: #fff4e4;
+      --muted: #d0b89c;
+      --accent: #f3ad62;
+      --accent-strong: #f9c27e;
+      --border: #483524;
+      --chip: #241b13;
+      --hero-ink: #fff8eb;
+      --shadow: 0 12px 34px rgb(0 0 0 / 25%);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 142px; }
+    body { margin: 0; min-width: 320px; background: var(--page); color: var(--ink); }
+    a { color: inherit; }
+    button, input { font: inherit; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px 16px 28px;
+      background: linear-gradient(140deg, #78350f, #a45113 58%, #c47a27);
+      color: var(--hero-ink);
+      text-align: center;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      max-width: 980px;
+      margin: 0 auto 18px;
+    }
+
+    .brand-link {
+      margin-right: auto;
+      color: #fff5e6;
+      font-size: .85rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .theme-toggle,
+    .social-link {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid rgb(255 255 255 / 35%);
+      border-radius: 999px;
+      background: rgb(255 255 255 / 12%);
+      color: #fffaf0;
+      font-size: .82rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .theme-toggle { width: 40px; padding: 0; cursor: pointer; }
+    .social-link { padding: 8px 12px; }
+
+    .wordmark {
+      margin: 0;
+      font-size: clamp(2.1rem, 10vw, 4.2rem);
+      font-weight: 950;
+      letter-spacing: -.055em;
+      line-height: .98;
+      text-wrap: balance;
+    }
+
+    .tagline {
+      margin: 12px 0 0;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      font-weight: 750;
+    }
+
+    .since {
+      display: inline-block;
+      margin-top: 7px;
+      color: #ffdfad;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+    }
+
+    .location {
+      margin: 8px 0 0;
+      color: #fff1da;
+      font-size: .92rem;
+    }
+
+    .combo-ticker {
+      overflow: hidden;
+      padding: 10px 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: ticker-scroll 32s linear infinite;
+    }
+
+    .combo-ticker:hover .ticker-track,
+    .combo-ticker:focus-within .ticker-track { animation-play-state: paused; }
+
+    .ticker-group { display: flex; flex: none; gap: 9px; padding-right: 9px; }
+
+    .ticker-pill {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--page);
+      color: var(--ink);
+      font-size: .84rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .ticker-pill strong { color: var(--accent); }
+    @keyframes ticker-scroll { to { transform: translateX(-50%); } }
+
+    .menu-tools {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--page);
+    }
+
+    .search-wrap { width: min(100%, 960px); margin: 0 auto 9px; }
+
+    .search-wrap input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 15px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      outline: none;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .search-wrap input:focus-visible { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 28%, transparent); }
+
+    .category-tabs {
+      display: flex;
+      width: min(100%, 960px);
+      gap: 7px;
+      overflow-x: auto;
+      margin: 0 auto;
+      padding: 1px 1px 4px;
+      scrollbar-width: none;
+      overscroll-behavior-inline: contain;
+    }
+
+    .category-tabs::-webkit-scrollbar { display: none; }
+
+    .category-tabs a {
+      flex: none;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--chip);
+      color: var(--ink);
+      font-size: .83rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .category-tabs a.active { border-color: var(--accent-strong); background: var(--accent-strong); color: #fffaf0; }
+
+    main { width: min(100%, 1000px); margin: 0 auto; padding: 16px 13px 28px; }
+    .menu-grid { display: grid; gap: 13px; }
+
+    .menu-category {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      scroll-margin-top: 142px;
+    }
+
+    .menu-category h2 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 9px;
+      color: var(--accent-strong);
+      font-size: 1.17rem;
+    }
+
+    .category-icon { font-size: 1.25rem; }
+    .menu-items { margin: 0; padding: 0; list-style: none; }
+
+    .menu-item {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      padding: 8px 2px;
+    }
+
+    .menu-item + .menu-item { border-top: 1px dashed var(--border); }
+    .item-name { overflow-wrap: anywhere; }
+    .item-dots { flex: 1; min-width: 10px; border-bottom: 1px dotted var(--muted); opacity: .6; }
+    .item-price { color: var(--accent); font-weight: 800; white-space: nowrap; }
+
+    .combo-category {
+      border-color: #d89942;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 85%, #f8c66d), var(--surface));
+    }
+
+    .combo-category h2 { color: var(--accent-strong); }
+    .empty { display: none; padding: 28px 12px; color: var(--muted); text-align: center; }
+
+    .footer {
+      padding: 25px 16px 32px;
+      background: #4a2915;
+      color: #fff1da;
+      text-align: center;
+    }
+
+    .footer p { margin: 5px 0; }
+    .footer-brand { color: #fff; font-size: 1.1rem; font-weight: 850; }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 15px auto;
+    }
+
+    .footer-actions a {
+      padding: 8px 13px;
+      border: 1px solid rgb(255 255 255 / 38%);
+      border-radius: 999px;
+      color: white;
+      font-size: .87rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer-marketing { margin-top: 15px !important; font-size: .84rem; }
+    .footer-marketing a { color: #ffdfad; font-weight: 800; }
+    [hidden] { display: none !important; }
+
+    @media (min-width: 760px) {
+      .hero { padding-top: 20px; }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .combo-category { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 15px 12px 22px; }
+      .hero-top { gap: 6px; margin-bottom: 18px; }
+      .brand-link { font-size: .78rem; }
+      .social-link { min-height: 38px; padding: 7px 9px; font-size: .76rem; }
+      .theme-toggle { min-height: 38px; width: 38px; }
+      .menu-category { padding: 14px 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ticker-track { animation: none; }
+      .ticker-group[aria-hidden="true"] { display: none; }
+      .ticker-group:not([aria-hidden="true"]) { flex-wrap: wrap; width: 100%; }
+    }
+  </style>
+</head>
+<body data-cafe="upscchaiwala" data-location="bhawarkua">
+  <header class="hero">
+    <div class="hero-top">
+      <a class="brand-link" href="https://roomslider.in/">RoomSlider.in ↗</a>
+      <a class="social-link" href="https://instagram.com/upscchaiwala.777" target="_blank" rel="noopener noreferrer" aria-label="UPSC Chai Wala on Instagram">Instagram</a>
+      <a class="social-link" href="https://wa.me/918923189640" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp UPSC Chai Wala">WhatsApp</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">🌙</button>
+    </div>
+    <!-- TODO: Replace this text-only wordmark with the cafe-provided round UPSC CHAI WALA cup logo. -->
+    <h1 class="wordmark">UPSC CHAI WALA</h1>
+    <p class="tagline">Taste The Kulhad</p>
+    <span class="since">SINCE 2022</span>
+    <p class="location">📍 Bhawarkua, Indore · Chai breaks for every big dream</p>
+  </header>
+
+  <div class="combo-ticker" id="combo-ticker" aria-label="Popular student-friendly combos">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+
+  <nav class="menu-tools" aria-label="Search and menu categories">
+    <label class="search-wrap">
+      <input id="menu-search" type="search" placeholder="Search chai, coffee, snacks…" aria-label="Search menu items" autocomplete="off">
+    </label>
+    <div class="category-tabs" id="category-tabs"></div>
+  </nav>
+
+  <main>
+    <div class="menu-grid" id="menu-grid"></div>
+    <p class="empty" id="empty-message" role="status">No matching items. Try another search.</p>
+  </main>
+
+  <section class="ad-carousel bottom" id="adbot" aria-label="Sponsored offers below menu items" hidden>
+    <div class="ad-carousel-track"></div>
+  </section>
+
+  <footer class="footer">
+    <p class="footer-brand">UPSC Chai Wala · Bhawarkua</p>
+    <p>Taste The Kulhad · Since 2022</p>
+    <div class="footer-actions">
+      <a href="tel:+918923189640">Call 8923189640</a>
+      <a href="https://wa.me/918923189640" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      <a href="https://instagram.com/upscchaiwala.777" target="_blank" rel="noopener noreferrer">Instagram</a>
+    </div>
+    <p>Need your own QR menu? Contact us at <a href="tel:+918889631476">+91 8889631476</a></p>
+    <p class="footer-marketing"><a href="https://roomslider.in/">RoomSlider.in</a> · Find your perfect stay, without the hassle.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var categories = [
+        { id: "combos", name: "Combos", icon: "🎓", combo: true, items: [
+          ["Butter Toast + Large Chai", 50],
+          ["Cheese Chutney Sandwich + Cold Coffee", 115],
+          ["Oreo Cold Coffee + Aalu Tikki Burger", 120],
+          ["Oreo Shake + Cheese Masala Sandwich", 139],
+          ["Masala Maggi + Cheese Corn Sandwich + 2 Chai", 139]
+        ] },
+        { id: "chai", name: "Chai", icon: "☕", items: [
+          ["Regular Chai", 12], ["Full Chai", 15], ["Kulhad Chai", 20], ["Large Chai", 20],
+          ["Chocolate Chai", 25], ["Elaichi Chai", 20], ["Gud Chai", 25], ["Black Tea", 20], ["Lemon Tea", 30]
+        ] },
+        { id: "hot-coffee", name: "Hot Coffee", icon: "☕", items: [
+          ["Hot Coffee", 20], ["Strong Hot Coffee", 25], ["Chocolate Coffee", 25], ["Black Coffee", 20]
+        ] },
+        { id: "cold-coffee", name: "Cold Coffee", icon: "🥤", items: [
+          ["Cold Coffee", 60], ["Chocolate Cold Coffee", 70], ["Oreo Cold Coffee", 80], ["Thick Cold Coffee", 75]
+        ] },
+        { id: "mocktails", name: "Mocktails", icon: "🍹", items: [
+          ["Mint Mojito", 70], ["Blue Curacao Mojito", 80], ["Strawberry Mojito", 80]
+        ] },
+        { id: "sharbat", name: "Sharbat", icon: "🍋", items: [
+          ["Lemon Sharbat", 20], ["Rose Sharbat", 15], ["Orange Sharbat", 20], ["Nimbu Masala", 25]
+        ] },
+        { id: "shakes", name: "Shakes", icon: "🥛", items: [
+          ["Mango Shake", 55], ["Pineapple Shake", 55], ["Strawberry Shake", 60], ["Oreo Shake", 75],
+          ["Chocolate Shake", 75], ["Black Currant Shake", 65], ["Kit-Kat Shake", 99], ["Kiwi Shake", 75],
+          ["Protein Banana Shake", 110]
+        ] },
+        { id: "sandwich", name: "Sandwich", icon: "🥪", items: [
+          ["Butter Toast", 40], ["Masala Sandwich", 60], ["Cheese Chutney Sandwich", 70],
+          ["Cheese Corn Sandwich", 70], ["Cheese Masala Sandwich", 80], ["Veg Sandwich", 65],
+          ["Paneer Special Sandwich", 99]
+        ] },
+        { id: "burger", name: "Burger", icon: "🍔", items: [
+          ["Aalu Tikki Burger", 60], ["Cheese Burger", 70], ["Paneer Special Burger", 85]
+        ] },
+        { id: "fries", name: "Fries", icon: "🍟", items: [
+          ["Salted Fries", 70], ["Masala Fries", 75], ["Peri-Peri Fries", 85],
+          ["Cheesy Fries", 90], ["Peri-Peri Cheese Fries", 100]
+        ] },
+        { id: "pasta", name: "Pasta", icon: "🍝", items: [
+          ["Red Sauce Pasta", 115], ["White Sauce Pasta", 125]
+        ] },
+        { id: "maggi", name: "Maggi", icon: "🍜", items: [
+          ["Plain Maggi", 55], ["Masala Maggi", 65], ["Cheese Maggi", 70],
+          ["Cheese Corn Maggi", 75], ["Veg Maggi", 75], ["Veg Cheese Maggi", 80], ["Butter Masala Maggi", 80]
+        ] },
+        { id: "add-on", name: "Add on", icon: "➕", items: [
+          ["Extra Butter", 15], ["Extra Cheese", 20], ["Extra Biscuit", 5]
+        ] }
+      ];
+
+      var grid = document.getElementById("menu-grid");
+      var tabs = document.getElementById("category-tabs");
+      var search = document.getElementById("menu-search");
+      var empty = document.getElementById("empty-message");
+      var ticker = document.getElementById("combo-ticker");
+      var tickerTrack = document.getElementById("ticker-track");
+
+      function makeItem(item) {
+        var row = document.createElement("li");
+        row.className = "menu-item";
+        var name = document.createElement("span");
+        name.className = "item-name";
+        name.textContent = item[0];
+        var dots = document.createElement("span");
+        dots.className = "item-dots";
+        dots.setAttribute("aria-hidden", "true");
+        var price = document.createElement("span");
+        price.className = "item-price";
+        price.textContent = "₹" + item[1];
+        row.append(name, dots, price);
+        return row;
+      }
+
+      function makeCategory(category) {
+        var section = document.createElement("section");
+        section.id = category.id;
+        section.className = "menu-category" + (category.combo ? " combo-category" : "");
+        section.dataset.name = category.name.toLowerCase();
+        var heading = document.createElement("h2");
+        var icon = document.createElement("span");
+        icon.className = "category-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = category.icon;
+        heading.append(icon, document.createTextNode(category.name));
+        var list = document.createElement("ul");
+        list.className = "menu-items";
+        category.items.forEach(function (item) { list.appendChild(makeItem(item)); });
+        section.append(heading, list);
+        return section;
+      }
+
+      categories.forEach(function (category, index) {
+        var tab = document.createElement("a");
+        tab.href = "#" + category.id;
+        tab.textContent = (category.combo ? "🎓 " : category.icon + " ") + category.name;
+        tab.dataset.category = category.id;
+        if (index === 0) tab.classList.add("active");
+        tabs.appendChild(tab);
+        grid.appendChild(makeCategory(category));
+      });
+
+      var comboGroup = document.createElement("div");
+      comboGroup.className = "ticker-group";
+      categories[0].items.forEach(function (item) {
+        var pill = document.createElement("span");
+        pill.className = "ticker-pill";
+        pill.textContent = "🎓 " + item[0] + " · ";
+        var amount = document.createElement("strong");
+        amount.textContent = "₹" + item[1];
+        pill.appendChild(amount);
+        comboGroup.appendChild(pill);
+      });
+      tickerTrack.appendChild(comboGroup);
+      var duplicateGroup = comboGroup.cloneNode(true);
+      duplicateGroup.setAttribute("aria-hidden", "true");
+      tickerTrack.appendChild(duplicateGroup);
+
+      search.addEventListener("input", function () {
+        var term = search.value.trim().toLocaleLowerCase();
+        var visibleCount = 0;
+        grid.querySelectorAll(".menu-category").forEach(function (section) {
+          var categoryMatch = term && section.dataset.name.indexOf(term) !== -1;
+          var visibleItems = 0;
+          section.querySelectorAll(".menu-item").forEach(function (item) {
+            var matches = !term || categoryMatch || item.querySelector(".item-name").textContent.toLocaleLowerCase().indexOf(term) !== -1;
+            item.hidden = !matches;
+            if (matches) visibleItems += 1;
+          });
+          section.hidden = visibleItems === 0;
+          if (visibleItems) visibleCount += 1;
+        });
+        empty.style.display = visibleCount ? "none" : "block";
+        ticker.hidden = Boolean(term);
+      });
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            tabs.querySelectorAll("a").forEach(function (tab) {
+              tab.classList.toggle("active", tab.dataset.category === entry.target.id);
+            });
+          });
+        }, { rootMargin: "-28% 0px -62% 0px" });
+        grid.querySelectorAll(".menu-category").forEach(function (section) { observer.observe(section); });
+      }
+
+      var themeToggle = document.getElementById("theme-toggle");
+      function isDarkTheme() {
+        return document.documentElement.dataset.theme === "dark"
+          || (!document.documentElement.dataset.theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      }
+      function updateThemeIcon() {
+        var dark = isDarkTheme();
+        themeToggle.textContent = dark ? "☀️" : "🌙";
+      }
+      themeToggle.addEventListener("click", function () {
+        var next = isDarkTheme() ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem("upsc-chai-wala-theme", next); } catch (error) {}
+        updateThemeIcon();
+      });
+      updateThemeIcon();
+    })();
+  </script>
+  <script src="/cafe-menu-ai.js" defer></script>
+  <script src="/cafe-ads.js" defer></script>
+  <script src="/cafe-analytics.js" defer></script>
+</body>
+</html>

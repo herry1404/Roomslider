@@ -40,6 +40,17 @@ const cafes = [
     tagline: "Crafted for Cravings. Made for Moments",
   },
   {
+    id: "upscchaiwala",
+    name: "UPSC Chai Wala",
+    area: "Bhawarkua",
+    address: "Bhawarkua, Indore",
+    // TODO: Update this approximate location with the cafe's exact map pin.
+    latitude: 22.6914456,
+    longitude: 75.8654937,
+    menuUrl: "https://roomslider.in/cafe/bhawarkua/upscchaiwala",
+    tagline: "Taste The Kulhad",
+  },
+  {
     id: "yuvanamritulya",
     name: "श्री युवान अमृततुल्य",
     area: "Vishnupuri",

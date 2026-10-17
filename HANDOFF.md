@@ -326,3 +326,9 @@ NEXT: Updates section (after Profile page improvements)
 - Villa card data spacing follow-up (9 Oct 2026): removed the legacy shared paragraph minimum-height and margins from villa-card data rows, which caused visible blank space below/between details despite the earlier padding adjustment.
 - AI search follow-up (9 Oct 2026): added active villa search with location/nightly budget and event/day budget filters, villa result cards and `/villas` view-all navigation. Added room/villa quick-search examples and simpler search guidance; removed budget/filler words from fallback room keywords so broad room searches do not incorrectly return no matches.
 - RO search follow-up (9 Oct 2026): recognize `RO`, `R.O.`, spaced spellings, water purifier and water filter queries. Don't require the service keyword to appear in each provider's name/description after the Wi-Fi & RO category has already been identified, so matching providers are not filtered out.
+
+### 17 Oct 2026 — UPSC Chai Wala menu
+
+- Added the mobile-first UPSC Chai Wala QR menu at `/cafe/bhawarkua/upscchaiwala`, with the supplied menu/prices, combo ticker and section, sticky category search, light/dark theme, Instagram/WhatsApp actions, and RoomSlider.in link.
+- Added the public cafe rewrite and cafe directory entry, reusing Wow Pav's Bhawarkua coordinates.
+- Pending TODOs: add the cafe-provided round cup logo; replace the approximate coordinates with the exact map pin; verify the public URL after deployment.
