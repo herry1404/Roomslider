@@ -284,6 +284,126 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.dashboard-ads {
+  margin-top: 18px;
+}
+
+.dashboard-ads .dashboard-section-heading {
+  margin-bottom: 14px;
+}
+
+.dashboard-ads .dashboard-section-heading h3 {
+  margin: 0 0 4px;
+}
+
+.dashboard-ads-manage {
+  flex: none;
+  gap: 7px;
+}
+
+.dashboard-ads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 12px;
+}
+
+.dashboard-ad-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.dashboard-ad-image {
+  display: grid;
+  flex: 0 0 58px;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--admin-bg);
+}
+
+.dashboard-ad-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dashboard-ad-image.banner {
+  flex-basis: 88px;
+  width: 88px;
+}
+
+.dashboard-ad-image.banner img {
+  object-fit: contain;
+}
+
+.dashboard-ad-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dashboard-ad-copy strong {
+  overflow-wrap: anywhere;
+  color: var(--admin-text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.dashboard-ad-copy small {
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-ad-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--admin-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dashboard-ad-status.is-live {
+  color: #4ade80;
+}
+
+.dashboard-ad-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.dashboard-ads-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 12px;
+  border: 1px dashed var(--admin-border);
+  border-radius: 12px;
+  color: var(--admin-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.dashboard-ads-state p {
+  margin: 0;
+}
+
 /* ===========================
    QUICK ACTIONS
 =========================== */
@@ -358,6 +478,15 @@
 
   .dashboard-lower .quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-ads .dashboard-section-heading {
+    align-items: center;
+  }
+
+  .dashboard-ads-manage {
+    padding: 8px 10px;
+    font-size: 12px;
   }
 
   .dashboard-live-heading {
