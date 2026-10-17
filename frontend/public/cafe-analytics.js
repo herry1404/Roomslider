@@ -8,12 +8,12 @@
 
   var visitorId;
   try {
-    visitorId = sessionStorage.getItem("cafe-analytics-visitor");
+    visitorId = sessionStorage.getItem("roomslider-analytics-visitor");
     if (!visitorId) {
       visitorId = window.crypto && window.crypto.randomUUID
         ? window.crypto.randomUUID()
         : Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
-      sessionStorage.setItem("cafe-analytics-visitor", visitorId);
+      sessionStorage.setItem("roomslider-analytics-visitor", visitorId);
     }
   } catch {
     visitorId = Math.random().toString(36).slice(2) + Date.now().toString(36);

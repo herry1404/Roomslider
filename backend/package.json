@@ -10,7 +10,8 @@
     "seed:vehicles": "node scripts/seedVehicles.js",
     "seed:cleaning": "node scripts/seedCleaning.js",
     "seed:study": "node scripts/seedStudySupport.js",
-    "backfill:hourly-rooms": "node scripts/backfillHourlyRoomFields.js"
+    "backfill:hourly-rooms": "node scripts/backfillHourlyRoomFields.js",
+    "analytics:retain": "node scripts/retainAnalyticsHistory.js"
   },
   "keywords": [
     "roomslider",

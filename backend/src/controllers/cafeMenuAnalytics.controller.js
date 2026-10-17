@@ -37,18 +37,36 @@ const trackCafeMenuEvent = async (req, res) => {
   }
 };
 
+const getIndiaDayStart = (date = new Date()) => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map(({ type, value }) => [type, Number(value)])
+  );
+  return new Date(Date.UTC(values.year, values.month - 1, values.day) - (330 * 60 * 1000));
+};
+
 const getCafeMenuAnalytics = async (req, res) => {
-  const days = Number(req.query.days || 30);
-  if (![7, 30, 90].includes(days)) {
-    return res.status(400).json({ success: false, message: "Analytics range must be 7, 30, or 90 days" });
+  const requestedDays = req.query.days || "30";
+  const allTime = requestedDays === "all";
+  const days = Number(requestedDays);
+  if (!allTime && ![1, 7, 30, 90].includes(days)) {
+    return res.status(400).json({ success: false, message: "Analytics range must be 1, 7, 30, or 90 days, or all" });
   }
 
   try {
-    const start = new Date();
-    start.setUTCHours(0, 0, 0, 0);
-    start.setUTCDate(start.getUTCDate() - days + 1);
-    const match = { createdAt: { $gte: start } };
-    const [summaryRows, dailyRows, cafeRows, locationRows, adRows, sourceRows, platformRows, recentRows] = await Promise.all([
+    const now = new Date();
+    const todayStart = getIndiaDayStart(now);
+    const start = allTime ? null : new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+    const match = allTime ? {} : { createdAt: { $gte: start, $lte: now } };
+    const todayMatch = { createdAt: { $gte: todayStart, $lte: now } };
+    const [summaryRows, todayRows, dailyRows, cafeRows, locationRows, adRows, sourceRows, platformRows, recentRows] = await Promise.all([
       CafeMenuAnalytics.aggregate([
         { $match: match },
         {
@@ -70,9 +88,45 @@ const getCafeMenuAnalytics = async (req, res) => {
         },
       ]),
       CafeMenuAnalytics.aggregate([
-        { $match: { ...match, type: "menu_view" } },
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, views: { $sum: 1 }, visitors: { $addToSet: "$visitorId" } } },
-        { $project: { date: "$_id", views: 1, uniqueVisitors: { $size: "$visitors" } } },
+        { $match: todayMatch },
+        {
+          $group: {
+            _id: null,
+            menuViews: { $sum: { $cond: [{ $eq: ["$type", "menu_view"] }, 1, 0] } },
+            adImpressions: { $sum: { $cond: [{ $eq: ["$type", "ad_impression"] }, 1, 0] } },
+            adClicks: { $sum: { $cond: [{ $eq: ["$type", "ad_click"] }, 1, 0] } },
+            visitors: { $addToSet: { $cond: [{ $eq: ["$type", "menu_view"] }, "$visitorId", null] } },
+          },
+        },
+        {
+          $project: {
+            menuViews: 1,
+            adImpressions: 1,
+            adClicks: 1,
+            uniqueVisitors: { $size: { $setDifference: ["$visitors", [null]] } },
+          },
+        },
+      ]),
+      CafeMenuAnalytics.aggregate([
+        { $match: match },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Asia/Kolkata" } },
+            views: { $sum: { $cond: [{ $eq: ["$type", "menu_view"] }, 1, 0] } },
+            adImpressions: { $sum: { $cond: [{ $eq: ["$type", "ad_impression"] }, 1, 0] } },
+            adClicks: { $sum: { $cond: [{ $eq: ["$type", "ad_click"] }, 1, 0] } },
+            visitors: { $addToSet: { $cond: [{ $eq: ["$type", "menu_view"] }, "$visitorId", null] } },
+          },
+        },
+        {
+          $project: {
+            date: "$_id",
+            views: 1,
+            adImpressions: 1,
+            adClicks: 1,
+            uniqueVisitors: { $size: { $setDifference: ["$visitors", [null]] } },
+          },
+        },
         { $sort: { date: 1 } },
       ]),
       CafeMenuAnalytics.aggregate([
@@ -127,19 +181,52 @@ const getCafeMenuAnalytics = async (req, res) => {
       .filter((id) => mongoose.isValidObjectId(id));
     const ads = await Ad.find({ _id: { $in: adIds } }).select("text slot targetBy cafe location").lean();
     const adsById = new Map(ads.map((ad) => [ad._id.toString(), ad]));
-    const summary = summaryRows[0] || { menuViews: 0, uniqueVisitors: 0, adImpressions: 0, adClicks: 0 };
+    const makeSummary = (row = {}) => {
+      const summary = {
+        menuViews: row.menuViews || 0,
+        uniqueVisitors: row.uniqueVisitors || 0,
+        adImpressions: row.adImpressions || 0,
+        adClicks: row.adClicks || 0,
+      };
+      summary.clickRate = summary.adImpressions
+        ? Number(((summary.adClicks / summary.adImpressions) * 100).toFixed(2))
+        : 0;
+      return summary;
+    };
+
+    const dailyTrend = allTime ? dailyRows : (() => {
+      const dailyByDate = new Map(dailyRows.map((row) => [row.date, row]));
+      const rows = [];
+      for (let offset = 0; offset < days; offset += 1) {
+        const day = new Date(start.getTime() + offset * 24 * 60 * 60 * 1000);
+        const date = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(day);
+        rows.push(dailyByDate.get(date) || {
+          date,
+          views: 0,
+          adImpressions: 0,
+          adClicks: 0,
+          uniqueVisitors: 0,
+        });
+      }
+      return rows;
+    })();
 
     return res.status(200).json({
       success: true,
       analytics: {
-        days,
+        days: allTime ? "all" : days,
         from: start,
-        to: new Date(),
+        to: now,
         summary: {
-          ...summary,
-          clickRate: summary.adImpressions ? Number(((summary.adClicks / summary.adImpressions) * 100).toFixed(2)) : 0,
+          ...makeSummary(summaryRows[0]),
         },
-        dailyViews: dailyRows,
+        today: makeSummary(todayRows[0]),
+        dailyViews: dailyTrend,
         byCafe: cafeRows,
         byLocation: locationRows,
         bySource: sourceRows,

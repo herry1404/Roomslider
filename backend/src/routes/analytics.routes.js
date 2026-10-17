@@ -11,7 +11,7 @@ const pageViewLimiter = rateLimit({
   message: { success: false, message: "Too many analytics events. Please try again shortly." },
 });
 
-router.post("/page-view", pageViewLimiter, trackPageView);
-router.post("/page-view-duration", pageViewLimiter, trackPageDuration);
+router.post("/page-view", pageViewLimiter, express.urlencoded({ extended: false }), trackPageView);
+router.post("/page-view-duration", pageViewLimiter, express.urlencoded({ extended: false }), trackPageDuration);
 
 module.exports = router;

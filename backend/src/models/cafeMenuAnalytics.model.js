@@ -37,7 +37,7 @@ const cafeMenuAnalyticsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-cafeMenuAnalyticsSchema.index({ createdAt: 1 }, { expireAfterSeconds: 34560000 });
+cafeMenuAnalyticsSchema.index({ createdAt: -1 });
 cafeMenuAnalyticsSchema.index({ createdAt: -1, type: 1, cafe: 1, location: 1 });
 cafeMenuAnalyticsSchema.index({ adId: 1, type: 1, createdAt: -1 });
 

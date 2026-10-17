@@ -14,7 +14,7 @@ const trackSchema = z.object({
 
 const durationSchema = z.object({
   eventId: z.string().regex(/^[a-zA-Z0-9-]{16,80}$/),
-  durationSeconds: z.number().int().min(0).max(43200),
+  durationSeconds: z.coerce.number().int().min(0).max(43200),
 });
 
 const getIndiaDayStart = (date = new Date()) => {
@@ -66,17 +66,19 @@ const trackPageDuration = async (req, res) => {
 };
 
 const getSiteTraffic = async (req, res) => {
-  const days = Number(req.query.days || 7);
-  if (![7, 30, 90].includes(days)) {
-    return res.status(400).json({ success: false, message: "Traffic range must be 7, 30, or 90 days" });
+  const requestedDays = req.query.days || "7";
+  const allTime = requestedDays === "all";
+  const days = Number(requestedDays);
+  if (!allTime && ![1, 7, 30, 90].includes(days)) {
+    return res.status(400).json({ success: false, message: "Traffic range must be 1, 7, 30, or 90 days, or all" });
   }
 
   try {
     const now = new Date();
     const todayStart = getIndiaDayStart(now);
     const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-    const start = new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-    const match = { createdAt: { $gte: start, $lte: now } };
+    const start = allTime ? null : new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+    const match = allTime ? {} : { createdAt: { $gte: start, $lte: now } };
     const [todayRows, activeRows, dailyRows, sourceRows, platformRows, pageRows, recentRows, trackedRows] = await Promise.all([
       SiteAnalytics.aggregate([
         { $match: { createdAt: { $gte: todayStart, $lt: tomorrowStart } } },
@@ -132,23 +134,26 @@ const getSiteTraffic = async (req, res) => {
       ]),
     ]);
 
-    const dailyByDate = new Map(dailyRows.map((row) => [row.date, row]));
-    const daily = [];
-    for (let offset = 0; offset < days; offset += 1) {
-      const day = new Date(start.getTime() + offset * 24 * 60 * 60 * 1000);
-      const date = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Asia/Kolkata",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(day);
-      daily.push(dailyByDate.get(date) || { date, pageViews: 0, uniqueVisitors: 0, durationSeconds: 0 });
-    }
+    const daily = allTime ? dailyRows : (() => {
+      const dailyByDate = new Map(dailyRows.map((row) => [row.date, row]));
+      const rows = [];
+      for (let offset = 0; offset < days; offset += 1) {
+        const day = new Date(start.getTime() + offset * 24 * 60 * 60 * 1000);
+        const date = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(day);
+        rows.push(dailyByDate.get(date) || { date, pageViews: 0, uniqueVisitors: 0, durationSeconds: 0 });
+      }
+      return rows;
+    })();
 
     return res.status(200).json({
       success: true,
       traffic: {
-        days,
+        days: allTime ? "all" : days,
         summary: {
           ...(todayRows[0] || { pageViews: 0, uniqueVisitors: 0, durationSeconds: 0 }),
           activeVisitors: activeRows[0]?.activeVisitors || 0,

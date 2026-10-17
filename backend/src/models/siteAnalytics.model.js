@@ -15,6 +15,5 @@ const siteAnalyticsSchema = new mongoose.Schema(
 );
 
 siteAnalyticsSchema.index({ createdAt: -1 });
-siteAnalyticsSchema.index({ createdAt: 1 }, { expireAfterSeconds: 15552000 });
 
 module.exports = mongoose.model("SiteAnalytics", siteAnalyticsSchema);

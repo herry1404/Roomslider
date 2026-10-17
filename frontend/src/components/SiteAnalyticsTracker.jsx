@@ -4,12 +4,12 @@ import api from "../api/axios";
 
 const getVisitorId = () => {
   try {
-    let visitorId = sessionStorage.getItem("roomslider-site-visitor");
+    let visitorId = sessionStorage.getItem("roomslider-analytics-visitor");
     if (!visitorId) {
       visitorId = window.crypto?.randomUUID
         ? window.crypto.randomUUID()
         : `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
-      sessionStorage.setItem("roomslider-site-visitor", visitorId);
+      sessionStorage.setItem("roomslider-analytics-visitor", visitorId);
     }
     return visitorId;
   } catch {
@@ -53,16 +53,24 @@ function SiteAnalyticsTracker() {
       : `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
     const attribution = getAttribution();
     const device = window.matchMedia("(max-width: 767px)").matches ? "Mobile" : "Desktop";
-    api.post("/analytics/page-view", {
+    const pageView = {
       visitorId,
       eventId,
       path: pathname.slice(0, 160),
       ...attribution,
       platform: getPlatform(),
       device,
-    }).catch((error) => {
-      console.error("Site analytics tracking failed:", error);
-    });
+    };
+    const pageViewEndpoint = `${api.defaults.baseURL}/analytics/page-view`;
+    const pageViewPayload = new URLSearchParams(pageView);
+    if (!navigator.sendBeacon?.(pageViewEndpoint, pageViewPayload)) {
+      fetch(pageViewEndpoint, {
+        method: "POST",
+        body: pageViewPayload,
+        keepalive: true,
+        credentials: "omit",
+      }).catch((error) => console.error("Site analytics tracking failed:", error));
+    }
 
     const startedAt = Date.now();
     let durationSent = false;
@@ -71,11 +79,13 @@ function SiteAnalyticsTracker() {
       durationSent = true;
       const durationSeconds = Math.min(43200, Math.floor((Date.now() - startedAt) / 1000));
       const url = `${api.defaults.baseURL}/analytics/page-view-duration`;
+      const payload = new URLSearchParams({ eventId, durationSeconds: String(durationSeconds) });
+      if (navigator.sendBeacon?.(url, payload)) return;
       fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId, durationSeconds }),
+        body: payload,
         keepalive: true,
+        credentials: "omit",
       }).catch((error) => {
         console.error("Site analytics duration tracking failed:", error);
       });

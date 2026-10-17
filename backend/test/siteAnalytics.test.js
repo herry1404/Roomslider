@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const SiteAnalytics = require("../src/models/siteAnalytics.model");
+const analyticsRoutes = require("../src/routes/analytics.routes");
 const {
   trackPageDuration,
   trackPageView,
@@ -61,6 +62,51 @@ test("site page duration tracking updates the matching visit", async () => {
   }
 });
 
+test("site analytics route accepts URL-encoded page and duration beacons", async () => {
+  const originalCreate = SiteAnalytics.create;
+  const originalUpdateOne = SiteAnalytics.updateOne;
+  let savedPageView;
+  let savedDuration;
+  SiteAnalytics.create = async (event) => { savedPageView = event; };
+  SiteAnalytics.updateOne = async (...args) => { savedDuration = args; };
+
+  const app = require("express")();
+  app.use("/api/analytics", analyticsRoutes);
+  const server = app.listen(0);
+
+  try {
+    await new Promise((resolve) => server.once("listening", resolve));
+    const baseUrl = `http://127.0.0.1:${server.address().port}/api/analytics`;
+    const pageResponse = await fetch(`${baseUrl}/page-view`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        visitorId: "visitor-session-123456789",
+        eventId: "page-event-123456789",
+        path: "/rooms",
+        source: "Direct",
+        referrer: "",
+        platform: "Android",
+        device: "Mobile",
+      }),
+    });
+    const durationResponse = await fetch(`${baseUrl}/page-view-duration`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ eventId: "page-event-123456789", durationSeconds: "42" }),
+    });
+
+    assert.equal(pageResponse.status, 202);
+    assert.equal(durationResponse.status, 202);
+    assert.equal(savedPageView.path, "/rooms");
+    assert.deepEqual(savedDuration[1], { $max: { durationSeconds: 42 } });
+  } finally {
+    server.close();
+    SiteAnalytics.create = originalCreate;
+    SiteAnalytics.updateOne = originalUpdateOne;
+  }
+});
+
 test("site traffic validates supported reporting periods", async () => {
   const res = response();
   await getSiteTraffic({ query: { days: "14" } }, res);
@@ -78,6 +124,30 @@ test("site traffic returns zeroed metrics when no page views are recorded", asyn
         limit: () => ({ lean: async () => [] }),
       }),
     }),
+  });
+
+  test("site traffic can report all retained history", async () => {
+    const originalAggregate = SiteAnalytics.aggregate;
+    const originalFind = SiteAnalytics.find;
+    SiteAnalytics.aggregate = async () => [];
+    SiteAnalytics.find = () => ({
+      sort: () => ({
+        select: () => ({
+          limit: () => ({ lean: async () => [] }),
+        }),
+      }),
+    });
+
+    try {
+      const res = response();
+      await getSiteTraffic({ query: { days: "all" } }, res);
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.traffic.days, "all");
+      assert.deepEqual(res.body.traffic.daily, []);
+    } finally {
+      SiteAnalytics.aggregate = originalAggregate;
+      SiteAnalytics.find = originalFind;
+    }
   });
 
   try {

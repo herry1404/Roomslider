@@ -332,3 +332,11 @@ NEXT: Updates section (after Profile page improvements)
 - Added the mobile-first UPSC Chai Wala QR menu at `/cafe/bhawarkua/upscchaiwala`, with the supplied menu/prices, combo ticker and section, sticky category search, light/dark theme, Instagram/WhatsApp actions, and RoomSlider.in link.
 - Added the public cafe rewrite and cafe directory entry, reusing Wow Pav's Bhawarkua coordinates.
 - Pending TODOs: add the cafe-provided round cup logo; replace the approximate coordinates with the exact map pin; verify the public URL after deployment.
+
+### 17 Oct 2026 — Analytics tracking and history
+
+- Enabled real `today`, 7/30/90-day, and all-retained-history reports for site, cafe, signup, and search activity. Admin Analytics' Site Traffic, Ads Traffic, and Traffic Sources tabs now show the tracked reports instead of empty states; today's cafe ad counts and India-timezone daily ad trends are included.
+- Website and cafe menus now share one temporary browser-session analytics ID. Event storage continues in the existing MongoDB analytics collections; schemas no longer declare data-expiry indexes.
+- Added `cd backend && npm run analytics:retain` to remove only the `createdAt` TTL indexes from the existing site/cafe analytics collections. It drops indexes only, does not alter documents, and logs the exact indexes removed.
+- Backend analytics tests, frontend production build, targeted ESLint, JavaScript syntax checks, and `git diff --check` passed.
+- Validation needed: run the retention command with the production `MONGODB_URI` after deploying the schema change, then confirm production admin reports include prior records. TTL may have already expired older documents before the index is removed; deleted records cannot be recovered by this change. Staff/admin pages remain excluded from public visitor page-view tracking.

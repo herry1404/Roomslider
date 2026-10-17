@@ -5,7 +5,6 @@ import api from "../../api/axios";
 import "../../styles/admin/theme.css";
 import "./analytics/analytics.css";
 import {
-  AnalyticsEmptyState,
   AnalyticsList,
   AnalyticsSkeleton,
   MetricCard,
@@ -47,7 +46,9 @@ const aggregateCafeViews = (rows) => Object.values((rows || []).reduce((result, 
   return result;
 }, {})).sort((left, right) => right.views - left.views).slice(0, 8);
 
-const periodText = (range) => range === "today" ? "Aaj" : `Pichhle ${range} din`;
+const periodText = (range) => range === "today" ? "Aaj"
+  : range === "all" ? "Shuru se ab tak"
+    : `Pichhle ${range} din`;
 
 const getWithRetry = async (path, config) => {
   try {
@@ -72,7 +73,7 @@ function comparePercent(current, previous) {
 
 function Glossary() {
   const terms = [
-    ["Visitors", "Alag log jo site ya menu dekhne aaye. Ek hi log alag din phir gine ja sakte hain."],
+    ["Visitors", "Anonymous browser sessions ka andaaza, alag logon ki exact ginti nahi. Ek hi browser session dobara gin sakta hai."],
     ["Page views", "Site par khole gaye kul pages."],
     ["Sessions", "Ek baar site khol kar dekhne ka daura."],
     ["Referrer", "Woh website ya app jahan se koi yahan aaya."],
@@ -126,11 +127,15 @@ function AdminAnalytics() {
   const fetchAnalytics = useCallback(async ({ showLoading = true } = {}) => {
     if (showLoading) setLoading(true);
     setError("");
-    const apiDays = range === "today" ? 7 : Number(range);
+    const apiDays = range === "today" ? 1 : range === "all" ? "all" : Number(range);
+    const trafficRequest = getWithRetry("/admin/traffic", { params: { days: apiDays } });
+    const historyRequest = range === "all"
+      ? trafficRequest
+      : getWithRetry("/admin/traffic", { params: { days: 90 } });
     const results = await Promise.allSettled([
-      getWithRetry("/admin/analytics"),
-      getWithRetry("/admin/traffic", { params: { days: apiDays } }),
-      getWithRetry("/admin/traffic", { params: { days: 90 } }),
+      getWithRetry("/admin/analytics", { params: { days: apiDays } }),
+      trafficRequest,
+      historyRequest,
       getWithRetry("/promo-listings/admin/analytics", { params: { days: apiDays } }),
     ]);
     const labels = ["Listings and engagement", "Site traffic", "Traffic history", "Cafe menu and ad"];
@@ -157,9 +162,11 @@ function AdminAnalytics() {
 
   const siteDays = useMemo(() => {
     const rows = history?.daily || [];
-    return range === "today" ? rows.filter((row) => row.date === todayKey()) : rows.slice(-Number(range));
+    if (range === "today") return rows.filter((row) => row.date === todayKey());
+    return range === "all" ? rows : rows.slice(-Number(range));
   }, [history, range]);
   const previousSiteDays = useMemo(() => {
+    if (range === "all") return [];
     if (range === "today") return (history?.daily || []).filter((row) => row.date === yesterdayKey());
     const days = Number(range);
     return (history?.daily || []).slice(-2 * days, -days);
@@ -171,7 +178,7 @@ function AdminAnalytics() {
   const activityRows = useMemo(() => {
     const rows = analytics?.dailyActivity || [];
     if (range === "today") return rows.filter((row) => row.date === todayKey());
-    return rows.slice(-Math.min(Number(range), 30));
+    return range === "all" ? rows : rows.slice(-Math.min(Number(range), 30));
   }, [analytics, range]);
   const cafeRows = useMemo(() => {
     const rows = cafe?.dailyViews || [];
@@ -189,7 +196,7 @@ function AdminAnalytics() {
         <div>
           <span className="admin-analytics-eyebrow"><BarChart3 size={16} /> ROOMSLIDER KI REPORT</span>
           <h1>Analytics</h1>
-          <p>Yahan site, cafe menus aur listings par log kya kar rahe hain, seedhe shabdon mein dekho.</p>
+          <p>Yahan site traffic, cafe menu views aur ad performance ka live hisaab dekho.</p>
         </div>
       </header>
 
@@ -279,26 +286,23 @@ function AdminAnalytics() {
                         <AnalyticsList
                           title="Log kahan se aaye?"
                           description="Sabse zyada pages dekhne wale sources."
-                          rows={range === "today" ? [] : traffic.sources}
+                          rows={traffic.sources}
                           labelKey="source"
                           valueKey="pageViews"
-                          emptyMessage={range === "today" ? "Aaj ke source ka data abhi available nahi." : undefined}
                         />
                         <AnalyticsList
                           title="Kaun se device par?"
                           description="Phone ya computer se khole gaye pages."
-                          rows={range === "today" ? [] : traffic.platforms}
+                          rows={traffic.platforms}
                           labelKey="platform"
                           valueKey="pageViews"
-                          emptyMessage={range === "today" ? "Aaj ke device ka data abhi available nahi." : undefined}
                         />
                         <AnalyticsList
                           title="Sabse zyada dekhe gaye pages"
                           description="Site ke popular pages aur unke views."
-                          rows={range === "today" ? [] : traffic.topPages}
+                          rows={traffic.topPages}
                           labelKey="path"
                           valueKey="pageViews"
-                          emptyMessage={range === "today" ? "Aaj ke page breakdown ka data abhi available nahi." : undefined}
                         />
                       </>
                     )}
@@ -327,9 +331,71 @@ function AdminAnalytics() {
         </section>
       )}
 
-      {activeTab === "site" && <AnalyticsEmptyState />}
-      {activeTab === "ads" && <AnalyticsEmptyState />}
-      {activeTab === "sources" && <AnalyticsEmptyState />}
+      {activeTab === "site" && (
+        <section className="analytics-tab-content">
+          <p className="analytics-summary">Site ke har page par aane wale visits, devices, sources aur rukne ka waqt.</p>
+          {loading ? <AnalyticsSkeleton /> : (
+            <>
+              {error && <div className="analytics-error" role="alert"><p>{error}</p><button type="button" className="admin-btn secondary" onClick={() => setRetry((value) => value + 1)}>Dobara koshish karein</button></div>}
+              {history && (
+                <>
+                  <div className="admin-stats-grid analytics-stats-grid">
+                    <MetricCard metric="pageViews" value={pageViews} />
+                    <MetricCard metric="visitors" value={visitors} />
+                    <MetricCard metric="activeVisitors" value={traffic?.summary.activeVisitors} />
+                    <MetricCard metric="totalTime" value={(Number(traffic?.summary.durationSeconds) || 0) / 60} displayValue={formatMinutes(traffic?.summary.durationSeconds)} />
+                    <MetricCard metric="trackedVisits" value={history.tracked?.pageViews} />
+                  </div>
+                  <TrendChart title="Site traffic" description="Har din ke page views aur unique browser sessions." data={siteDays} lines={[{ key: "pageViews", metric: "pageViews" }, { key: "uniqueVisitors", metric: "visitors" }]} emptyMessage="Visits aate hi yahan trend dikhne lagega." />
+                  <div className="admin-analytics-grid analytics-lists-grid">
+                    <AnalyticsList title="Traffic sources" description="Visitors kahan se aaye." rows={traffic?.sources} labelKey="source" valueKey="pageViews" />
+                    <AnalyticsList title="Devices / platforms" description="Kaun se device se site kholi." rows={traffic?.platforms} labelKey="platform" valueKey="pageViews" />
+                    <AnalyticsList title="Popular pages" description="Sabse zyada khole gaye pages." rows={traffic?.topPages} labelKey="path" valueKey="pageViews" />
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </section>
+      )}
+      {activeTab === "ads" && (
+        <section className="analytics-tab-content">
+          <p className="analytics-summary">Cafe menus par dikhaye gaye ads ke impressions, clicks aur click rate.</p>
+          {loading ? <AnalyticsSkeleton /> : (
+            <>
+              {error && <div className="analytics-error" role="alert"><p>{error}</p><button type="button" className="admin-btn secondary" onClick={() => setRetry((value) => value + 1)}>Dobara koshish karein</button></div>}
+              {cafe && (
+                <>
+                  <div className="admin-stats-grid analytics-stats-grid">
+                    <MetricCard metric="adImpressions" value={range === "today" ? cafe.today.adImpressions : cafe.summary.adImpressions} />
+                    <MetricCard metric="adClicks" value={range === "today" ? cafe.today.adClicks : cafe.summary.adClicks} />
+                    <MetricCard metric="adClickRate" value={range === "today" ? cafe.today.clickRate : cafe.summary.clickRate} suffix="%" />
+                    <MetricCard metric="menuViews" value={range === "today" ? cafe.today.menuViews : cafe.summary.menuViews} />
+                  </div>
+                  <TrendChart title="Ad delivery and clicks" description="Daily menu ad impressions and clicks (an impression counts once the ad is visible)." data={cafeRows} lines={[{ key: "adImpressions", metric: "adImpressions" }, { key: "adClicks", metric: "adClicks" }]} emptyMessage="Ads show aur click hone par yahan daily report aayegi." />
+                  <AnalyticsList title="Ad ke hisaab se performance" description="Har ad ke impressions, clicks aur click rate." rows={(cafe.adPerformance || []).map((item) => ({ ad: `${item.text} · ${item.cafe} · ${item.location}`, result: `${formatCount(item.impressions)} impressions · ${formatCount(item.clicks)} clicks · ${item.clickRate || 0}%` }))} labelKey="ad" valueKey="result" emptyMessage="Chune gaye samay mein koi ad event save nahi hua." />
+                  <AnalyticsList title="Recent ad/menu events" description="Latest views, impressions aur clicks." rows={(cafe.recentEvents || []).filter((event) => event.type !== "menu_view").map((event) => ({ event: `${event.type.replace("_", " ")} · ${event.ad} · ${event.cafe} · ${event.location}`, time: new Date(event.createdAt).toLocaleString("en-IN") }))} labelKey="event" valueKey="time" emptyMessage="Recent ad events yahan dikhengi." />
+                </>
+              )}
+            </>
+          )}
+        </section>
+      )}
+      {activeTab === "sources" && (
+        <section className="analytics-tab-content">
+          <p className="analytics-summary">Campaign UTM tags aur referring domains se pata chalega traffic kahan se aa raha hai.</p>
+          {loading ? <AnalyticsSkeleton /> : (
+            <>
+              {error && <div className="analytics-error" role="alert"><p>{error}</p><button type="button" className="admin-btn secondary" onClick={() => setRetry((value) => value + 1)}>Dobara koshish karein</button></div>}
+              <div className="admin-analytics-grid analytics-lists-grid">
+                <AnalyticsList title="Website traffic sources" description="Website par visitors bhejne wale sources." rows={traffic?.sources} labelKey="source" valueKey="pageViews" emptyMessage="Source ke saath visits aate hi report dikhegi." />
+                <AnalyticsList title="Cafe menu traffic sources" description="Cafe menu visits ke source/referrer." rows={cafe?.bySource} labelKey="source" valueKey="views" emptyMessage="Menu visits aate hi source report dikhegi." />
+                <AnalyticsList title="Website ke popular pages" description="Source breakdown ke saath site par sabse dekhe gaye pages." rows={traffic?.topPages} labelKey="path" valueKey="pageViews" />
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       {activeTab === "listings" && (
         <section className="analytics-tab-content">
@@ -357,10 +423,11 @@ function AdminAnalytics() {
                 )}
                 {cafe && range === "today" && (
                   <>
-                    <MetricCard metric="menuViews" value={sumValues(cafeRows, "views")} />
-                    <MetricCard metric="menuVisitors" value={sumValues(cafeRows, "uniqueVisitors")} />
-                    <MetricCard metric="adImpressions" value={0} />
-                    <MetricCard metric="adClicks" value={0} />
+                    <MetricCard metric="menuViews" value={cafe.today.menuViews} />
+                    <MetricCard metric="menuVisitors" value={cafe.today.uniqueVisitors} />
+                    <MetricCard metric="adImpressions" value={cafe.today.adImpressions} />
+                    <MetricCard metric="adClicks" value={cafe.today.adClicks} />
+                    <MetricCard metric="adClickRate" value={cafe.today.clickRate} suffix="%" />
                   </>
                 )}
               </div>
@@ -373,7 +440,6 @@ function AdminAnalytics() {
                     { key: "signups", metric: "signups" },
                     { key: "searches", metric: "searches" },
                   ]}
-                  note={Number(range) > 30 ? "Is chart ke liye abhi sirf aakhri 30 din ka data milta hai." : undefined}
                   emptyMessage="Signup aur search hote hi yahan unka roz ka graph dikhega."
                 />
               )}
@@ -389,25 +455,22 @@ function AdminAnalytics() {
                     ]}
                     emptyMessage="Jaise hi koi cafe ka menu dekhega, yahan graph dikhega."
                   />
-                  {range === "today" && (
-                    <p className="analytics-chart-note">Aaj ke ad impressions aur clicks ka daily data API mein nahi milta, isliye unka aaj ka number nahi dikhaya ja raha.</p>
-                  )}
                   <div className="admin-analytics-grid analytics-lists-grid">
-                    <AnalyticsList title="Cafe ke hisaab se" description="Kaun se cafe menu zyada khule." rows={range === "today" ? [] : aggregateCafeViews(cafe.byCafe)} labelKey="cafe" valueKey="views" />
-                    <AnalyticsList title="Jagah ke hisaab se" description="Kaun si location ke menu zyada khule." rows={range === "today" ? [] : cafe.byLocation} labelKey="location" valueKey="views" />
-                    <AnalyticsList title="Menu par log kahan se aaye?" description="Cafe menu tak pahunchne ke sources." rows={range === "today" ? [] : cafe.bySource} labelKey="source" valueKey="views" />
-                    <AnalyticsList title="Cafe menu kis device par?" description="Phone ya computer se khole gaye menu." rows={range === "today" ? [] : cafe.byPlatform} labelKey="platform" valueKey="views" />
+                    <AnalyticsList title="Cafe ke hisaab se" description="Kaun se cafe menu zyada khule." rows={aggregateCafeViews(cafe.byCafe)} labelKey="cafe" valueKey="views" />
+                    <AnalyticsList title="Jagah ke hisaab se" description="Kaun si location ke menu zyada khule." rows={cafe.byLocation} labelKey="location" valueKey="views" />
+                    <AnalyticsList title="Menu par log kahan se aaye?" description="Cafe menu tak pahunchne ke sources." rows={cafe.bySource} labelKey="source" valueKey="views" />
+                    <AnalyticsList title="Cafe menu kis device par?" description="Phone ya computer se khole gaye menu." rows={cafe.byPlatform} labelKey="platform" valueKey="views" />
                   </div>
                   <AnalyticsList
                     title="Cafe menu par dikhaye gaye ads"
                     description="Impressions = ad kitni baar dikha. Clicks = ad kitni baar dabaya."
-                    rows={range === "today" ? [] : (cafe.adPerformance || []).map((item) => ({
+                    rows={(cafe.adPerformance || []).map((item) => ({
                       ad: `${item.text} · ${item.cafe} · ${item.location}`,
                       result: `${formatCount(item.impressions)} dikhaye · ${formatCount(item.clicks)} clicks · ${item.clickRate || 0}%`,
                     }))}
                     labelKey="ad"
                     valueKey="result"
-                    emptyMessage={range === "today" ? "Aaj ke ad ka hisaab is API mein nahi aata." : "Jab cafe ads dekhe ya click honge, unka hisaab yahan aayega."}
+                    emptyMessage="Jab cafe ads dekhe ya click honge, unka hisaab yahan aayega."
                   />
                 </>
               )}

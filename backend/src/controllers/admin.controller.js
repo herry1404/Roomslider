@@ -135,6 +135,13 @@ const getDashboard = async (req, res) => {
 };
 
 const getAnalytics = async (req, res) => {
+  const requestedDays = req.query.days || "30";
+  const allTime = requestedDays === "all";
+  const days = Number(requestedDays);
+  if (!allTime && ![1, 7, 30, 90].includes(days)) {
+    return res.status(400).json({ success: false, message: "Analytics range must be 1, 7, 30, or 90 days, or all" });
+  }
+
   try {
     const indiaDateParts = new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Kolkata",
@@ -154,21 +161,19 @@ const getAnalytics = async (req, res) => {
     ) - (5 * 60 + 30) * 60 * 1000);
     const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
     const end = new Date();
-    end.setUTCHours(23, 59, 59, 999);
-    const start = new Date(end);
-    start.setUTCDate(start.getUTCDate() - 29);
-    start.setUTCHours(0, 0, 0, 0);
+    const start = allTime ? null : new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+    const activityMatch = allTime ? {} : { createdAt: { $gte: start, $lte: end } };
 
     const dateGroup = {
-      $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+      $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Asia/Kolkata" },
     };
     const [signups, searches, topAreas, listingsByCategory, pushSentCount, todayViews] = await Promise.all([
       User.aggregate([
-        { $match: { role: "user", createdAt: { $gte: start, $lte: end } } },
+        { $match: { ...activityMatch, role: "user" } },
         { $group: { _id: dateGroup, count: { $sum: 1 } } },
       ]),
       SearchEvent.aggregate([
-        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $match: activityMatch },
         { $group: { _id: dateGroup, count: { $sum: 1 } } },
       ]),
       Room.aggregate([
@@ -189,21 +194,27 @@ const getAnalytics = async (req, res) => {
 
     const signupCounts = new Map(signups.map((item) => [item._id, item.count]));
     const searchCounts = new Map(searches.map((item) => [item._id, item.count]));
-    const dailyActivity = [];
-    for (let offset = 0; offset < 30; offset += 1) {
-      const date = new Date(start);
-      date.setUTCDate(start.getUTCDate() + offset);
-      const key = date.toISOString().slice(0, 10);
-      dailyActivity.push({
-        date: key,
-        signups: signupCounts.get(key) || 0,
-        searches: searchCounts.get(key) || 0,
+    const activityDates = allTime
+      ? [...new Set([...signupCounts.keys(), ...searchCounts.keys()])].sort()
+      : Array.from({ length: days }, (_, offset) => {
+        const date = new Date(start.getTime() + offset * 24 * 60 * 60 * 1000);
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(date);
       });
-    }
+    const dailyActivity = activityDates.map((date) => ({
+      date,
+      signups: signupCounts.get(date) || 0,
+      searches: searchCounts.get(date) || 0,
+    }));
 
     return res.status(200).json({
       success: true,
       analytics: {
+        days: allTime ? "all" : days,
         dailyActivity,
         topAreas: topAreas.map((item) => ({ area: item._id || "Unknown", count: item.count })),
         listingsByCategory: listingsByCategory.map((item) => ({

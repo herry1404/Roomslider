@@ -112,7 +112,17 @@ test("cafe ad analytics returns empty report data for a valid period", async () 
       adClicks: 0,
       clickRate: 0,
     });
-    assert.deepEqual(res.body.analytics.dailyViews, []);
+    assert.deepEqual(res.body.analytics.today, {
+      menuViews: 0,
+      uniqueVisitors: 0,
+      adImpressions: 0,
+      adClicks: 0,
+      clickRate: 0,
+    });
+    assert.equal(res.body.analytics.dailyViews.length, 30);
+    assert.ok(res.body.analytics.dailyViews.every((row) =>
+      row.views === 0 && row.adImpressions === 0 && row.adClicks === 0 && row.uniqueVisitors === 0
+    ));
     assert.deepEqual(res.body.analytics.byCafe, []);
     assert.deepEqual(res.body.analytics.byLocation, []);
     assert.deepEqual(res.body.analytics.recentEvents, []);
@@ -169,4 +179,75 @@ test("cafe ad analytics only accepts supported reporting periods", async () => {
   await getCafeMenuAnalytics({ query: { days: "14" } }, res);
   assert.equal(res.statusCode, 400);
   assert.equal(res.body.success, false);
+});
+
+test("cafe ad analytics includes all retained history", async () => {
+  const originalAggregate = CafeMenuAnalytics.aggregate;
+  const originalAnalyticsFind = CafeMenuAnalytics.find;
+  const originalFind = Ad.find;
+  CafeMenuAnalytics.aggregate = async () => [];
+  CafeMenuAnalytics.find = () => ({
+    sort: () => ({
+      select: () => ({
+        limit: () => ({ lean: async () => [] }),
+      }),
+    }),
+  });
+  Ad.find = () => ({ select: () => ({ lean: async () => [] }) });
+
+  try {
+    const res = response();
+    await getCafeMenuAnalytics({ query: { days: "all" } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.analytics.days, "all");
+    assert.deepEqual(res.body.analytics.today, {
+      menuViews: 0,
+      uniqueVisitors: 0,
+      adImpressions: 0,
+      adClicks: 0,
+      clickRate: 0,
+    });
+  } finally {
+    CafeMenuAnalytics.aggregate = originalAggregate;
+    CafeMenuAnalytics.find = originalAnalyticsFind;
+    Ad.find = originalFind;
+  }
+});
+
+test("cafe analytics reports today's real ad impressions and clicks", async () => {
+  const originalAggregate = CafeMenuAnalytics.aggregate;
+  const originalAnalyticsFind = CafeMenuAnalytics.find;
+  const originalFind = Ad.find;
+  let aggregateCall = 0;
+  CafeMenuAnalytics.aggregate = async () => {
+    aggregateCall += 1;
+    return aggregateCall === 2
+      ? [{ menuViews: 7, uniqueVisitors: 5, adImpressions: 12, adClicks: 3 }]
+      : [];
+  };
+  CafeMenuAnalytics.find = () => ({
+    sort: () => ({
+      select: () => ({
+        limit: () => ({ lean: async () => [] }),
+      }),
+    }),
+  });
+  Ad.find = () => ({ select: () => ({ lean: async () => [] }) });
+
+  try {
+    const res = response();
+    await getCafeMenuAnalytics({ query: { days: "1" } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body.analytics.today, {
+      menuViews: 7,
+      uniqueVisitors: 5,
+      adImpressions: 12,
+      adClicks: 3,
+      clickRate: 25,
+    });
+  } finally {
+    CafeMenuAnalytics.aggregate = originalAggregate;
+    CafeMenuAnalytics.find = originalAnalyticsFind;
+    Ad.find = originalFind;
+  }
 });

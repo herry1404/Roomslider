@@ -6,10 +6,10 @@ export const ANALYTICS_METRICS = {
     unit: "pages",
   },
   visitors: {
-    name: "Visitors (log)",
+    name: "Visitors (sessions)",
     color: "#34d399",
-    description: "Har din aane wale alag log. Wahi log agle din phir gin sakte hain.",
-    unit: "log",
+    description: "Har din ke alag anonymous browser sessions; wahi session alag din phir gin sakta hai.",
+    unit: "sessions",
   },
   todayVisitors: {
     name: "Aaj aaye visitors (andaza)",
@@ -36,9 +36,9 @@ export const ANALYTICS_METRICS = {
     unit: "min",
   },
   trackedVisits: {
-    name: "Visits saved (last 6 months)",
+    name: "Saved page visits",
     color: "#2dd4bf",
-    description: "Abhi jitne page visits record mein bache hain. Purane records 6 mahine baad delete hote hain.",
+    description: "Analytics record mein ab tak save hue kul page visits.",
     unit: "visits",
   },
   signups: {
@@ -60,16 +60,16 @@ export const ANALYTICS_METRICS = {
     unit: "menus",
   },
   menuVisitors: {
-    name: "Menu visitors (log)",
+    name: "Menu visitors (sessions)",
     color: "#fb7185",
-    description: "Har din cafe menu dekhne wale alag log.",
-    unit: "log",
+    description: "Har din cafe menu dekhne wale alag anonymous browser sessions.",
+    unit: "sessions",
   },
   cafeUniqueVisitors: {
-    name: "Menu ke alag visitors",
+    name: "Menu ke alag sessions",
     color: "#fb7185",
-    description: "Chune hue dinon mein cafe menu dekhne wale alag log.",
-    unit: "log",
+    description: "Chune hue samay mein cafe menu dekhne wale alag anonymous browser sessions.",
+    unit: "sessions",
   },
   listingViews: {
     name: "Listing views",
@@ -102,6 +102,7 @@ export const DATE_RANGES = [
   { key: "7", label: "7 din", days: 7 },
   { key: "30", label: "30 din", days: 30 },
   { key: "90", label: "90 din", days: 90 },
+  { key: "all", label: "Shuru se", days: null },
 ];
 
 export const ANALYTICS_TABS = [
