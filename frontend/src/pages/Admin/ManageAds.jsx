@@ -619,22 +619,22 @@ function ManageAds() {
         .ads-form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
         .ads-live-preview{margin-top:16px;padding:12px;border:1px dashed var(--admin-border);border-radius:12px}
         .ads-live-preview>span{display:block;color:var(--admin-muted);font-size:9px;font-weight:800;letter-spacing:.12em;margin-bottom:8px}
-        .ads-live-preview>div{display:flex;align-items:center;gap:10px;min-height:54px;padding:9px 12px;border:1px solid var(--admin-border);border-radius:10px;background:var(--admin-bg)}
+        .ads-live-preview>div{display:flex;align-items:center;gap:10px;min-width:0;min-height:54px;padding:9px 12px;border:1px solid var(--admin-border);border-radius:10px;background:var(--admin-bg)}
         .ads-live-preview img{width:34px;height:34px;object-fit:contain;border-radius:5px}
-        .ads-live-preview b{flex:1;color:var(--admin-text);font-size:12px}
+        .ads-live-preview b{flex:1;min-width:0;color:var(--admin-text);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
         .ads-live-preview small{color:var(--admin-muted);font-size:9px}
         .ads-live-preview .ads-bottom-preview{display:grid;gap:7px}
-        .ads-live-preview .ads-bottom-preview img{width:100%;height:92px;object-fit:cover}
+        .ads-live-preview .ads-bottom-preview img{width:100%;height:auto;max-height:min(45vh,280px);object-fit:contain;background:var(--admin-card)}
         .ads-preview-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow-y:auto;padding:20px;background:#020617b8}
         .ads-preview-dialog{width:min(100%,540px);max-height:calc(100vh - 40px);overflow-y:auto}
-        .ads-customer-preview{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--admin-border);border-radius:14px;background:var(--admin-bg)}
-        .ads-customer-preview>img{width:56px;height:56px;flex:none;object-fit:contain;border-radius:10px;background:#fff}
+        .ads-customer-preview{display:flex;align-items:center;gap:12px;min-width:0;padding:14px;border:1px solid var(--admin-border);border-radius:14px;background:var(--admin-bg)}
+        .ads-customer-preview>img{display:block;width:56px;height:56px;flex:none;object-fit:contain;border-radius:10px;background:#fff}
         .ads-customer-preview>div{display:grid;gap:5px;min-width:0}
         .ads-customer-preview small{color:var(--admin-muted);font-size:10px;font-weight:800;letter-spacing:.08em}
-        .ads-customer-preview strong{color:var(--admin-text);overflow-wrap:anywhere}
+        .ads-customer-preview strong{min-width:0;color:var(--admin-text);line-height:1.45;overflow-wrap:anywhere}
         .ads-customer-preview span{color:#4ade80;font-size:12px;font-weight:700}
         .ads-customer-preview.wide{display:grid;grid-template-columns:1fr}
-        .ads-customer-preview.wide>img{width:100%;height:180px;object-fit:cover}
+        .ads-customer-preview.wide>img{width:100%;height:auto;max-height:min(55vh,360px);object-fit:contain;background:var(--admin-card)}
         .ads-preview-destination{margin-top:12px;color:var(--admin-muted);font-size:12px;overflow-wrap:anywhere}
         .ads-preview-destination strong{color:var(--admin-text);font-weight:600}
         .ads-toolbar{display:flex;align-items:center;gap:9px;margin:20px 0 12px;padding:10px;border:1px solid var(--admin-border);border-radius:13px;background:var(--admin-card)}
@@ -684,6 +684,8 @@ function ManageAds() {
         @media(max-width:520px){
           .ads-preview-backdrop{align-items:end;padding:10px}
           .ads-preview-dialog{max-height:calc(100vh - 20px)}
+          .ads-customer-preview{padding:10px}
+          .ads-preview-destination{line-height:1.5}
           .ads-header{align-items:flex-start}
           .ads-header-actions{width:100%}
           .ads-header-actions .admin-btn{flex:1;justify-content:center}

@@ -3,8 +3,8 @@ const test = require("node:test");
 const Ad = require("../src/models/ad.model");
 const { getPublicAds } = require("../src/controllers/ad.controller");
 
-test("public cafe ads return up to ten ads from the most specific target per placement", async () => {
-  const cafeTopAds = Array.from({ length: 11 }, (_, index) => ({
+test("public cafe ads include specific and general matches with the most specific first", async () => {
+  const cafeTopAds = Array.from({ length: 6 }, (_, index) => ({
     _id: `cafe-${index}`,
     slot: "top",
     targetBy: "cafe",
@@ -47,7 +47,11 @@ test("public cafe ads return up to ten ads from the most specific target per pla
   assert.equal(response.statusCode, 200);
   const cafeTarget = queryFilter.$and[0].$or.find((target) => target.targetBy === "cafe");
   assert.deepEqual(cafeTarget.$or[1].cafes.$in, ["wowpav"]);
-  assert.equal(response.payload.top.length, 10);
-  assert.deepEqual(response.payload.top.map((ad) => ad.id), cafeTopAds.slice(0, 10).map((ad) => ad._id));
+  assert.equal(response.payload.top.length, 8);
+  assert.deepEqual(response.payload.top.map((ad) => ad.id), [
+    ...cafeTopAds.map((ad) => ad._id),
+    "location-top",
+    "all-top",
+  ]);
   assert.deepEqual(response.payload.bottom.map((ad) => ad.id), ["location-bottom"]);
 });

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4ef">
+  <title>CAFE_NAME — Menu</title>
+  <link rel="stylesheet" href="/cafe-ads.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --menu-bg: #f7f4ef;
+      --menu-card: #fff;
+      --menu-ink: #29231e;
+      --menu-muted: #766b62;
+      --menu-accent: #9a5430;
+      --menu-line: #e7ded5;
+      font-family: system-ui, sans-serif;
+      color: var(--menu-ink);
+      background: var(--menu-bg);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--menu-bg); color: var(--menu-ink); }
+    .cafe-page { width: min(100% - 24px, 960px); margin: 0 auto; }
+    .cafe-header, .cafe-details, .cafe-footer { padding: 24px 16px; text-align: center; }
+    .cafe-header h1 { margin: 0; font-size: clamp(2rem, 8vw, 3.5rem); }
+    .cafe-header p, .cafe-details p { margin: 8px 0 0; color: var(--menu-muted); }
+    .cafe-search { position: sticky; top: 0; z-index: 2; padding: 10px 0; background: var(--menu-bg); }
+    .cafe-search input { width: 100%; min-height: 46px; padding: 10px 14px; border: 1px solid var(--menu-line); border-radius: 999px; background: var(--menu-card); color: inherit; font: inherit; }
+    .cafe-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; padding: 14px 0; }
+    .cafe-menu-card { min-width: 0; padding: 16px; border: 1px solid var(--menu-line); border-radius: 16px; background: var(--menu-card); }
+    .cafe-menu-card h2 { margin: 0 0 10px; color: var(--menu-accent); }
+    .cafe-menu-card ul { margin: 0; padding: 0; list-style: none; }
+    .cafe-menu-card li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px dashed var(--menu-line); }
+    .cafe-menu-card li:first-child { border-top: 0; }
+    .cafe-menu-card li span:first-child { min-width: 0; overflow-wrap: anywhere; }
+    .cafe-menu-card li span:last-child { flex: none; font-weight: 700; }
+    .cafe-details { margin: 12px 0; border: 1px solid var(--menu-line); border-radius: 16px; background: var(--menu-card); }
+    .cafe-details a, .cafe-footer a { color: var(--menu-accent); }
+    .cafe-footer { color: var(--menu-muted); }
+    .cafe-footer p { margin: 8px 0; }
+    @media (max-width: 480px) {
+      .cafe-header, .cafe-details, .cafe-footer { padding: 18px 10px; }
+      .cafe-menu-card { padding: 14px; }
+    }
+  </style>
+</head>
+<body data-cafe="CAFE_SLUG" data-location="LOCATION_SLUG">
+  <div class="cafe-page">
+    <header class="cafe-header">
+      <img src="CAFE_LOGO_URL" alt="CAFE_NAME logo" width="96" height="96">
+      <h1>CAFE_NAME</h1>
+      <p>CAFE_TAGLINE · 📍 CAFE_AREA</p>
+    </header>
+
+    <section class="ad-carousel top" id="adtop" aria-label="Sponsored offers above the menu" hidden>
+      <div class="ad-carousel-track"></div>
+      <div class="ad-carousel-controls" hidden>
+        <button type="button" data-ad-previous aria-label="Previous ad">‹</button>
+        <span data-ad-count></span>
+        <button type="button" data-ad-next aria-label="Next ad">›</button>
+      </div>
+    </section>
+
+    <nav class="cafe-search" aria-label="Search menu">
+      <input type="search" placeholder="Search menu items…" aria-label="Search menu items">
+    </nav>
+
+    <main class="cafe-menu">
+      <section class="cafe-menu-card">
+        <h2>CATEGORY_NAME</h2>
+        <ul>
+          <li><span>MENU_ITEM</span><span>₹PRICE</span></li>
+        </ul>
+      </section>
+    </main>
+
+    <section class="ad-carousel bottom" id="adbot" aria-label="Sponsored offers below menu items" hidden>
+      <div class="ad-carousel-track"></div>
+      <div class="ad-carousel-controls" hidden>
+        <button type="button" data-ad-previous aria-label="Previous ad">‹</button>
+        <span data-ad-count></span>
+        <button type="button" data-ad-next aria-label="Next ad">›</button>
+      </div>
+    </section>
+
+    <section class="cafe-details" aria-label="Cafe details">
+      <p>📍 CAFE_ADDRESS</p>
+      <p><a href="SOCIAL_OR_ORDER_URL">Social / order link</a> · <a href="GOOGLE_REVIEW_URL">Write a review</a></p>
+    </section>
+
+    <footer class="cafe-footer">
+      <p>Managed by CAFE_MANAGER</p>
+      <p>Need your own QR menu? <a data-menu-whatsapp href="https://wa.me/918889631476">Message RoomSlider</a></p>
+      <a href="https://roomslider.in/">RoomSlider</a>
+    </footer>
+  </div>
+
+  <script src="/cafe-ads.js" defer></script>
+  <script src="/cafe-analytics.js" defer></script>
+</body>
+</html>
