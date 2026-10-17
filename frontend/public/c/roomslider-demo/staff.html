@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#173b31">
+  <title>RoomSlider Loyalty Trial Staff</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#18362e;background:#f2f7f2}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,#d9f3e8,transparent 28rem),#f2f7f2}
+    main{width:min(100% - 28px,570px);margin:0 auto;padding:24px 0 40px}
+    .trial{padding:10px;border:1px solid #e9b74c;border-radius:12px;background:#fff5d8;color:#68450b;font-size:.75rem;font-weight:900;letter-spacing:.1em;text-align:center}
+    header{text-align:center;padding:18px 0}
+    h1{margin:3px 0;color:#173b31;font-size:2rem}
+    header p{margin:0;color:#607369;font-size:.9rem}
+    section{margin-top:13px;padding:18px;border:1px solid #d6e5da;border-radius:17px;background:#fff;box-shadow:0 10px 28px #2149380d}
+    label{display:block;margin:12px 0 6px;font-size:.84rem;font-weight:750}
+    input{width:100%;min-height:46px;padding:11px 13px;border:1px solid #bdcec2;border-radius:11px;background:#fff;color:#18362e;font:inherit}
+    input:focus-visible,button:focus-visible{outline:3px solid #83cda8;outline-offset:2px}
+    .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+    button{min-height:46px;padding:10px;border:0;border-radius:11px;background:#197450;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+    button.secondary{background:#e8f0ea;color:#28563f}
+    button.danger{background:#fff0e7;color:#9b431f}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .status{min-height:24px;margin:12px 0 0;color:#a33232;font-size:.88rem}
+    .status.ok{color:#1e6c4c}
+    .result{margin-top:12px;padding:13px;border:1px solid #dce9de;border-radius:12px;background:#f8fcf8}
+    .result strong{display:block}
+    .result small{display:block;margin-top:5px;color:#61756a}
+    .rewards{display:grid;gap:7px;margin-top:9px}
+    .reward{padding:9px;border-radius:9px;background:#fff5d8;color:#5c4a19}
+    .warning{color:#79877e;font-size:.76rem;line-height:1.5}
+    @media(max-width:380px){.actions{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="trial">TRIAL DEMO CAFE · STAFF TOOLS</div>
+    <header><h1>RoomSlider Cafe</h1><p>Demo staff counter — not connected to a real cafe.</p></header>
+    <section>
+      <label for="pin">Staff PIN</label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="64" placeholder="Enter demo staff PIN">
+      <label for="card-code">Customer card code</label>
+      <input id="card-code" autocomplete="off" autocapitalize="characters" maxlength="6" placeholder="6-character code">
+      <div class="actions">
+        <button type="button" id="lookup">Lookup</button>
+        <button type="button" id="stamp">Add stamp</button>
+        <button type="button" id="reset" class="secondary">Demo reset today</button>
+      </div>
+      <label for="reward-code">Reward code to redeem</label>
+      <input id="reward-code" autocomplete="off" autocapitalize="characters" maxlength="8" placeholder="8-character code">
+      <button type="button" id="redeem" class="secondary" style="width:100%;margin-top:10px">Redeem reward</button>
+      <p id="status" class="status" role="status"></p>
+      <div id="result" class="result" hidden></div>
+    </section>
+    <p class="warning">Trial only. PIN is sent to the API for verification and is not stored by this page. Phone numbers are not OTP-verified. Do not use real customer data.</p>
+  </main>
+  <script src="/c/roomslider-demo/loyalty-api.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var status = document.getElementById("status");
+      var result = document.getElementById("result");
+      var pinInput = document.getElementById("pin");
+      var cardInput = document.getElementById("card-code");
+      function setStatus(message, ok) {
+        status.textContent = message;
+        status.classList.toggle("ok", Boolean(ok));
+      }
+      function rewardRow(reward) {
+        var row = document.createElement("div");
+        row.className = "reward";
+        row.textContent = reward.label + " · Code " + reward.code + " · Expires " + new Date(reward.expiresAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
+        return row;
+      }
+      function renderCard(data) {
+        result.replaceChildren();
+        result.hidden = false;
+        var title = document.createElement("strong");
+        title.textContent = data.card.name + " · " + data.card.phone;
+        var detail = document.createElement("small");
+        detail.textContent = "Card " + data.card.cardCode + " · " + data.card.stamps + "/" + data.stampsRequired + " stamps · " + data.card.completedCards + " completed card(s)";
+        result.append(title, detail);
+        if (data.rewards.length) {
+          var list = document.createElement("div");
+          list.className = "rewards";
+          data.rewards.forEach(function (reward) { list.appendChild(rewardRow(reward)); });
+          result.appendChild(list);
+        }
+      }
+      async function action(path, body, label, render) {
+        setStatus("");
+        var button = document.activeElement;
+        if (button && button.tagName === "BUTTON") button.disabled = true;
+        try {
+          var data = await window.RoomSliderLoyalty.request(path, {
+            method: "POST", staffPin: pinInput.value, body: body
+          });
+          if (render) render(data);
+          setStatus(label, true);
+          return data;
+        } catch (error) {
+          setStatus(error.message);
+          if (error.status === 429) pinInput.value = "";
+        } finally {
+          if (button && button.tagName === "BUTTON") button.disabled = false;
+        }
+        return null;
+      }
+      document.getElementById("lookup").addEventListener("click", function () {
+        action("/staff/lookup", { cardCode: cardInput.value }, "Card found.", renderCard);
+      });
+      document.getElementById("stamp").addEventListener("click", function () {
+        action("/staff/stamp", { cardCode: cardInput.value }, "Stamp added.", function (data) {
+          var message = data.completed && data.reward ? "Stamp added · Card complete · Reward " + data.reward.code : "Stamp added · " + data.card.stamps + " stamps on card";
+          setStatus(message, true);
+          action("/staff/lookup", { cardCode: cardInput.value }, message, renderCard);
+        });
+      });
+      document.getElementById("redeem").addEventListener("click", function () {
+        action("/staff/redeem", { code: document.getElementById("reward-code").value }, "Reward redeemed: " + document.getElementById("reward-code").value.toUpperCase(), function (data) {
+          result.replaceChildren();
+          result.hidden = false;
+          var text = document.createElement("strong");
+          text.textContent = data.reward.label + " · " + data.reward.code + " — used";
+          result.appendChild(text);
+        });
+      });
+      document.getElementById("reset").addEventListener("click", function () {
+        if (!window.confirm("Aaj ke demo stamp/spin log reset karein? Existing stamps aur rewards nahi mitenge.")) return;
+        action("/staff/demo-reset", { cardCode: cardInput.value }, "Today's demo logs cleared; existing stamps/rewards kept.", function (data) {
+          result.replaceChildren();
+          result.hidden = false;
+          var text = document.createElement("strong");
+          text.textContent = data.card.cardCode + " · today's logs reset";
+          result.appendChild(text);
+        });
+      });
+      [cardInput, document.getElementById("reward-code")].forEach(function (input) {
+        input.addEventListener("input", function () { input.value = input.value.toUpperCase().replace(/[^23456789ABCDEFGHJKLMNPQRSTUVWXYZ]/g, ""); });
+      });
+    })();
+  </script>
+</body>
+</html>

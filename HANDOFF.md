@@ -356,3 +356,19 @@ NEXT: Updates section (after Profile page improvements)
 - Added `frontend/public/c/_shared/festival-art.js`, loaded by the shared festival controller only when a festival is active or previewed. It adds lightweight inline-SVG motifs for each configured festival; no cafe page tags or menu content were changed.
 - Preview any configured motif with `?festival=diwali`, `?festival=holi`, or another festival id; `?festivalDate=2026-11-08` previews the Diwali date-specific decoration.
 - To add art for a configured festival, add its motif renderer to the `registry` in `festival-art.js`; do not change the festival dates or configuration here.
+
+### 17 Oct 2026 — RoomSlider loyalty trial demo
+
+- Added the isolated, noindex demo menu and PIN-protected staff page at `/cafe/demo/roomslider` and `/cafe/demo/roomslider/staff`; no real cafe menu, cafe directory, sitemap, or listing was changed.
+- Added `POST /api/loyalty/:slug/cards`, `GET /api/loyalty/:slug/card`, `POST /api/loyalty/:slug/spin`, plus staff-PIN protected `POST /api/loyalty/:slug/staff/lookup`, `/stamp`, `/redeem`, and `/demo-reset`. The server hashes card tokens and staff PINs, uses IST day keys, enforces per-card stamp/spin limits and a shared daily spin-reward budget, and redeems rewards atomically.
+- Configure `LOYALTY_DEMO_PIN` in the backend environment and run `cd backend && npm run seed:loyalty`; seeding fails when the PIN or `MONGODB_URI` is missing. Run `cd backend && npm test` for the DB/network-free loyalty rules tests.
+- Known limits: phone numbers are not OTP-verified yet; this trial needs the future counter-QR option B for real-world issuance. Staff PIN rate limits use the API process's in-memory store, so deployments with multiple API instances should switch to a shared rate-limit store before production use.
+
+### 18 Oct 2026 — RoomSlider demo daily check-in rewards
+
+- Added a separate Google-login customer rewards flow at `/rewards/roomslider-demo`: a daily cafe code, IST check-in streak, one server-decided weighted spin after check-in, and expiring one-time redeem codes. Incomplete profiles return through the existing phone/profile edit pages to the original rewards URL.
+- Added isolated `Cafe`, `DailyCode`, `CheckIn`, and `Spin` models and `/api/rewards` routes. The API only serves the `roomslider-demo` slug; check-in and spin uniqueness are indexed per customer/cafe/IST day, wrong-code attempts lock after five, and budget spend uses a conditional atomic `findOneAndUpdate`.
+- Added the admin/cafe-owner portal at `/rewards/roomslider-demo/portal` for daily code regeneration, budget and reward configuration, redemption, check-in counts, and a regulars list containing names/streaks/last visits only. Set optional `REWARDS_DEMO_OWNER_ID` to an existing Owner document ID to authorize that cafe owner; admins are also authorized.
+- The existing demo menu and loyalty-trial pages remain intact. Added `/c/shared/rewards-button.js` to the existing `roomslider-demo` menu only; its button opens the new rewards page outside the menu iframe. No other cafe menu was modified.
+- Seed with `cd backend && npm run seed:demo-rewards` (`MONGODB_URI` required); it configures six rewards and a ₹100 daily budget. Database-backed deployment behavior and live Google sign-in/cafe redemption remain unverified.
+- Validation: frontend production build and targeted ESLint passed; backend `node --check`, the full backend test suite (70 tests), and `git diff --check` passed. Added DB/network-free streak, weighted selection, and concurrent budget-deduction tests.

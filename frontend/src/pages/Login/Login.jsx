@@ -68,7 +68,10 @@ function Login({ modal = false, onClose = () => {} }) {
 
     if (result.needsPhone) {
 
-      navigate("/complete-profile", { replace: true });
+      navigate("/complete-profile", {
+        replace: true,
+        state: { returnTo: from },
+      });
       return;
 
     }

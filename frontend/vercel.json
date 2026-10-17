@@ -7,6 +7,8 @@
     { "source": "/cafe/bhawarkua/wowpav/:path*", "destination": "/c/wowpav/index.html" },
     { "source": "/cafe/bhawarkua/waffleo/:path*", "destination": "/c/wowpav/index.html" },
     { "source": "/cafe/bhawarkua/upscchaiwala/:path*", "destination": "/c/upscchaiwala/index.html" },
+    { "source": "/cafe/demo/roomslider/staff", "destination": "/c/roomslider-demo/staff.html" },
+    { "source": "/cafe/demo/roomslider", "destination": "/c/roomslider-demo/index.html" },
     { "source": "/cafe/vishnupuri/yuvanamritulya/:path*", "destination": "/c/yuvanamritulya/index.html" },
     { "source": "/htlcafe/:path*", "destination": "/c/htlcafe/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }

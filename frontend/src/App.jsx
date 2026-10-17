@@ -110,6 +110,8 @@ const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingRepor
 const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
 const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
 const Reels = lazy(() => import("./pages/Reels/Reels"));
+const RewardsPage = lazy(() => import("./pages/Rewards/RewardsPage"));
+const RewardsPortal = lazy(() => import("./pages/Rewards/RewardsPortal"));
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 import SiteAnalyticsTracker from "./components/SiteAnalyticsTracker";
 
@@ -117,7 +119,7 @@ const AdminRoute = lazy(() => import("./components/AdminRoute"));
 import OwnerRoute from "./components/OwnerRoute";
 import MessRoute from "./components/MessRoute";
 
-const PRIVATE_PATH = /^\/(?:admin(?:\/|$)|owner(?:\/|$)|mess\/(?:login|dashboard)(?:\/|$)|hourly-manager(?:\/|$)|login(?:\/|$)|register(?:\/|$)|complete-profile(?:\/|$)|forgot-password(?:\/|$)|settings(?:\/|$)|wishlist(?:\/|$)|profile(?:\/|$)|my-place(?:\/|$)|recently-viewed(?:\/|$)|notifications(?:\/|$)|hourly-bookings(?:\/|$)|hourly-rooms\/[^/]+\/book(?:\/|$)|roommates(?:\/(?:profile|requests|messages|chat)(?:\/|$))?|roommates\/profile\/[^/]+)$/i;
+const PRIVATE_PATH = /^\/(?:admin(?:\/|$)|owner(?:\/|$)|mess\/(?:login|dashboard)(?:\/|$)|hourly-manager(?:\/|$)|login(?:\/|$)|register(?:\/|$)|complete-profile(?:\/|$)|forgot-password(?:\/|$)|settings(?:\/|$)|wishlist(?:\/|$)|profile(?:\/|$)|my-place(?:\/|$)|recently-viewed(?:\/|$)|notifications(?:\/|$)|rewards(?:\/|$)|hourly-bookings(?:\/|$)|hourly-rooms\/[^/]+\/book(?:\/|$)|roommates(?:\/(?:profile|requests|messages|chat)(?:\/|$))?|roommates\/profile\/[^/]+)$/i;
 
 function PrivateRouteRobots() {
   const { pathname } = useLocation();
@@ -179,6 +181,8 @@ function App() {
       <Routes>
         <Route path="/htlcafe" element={<PublicCafeMenu legacy />} />
         <Route path="/cafe/:location/:cafeSlug" element={<PublicCafeMenu />} />
+        <Route path="/rewards/:slug/portal" element={<RewardsPortal />} />
+        <Route path="/rewards/:slug" element={<RewardsPage />} />
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
         <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />

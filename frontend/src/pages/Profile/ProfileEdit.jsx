@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { isProfileComplete } from "../../utils/isProfileComplete";
 import "../../styles/profile.css";
 import "../../styles/blood-donor.css";
 
@@ -190,7 +191,17 @@ function ProfileEdit() {
       setSaving(true);
       const res = await api.put("/users/me", payload);
       syncLocalUser(res.data.user);
-      toast.success("Profile save ho gayi");
+      if (location.state?.returnTo) {
+        const updatedUser = { ...user, ...res.data.user, ...payload };
+        if (!isProfileComplete(updatedUser)) {
+          toast.error("Complete your occupation, city, area and student details to continue.");
+          return;
+        }
+        toast.success("Profile complete.");
+        navigate(location.state.returnTo, { replace: true });
+      } else {
+        toast.success("Profile save ho gayi");
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || "Profile save nahi hui");
     } finally {

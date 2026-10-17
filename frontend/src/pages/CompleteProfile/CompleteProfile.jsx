@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
@@ -10,6 +10,7 @@ import "../../styles/complete-profile.css";
 function CompleteProfile() {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, setUser, promptPreferencesNow } = useAuth();
 
   const [phone, setPhone] = useState("");
@@ -45,7 +46,7 @@ function CompleteProfile() {
 
       toast.success(res.data.message || "Phone number added");
 
-      navigate("/", { replace: true });
+      navigate(location.state?.returnTo || "/", { replace: true });
 
       promptPreferencesNow(updatedUser);
 
