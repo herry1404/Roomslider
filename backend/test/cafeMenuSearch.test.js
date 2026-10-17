@@ -24,6 +24,12 @@ test("parses cafe menu items and prices from the published menu pages", () => {
   assert.ok(wowpavAndWaffleo.some((item) => item.cafe === "Waffleo" && item.name === "Chocolate Waffle"));
 });
 
+test("Wow Pav menu reveal animation does not hide ad carousels", () => {
+  const html = menuHtml("wowpav");
+  assert.match(html, /main>section\{[^}]*opacity:0/);
+  assert.doesNotMatch(html, /(?:^|})section\{[^}]*opacity:0/);
+});
+
 test("searches cafe menus by item and filters results to the requested location", async () => {
   const pages = {
     biryanikendra: menuHtml("biryanikendra"),
