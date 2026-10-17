@@ -342,3 +342,17 @@ NEXT: Updates section (after Profile page improvements)
 - Ran the retention command against the configured `MONGODB_URI`: removed `siteanalytics.createdAt_1` and `cafemenuanalytics.createdAt_1`; the command confirmed that no analytics documents were modified.
 - Backend analytics tests, frontend production build, targeted ESLint, JavaScript syntax checks, and `git diff --check` passed.
 - Remaining validation: sign in to production Admin Analytics and confirm historical rows are visible after backend rollout. TTL may have already expired older documents before the indexes were removed; deleted records cannot be recovered by this change. Staff/admin pages remain excluded from public visitor page-view tracking.
+
+### 17 Oct 2026 — Shared cafe festival themes
+
+- Added `frontend/public/c/_shared/festival.js` to apply only configured accent variables, a compact dismissible greeting banner, and its gradient edge during the supplied India-time festival dates. It reads the current date in Asia/Kolkata, follows dark/light theme changes, honors reduced-motion preferences and the `data-festival="off"` kill switch, and clears the active theme after its date window.
+- Cafe preview examples: `?festival=diwali`, `?festival=off`, or `?festivalDate=2026-11-08`; preview parameters do not persist banner dismissal.
+- To add a festival, add one object to the `FESTIVALS` array with its supplied id/date/accent/greeting fields and the required Drik Panchang verification comment. Do not guess future dates.
+- Added one shared script tag to Biryani Kendra, HTL Cafe, Wow Pav/Waffleo, श्री युवान अमृततुल्य, and UPSC Chai Wala. Menu content/prices/layout remain unchanged.
+- Pending: verify each configured festival date with Drik Panchang for Indore before the festival; add future festivals only after verification.
+
+### 17 Oct 2026 — Cafe festival decorative art
+
+- Added `frontend/public/c/_shared/festival-art.js`, loaded by the shared festival controller only when a festival is active or previewed. It adds lightweight inline-SVG motifs for each configured festival; no cafe page tags or menu content were changed.
+- Preview any configured motif with `?festival=diwali`, `?festival=holi`, or another festival id; `?festivalDate=2026-11-08` previews the Diwali date-specific decoration.
+- To add art for a configured festival, add its motif renderer to the `registry` in `festival-art.js`; do not change the festival dates or configuration here.
