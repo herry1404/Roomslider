@@ -331,6 +331,7 @@ NEXT: Updates section (after Profile page improvements)
 
 - Added the mobile-first UPSC Chai Wala QR menu at `/cafe/bhawarkua/upscchaiwala`, with the supplied menu/prices, combo ticker and section, sticky category search, light/dark theme, Instagram/WhatsApp actions, and RoomSlider.in link.
 - Added the public cafe rewrite and cafe directory entry, reusing Wow Pav's Bhawarkua coordinates.
+- Search-to-category-tab spacing follow-up: made the search label a block so its margin applies, and increased the gap below the search field.
 - Pending TODOs: add the cafe-provided round cup logo; replace the approximate coordinates with the exact map pin; verify the public URL after deployment.
 
 ### 17 Oct 2026 — Analytics tracking and history
