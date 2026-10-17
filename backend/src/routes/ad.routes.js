@@ -26,7 +26,7 @@ const publicAdLimiter = rateLimit({
 });
 
 router.get("/", publicAdLimiter, getPublicAds);
-router.post("/analytics", publicAdLimiter, trackCafeMenuEvent);
+router.post("/analytics", publicAdLimiter, express.urlencoded({ extended: false }), trackCafeMenuEvent);
 router.get("/admin", protect, adminOnly, listAds);
 router.get("/admin/analytics", protect, adminOnly, getCafeMenuAnalytics);
 router.post("/admin/upload", protect, adminOnly, upload.single("image"), async (req, res) => {

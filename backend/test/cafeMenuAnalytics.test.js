@@ -1,7 +1,10 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const express = require("express");
+const { once } = require("node:events");
 const Ad = require("../src/models/ad.model");
 const CafeMenuAnalytics = require("../src/models/cafeMenuAnalytics.model");
+const adRoutes = require("../src/routes/ad.routes");
 const {
   trackCafeMenuEvent,
   getCafeMenuAnalytics,
@@ -46,6 +49,43 @@ test("ad event tracking requires a valid ad id", async () => {
   }, res);
   assert.equal(res.statusCode, 400);
   assert.equal(res.body.success, false);
+});
+
+test("analytics route accepts form-encoded ad click beacons", async () => {
+  const originalCreate = CafeMenuAnalytics.create;
+  const originalExists = Ad.exists;
+  let savedEvent;
+  CafeMenuAnalytics.create = async (event) => { savedEvent = event; };
+  Ad.exists = async () => true;
+
+  const app = express();
+  app.use(express.json());
+  app.use("/api/ads", adRoutes);
+  const server = app.listen(0);
+
+  try {
+    await once(server, "listening");
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/api/ads/analytics`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        type: "ad_click",
+        cafe: "wowpav",
+        location: "bhawarkua",
+        visitorId: "visitor-session-123456789",
+        source: "Direct",
+        platform: "Android",
+        adId: "507f1f77bcf86cd799439011",
+      }),
+    });
+    assert.equal(response.status, 202);
+    assert.equal(savedEvent.type, "ad_click");
+    assert.equal(savedEvent.adId, "507f1f77bcf86cd799439011");
+  } finally {
+    server.close();
+    CafeMenuAnalytics.create = originalCreate;
+    Ad.exists = originalExists;
+  }
 });
 
 test("cafe ad analytics returns empty report data for a valid period", async () => {

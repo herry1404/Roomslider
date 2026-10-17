@@ -38,10 +38,12 @@
   function track(type, adId) {
     var event = { type: type, cafe: cafe, location: location, visitorId: visitorId, source: source, platform: platform };
     if (adId) event.adId = adId;
-    fetch("https://roomslider-api.onrender.com/api/ads/analytics", {
+    var payload = new URLSearchParams(event);
+    var endpoint = "https://roomslider-api.onrender.com/api/ads/analytics";
+    if (navigator.sendBeacon && navigator.sendBeacon(endpoint, payload)) return;
+    fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(event),
+      body: payload,
       keepalive: true,
       credentials: "omit"
     }).catch(function () {});
@@ -105,7 +107,8 @@
   });
 
   document.addEventListener("click", function (event) {
-    var anchor = event.target.closest(".ad-card");
+    var target = event.target;
+    var anchor = target instanceof Element ? target.closest(".ad-card") : null;
     if (anchor && anchor.dataset.adId) track("ad_click", anchor.dataset.adId);
   });
 })();
