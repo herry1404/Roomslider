@@ -81,6 +81,7 @@ const OwnerMaintenance = lazy(() => import("./pages/Owner/OwnerMaintenance"));
 const MessLogin = lazy(() => import("./pages/Mess/MessLogin"));
 const MessOwnerDashboard = lazy(() => import("./pages/Mess/MessOwnerDashboard"));
 const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
+const CafeMenus = lazy(() => import("./pages/Admin/CafeMenus"));
 const AddRoom = lazy(() => import("./pages/Admin/AddRoom"));
 const EditRoom = lazy(() => import("./pages/Admin/EditRoom"));
 const ManageRooms = lazy(() => import("./pages/Admin/ManageRooms"));
@@ -255,6 +256,7 @@ function App() {
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/cafe-menus" element={<AdminRoute><CafeMenus /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
         <Route path="/admin/reels" element={<AdminRoute><ManageReels /></AdminRoute>} />
         <Route path="/admin/rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />

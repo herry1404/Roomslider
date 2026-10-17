@@ -10,6 +10,7 @@ import {
   LineChart,
   Megaphone,
   RefreshCw,
+  Utensils,
   Users,
 } from "lucide-react";
 import api from "../../api/axios";
@@ -156,6 +157,7 @@ function AdminDashboard() {
     { label: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
     { label: "Manage Rooms", icon: <ClipboardList size={18} />, path: "/admin/rooms" },
     { label: "Manage Users", icon: <Users size={18} />, path: "/admin/users" },
+    { label: "Cafe Menus", icon: <Utensils size={18} />, path: "/admin/cafe-menus" },
     { label: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
     { label: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
   ];
