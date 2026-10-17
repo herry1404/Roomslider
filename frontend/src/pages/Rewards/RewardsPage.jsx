@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Gift, LockKeyhole, Sparkles } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -16,6 +16,13 @@ const fallbackReward = {
   minStreak: 0,
   isNoWin: true,
 };
+
+const HOW_IT_WORKS = [
+  "Order at the cafe and ask for today’s code.",
+  "Login with Google once and complete your RoomSlider profile.",
+  "Enter the code: your streak goes +1 and today’s spin unlocks.",
+  "Spin the wheel; if you win, show your redeem code to the cashier within 2 days.",
+];
 
 function wheelPath(startAngle, endAngle, radius = 110) {
   if (endAngle - startAngle >= 359.99) {
@@ -110,6 +117,8 @@ function RewardsPage() {
   const wheelRef = useRef(null);
   const rotationRef = useRef(0);
   const returnTo = `${location.pathname}${location.search}`;
+  const isCustomer = Boolean(user && ["user", "admin"].includes(user.role));
+  const profileComplete = isCustomer && isProfileComplete(user);
 
   useEffect(() => {
     if (!user || !["user", "admin"].includes(user.role)) return;
@@ -134,13 +143,14 @@ function RewardsPage() {
   useEffect(() => {
     if (!user || !["user", "admin"].includes(user.role) || !isProfileComplete(user)) return;
     let active = true;
-    Promise.all([
-      api.get(`/rewards/${encodeURIComponent(slug)}`),
-      api.get("/rewards/me"),
-    ]).then(([infoResponse, rewardsResponse]) => {
+    const requests = [api.get(`/rewards/${encodeURIComponent(slug)}`)];
+    if (["user", "admin"].includes(user.role) && isProfileComplete(user)) {
+      requests.push(api.get("/rewards/me"));
+    }
+    Promise.all(requests).then(([infoResponse, rewardsResponse]) => {
       if (!active) return;
       setInfo(infoResponse.data);
-      setMyRewards(rewardsResponse.data.rewards || []);
+      setMyRewards(rewardsResponse?.data?.rewards || []);
       setSpinResult(infoResponse.data.user?.todaySpin || null);
       setLoadError("");
     }).catch((error) => {
@@ -148,6 +158,24 @@ function RewardsPage() {
     }).finally(() => {
       if (active) setLoading(false);
     });
+    return () => { active = false; };
+  }, [slug, user]);
+
+  useEffect(() => {
+    if (user && ["user", "admin"].includes(user.role)) return;
+    let active = true;
+    api.get(`/rewards/${encodeURIComponent(slug)}`)
+      .then((response) => {
+        if (!active) return;
+        setInfo(response.data);
+        setLoadError("");
+      })
+      .catch((error) => {
+        if (active) setLoadError(error.response?.data?.message || "Rewards are temporarily unavailable.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => { active = false; };
   }, [slug, user]);
 
@@ -161,7 +189,12 @@ function RewardsPage() {
     setLoading(true);
     setLoadError("");
     try {
-      await loadPage();
+      if (user && ["user", "admin"].includes(user.role) && isProfileComplete(user)) {
+        await loadPage();
+      } else {
+        const response = await api.get(`/rewards/${encodeURIComponent(slug)}`);
+        setInfo(response.data);
+      }
     } catch (error) {
       setLoadError(error.response?.data?.message || "Rewards are temporarily unavailable.");
     } finally {
@@ -226,17 +259,106 @@ function RewardsPage() {
     }
   }
 
-  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
-  if (!["user", "admin"].includes(user.role)) {
-    return <main className="rewards-page rewards-loading"><strong>Daily rewards are available to customer accounts.</strong></main>;
-  }
-  if (!isProfileComplete(user)) {
+  if (isCustomer && !profileComplete) {
     return <div className="rewards-loading" role="status">Taking you to finish your profile…</div>;
+  }
+
+  const streakCard = (state, status) => (
+    <section className="rewards-streak-card" aria-label="Your check-in streak">
+      <div className="rewards-streak-icon"><Flame size={27} fill="currentColor" /></div>
+      <div>
+        <span>YOUR STREAK</span>
+        <strong>{state ? `${state.streak} ${state.streak === 1 ? "day" : "days"}` : status}</strong>
+      </div>
+      <span className="rewards-streak-caption">
+        {state
+          ? state.checkedInToday ? "Checked in today" : "Keep your streak alive"
+          : !user ? "Log in to view your streak" : "Your check-in streak"}
+      </span>
+    </section>
+  );
+
+  if (!user) {
+    const previewRewards = (info?.rewards || []).filter((reward) => !reward.isNoWin);
+    return (
+      <main className="rewards-page rewards-intro-page">
+        <Helmet>
+          <title>Daily Check-in &amp; Spin | {info?.cafe?.name || "RoomSlider"}</title>
+          <meta name="description" content="Check in at the cafe, build your daily streak and spin for rewards." />
+        </Helmet>
+        <header className="rewards-heading">
+          <span className="rewards-eyebrow"><Sparkles size={15} /> {info?.cafe?.name || "ROOMSLIDER"}</span>
+          <h1>Daily Check-in &amp; Spin</h1>
+          <p>Come by daily. Build your streak. Spin for a treat.</p>
+        </header>
+        {streakCard(null, "— days")}
+        {loadError && <p className="rewards-load-message" role="alert">{loadError}</p>}
+        {!info && !loadError && (
+          <div className="rewards-intro-status" role="status">
+            <span className="rewards-loader" />
+            <strong>Waking up the rewards…</strong>
+            <span>The first load may take a few seconds.</span>
+          </div>
+        )}
+        {info && (
+          <>
+            <section className="rewards-panel rewards-intro-steps">
+              <h2>How it works</h2>
+              <ol>
+                {HOW_IT_WORKS.map((step) => <li key={step}>{step}</li>)}
+              </ol>
+            </section>
+            <section className="rewards-panel rewards-intro-rules" aria-label="Reward rules">
+              <p>One spin per day.</p>
+              <p>Higher streaks unlock better rewards.</p>
+              <p>Daily reward budget is limited, so rewards can run out.</p>
+            </section>
+            <section className="rewards-panel rewards-intro-preview">
+              <div className="rewards-panel-title">
+                <span className="rewards-my-icon"><Gift size={18} /></span>
+                <div><h2>Rewards to unlock</h2><p>Keep your streak going for more choices.</p></div>
+              </div>
+              <div className="rewards-preview-list">
+                {previewRewards.map((reward) => {
+                  const locked = reward.minStreak > 0;
+                  return (
+                    <article className={`rewards-preview-item${locked ? " is-locked" : ""}`} key={reward.key}>
+                      <span className="rewards-preview-lock">{locked ? <LockKeyhole size={15} /> : <Gift size={15} />}</span>
+                      <span className="rewards-preview-copy">
+                        <strong>{reward.label}</strong>
+                        {locked && <small>Unlocks at {reward.minStreak}-day streak</small>}
+                      </span>
+                      <span className="rewards-preview-value">₹{reward.valueRs}</span>
+                    </article>
+                  );
+                })}
+                {!previewRewards.length && <p className="rewards-empty">Reward details are loading. Please check again soon.</p>}
+              </div>
+            </section>
+          </>
+        )}
+        {loadError && <button className="rewards-spin-button rewards-retry-button" type="button" onClick={retryLoad}>Try again</button>}
+        <Link className="rewards-google-cta" to="/login" state={{ from: location }}>
+          Login with Google to start
+        </Link>
+        <footer className="rewards-footer"><Link to="/">RoomSlider</Link> · Simple daily rewards at {info?.cafe?.name || "the cafe"}.</footer>
+      </main>
+    );
+  }
+
+  if (!isCustomer) {
+    return (
+      <main className="rewards-page rewards-loading" role="status">
+        <strong>Daily rewards are available to customer accounts.</strong>
+        <span>You are already signed in. Switch to a customer account to check in.</span>
+      </main>
+    );
   }
 
   if (loading) {
     return (
       <main className="rewards-page rewards-loading" role="status">
+        {streakCard(info?.user, info?.user ? "" : "Loading…")}
         <span className="rewards-loader" />
         <strong>Waking up the rewards…</strong>
         <span>The first load may take a few seconds.</span>
@@ -247,13 +369,14 @@ function RewardsPage() {
   if (loadError || !info) {
     return (
       <main className="rewards-page rewards-loading" role="alert">
+        {streakCard(info?.user, "Unavailable")}
         <strong>{loadError || "Rewards are temporarily unavailable."}</strong>
         <button className="rewards-spin-button" type="button" onClick={retryLoad}>Try again</button>
       </main>
     );
   }
 
-  const userState = info?.user || { streak: 0, checkedInToday: false, spunToday: false };
+  const userState = info.user || { streak: 0, checkedInToday: false, spunToday: false };
   const displayedSegments = spinning && wheelSegments.length ? wheelSegments : availableSegments;
 
   return (
@@ -268,11 +391,15 @@ function RewardsPage() {
         <p>{info?.cafe?.name} · check in once a day and spin for a cafe reward.</p>
       </header>
 
-      <section className="rewards-streak-card" aria-label="Your check-in streak">
-        <div className="rewards-streak-icon"><Flame size={27} fill="currentColor" /></div>
-        <div><span>YOUR STREAK</span><strong>{userState.streak} {userState.streak === 1 ? "day" : "days"}</strong></div>
-        <span className="rewards-streak-caption">{userState.checkedInToday ? "Checked in today" : "Keep your streak alive"}</span>
-      </section>
+      <details className="rewards-how-details">
+        <summary>How it works</summary>
+        <ol>
+          {HOW_IT_WORKS.map((step) => <li key={step}>{step}</li>)}
+        </ol>
+        <p>One spin per day. Higher streaks unlock better rewards. Daily reward budget is limited, so rewards can run out.</p>
+      </details>
+
+      {streakCard(userState, "")}
 
       {!userState.checkedInToday ? (
         <section className="rewards-panel">
