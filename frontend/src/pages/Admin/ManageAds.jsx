@@ -263,8 +263,8 @@ function ManageAds() {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast.error("Choose a JPG, PNG, or WebP image.");
+    if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
+      toast.error("Choose a JPG, PNG, WebP, or GIF image.");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -415,7 +415,7 @@ function ManageAds() {
             </label>
             <div className="ads-wide ads-upload">
               <span><Image size={14} /> Ad image</span>
-              <input ref={imageInputRef} className="ads-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadAdImage} disabled={imageUploading || saving} />
+              <input ref={imageInputRef} className="ads-file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadAdImage} disabled={imageUploading || saving} />
               <div className="ads-upload-control">
                 {(form.slot === "top" ? form.logoUrl : form.imageUrl) && <img src={form.slot === "top" ? form.logoUrl : form.imageUrl} alt="Ad image preview" />}
                 <div>
