@@ -64,33 +64,6 @@
   font-weight: 700;
 }
 
-.ad-carousel-controls {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  min-height: 34px;
-  padding: 4px 2px 0;
-  color: var(--muted, var(--mut, #74685e));
-  font-size: .78rem;
-}
-
-.ad-carousel-controls[hidden] {
-  display: none;
-}
-
-.ad-carousel-controls button {
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--line, var(--bd, rgba(0, 0, 0, .15)));
-  border-radius: 50%;
-  background: var(--surface, var(--card, #fff));
-  color: inherit;
-  font: inherit;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
 .ad-carousel.bottom .ad-carousel-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -162,8 +135,4 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ad-carousel-card,
-  .ad-carousel-controls button {
-    scroll-behavior: auto;
-    transition: none;
-  }
 }

@@ -30,6 +30,17 @@ test("Wow Pav menu reveal animation does not hide ad carousels", () => {
   assert.doesNotMatch(html, /(?:^|})section\{[^}]*opacity:0/);
 });
 
+test("cafe ad carousels have no manual buttons and support touch swipes", () => {
+  const html = menuHtml("wowpav");
+  const adsScript = fs.readFileSync(
+    path.join(__dirname, "../../frontend/public/cafe-ads.js"),
+    "utf8"
+  );
+  assert.doesNotMatch(html, /ad-carousel-controls|data-ad-previous|data-ad-next/);
+  assert.match(adsScript, /addEventListener\("touchstart"/);
+  assert.match(adsScript, /addEventListener\("touchend"/);
+});
+
 test("searches cafe menus by item and filters results to the requested location", async () => {
   const pages = {
     biryanikendra: menuHtml("biryanikendra"),

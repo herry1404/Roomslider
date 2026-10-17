@@ -58,11 +58,7 @@
     var wrapper = document.getElementById(slot === "top" ? "adtop" : "adbot");
     if (!wrapper) return;
     var track = wrapper.querySelector(".ad-carousel-track");
-    var controls = wrapper.querySelector(".ad-carousel-controls");
-    var count = wrapper.querySelector("[data-ad-count]");
-    var previous = wrapper.querySelector("[data-ad-previous]");
-    var next = wrapper.querySelector("[data-ad-next]");
-    if (!track || !controls || !count || !previous || !next) return;
+    if (!track) return;
 
     var slides = ads.slice(0, 10).map(function (ad) { return makeSlide(ad, slot); }).filter(Boolean);
     if (!slides.length) return;
@@ -71,7 +67,6 @@
     slides[0].hidden = false;
     if (slides.length === 1) return;
 
-    controls.hidden = false;
     var index = 0;
     var timer;
     var touchStart = null;
@@ -80,7 +75,6 @@
       slides.forEach(function (slide, slideIndex) {
         slide.hidden = slideIndex !== index;
       });
-      count.textContent = (index + 1) + " / " + slides.length;
     }
     function scheduleNext() {
       window.clearTimeout(timer);
@@ -92,14 +86,6 @@
     }
 
     showSlide(0);
-    previous.addEventListener("click", function () {
-      showSlide(index - 1);
-      scheduleNext();
-    });
-    next.addEventListener("click", function () {
-      showSlide(index + 1);
-      scheduleNext();
-    });
     wrapper.addEventListener("mouseenter", function () { window.clearTimeout(timer); });
     wrapper.addEventListener("mouseleave", scheduleNext);
     wrapper.addEventListener("focusin", function () { window.clearTimeout(timer); });
