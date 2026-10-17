@@ -50,8 +50,16 @@ test("ad event tracking requires a valid ad id", async () => {
 
 test("cafe ad analytics returns empty report data for a valid period", async () => {
   const originalAggregate = CafeMenuAnalytics.aggregate;
+  const originalAnalyticsFind = CafeMenuAnalytics.find;
   const originalFind = Ad.find;
   CafeMenuAnalytics.aggregate = async () => [];
+  CafeMenuAnalytics.find = () => ({
+    sort: () => ({
+      select: () => ({
+        limit: () => ({ lean: async () => [] }),
+      }),
+    }),
+  });
   Ad.find = () => ({ select: () => ({ lean: async () => [] }) });
   try {
     const res = response();
@@ -67,9 +75,51 @@ test("cafe ad analytics returns empty report data for a valid period", async () 
     assert.deepEqual(res.body.analytics.dailyViews, []);
     assert.deepEqual(res.body.analytics.byCafe, []);
     assert.deepEqual(res.body.analytics.byLocation, []);
+    assert.deepEqual(res.body.analytics.recentEvents, []);
     assert.deepEqual(res.body.analytics.adPerformance, []);
   } finally {
     CafeMenuAnalytics.aggregate = originalAggregate;
+    CafeMenuAnalytics.find = originalAnalyticsFind;
+    Ad.find = originalFind;
+  }
+});
+
+test("cafe menu analytics includes recent menu and ad events", async () => {
+  const originalAggregate = CafeMenuAnalytics.aggregate;
+  const originalAnalyticsFind = CafeMenuAnalytics.find;
+  const originalFind = Ad.find;
+  const adId = "507f1f77bcf86cd799439011";
+  const createdAt = new Date("2026-10-17T05:00:00.000Z");
+  CafeMenuAnalytics.aggregate = async () => [];
+  CafeMenuAnalytics.find = () => ({
+    sort: () => ({
+      select: () => ({
+        limit: () => ({
+          lean: async () => [
+            { type: "ad_click", cafe: "wowpav", location: "bhawarkua", adId, createdAt },
+            { type: "menu_view", cafe: "wowpav", location: "bhawarkua", createdAt },
+          ],
+        }),
+      }),
+    }),
+  });
+  Ad.find = () => ({
+    select: () => ({
+      lean: async () => [{ _id: { toString: () => adId }, text: "Cafe offer" }],
+    }),
+  });
+
+  try {
+    const res = response();
+    await getCafeMenuAnalytics({ query: { days: "7" } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body.analytics.recentEvents, [
+      { type: "ad_click", cafe: "wowpav", location: "bhawarkua", ad: "Cafe offer", createdAt },
+      { type: "menu_view", cafe: "wowpav", location: "bhawarkua", ad: "", createdAt },
+    ]);
+  } finally {
+    CafeMenuAnalytics.aggregate = originalAggregate;
+    CafeMenuAnalytics.find = originalAnalyticsFind;
     Ad.find = originalFind;
   }
 });

@@ -123,8 +123,8 @@ function AdminAnalytics() {
     }
   }, [location.hash, location.pathname, navigate, searchParams]);
 
-  const fetchAnalytics = useCallback(async () => {
-    setLoading(true);
+  const fetchAnalytics = useCallback(async ({ showLoading = true } = {}) => {
+    if (showLoading) setLoading(true);
     setError("");
     const apiDays = range === "today" ? 7 : Number(range);
     const results = await Promise.allSettled([
@@ -147,7 +147,12 @@ function AdminAnalytics() {
   }, [range]);
 
   useEffect(() => {
-    fetchAnalytics();
+    const initialFetch = window.setTimeout(fetchAnalytics, 0);
+    const interval = window.setInterval(() => fetchAnalytics({ showLoading: false }), 30000);
+    return () => {
+      window.clearTimeout(initialFetch);
+      window.clearInterval(interval);
+    };
   }, [fetchAnalytics, retry]);
 
   const siteDays = useMemo(() => {
@@ -301,7 +306,7 @@ function AdminAnalytics() {
                       <header className="analytics-chart-heading">
                         <div><h2>Abhi-abhi site par aaye</h2><p>Recent page visits; koi personal jaankari nahi.</p></div>
                       </header>
-                      {range !== "today" && traffic.recent?.length ? (
+                      {traffic.recent?.length ? (
                         <div className="analytics-list">
                           {traffic.recent.slice(0, 8).map((visit, index) => (
                             <div className="analytics-list-row analytics-recent-row" key={`${visit.createdAt}-${visit.path}-${index}`}>

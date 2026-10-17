@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '../../api/axios';
+import api from '../../api/axios';
 
 const activityIcons = {
   user_registered: '👤',
@@ -8,8 +8,18 @@ const activityIcons = {
   room_updated: '✏️',
   room_deleted: '🗑️',
   payment_received: '💰',
-  tenant_assigned: '🔑'
+  tenant_assigned: '🔑',
+  menu_view: '🍽️',
+  ad_impression: '👁️',
+  ad_click: '🖱️',
 };
+
+function cafeActivityMessage(event) {
+  const cafe = `${event.cafe} · ${event.location}`;
+  if (event.type === 'menu_view') return `Cafe menu opened: ${cafe}`;
+  if (event.type === 'ad_impression') return `Ad shown: ${event.ad} · ${cafe}`;
+  return `Ad clicked: ${event.ad} · ${cafe}`;
+}
 
 function timeAgo(date) {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -26,20 +36,39 @@ export default function RecentActivity() {
   const [loading, setLoading] = useState(true);
 
   const fetchActivities = async () => {
-    try {
-      const res = await axios.get('/activity/recent?limit=20');
-      setActivities(res.data.activities);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    const [activityResult, cafeResult] = await Promise.allSettled([
+      api.get('/activity/recent?limit=20'),
+      api.get('/promo-listings/admin/analytics', { params: { days: 7 } }),
+    ]);
+    if (activityResult.status === 'rejected') console.error('Recent admin activity fetch failed:', activityResult.reason);
+    if (cafeResult.status === 'rejected') console.error('Recent cafe activity fetch failed:', cafeResult.reason);
+
+    const adminActivities = activityResult.status === 'fulfilled'
+      ? (activityResult.value.data.activities || [])
+      : [];
+    const recentEvents = cafeResult.status === 'fulfilled'
+      ? (cafeResult.value.data.analytics?.recentEvents || [])
+      : [];
+    const cafeEvents = cafeResult.status === 'fulfilled'
+      ? recentEvents.map((event, index) => ({
+          ...event,
+          _id: `cafe-${event.type}-${event.createdAt}-${index}`,
+          message: cafeActivityMessage(event),
+        }))
+      : [];
+    setActivities([...adminActivities, ...cafeEvents]
+      .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
+      .slice(0, 20));
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchActivities();
+    const initialFetch = setTimeout(fetchActivities, 0);
     const interval = setInterval(fetchActivities, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialFetch);
+      clearInterval(interval);
+    };
   }, []);
 
   return (

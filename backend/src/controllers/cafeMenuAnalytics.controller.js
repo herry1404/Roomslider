@@ -48,7 +48,7 @@ const getCafeMenuAnalytics = async (req, res) => {
     start.setUTCHours(0, 0, 0, 0);
     start.setUTCDate(start.getUTCDate() - days + 1);
     const match = { createdAt: { $gte: start } };
-    const [summaryRows, dailyRows, cafeRows, locationRows, adRows, sourceRows, platformRows] = await Promise.all([
+    const [summaryRows, dailyRows, cafeRows, locationRows, adRows, sourceRows, platformRows, recentRows] = await Promise.all([
       CafeMenuAnalytics.aggregate([
         { $match: match },
         {
@@ -113,9 +113,17 @@ const getCafeMenuAnalytics = async (req, res) => {
         { $project: { platform: { $ifNull: ["$_id", "Other"] }, views: 1, uniqueVisitors: { $size: "$visitors" } } },
         { $sort: { views: -1, platform: 1 } },
       ]),
+      CafeMenuAnalytics.find(match)
+        .sort({ createdAt: -1 })
+        .select("type cafe location adId createdAt")
+        .limit(20)
+        .lean(),
     ]);
 
-    const adIds = [...new Set(adRows.map((row) => row._id.adId.toString()))]
+    const adIds = [...new Set([
+      ...adRows.map((row) => row._id.adId.toString()),
+      ...recentRows.filter((row) => row.adId).map((row) => row.adId.toString()),
+    ])]
       .filter((id) => mongoose.isValidObjectId(id));
     const ads = await Ad.find({ _id: { $in: adIds } }).select("text slot targetBy cafe location").lean();
     const adsById = new Map(ads.map((ad) => [ad._id.toString(), ad]));
@@ -136,6 +144,13 @@ const getCafeMenuAnalytics = async (req, res) => {
         byLocation: locationRows,
         bySource: sourceRows,
         byPlatform: platformRows,
+        recentEvents: recentRows.map((row) => ({
+          type: row.type,
+          cafe: row.cafe,
+          location: row.location,
+          ad: row.adId ? (adsById.get(row.adId.toString())?.text || "Deleted ad") : "",
+          createdAt: row.createdAt,
+        })),
         adPerformance: adRows.map((row) => {
           const ad = adsById.get(row._id.adId.toString());
           return {
