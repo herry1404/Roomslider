@@ -3,6 +3,10 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const { parseCafeMenu, searchCafeMenus } = require("../src/services/cafeMenuSearch.service");
+const {
+  formatCafeMenuReply,
+  getConversationalReply,
+} = require("../src/controllers/cafeMenuSearch.controller");
 
 const menuHtml = (cafe) => fs.readFileSync(
   path.join(__dirname, "../../frontend/public/c", cafe, "index.html"),
@@ -70,4 +74,33 @@ test("searches cafe menus by item and filters results to the requested location"
   const localCoffee = await searchCafeMenus("coffee", { location: "bhawarkua", fetchImpl });
   assert.ok(localCoffee.items.length > 0);
   assert.ok(localCoffee.items.every((item) => item.location === "Bhawarkua"));
+});
+
+test("AI cafe menu reply shows item and cafe details without printing the menu URL", () => {
+  const reply = formatCafeMenuReply([{
+    name: "Mexican Pizza Sandwich",
+    price: "₹120",
+    cafe: "Wow Pav",
+    location: "Bhawarkua",
+    menuUrl: "https://www.roomslider.in/cafe/bhawarkua/wowpav",
+  }], "Bhawarkua");
+
+  assert.equal(reply, "Menu me ye items mile Bhawarkua area me:\n• Mexican Pizza Sandwich — ₹120 · Wow Pav, Bhawarkua");
+  assert.doesNotMatch(reply, /https?:\/\//);
+});
+
+test("cafe menu assistant responds to greetings without searching menus", () => {
+  const greeting = getConversationalReply("Hii!");
+  assert.equal(greeting.intent, "greeting");
+  assert.match(greeting.reply, /Hi!/);
+  assert.equal(getConversationalReply("hello").intent, "greeting");
+  assert.equal(getConversationalReply("How are you?").intent, "greeting");
+});
+
+test("cafe menu assistant answers creator questions from the About page", () => {
+  const aboutReply = getConversationalReply("RoomSlider kisne banaya?");
+  assert.equal(aboutReply.intent, "about_roomslider");
+  assert.match(aboutReply.reply, /do doston ne banaya tha/);
+  assert.match(aboutReply.reply, /founders ke naam nahi diye gaye hain/);
+  assert.equal(getConversationalReply("Who created RoomSlider?").intent, "about_roomslider");
 });
