@@ -10,8 +10,8 @@
     "seed:vehicles": "node scripts/seedVehicles.js",
     "seed:cleaning": "node scripts/seedCleaning.js",
     "seed:study": "node scripts/seedStudySupport.js",
-    "seed:loyalty": "node scripts/seedLoyaltyDemo.js",
     "seed:demo-rewards": "node scripts/seedDemoRewards.js",
+    "migrate:spin-types": "node scripts/migrateSpinTypeIndex.js",
     "backfill:hourly-rooms": "node scripts/backfillHourlyRoomFields.js",
     "analytics:retain": "node scripts/retainAnalyticsHistory.js"
   },

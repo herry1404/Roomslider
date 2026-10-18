@@ -17,4 +17,10 @@ function addDaysToDateKey(dateKey, days) {
   return date.toISOString().slice(0, 10);
 }
 
-module.exports = { TIME_ZONE, getIndiaDateKey, addDaysToDateKey };
+function getIndiaDayBounds(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const start = new Date(Date.UTC(year, month - 1, day) - (5 * 60 + 30) * 60 * 1000);
+  return { start, end: new Date(start.getTime() + 24 * 60 * 60 * 1000) };
+}
+
+module.exports = { TIME_ZONE, getIndiaDateKey, addDaysToDateKey, getIndiaDayBounds };

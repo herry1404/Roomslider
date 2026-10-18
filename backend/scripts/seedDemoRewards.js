@@ -1,6 +1,8 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const Cafe = require("../src/models/Cafe");
+const Sponsor = require("../src/models/Sponsor");
+const Coupon = require("../src/models/Coupon");
 
 const rewards = [
   { label: "₹10 off your order", valueRs: 10, weight: 30, minStreak: 0 },
@@ -26,7 +28,31 @@ async function seed() {
     update,
     { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true }
   );
-  console.log("Seeded RoomSlider demo rewards with a ₹100 daily budget.");
+
+  const sponsors = await Promise.all([
+    { name: "DemoGym", videoUrl: "", durationSec: 10, active: true },
+    { name: "DemoBites", videoUrl: "", durationSec: 10, active: true },
+  ].map((sponsor) => Sponsor.findOneAndUpdate(
+    { name: sponsor.name }, { $set: sponsor }, { upsert: true, returnDocument: "after", runValidators: true }
+  )));
+  const onlineCoupons = [
+    ["DemoMart", "10% off demo essentials", "DEMO10"],
+    ["DemoBooks", "₹75 off a demo order", "BOOK75"],
+    ["DemoStyle", "15% off demo picks", "STYLE15"],
+    ["DemoTech", "₹100 off demo accessories", "TECH100"],
+    ["DemoStay", "12% off a demo booking", "STAY12"],
+  ];
+  await Promise.all(onlineCoupons.map(([brand, title, code], index) => Coupon.findOneAndUpdate(
+    { code },
+    { $set: { kind: "online", sponsorId: null, brand, title, code, terms: "Demo coupon for the RoomSlider rewards preview.", stock: 100, weight: 5 - Math.min(index, 4), active: true } },
+    { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true }
+  )));
+  await Promise.all(sponsors.map((sponsor, index) => Coupon.findOneAndUpdate(
+    { code: `LOCAL${index + 1}0` },
+    { $set: { kind: "local", sponsorId: sponsor._id, brand: sponsor.name, title: `${sponsor.name} demo reward`, code: `LOCAL${index + 1}0`, terms: "Demo sponsor coupon for the RoomSlider rewards preview.", stock: 100, weight: 1, active: true } },
+    { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true }
+  )));
+  console.log("Seeded RoomSlider demo rewards, 2 demo sponsors, and 5 online demo coupons.");
 }
 
 seed()

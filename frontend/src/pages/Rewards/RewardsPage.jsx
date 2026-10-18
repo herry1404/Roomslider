@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Gift, LockKeyhole, Sparkles } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-import { isProfileComplete } from "../../utils/isProfileComplete";
 import "../../styles/rewards.css";
 
 const fallbackReward = {
@@ -19,9 +18,9 @@ const fallbackReward = {
 
 const HOW_IT_WORKS = [
   "Order at the cafe and ask for today’s code.",
-  "Login with Google once and complete your RoomSlider profile.",
-  "Enter the code: your streak goes +1 and today’s spin unlocks.",
-  "Spin the wheel; if you win, show your redeem code to the cashier within 2 days.",
+  "Log in with Google once to use online coupons and Watch & Win.",
+  "Enter the cafe code to grow your streak and unlock the cafe spin.",
+  "Watch a sponsor ad or choose online coupons for two additional daily spins.",
 ];
 
 function wheelPath(startAngle, endAngle, radius = 110) {
@@ -103,7 +102,6 @@ function expiryText(value) {
 function RewardsPage() {
   const { slug } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [info, setInfo] = useState(null);
   const [myRewards, setMyRewards] = useState([]);
@@ -114,20 +112,12 @@ function RewardsPage() {
   const [spinning, setSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
   const [wheelSegments, setWheelSegments] = useState([]);
+  const [activeSpinType, setActiveSpinType] = useState("cafe");
+  const [adSession, setAdSession] = useState(null);
+  const [adCountdown, setAdCountdown] = useState(0);
   const wheelRef = useRef(null);
   const rotationRef = useRef(0);
-  const returnTo = `${location.pathname}${location.search}`;
   const isCustomer = Boolean(user && ["user", "admin"].includes(user.role));
-  const profileComplete = isCustomer && isProfileComplete(user);
-
-  useEffect(() => {
-    if (!user || !["user", "admin"].includes(user.role)) return;
-    if (!String(user.phone || "").trim()) {
-      navigate("/complete-profile", { replace: true, state: { returnTo } });
-    } else if (!isProfileComplete(user)) {
-      navigate("/profile/edit", { replace: true, state: { returnTo } });
-    }
-  }, [user, navigate, location, returnTo]);
 
   const loadPage = useCallback(async () => {
     const [infoResponse, rewardsResponse] = await Promise.all([
@@ -141,10 +131,10 @@ function RewardsPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!user || !["user", "admin"].includes(user.role) || !isProfileComplete(user)) return;
+    if (!user || !["user", "admin"].includes(user.role)) return;
     let active = true;
     const requests = [api.get(`/rewards/${encodeURIComponent(slug)}`)];
-    if (["user", "admin"].includes(user.role) && isProfileComplete(user)) {
+    if (["user", "admin"].includes(user.role)) {
       requests.push(api.get("/rewards/me"));
     }
     Promise.all(requests).then(([infoResponse, rewardsResponse]) => {
@@ -189,7 +179,7 @@ function RewardsPage() {
     setLoading(true);
     setLoadError("");
     try {
-      if (user && ["user", "admin"].includes(user.role) && isProfileComplete(user)) {
+    if (user && ["user", "admin"].includes(user.role)) {
         await loadPage();
       } else {
         const response = await api.get(`/rewards/${encodeURIComponent(slug)}`);
@@ -218,12 +208,15 @@ function RewardsPage() {
     }
   }
 
-  async function handleSpin() {
-    if (busy || !info?.user?.checkedInToday || info.user.spunToday) return;
+  async function handleSpin(type) {
+    const spinState = info?.user?.spins?.[type];
+    if (busy || spinState || (type === "cafe" && !info?.user?.checkedInToday)
+      || (type === "ad" && !adSession?.completed)) return;
     try {
       setBusy(true);
+      setActiveSpinType(type);
       setSpinResult(null);
-      const response = await api.post(`/rewards/${encodeURIComponent(slug)}/spin`);
+      const response = await api.post(`/rewards/${encodeURIComponent(slug)}/spin`, { type });
       const result = response.data;
       const segments = result.segments?.length ? result.segments : [fallbackReward];
       setWheelSegments(segments);
@@ -242,7 +235,12 @@ function RewardsPage() {
         setSpinning(false);
         setInfo((current) => current ? {
           ...current,
-          user: { ...current.user, spunToday: true, todaySpin: result },
+          user: {
+            ...current.user,
+            spunToday: type === "cafe" ? true : current.user.spunToday,
+            todaySpin: type === "cafe" ? result : current.user.todaySpin,
+            spins: { ...(current.user.spins || {}), [type]: result },
+          },
         } : current);
         try {
           const rewardsResponse = await api.get("/rewards/me");
@@ -259,9 +257,39 @@ function RewardsPage() {
     }
   }
 
-  if (isCustomer && !profileComplete) {
-    return <div className="rewards-loading" role="status">Taking you to finish your profile…</div>;
+  async function startAd() {
+    if (busy || info?.user?.spins?.ad) return;
+    try {
+      setBusy(true);
+      const response = await api.post(`/rewards/${encodeURIComponent(slug)}/ad/start`);
+      setAdSession({ ...response.data, completed: false });
+      setAdCountdown(response.data.sponsor.durationSec);
+      setActiveSpinType("ad");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Could not start the sponsor ad.");
+    } finally {
+      setBusy(false);
+    }
   }
+
+  useEffect(() => {
+    if (!adSession || adSession.completed || adCountdown <= 0) return undefined;
+    const timer = window.setTimeout(() => setAdCountdown((seconds) => seconds - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [adSession, adCountdown]);
+
+  useEffect(() => {
+    if (!adSession || adSession.completed || adCountdown > 0) return;
+    let active = true;
+    api.post(`/rewards/${encodeURIComponent(slug)}/ad/complete`, { token: adSession.token })
+      .then(() => {
+        if (!active) return;
+        setAdSession((current) => current ? { ...current, completed: true } : current);
+        toast.success("Ad complete. Your sponsor-coupon spin is ready.");
+      })
+      .catch((error) => active && toast.error(error.response?.data?.message || "Ad completion could not be verified."));
+    return () => { active = false; };
+  }, [adSession, adCountdown, slug]);
 
   const streakCard = (state, status) => (
     <section className="rewards-streak-card" aria-label="Your check-in streak">
@@ -283,13 +311,13 @@ function RewardsPage() {
     return (
       <main className="rewards-page rewards-intro-page">
         <Helmet>
-          <title>Daily Check-in &amp; Spin | {info?.cafe?.name || "RoomSlider"}</title>
-          <meta name="description" content="Check in at the cafe, build your daily streak and spin for rewards." />
+          <title>Daily Rewards | {info?.cafe?.name || "RoomSlider"}</title>
+          <meta name="description" content="Check in, watch a sponsor ad, or spin for online coupons." />
         </Helmet>
         <header className="rewards-heading">
           <span className="rewards-eyebrow"><Sparkles size={15} /> {info?.cafe?.name || "ROOMSLIDER"}</span>
-          <h1>Daily Check-in &amp; Spin</h1>
-          <p>Come by daily. Build your streak. Spin for a treat.</p>
+          <h1>Three daily spins</h1>
+          <p>Check in, watch a sponsor ad, or unlock an online coupon.</p>
         </header>
         {streakCard(null, "— days")}
         {loadError && <p className="rewards-load-message" role="alert">{loadError}</p>}
@@ -309,9 +337,9 @@ function RewardsPage() {
               </ol>
             </section>
             <section className="rewards-panel rewards-intro-rules" aria-label="Reward rules">
-              <p>One spin per day.</p>
-              <p>Higher streaks unlock better rewards.</p>
-              <p>Daily reward budget is limited, so rewards can run out.</p>
+              <p>One spin per type each day.</p>
+              <p>Only cafe check-ins build your streak.</p>
+              <p>The cafe budget applies only to cafe rewards.</p>
             </section>
             <section className="rewards-panel rewards-intro-preview">
               <div className="rewards-panel-title">
@@ -378,6 +406,9 @@ function RewardsPage() {
 
   const userState = info.user || { streak: 0, checkedInToday: false, spunToday: false };
   const displayedSegments = spinning && wheelSegments.length ? wheelSegments : availableSegments;
+  const spins = userState.spins || {};
+  const activeTitle = activeSpinType === "cafe" ? "Cafe Spin"
+    : activeSpinType === "ad" ? "Watch & Win" : "Online Coupons";
 
   return (
     <main className="rewards-page">
@@ -387,8 +418,8 @@ function RewardsPage() {
       </Helmet>
       <header className="rewards-heading">
         <span className="rewards-eyebrow"><Sparkles size={15} /> ROOMSLIDER REWARDS</span>
-        <h1>Daily Check-in</h1>
-        <p>{info?.cafe?.name} · check in once a day and spin for a cafe reward.</p>
+        <h1>Three daily spins</h1>
+        <p>{info?.cafe?.name} · check in, watch, or claim an online coupon.</p>
       </header>
 
       <details className="rewards-how-details">
@@ -396,66 +427,39 @@ function RewardsPage() {
         <ol>
           {HOW_IT_WORKS.map((step) => <li key={step}>{step}</li>)}
         </ol>
-        <p>One spin per day. Higher streaks unlock better rewards. Daily reward budget is limited, so rewards can run out.</p>
+        <p>Each spin type is available once daily in Asia/Kolkata. Only the cafe spin grows your streak and uses the cafe budget.</p>
       </details>
 
       {streakCard(userState, "")}
 
-      {!userState.checkedInToday ? (
-        <section className="rewards-panel">
-          <div className="rewards-panel-title"><span className="rewards-step">1</span><div><h2>Enter today’s code</h2><p>Get the daily code from the cafe after your order.</p></div></div>
-          <form className="rewards-code-form" onSubmit={handleCheckIn}>
-            <label className="sr-only" htmlFor="daily-reward-code">Daily cafe code</label>
-            <input
-              id="daily-reward-code"
-              autoComplete="one-time-code"
-              value={code}
-              onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0, 5))}
-              placeholder="ABC23"
-              maxLength={5}
-              required
-              aria-describedby="reward-code-help"
-            />
-            <button type="submit" disabled={busy || code.length !== 5}>{busy ? "Checking…" : "Check in"}</button>
-          </form>
-          <small id="reward-code-help">3 letters + 2 numbers · 5 attempts per day</small>
-        </section>
-      ) : (
-        <section className="rewards-panel rewards-checkin-done">
-          <span className="rewards-step rewards-step--done">✓</span>
-          <div><h2>Today’s check-in is complete</h2><p>Your streak is active and your daily spin is {userState.spunToday ? "used" : "unlocked"}.</p></div>
-        </section>
-      )}
-
+      <section className="rewards-spin-cards" aria-label="Today's spin choices">
+        <article className={`rewards-spin-card${activeSpinType === "cafe" ? " is-selected" : ""}`}>
+          <div className="rewards-card-top"><div><h2>Cafe Spin</h2><p>Today’s cafe code grows your streak. Paid by the cafe.</p></div><span className={`rewards-card-status ${spins.cafe ? "used" : userState.checkedInToday ? "available" : "locked"}`}>{spins.cafe ? "Used today" : userState.checkedInToday ? "Available" : "Locked"}</span></div>
+          {!userState.checkedInToday ? <form className="rewards-code-form" onSubmit={handleCheckIn}><label className="sr-only" htmlFor="daily-reward-code">Daily cafe code</label><input id="daily-reward-code" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0, 5))} placeholder="ABC23" maxLength={5} required /><button type="submit" disabled={busy || code.length !== 5}>{busy ? "Checking…" : "Check in"}</button></form> : <button className="rewards-card-action" type="button" disabled={Boolean(spins.cafe) || busy} onClick={() => handleSpin("cafe")}>{spins.cafe ? "Cafe spin used" : "Spin cafe rewards"}</button>}
+        </article>
+        <article className={`rewards-spin-card${activeSpinType === "ad" ? " is-selected" : ""}`}>
+          <div className="rewards-card-top"><div><h2>Watch &amp; Win</h2><p>Watch a sponsor ad, then spin for that sponsor’s coupon.</p></div><span className={`rewards-card-status ${spins.ad ? "used" : "available"}`}>{spins.ad ? "Used today" : "Available"}</span></div>
+          {!adSession ? <button className="rewards-card-action" type="button" disabled={Boolean(spins.ad) || busy} onClick={startAd}>{spins.ad ? "Ad spin used" : "Watch sponsor ad"}</button> : <div className="rewards-ad-screen"><span>SPONSORED</span>{adSession.sponsor.videoUrl ? <video src={adSession.sponsor.videoUrl} autoPlay muted playsInline /> : <div className="rewards-ad-fallback"><strong>{adSession.sponsor.name}</strong><small>Local sponsor message</small></div>}<strong>{adSession.completed ? "Reward unlocked" : `${adCountdown}s remaining`}</strong><small>Your reward is a coupon from {adSession.sponsor.name}.</small><button className="rewards-card-action" type="button" disabled={!adSession.completed || Boolean(spins.ad) || busy} onClick={() => handleSpin("ad")}>{adSession.completed ? "Spin sponsor coupons" : "Finish watching to spin"}</button></div>}
+        </article>
+        <article className={`rewards-spin-card${activeSpinType === "coupon" ? " is-selected" : ""}`}>
+          <div className="rewards-card-top"><div><h2>Online Coupons</h2><p>Just log in and spin for an online coupon. No cafe code needed.</p></div><span className={`rewards-card-status ${spins.coupon ? "used" : "available"}`}>{spins.coupon ? "Used today" : "Available"}</span></div>
+          <button className="rewards-card-action" type="button" disabled={Boolean(spins.coupon) || busy} onClick={() => handleSpin("coupon")}>{spins.coupon ? "Coupon spin used" : "Spin online coupons"}</button>
+        </article>
+      </section>
       <section className="rewards-panel rewards-spin-panel">
-        <div className="rewards-panel-title"><span className="rewards-step">2</span><div><h2>Daily spin</h2><p>Eligible rewards unlock as your streak grows.</p></div></div>
+        <div className="rewards-panel-title"><span className="rewards-step">★</span><div><h2>{activeTitle}</h2><p>The server chooses the result and records this spin.</p></div></div>
         <RewardWheel segments={displayedSegments} wheelRef={wheelRef} spinning={spinning} />
-        <button
-          className="rewards-spin-button"
-          type="button"
-          disabled={!userState.checkedInToday || userState.spunToday || busy}
-          onClick={handleSpin}
-        >
-          {!userState.checkedInToday ? <><LockKeyhole size={17} /> Check in to unlock</>
-            : userState.spunToday ? "Today's spin used"
-              : busy ? "Spinning…" : <><Gift size={17} /> Spin now</>}
-        </button>
-        {spinResult && !spinning && (
-          <div className={`rewards-spin-result${spinResult.reward.isNoWin ? " is-no-win" : ""}`} role="status">
-            <strong>{spinResult.reward.label}</strong>
-            {spinResult.redeemCode && <span>Redeem code <code>{spinResult.redeemCode}</code> · expires {expiryText(spinResult.expiresAt)}</span>}
-          </div>
-        )}
+        {spinResult && !spinning && <div className={`rewards-spin-result${spinResult.reward.isNoWin ? " is-no-win" : ""}`} role="status"><strong>{spinResult.reward.label}</strong>{spinResult.redeemCode && <span>Redeem code <code>{spinResult.redeemCode}</code> · expires {expiryText(spinResult.expiresAt)}</span>}{spinResult.coupon && <span>Coupon code <code>{spinResult.coupon.code}</code>{spinResult.coupon.expiresAt && ` · expires ${expiryText(spinResult.coupon.expiresAt)}`}</span>}</div>}
       </section>
 
       <section className="rewards-panel rewards-my-panel">
-        <div className="rewards-panel-title"><span className="rewards-my-icon"><Gift size={18} /></span><div><h2>My Rewards</h2><p>Unused codes are valid for 2 days.</p></div></div>
+        <div className="rewards-panel-title"><span className="rewards-my-icon"><Gift size={18} /></span><div><h2>My Rewards</h2><p>Cafe redeem codes and coupon codes appear here.</p></div></div>
         {myRewards.length ? (
           <div className="rewards-list">
             {myRewards.map((reward) => (
-              <article className="rewards-list-item" key={reward.redeemCode}>
-                <div><strong>{reward.reward.label}</strong><small>{reward.cafe?.name || "RoomSlider"} · Expires {expiryText(reward.expiresAt)}</small></div>
-                <div className="rewards-list-code"><code>{reward.redeemCode}</code><span className={`rewards-status status-${reward.status}`}>{reward.status}</span></div>
+              <article className="rewards-list-item" key={reward.redeemCode || `${reward.type}-${reward.createdAt}`}>
+                <div><strong>{reward.coupon?.brand ? `${reward.coupon.brand} · ${reward.coupon.title}` : reward.reward.label}</strong><small>{reward.coupon?.terms || `${reward.cafe?.name || "RoomSlider"} · Expires ${expiryText(reward.expiresAt)}`}</small></div>
+                <div className="rewards-list-code"><code>{reward.coupon?.code || reward.redeemCode}</code>{reward.coupon?.link && <a href={reward.coupon.link} target="_blank" rel="noreferrer">Open</a>}{!reward.coupon && <span className={`rewards-status status-${reward.status}`}>{reward.status}</span>}</div>
               </article>
             ))}
           </div>

@@ -51,6 +51,7 @@ function Sidebar({ open, closeSidebar }) {
       items: [
         { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
         { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
+        { title: "Reward Catalog", icon: <Sparkles size={18} />, path: "/admin/reward-catalog" },
         { title: "Analytics", icon: <LineChart size={18} />, path: "/admin/analytics" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },

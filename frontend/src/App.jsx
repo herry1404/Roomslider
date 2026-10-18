@@ -112,6 +112,7 @@ const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
 const Reels = lazy(() => import("./pages/Reels/Reels"));
 const RewardsPage = lazy(() => import("./pages/Rewards/RewardsPage"));
 const RewardsPortal = lazy(() => import("./pages/Rewards/RewardsPortal"));
+const ManageRewardCatalog = lazy(() => import("./pages/Admin/ManageRewardCatalog"));
 import PushPermissionPrompt from "./components/notifications/PushPermissionPrompt";
 import SiteAnalyticsTracker from "./components/SiteAnalyticsTracker";
 
@@ -261,6 +262,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/cafe-menus" element={<AdminRoute><CafeMenus /></AdminRoute>} />
+        <Route path="/admin/reward-catalog" element={<AdminRoute><ManageRewardCatalog /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
         <Route path="/admin/reels" element={<AdminRoute><ManageReels /></AdminRoute>} />
         <Route path="/admin/rooms" element={<AdminRoute><ManageRooms /></AdminRoute>} />
