@@ -5,6 +5,7 @@ const { adminOnly } = require("../middleware/admin.middleware");
 const uploadAdImage = require("../middleware/uploadAdImage.middleware");
 const {
   getPublicAds,
+  clickAd,
   listAds,
   createAd,
   updateAd,
@@ -26,6 +27,7 @@ const publicAdLimiter = rateLimit({
 });
 
 router.get("/", publicAdLimiter, getPublicAds);
+router.get("/:id/click", publicAdLimiter, require("../middleware/auth.middleware").optionalAuth, clickAd);
 router.post("/analytics", publicAdLimiter, express.urlencoded({ extended: false }), trackCafeMenuEvent);
 router.get("/admin", protect, adminOnly, listAds);
 router.get("/admin/analytics", protect, adminOnly, getCafeMenuAnalytics);

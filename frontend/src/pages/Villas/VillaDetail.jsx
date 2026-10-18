@@ -1,6 +1,6 @@
 import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { MapPin, CheckCircle2, Heart, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
@@ -11,6 +11,7 @@ import { loadRazorpay } from "../../utils/loadRazorpay";
 import NearbyVillas from "../../components/home/NearbyVillas";
 import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/villas.css";
+import { sourceFromLocation, track } from "../../utils/track";
 
 const localDate = (date) => {
   const year = date.getFullYear();
@@ -27,6 +28,7 @@ const dayAfterValue = localDate(new Date(tomorrow.getTime() + 86400000));
 function VillaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const { user } = useAuth();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [villa, setVilla] = useState(null);
@@ -51,6 +53,7 @@ function VillaDetail() {
         if (!active) return;
         setVilla(response.data.villa);
         setActiveImage(0);
+        track("listing_view", { listingId: String(response.data.villa._id), listingType: "villa", source: sourceFromLocation(routeLocation) });
       })
       .catch((error) => {
         if (active) toast.error(error.response?.data?.message || "Villa nahi mili");
@@ -59,7 +62,7 @@ function VillaDetail() {
         if (active) setLoading(false);
       });
     return () => { active = false; };
-  }, [id]);
+  }, [id, routeLocation.pathname]);
 
   const updateForm = (key, value) => {
     setQuote(null);
@@ -78,6 +81,7 @@ function VillaDetail() {
 
   const checkAvailability = async (event) => {
     event.preventDefault();
+    if (villa) track("contact_request", { listingId: String(villa._id), listingType: "villa", source: sourceFromLocation(routeLocation) });
     try {
       setChecking(true);
       setQuote(null);
@@ -185,6 +189,7 @@ function VillaDetail() {
         ? await removeFromWishlist(villa._id)
         : await addToWishlist(villa._id);
       if (!updated) return;
+      if (!wishlisted) track("wishlist_add", { listingId: String(villa._id), listingType: "villa", source: sourceFromLocation(routeLocation) });
       toast.success(wishlisted ? "Wishlist se hata diya" : "Wishlist mein add ho gaya");
     } catch (error) {
       toast.error(error.response?.data?.message || "Wishlist update nahi hua");
@@ -229,7 +234,10 @@ function VillaDetail() {
               <Heart size={18} fill={wishlisted ? "currentColor" : "none"} />
               <span>{wishlisted ? "Saved" : "Save"}</span>
             </button>
-            <button type="button" onClick={() => shareVilla(villa)} aria-label="Share villa">
+            <button type="button" onClick={() => {
+              track("share", { listingId: String(villa._id), listingType: "villa", source: sourceFromLocation(routeLocation) });
+              return shareVilla(villa);
+            }} aria-label="Share villa">
               <Share2 size={18} />
               <span>Share</span>
             </button>

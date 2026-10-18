@@ -4,6 +4,41 @@
   var cafe = params.get("cafe") || body.dataset.cafe;
   var location = params.get("location") || body.dataset.location;
   if (!cafe || !location) return;
+  var impressedAds = new Set();
+
+  function getVisitorId() {
+    try {
+      var id = window.localStorage.getItem("roomsliderVisitorId");
+      if (!id) {
+        id = window.crypto && window.crypto.randomUUID
+          ? window.crypto.randomUUID()
+          : Date.now() + "-" + Math.random().toString(36).slice(2) + "-" + Math.random().toString(36).slice(2);
+        window.localStorage.setItem("roomsliderVisitorId", id);
+      }
+      return id;
+    } catch (error) {
+      return Date.now() + "-" + Math.random().toString(36).slice(2);
+    }
+  }
+
+  function trackImpression(adId) {
+    var payload = JSON.stringify({
+      type: "ad_impression",
+      adId: String(adId),
+      visitorId: getVisitorId(),
+      source: "ad"
+    });
+    var endpoint = "https://roomslider-api.onrender.com/api/track";
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(endpoint, new Blob([payload], { type: "application/json" }))) return;
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true
+      }).catch(function () {});
+    } catch (error) {}
+  }
 
   function validHttpsUrl(value) {
     try {
@@ -25,7 +60,8 @@
 
     var link = document.createElement("a");
     link.className = "ad-carousel-card ad-card";
-    link.href = ad.url;
+    var separator = ad.url.indexOf("?") === -1 ? "?" : "&";
+    link.href = ad.url + separator + "visitorId=" + encodeURIComponent(getVisitorId());
     link.target = "_blank";
     link.rel = "noopener sponsored";
     link.dataset.adId = ad.id || ad._id || "";
@@ -51,6 +87,26 @@
     cta.className = "ad-carousel-cta";
     cta.textContent = "Visit advertiser ↗";
     link.appendChild(cta);
+    var adId = ad.id || ad._id;
+    if (adId && window.IntersectionObserver) {
+      var timer;
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5 && !impressedAds.has(String(adId))) {
+            timer = window.setTimeout(function () {
+              if (impressedAds.has(String(adId))) return;
+              impressedAds.add(String(adId));
+              trackImpression(adId);
+              observer.disconnect();
+            }, 1000);
+          } else if (timer) {
+            window.clearTimeout(timer);
+            timer = null;
+          }
+        });
+      }, { threshold: [0.5] });
+      observer.observe(link);
+    }
     return link;
   }
 

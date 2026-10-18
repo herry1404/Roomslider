@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import "../../styles/owner-public-profile.css";
+import { track } from "../../utils/track";
 
 function OwnerPublicProfile() {
   const { slug } = useParams();
@@ -37,6 +38,11 @@ function OwnerPublicProfile() {
         const { data } = await api.get(`/owners/${encodeURIComponent(slug)}`);
         if (cancelled) return;
         setProfile(data.owner);
+        track("owner_profile_view", {
+          listingType: "other",
+          source: "profile",
+          meta: { ownerId: String(data.owner._id) },
+        });
         setFollowing(data.isFollowing);
         setFollowersCount(data.followersCount);
         setReelsLoading(true);

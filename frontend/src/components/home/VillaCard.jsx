@@ -1,6 +1,6 @@
 import { cloudinarySrcSet, cloudinaryUrl } from "../../utils/optimizeCloudinaryImage";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Heart, MapPin, Share2, Star } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
@@ -8,9 +8,11 @@ import { useWishlist } from "../../context/WishlistContext";
 import shareVilla from "../../utils/shareVilla";
 import { requestLogin } from "../../utils/loginPrompt";
 import "../../styles/room-card.css";
+import { track } from "../../utils/track";
 
 function VillaCard({ villa, distanceKm, onWishlistChange }) {
   const { user } = useAuth();
+  const routeLocation = useLocation();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [sharing, setSharing] = useState(false);
   const ratingValue = villa.averageRating ?? (
@@ -35,6 +37,7 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
         ? await removeFromWishlist(villa._id)
         : await addToWishlist(villa._id);
       if (!updated) return;
+      if (!wishlisted) track("wishlist_add", { listingId: String(villa._id), listingType: "villa", source: "home" });
       if (wishlisted) onWishlistChange?.();
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not update wishlist");
@@ -47,6 +50,7 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
     if (sharing) return;
     setSharing(true);
     try {
+      track("share", { listingId: String(villa._id), listingType: "villa", source: "home" });
       await shareVilla(villa);
     } finally {
       setSharing(false);
@@ -56,7 +60,7 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
   return (
     <article className="room-card rc-air villa-card">
       <div className="room-image-wrapper villa-image-wrapper">
-        <Link className="villa-card-main-link" to={detailPath} aria-label={`View ${villa.name}`}>
+        <Link className="villa-card-main-link" to={detailPath} state={{ analyticsSource: routeLocation.pathname === "/" ? "home" : "search" }} aria-label={`View ${villa.name}`}>
           {villa.images?.[0] ? (
             <img
               className="room-image"
@@ -84,7 +88,7 @@ function VillaCard({ villa, distanceKm, onWishlistChange }) {
       </div>
       <div className="room-content villa-card-info">
         <div className="villa-card-heading">
-          <h3><Link to={detailPath}>{villa.name}</Link></h3>
+          <h3><Link to={detailPath} state={{ analyticsSource: routeLocation.pathname === "/" ? "home" : "search" }}>{villa.name}</Link></h3>
           {hasRating && (
             <span className="villa-card-rating" aria-label={`${rating.toFixed(1)} out of 5`}>
               <Star size={14} fill="currentColor" aria-hidden="true" />

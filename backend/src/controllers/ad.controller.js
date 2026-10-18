@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { z } = require("zod");
 const Ad = require("../models/ad.model");
+const { writeEvent, getDevice } = require("./analyticsEvent.controller");
 
 const httpsUrl = z.string().url().refine((value) => value.startsWith("https://"), {
   message: "URL must use HTTPS",
@@ -51,6 +52,11 @@ const parseOrRespond = (schema, input, res) => {
     return null;
   }
   return parsed.data;
+};
+
+const adClickUrl = (req, id) => {
+  const host = typeof req.get === "function" ? req.get("host") : "roomslider-api.onrender.com";
+  return `${req.protocol || "https"}://${host}/api/ads/${id}/click`;
 };
 
 const getPublicAds = async (req, res) => {
@@ -110,14 +116,55 @@ const getPublicAds = async (req, res) => {
           .sort((a, b) => b.priority - a.priority || a.order - b.order)
           .slice(0, 10)
           .map(({ ad }) => slot === "top"
-            ? { id: ad._id, logo: ad.logoUrl, text: ad.text, url: ad.linkUrl }
-            : { id: ad._id, image: ad.imageUrl, text: ad.text, url: ad.linkUrl }),
+            ? { id: ad._id, logo: ad.logoUrl, text: ad.text, url: adClickUrl(req, ad._id) }
+            : { id: ad._id, image: ad.imageUrl, text: ad.text, url: adClickUrl(req, ad._id) }),
       ])
     );
     return res.status(200).json(selected);
   } catch (error) {
     console.error("GET PUBLIC ADS ERROR:", error);
     return res.status(500).json({ success: false, message: "Failed to fetch ads" });
+  }
+};
+
+const clickAd = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return res.sendStatus(404);
+  if (/bot|crawler|spider|slurp|headless|googlebot|bingbot/i.test(req.get("user-agent") || "")) {
+    return res.sendStatus(404);
+  }
+  try {
+    const ad = await Ad.findById(req.params.id).select("linkUrl").lean();
+    if (!ad) return res.sendStatus(404);
+    const target = new URL(ad.linkUrl);
+    if (!["http:", "https:"].includes(target.protocol)) return res.sendStatus(404);
+    const visitorId = typeof req.query.visitorId === "string"
+      && /^[a-zA-Z0-9-]{16,80}$/.test(req.query.visitorId)
+      ? req.query.visitorId
+      : `guest-${require("crypto").createHash("sha256")
+        .update(`${req.ip || ""}|${req.get("user-agent") || ""}`)
+        .digest("hex").slice(0, 48)}`;
+    try {
+      await writeEvent({
+        event: {
+          type: "ad_click",
+          listingType: "other",
+          listingId: null,
+          adId: ad._id,
+          visitorId,
+          source: "ad",
+          meta: {},
+        },
+        user: req.user,
+        device: getDevice(req.get("user-agent") || ""),
+        listingOwner: null,
+      });
+    } catch (trackingError) {
+      console.error("AD CLICK EVENT ERROR:", trackingError);
+    }
+    return res.redirect(302, target.toString());
+  } catch (error) {
+    console.error("AD CLICK REDIRECT ERROR:", error);
+    return res.sendStatus(404);
   }
 };
 
@@ -209,4 +256,4 @@ const deleteAd = async (req, res) => {
   }
 };
 
-module.exports = { getPublicAds, listAds, createAd, updateAd, toggleAd, deleteAd };
+module.exports = { getPublicAds, clickAd, listAds, createAd, updateAd, toggleAd, deleteAd };

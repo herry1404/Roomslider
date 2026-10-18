@@ -2,9 +2,8 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const User = require("../src/models/user.model");
 const Room = require("../src/models/room.model");
-const SearchEvent = require("../src/models/SearchEvent");
+const AnalyticsEvent = require("../src/models/analyticsEvent.model");
 const PushHistory = require("../src/models/PushHistory");
-const ListingEngagement = require("../src/models/ListingEngagement");
 const { getAnalytics } = require("../src/controllers/admin.controller");
 
 const response = () => ({
@@ -24,9 +23,8 @@ test("admin analytics can report all retained signup and search history", async 
   const originals = {
     userAggregate: User.aggregate,
     roomAggregate: Room.aggregate,
-    searchAggregate: SearchEvent.aggregate,
+    eventAggregate: AnalyticsEvent.aggregate,
     pushCount: PushHistory.countDocuments,
-    listingCount: ListingEngagement.countDocuments,
   };
   const userPipelines = [];
   const searchPipelines = [];
@@ -34,13 +32,15 @@ test("admin analytics can report all retained signup and search history", async 
     userPipelines.push(pipeline);
     return [{ _id: "2026-10-16", count: 2 }];
   };
-  SearchEvent.aggregate = async (pipeline) => {
-    searchPipelines.push(pipeline);
-    return [{ _id: "2026-10-17", count: 3 }];
+  AnalyticsEvent.aggregate = async (pipeline) => {
+    if (pipeline[0].$match.type === "search") {
+      searchPipelines.push(pipeline);
+      return [{ _id: "2026-10-17", count: 3 }];
+    }
+    return [{ count: 0 }];
   };
   Room.aggregate = async () => [];
   PushHistory.countDocuments = async () => 0;
-  ListingEngagement.countDocuments = async () => 0;
 
   try {
     const res = response();
@@ -52,12 +52,11 @@ test("admin analytics can report all retained signup and search history", async 
       { date: "2026-10-17", signups: 0, searches: 3 },
     ]);
     assert.deepEqual(userPipelines[0][0].$match, { role: "user" });
-    assert.deepEqual(searchPipelines[0][0].$match, {});
+    assert.deepEqual(searchPipelines[0][0].$match, { type: "search" });
   } finally {
     User.aggregate = originals.userAggregate;
     Room.aggregate = originals.roomAggregate;
-    SearchEvent.aggregate = originals.searchAggregate;
+    AnalyticsEvent.aggregate = originals.eventAggregate;
     PushHistory.countDocuments = originals.pushCount;
-    ListingEngagement.countDocuments = originals.listingCount;
   }
 });

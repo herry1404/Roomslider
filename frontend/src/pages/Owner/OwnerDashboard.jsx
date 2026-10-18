@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { Home, DoorOpen, DoorClosed, Zap, Wallet, Bell, Wrench, Clapperboard } from "lucide-react";
+import { Home, DoorOpen, DoorClosed, Zap, Wallet, Bell, Wrench, Clapperboard, LineChart } from "lucide-react";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -65,6 +65,13 @@ function OwnerDashboard() {
           >
             <Home size={16} />
             Add Room
+          </button>
+          <button
+            className="owner-btn owner-btn-secondary"
+            onClick={() => navigate("/owner/analytics")}
+          >
+            <LineChart size={16} />
+            Analytics
           </button>
           <button
             className="owner-btn owner-btn-secondary"
@@ -218,7 +225,7 @@ function OwnerDashboard() {
                   <div className="owner-advance-tag">
                     Inquiries: <strong>{room.inquiryCounts?.call || 0}</strong> calls
                     {" · "}<strong>{room.inquiryCounts?.whatsapp || 0}</strong> WhatsApp
-                    {" · "}<strong>{room.inquiryCounts?.chat || 0}</strong> chats
+                    {" · "}<strong>{room.inquiryCounts?.contacts || 0}</strong> contact requests
                   </div>
 
                   {room.currentTenant?.vacateNoticeDate && (

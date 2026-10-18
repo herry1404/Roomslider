@@ -7,6 +7,7 @@ import api from "../../api/axios";
 import { loadRazorpay } from "../../utils/loadRazorpay";
 import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/hourly-detail.css";
+import { track } from "../../utils/track";
 
 function toLocalInputValue(date) {
   const pad = (value) => String(value).padStart(2, "0");
@@ -40,7 +41,10 @@ function HourlyRoomDetail() {
     let active = true;
     api.get(`/hourly-rooms/public/${id}`)
       .then(({ data }) => {
-        if (active) setRoom(data);
+        if (active) {
+          setRoom(data);
+          track("listing_view", { listingId: String(data._id), listingType: "hourly", source: "listing" });
+        }
       })
       .catch((error) => {
         if (!active) return;
@@ -66,7 +70,6 @@ function HourlyRoomDetail() {
       toast.error("End time start time ke baad honi chahiye");
       return;
     }
-
     try {
       setChecking(true);
       setQuote(null);
@@ -102,6 +105,7 @@ function HourlyRoomDetail() {
     }
     if (!quote?.available || submitting) return;
 
+    track("contact_request", { listingId: String(room._id), listingType: "hourly", source: "listing" });
     try {
       setSubmitting(true);
       const data = new FormData();

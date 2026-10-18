@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { requestLogin } from "../../utils/loginPrompt";
 import { lookupPostalCode, reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/vehicles.css";
+import { track } from "../../utils/track";
 
 const formatPrice = (price) => `₹${Number(price || 0).toLocaleString("en-IN")}`;
 const toLocalDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -57,6 +58,7 @@ function VehicleDetail() {
         if (!active) return;
         setVehicle(data);
         setPhotoIndex(0);
+        track("listing_view", { listingId: String(data._id), listingType: "vehicle", source: "listing" });
       })
       .catch((error) => { if (active) toast.error(error.response?.data?.message || "Vehicle nahi mila"); })
       .finally(() => { if (active) setLoading(false); });
@@ -173,6 +175,7 @@ function VehicleDetail() {
       toast.error("Valid pickup aur return dates choose karein");
       return;
     }
+    track("contact_request", { listingId: String(vehicle._id), listingType: "vehicle", source: "listing" });
     const popup = window.open("about:blank", "_blank");
     try {
       setSending(true);

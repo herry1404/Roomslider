@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { idFromParam, roomPath } from "../../utils/roomUrl";
 import api from "../../api/axios";
@@ -22,6 +22,7 @@ import NearbyStays from "../../components/property/NearbyStays";
 import PropertyDetailsSkeleton from "../../components/property/PropertyDetailsSkeleton";
 import shareProperty from "../../utils/shareProperty";
 import { recordRecentlyViewed } from "../../utils/recentlyViewed";
+import { sourceFromLocation, track } from "../../utils/track";
 import SEO, { SITE_URL } from "../../components/SEO";
 import "../../styles/property-details.css";
 
@@ -29,6 +30,7 @@ function PropertyDetails() {
   const { id: rawId } = useParams();
   const id = idFromParam(rawId);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
   const [roomResult, setRoomResult] = useState(null);
@@ -44,7 +46,15 @@ function PropertyDetails() {
         if (active) {
           const loadedRoom = data.room || null;
           setRoomResult({ id, room: loadedRoom });
-          if (loadedRoom?._id) recordRecentlyViewed(loadedRoom._id);
+          if (loadedRoom?._id) {
+            recordRecentlyViewed(loadedRoom._id);
+            const category = String(loadedRoom.category || "Room").toLowerCase();
+            track("listing_view", {
+              listingId: String(loadedRoom._id),
+              listingType: ["room", "pg", "hostel", "flat"].includes(category) ? category : "room",
+              source: sourceFromLocation(location),
+            });
+          }
         }
       })
       .catch((error) => {
@@ -53,7 +63,7 @@ function PropertyDetails() {
         setRoomResult({ id, room: null });
       });
     return () => { active = false; };
-  }, [id]);
+  }, [id, location]);
 
   const toggleWishlist = async () => {
     if (!user) {
@@ -66,7 +76,9 @@ function PropertyDetails() {
         await removeFromWishlist(room._id);
         toast.success("Removed from saved listings");
       } else {
-        await addToWishlist(room._id);
+        const added = await addToWishlist(room._id);
+        if (!added) return;
+        track("wishlist_add", { listingId: String(room._id), listingType: String(room.category || "room").toLowerCase(), source: sourceFromLocation(location) });
         toast.success("Listing saved");
       }
     } catch (error) {
@@ -95,6 +107,12 @@ function PropertyDetails() {
   const showWhatsApp = Boolean(room.hasWhatsAppContact ?? (room.whatsapp || room.contact));
   const loginHref = !user && (room.hasContact || showCall || showWhatsApp) ? "/login" : "";
   const openContact = async (channel) => {
+    const listingPayload = {
+      listingId: String(room._id),
+      listingType: String(room.category || "room").toLowerCase(),
+      source: sourceFromLocation(location),
+    };
+    track(channel === "call" ? "call_click" : "whatsapp_click", listingPayload);
     const whatsappWindow = channel === "whatsapp" ? window.open("about:blank", "_blank") : null;
     if (whatsappWindow) whatsappWindow.opener = null;
     try {
@@ -167,7 +185,10 @@ function PropertyDetails() {
         wishlisted={wishlisted}
         onBack={() => navigate(-1)}
         onSave={toggleWishlist}
-        onShare={() => shareProperty(room)}
+        onShare={() => {
+          track("share", { listingId: String(room._id), listingType: String(room.category || "room").toLowerCase(), source: sourceFromLocation(location) });
+          return shareProperty(room);
+        }}
       />
       <ReportListing roomId={room._id} />
 

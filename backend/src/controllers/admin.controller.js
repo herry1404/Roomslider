@@ -1,9 +1,8 @@
 const User = require("../models/user.model");
 const Room = require("../models/room.model");
 const Owner = require("../models/Owner");
-const SearchEvent = require("../models/SearchEvent");
+const AnalyticsEvent = require("../models/analyticsEvent.model");
 const PushHistory = require("../models/PushHistory");
-const ListingEngagement = require("../models/ListingEngagement");
 
 
 // ===============================
@@ -172,8 +171,8 @@ const getAnalytics = async (req, res) => {
         { $match: { ...activityMatch, role: "user" } },
         { $group: { _id: dateGroup, count: { $sum: 1 } } },
       ]),
-      SearchEvent.aggregate([
-        { $match: activityMatch },
+      AnalyticsEvent.aggregate([
+        { $match: { ...activityMatch, type: "search" } },
         { $group: { _id: dateGroup, count: { $sum: 1 } } },
       ]),
       Room.aggregate([
@@ -186,10 +185,10 @@ const getAnalytics = async (req, res) => {
         { $sort: { count: -1, _id: 1 } },
       ]),
       PushHistory.countDocuments(),
-      ListingEngagement.countDocuments({
-        type: "view",
-        createdAt: { $gte: todayStart, $lt: tomorrowStart },
-      }),
+      AnalyticsEvent.aggregate([
+        { $match: { type: "listing_view", createdAt: { $gte: todayStart, $lt: tomorrowStart } } },
+        { $count: "count" },
+      ]),
     ]);
 
     const signupCounts = new Map(signups.map((item) => [item._id, item.count]));
@@ -222,7 +221,7 @@ const getAnalytics = async (req, res) => {
           count: item.count,
         })),
         pushSentCount,
-        todayViews,
+        todayViews: todayViews[0]?.count || 0,
       },
     });
   } catch (error) {

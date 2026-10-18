@@ -21,6 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 import { requestLogin } from "../../utils/loginPrompt";
 import { reverseGeocodeLocation } from "../../utils/locationAddress";
 import "../../styles/mess.css";
+import { track } from "../../utils/track";
 
 const formatPrice = (amount) => `₹${Number(amount || 0).toLocaleString("en-IN")}`;
 
@@ -62,6 +63,7 @@ function MessDetail() {
         if (!active) return;
         if (messResult.status === "rejected") throw messResult.reason;
         setMess(messResult.value.data);
+        track("listing_view", { listingId: String(messResult.value.data._id), listingType: "mess", source: "listing" });
         setReviews(reviewResult.status === "fulfilled" ? reviewResult.value.data?.reviews || [] : []);
         if (reviewResult.status === "rejected") {
           console.error("MESS REVIEWS LOAD ERROR:", reviewResult.reason);
@@ -165,6 +167,7 @@ function MessDetail() {
       toast.error("Enter a recipient name, valid phone number, and delivery address.");
       return;
     }
+    track("contact_request", { listingId: String(mess._id), listingType: "mess", source: "listing" });
     try {
       setOrdering(true);
       const orderRes = await api.post("/payments/mess/create-order", {
@@ -520,7 +523,7 @@ function MessDetail() {
             ) : (
               <Link className="mess-order-button" to="/login">Log in to order</Link>
             )}
-            <a className="mess-call-button" href={`tel:${mess.phone}`}><Phone size={16} /> Call mess</a>
+            <a className="mess-call-button" href={`tel:${mess.phone}`} onClick={() => track("call_click", { listingId: String(mess._id), listingType: "mess", source: "listing" })}><Phone size={16} /> Call mess</a>
             <p className="mess-payment-note">Your add-ons and total are confirmed before payment.</p>
           </aside>
         </div>

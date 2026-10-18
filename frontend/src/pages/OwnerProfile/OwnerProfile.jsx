@@ -5,6 +5,7 @@ import { BadgeCheck, Home } from "lucide-react";
 import api from "../../api/axios";
 import RoomCard from "../../components/ui/RoomCard";
 import SkeletonDetailCard from "../../components/ui/SkeletonDetailCard";
+import { track } from "../../utils/track";
 
 function OwnerProfile() {
   const { id } = useParams();
@@ -19,6 +20,11 @@ function OwnerProfile() {
       setLoading(true);
       try {
         const profileRes = await api.get(`/owners/public/${id}`);
+        track("owner_profile_view", {
+          listingType: "other",
+          source: "profile",
+          meta: { ownerId: String(profileRes.data.owner._id) },
+        });
         const roomsRes = await api.get("/rooms", {
           params: { owner: profileRes.data.owner._id },
         });

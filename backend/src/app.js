@@ -49,6 +49,7 @@ const telegramWebhookRoutes = require("./routes/telegramWebhook.routes");
 const adRoutes = require("./routes/ad.routes");
 const cafeMenuSearchRoutes = require("./routes/cafeMenuSearch.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
+const trackRoutes = require("./routes/track.routes");
 const rewardsRoutes = require("./routes/rewards.routes");
 
 
@@ -233,6 +234,7 @@ app.use("/api/ads", adRoutes);
 app.use("/api/promo-listings", adRoutes);
 app.use("/api/cafe-menu-search", cafeMenuSearchRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/track", trackRoutes);
 app.use("/api/rewards", rewardsRoutes);
 
 

@@ -5,13 +5,14 @@ import {
   MapPin, Heart, BadgeCheck, Wifi, Snowflake, Bath, Tv, Refrigerator,
   Zap, Camera, Car, Shirt, Utensils, Droplets, BookOpen, Sparkles,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ShareButton from "./ShareButton";
 
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { requestLogin } from "../../utils/loginPrompt";
+import { track } from "../../utils/track";
 
 import "../../styles/room-card.css";
 
@@ -34,6 +35,7 @@ function amenityIcon(amenity) {
 
 function RoomCard({ room, onWishlistChange }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { isWishlisted, addToWishlist, removeFromWishlist } = useWishlist();
 
@@ -56,7 +58,7 @@ function RoomCard({ room, onWishlistChange }) {
 
     const detailsPath = cardPath;
 
-    navigate(detailsPath);
+    navigate(detailsPath, { state: { analyticsSource: location.pathname === "/" ? "home" : location.pathname === "/map" ? "map" : "search" } });
   };
 
   const handleWishlist = async (e) => {
@@ -74,7 +76,9 @@ function RoomCard({ room, onWishlistChange }) {
         await removeFromWishlist(room._id);
         toast.success("Wishlist se hata diya");
       } else {
-        await addToWishlist(room._id);
+        const added = await addToWishlist(room._id);
+        if (!added) return;
+        track("wishlist_add", { listingId: String(room._id), listingType: String(room.category || "room").toLowerCase(), source: location.pathname === "/" ? "home" : location.pathname === "/map" ? "map" : "search" });
         toast.success("Wishlist mein add ho gaya ❤️");
 
         // trigger sparkle burst animation
@@ -149,6 +153,7 @@ function RoomCard({ room, onWishlistChange }) {
         <h3>
           <Link
             to={cardPath}
+            state={{ analyticsSource: location.pathname === "/" ? "home" : location.pathname === "/map" ? "map" : "search" }}
             onClick={(e) => e.stopPropagation()}
             style={{ color: "inherit", textDecoration: "none" }}
           >

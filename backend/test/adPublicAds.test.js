@@ -39,7 +39,11 @@ test("public cafe ads include specific and general matches with the most specifi
     json(payload) { this.payload = payload; return this; },
   };
   try {
-    await getPublicAds({ query: { cafe: "wowpav", location: "bhawarkua" } }, response);
+    await getPublicAds({
+      query: { cafe: "wowpav", location: "bhawarkua" },
+      protocol: "https",
+      get: () => "api.example.com",
+    }, response);
   } finally {
     Ad.find = originalFind;
   }
@@ -54,4 +58,5 @@ test("public cafe ads include specific and general matches with the most specifi
     "all-top",
   ]);
   assert.deepEqual(response.payload.bottom.map((ad) => ad.id), ["location-bottom"]);
+  assert.equal(response.payload.top[0].url, "https://api.example.com/api/ads/cafe-0/click");
 });

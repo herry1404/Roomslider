@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const Owner = require("../models/Owner");
 const Follow = require("../models/Follow");
 const Room = require("../models/room.model");
-const ListingEngagement = require("../models/ListingEngagement");
+const AnalyticsEvent = require("../models/analyticsEvent.model");
 const { createUniqueSlug } = require("../utils/publicSlug");
 const { notifyAdmin } = require("../services/adminAlert.service");
 const { ownerUpdateSchema } = require("../validators/owner.validator");
@@ -223,23 +223,26 @@ const getMyRooms = async (req, res) => {
     const rooms = await Room.find({ owner: owner._id });
     const roomIds = rooms.map((room) => room._id);
     const engagementRows = roomIds.length
-      ? await ListingEngagement.aggregate([
-          { $match: { room: { $in: roomIds }, type: { $ne: "view" } } },
-          { $group: { _id: { room: "$room", type: "$type" }, count: { $sum: 1 } } },
+      ? await AnalyticsEvent.aggregate([
+          { $match: { owner: owner._id, listingId: { $in: roomIds }, listingType: { $in: ["room", "pg", "hostel", "flat"] } } },
+          {
+            $group: {
+              _id: "$listingId",
+              views: { $sum: { $cond: [{ $eq: ["$type", "listing_view"] }, 1, 0] } },
+              calls: { $sum: { $cond: [{ $eq: ["$type", "call_click"] }, 1, 0] } },
+              whatsapp: { $sum: { $cond: [{ $eq: ["$type", "whatsapp_click"] }, 1, 0] } },
+              contacts: { $sum: { $cond: [{ $eq: ["$type", "contact_request"] }, 1, 0] } },
+            },
+          },
         ])
       : [];
-    const inquiryCounts = new Map();
-    engagementRows.forEach((row) => {
-      const key = String(row._id.room);
-      const counts = inquiryCounts.get(key) || { call: 0, whatsapp: 0, chat: 0 };
-      counts[row._id.type] = row.count;
-      inquiryCounts.set(key, counts);
-    });
+    const engagementByRoom = new Map(engagementRows.map((row) => [String(row._id), row]));
 
     const roomsWithStatus = rooms.map((room) => {
       const roomObj = room.toObject();
-      const counts = inquiryCounts.get(String(room._id)) || { call: 0, whatsapp: 0, chat: 0 };
-      roomObj.inquiryCounts = counts;
+      const counts = engagementByRoom.get(String(room._id)) || { views: 0, calls: 0, whatsapp: 0, contacts: 0 };
+      roomObj.views = counts.views;
+      roomObj.inquiryCounts = { call: counts.calls, whatsapp: counts.whatsapp, contacts: counts.contacts };
       if (room.status === "occupied") {
         roomObj.liveRentStatus = computeRentStatus(room.currentTenant?.nextDueDate);
       }

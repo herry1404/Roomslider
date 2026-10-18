@@ -1,0 +1,28 @@
+.owner-analytics-page{max-width:1180px;margin:0 auto;padding:28px 20px 56px;color:#17211b}
+.owner-analytics-header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px}
+.owner-analytics-header a{color:#15803d;text-decoration:none;font-size:13px;font-weight:700}
+.owner-analytics-header h1{margin:8px 0 4px;font-size:28px}
+.owner-analytics-header p{margin:0;color:#64748b}
+.owner-analytics-header label{display:flex;align-items:center;gap:8px;font-size:13px}
+.owner-analytics-header select{padding:9px 12px;border:1px solid #cbd5e1;border-radius:9px;background:white}
+.owner-analytics-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px;margin-bottom:18px}
+.owner-analytics-stats article,.owner-analytics-panel,.owner-analytics-loading{border:1px solid #e2e8f0;border-radius:14px;background:#fff;box-shadow:0 4px 18px #0f172a08}
+.owner-analytics-stats article{padding:16px}
+.owner-analytics-stats span{display:block;color:#64748b;font-size:12px}
+.owner-analytics-stats strong{display:block;margin-top:7px;color:#16a34a;font-size:24px}
+.owner-analytics-panel{padding:18px;margin-top:16px}
+.owner-analytics-panel h2{margin:0 0 14px;font-size:17px}
+.owner-analytics-chart{height:280px}
+.owner-analytics-table-wrap{overflow:auto}
+.owner-analytics-panel table{width:100%;border-collapse:collapse;min-width:520px;font-size:13px}
+.owner-analytics-panel th,.owner-analytics-panel td{padding:11px 9px;text-align:left;border-bottom:1px solid #e2e8f0}
+.owner-analytics-panel th{color:#64748b;font-weight:700}
+.owner-analytics-empty{padding:24px;color:#64748b}
+.owner-analytics-loading{padding:20px;color:#64748b}
+.owner-analytics-skeleton-grid{display:grid;grid-template-columns:repeat(5,minmax(100px,1fr));gap:12px;margin:14px 0}
+.owner-analytics-skeleton-grid i,.owner-analytics-skeleton-chart{display:block;border-radius:10px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:owner-analytics-shimmer 1.4s infinite}
+.owner-analytics-skeleton-grid i{height:74px}
+.owner-analytics-skeleton-chart{height:260px}
+@keyframes owner-analytics-shimmer{to{background-position:-200% 0}}
+.owner-analytics-error{padding:14px;border-radius:10px;background:#fef2f2;color:#b91c1c}
+@media(max-width:600px){.owner-analytics-header{align-items:flex-start;flex-direction:column}.owner-analytics-chart{height:240px}.owner-analytics-skeleton-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

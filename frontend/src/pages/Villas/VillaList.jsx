@@ -7,6 +7,7 @@ import VillaCard from "../../components/home/VillaCard";
 import SEO from "../../components/SEO";
 import { distanceKm, findIndorePlace, normalizePlaceName } from "../../utils/indoreLocation";
 import "../../styles/villas.css";
+import { track } from "../../utils/track";
 
 const VILLA_NEARBY_RADIUS_KM = 10;
 
@@ -110,6 +111,7 @@ function VillaList() {
   const submitSearch = (event) => {
     event.preventDefault();
     const value = searchInput.trim();
+    track("search", { source: "search", meta: { query: value, listingType: "villa" } });
     setSearchParams(value ? { search: value } : {});
   };
 

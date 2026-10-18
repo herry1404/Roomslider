@@ -1,11 +1,15 @@
 import { Share2 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import shareProperty from "../../utils/shareProperty";
 import "../../styles/share-button.css";
+import { sourceFromLocation, track } from "../../utils/track";
 
 function ShareButton({ room, variant = "card" }) {
+  const location = useLocation();
   const handleShare = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    track("share", { listingId: String(room._id), listingType: String(room.category || "room").toLowerCase(), source: sourceFromLocation(location) });
     await shareProperty(room);
   };
 

@@ -72,6 +72,7 @@ const HourlyManagerLogin = lazy(() => import("./pages/HourlyManager/HourlyManage
 const HourlyManagerDashboard = lazy(() => import("./pages/HourlyManager/HourlyManagerDashboard"));
 const HourlyRoomCheckout = lazy(() => import("./pages/Rooms/HourlyRoomCheckout"));
 const OwnerDashboard = lazy(() => import("./pages/Owner/OwnerDashboard"));
+const OwnerAnalytics = lazy(() => import("./pages/Owner/OwnerAnalytics"));
 const OwnerAddRoom = lazy(() => import("./pages/Owner/OwnerAddRoom"));
 const OwnerRoomDetail = lazy(() => import("./pages/Owner/OwnerRoomDetail"));
 const OwnerElectricity = lazy(() => import("./pages/Owner/OwnerElectricity"));
@@ -105,7 +106,7 @@ const BloodRequestForm = lazy(() => import("./pages/Blood/BloodRequestForm"));
 const BloodRequestDetail = lazy(() => import("./pages/Blood/BloodRequestDetail"));
 const ManageBloodRequests = lazy(() => import("./pages/Admin/ManageBloodRequests"));
 const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateReports"));
-const AdminAnalytics = lazy(() => import("./pages/Admin/AdminAnalytics"));
+const AdminAnalytics = lazy(() => import("./pages/Admin/EventAnalytics"));
 const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
 const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
 const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
@@ -250,6 +251,7 @@ function App() {
         <Route path="/hourly-rooms/:id/book" element={<HourlyRoomCheckout />} />
         <Route path="/hourly-bookings/:id/receipt" element={<HourlyBookingReceipt />} />
         <Route path="/owner/dashboard" element={<OwnerRoute><OwnerDashboard /></OwnerRoute>} />
+        <Route path="/owner/analytics" element={<OwnerRoute><OwnerAnalytics /></OwnerRoute>} />
         <Route path="/owner/reels" element={<OwnerRoute><OwnerReels /></OwnerRoute>} />
         <Route path="/owner/rooms/add" element={<OwnerRoute><OwnerAddRoom /></OwnerRoute>} />
         <Route path="/owner/rooms/:id" element={<OwnerRoute><OwnerRoomDetail /></OwnerRoute>} />

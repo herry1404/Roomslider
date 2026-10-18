@@ -9,6 +9,7 @@ import ShareButton from "../ui/ShareButton";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { requestLogin } from "../../utils/loginPrompt";
+import { track } from "../../utils/track";
 
 function CategorySection({ title, viewAllPath, rooms, priority = false }) {
   const navigate = useNavigate();
@@ -34,7 +35,10 @@ function CategorySection({ title, viewAllPath, rooms, priority = false }) {
         await removeFromWishlist(roomId);
         toast.success("Removed from wishlist");
       } else {
-        await addToWishlist(roomId);
+        const added = await addToWishlist(roomId);
+        if (!added) return;
+        const room = rooms.find((item) => String(item._id) === String(roomId));
+        track("wishlist_add", { listingId: String(roomId), listingType: String(room?.category || "room").toLowerCase(), source: "home" });
         toast.success("Added to wishlist ❤️");
       }
     } catch (error) {
