@@ -120,8 +120,9 @@ const trackEvent = async (req, res) => {
 };
 
 const getRange = (value) => {
-  const days = Number(value || 7);
-  if (![7, 30, 90].includes(days)) return null;
+  const parsedRange = String(value || "7").match(/^(7|30|90)d?$/i);
+  if (!parsedRange) return null;
+  const days = Number(parsedRange[1]);
   const end = new Date();
   return { days, end, start: new Date(end.getTime() - days * 86400000) };
 };
@@ -255,4 +256,4 @@ const getAdminAnalytics = async (req, res) => {
   }
 };
 
-module.exports = { trackEvent, getOwnerAnalytics, getAdminAnalytics, writeEvent, getDevice };
+module.exports = { trackEvent, getOwnerAnalytics, getAdminAnalytics, writeEvent, getDevice, getRange };
