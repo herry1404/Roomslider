@@ -2,7 +2,7 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 const { trackPageView, trackPageDuration } = require("../controllers/siteAnalytics.controller");
 const { getOwnerAnalytics, getAdminAnalytics } = require("../controllers/analyticsEvent.controller");
-const { track, getLive, getOverview, getCafeAnalytics } = require("../controllers/analytics.controller");
+const { track, getLive, getOverview, getCafeAnalytics, getDirectMenuAnalytics } = require("../controllers/analytics.controller");
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
 
@@ -25,6 +25,7 @@ const eventTrackerLimiter = rateLimit({
 router.post("/track", eventTrackerLimiter, express.text({ type: "text/plain", limit: "8kb" }), require("../middleware/auth.middleware").optionalAuth, track);
 router.get("/live", protect, adminOnly, getLive);
 router.get("/admin/overview", protect, adminOnly, getOverview);
+router.get("/menus/overview", protect, adminOnly, getDirectMenuAnalytics);
 router.get("/owner/overview", protect, (req, res, next) => {
   if (req.user?.role !== "owner") {
     return res.status(403).json({ success: false, message: "Owner access required" });

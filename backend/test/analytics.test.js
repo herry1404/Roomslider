@@ -13,6 +13,7 @@ const analyticsRoutes = require("../src/routes/analytics.routes");
 const {
   track,
   getOverview,
+  getDirectMenuAnalytics,
   getDateRange,
   getIndiaDayStart,
   saveEvent,
@@ -137,6 +138,42 @@ test("date ranges reject malformed, reversed, and longer-than-366-day intervals"
   assert.equal(getDateRange({ from: "2026-02-30", to: "2026-03-01" }), null);
   assert.equal(getDateRange({ from: "2026-03-01", to: "2026-02-28" }), null);
   assert.equal(getDateRange({ from: "2025-01-01", to: "2026-01-02" }), null);
+});
+
+test("direct menu analytics only reports direct cafe menu scans by cafe and location", async () => {
+  const originalAggregate = AnalyticsEvent.aggregate;
+  let pipeline;
+  AnalyticsEvent.aggregate = async (value) => {
+    pipeline = value;
+    return [{
+      totals: [{ views: 4 }],
+      daily: [{ date: "2026-10-19", views: 4 }],
+      cafes: [{ _id: "waffleo", views: 3 }, { _id: "htlcafe", views: 1 }],
+      locations: [{ _id: "Bhawarkua", views: 3 }, { _id: "Indrapuri", views: 1 }],
+      cafeLocations: [{ _id: { cafeId: "waffleo", location: "Bhawarkua" }, views: 3 }],
+    }];
+  };
+  try {
+    const res = response();
+    await getDirectMenuAnalytics({ query: { range: "7d" } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(pipeline[0].$match, {
+      createdAt: pipeline[0].$match.createdAt,
+      type: "menu_scan",
+      entityType: "cafe",
+      source: "direct",
+    });
+    assert.equal(res.body.analytics.totals.views, 4);
+    assert.equal(res.body.analytics.cafes[0].cafeId, "waffleo");
+    assert.equal(res.body.analytics.locations[0].location, "Bhawarkua");
+    assert.deepEqual(res.body.analytics.cafeLocations[0], {
+      cafeId: "waffleo",
+      location: "Bhawarkua",
+      views: 3,
+    });
+  } finally {
+    AnalyticsEvent.aggregate = originalAggregate;
+  }
 });
 
 test("owner overview constrains every aggregation to the authenticated owner", async () => {

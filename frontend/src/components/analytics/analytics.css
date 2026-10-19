@@ -4,6 +4,43 @@
   overflow-x: hidden;
 }
 
+.analytics-menu-table-card {
+  min-width: 0;
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.analytics-menu-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.analytics-menu-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--admin-text);
+  font-size: 13px;
+}
+
+.analytics-menu-table th,
+.analytics-menu-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--admin-border);
+  text-align: left;
+}
+
+.analytics-menu-table th {
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.analytics-menu-table td:last-child,
+.analytics-menu-table th:last-child {
+  text-align: right;
+}
+
 .analytics-dashboard .admin-page-header {
   margin-bottom: 20px;
 }

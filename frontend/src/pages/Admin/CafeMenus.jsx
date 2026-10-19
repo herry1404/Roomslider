@@ -12,6 +12,7 @@ export default function CafeMenus() {
           <span className="cafe-menus-eyebrow"><Utensils size={15} /> CAFE DIRECTORY</span>
           <h1>Cafe Menus</h1>
           <p>All public cafe menus and their locations in one place.</p>
+          <Link className="admin-btn" to="/admin/analytics/menus">Direct menu analytics</Link>
         </div>
       </header>
 

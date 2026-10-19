@@ -485,11 +485,83 @@ const getCafeAnalytics = async (req, res) => {
   }
 };
 
+const getDirectMenuAnalytics = async (req, res) => {
+  const range = getRangeOr400(req, res);
+  if (!range) return;
+  const match = {
+    ...baseMatch(range),
+    type: "menu_scan",
+    entityType: "cafe",
+    source: "direct",
+  };
+  try {
+    const [report] = await AnalyticsEvent.aggregate([
+      { $match: match },
+      { $facet: {
+        totals: [{ $count: "views" }],
+        daily: [
+          { $group: { _id: dateGroup, views: { $sum: 1 } } },
+          { $project: { _id: 0, date: "$_id", views: 1 } },
+          { $sort: { date: 1 } },
+        ],
+        cafes: [
+          { $group: { _id: "$entityId", views: { $sum: 1 } } },
+          { $sort: { views: -1, _id: 1 } },
+        ],
+        locations: [
+          { $group: { _id: { $ifNull: ["$area", ""] }, views: { $sum: 1 } } },
+          { $sort: { views: -1, _id: 1 } },
+        ],
+        cafeLocations: [
+          { $group: { _id: { cafeId: "$entityId", location: { $ifNull: ["$area", ""] } }, views: { $sum: 1 } } },
+          { $sort: { views: -1, "_id.cafeId": 1, "_id.location": 1 } },
+        ],
+      } },
+    ]);
+    const totals = { views: report?.totals?.[0]?.views || 0 };
+    const response = {
+      success: true,
+      analytics: {
+        range: range.from ? { from: range.from, to: range.to } : `${range.days}d`,
+        totals,
+        daily: fillDailyRows(report?.daily || [], range, ["views"]),
+        cafes: (report?.cafes || []).map((row) => ({ cafeId: row._id || "", views: row.views })),
+        locations: (report?.locations || []).map((row) => ({ location: row._id || "Unknown", views: row.views })),
+        cafeLocations: (report?.cafeLocations || []).map((row) => ({
+          cafeId: row._id.cafeId || "",
+          location: row._id.location || "Unknown",
+          views: row.views,
+        })),
+      },
+    };
+    if (req.query.compare === "1") {
+      const previous = previousRange(range);
+      const previousTotals = await countTotals({
+        ...match,
+        createdAt: { $gte: previous.start, $lte: previous.end },
+      });
+      response.comparison = {
+        totals: { views: previousTotals.scans },
+        growth: {
+          views: previousTotals.scans
+            ? ((totals.views - previousTotals.scans) / previousTotals.scans) * 100
+            : null,
+        },
+      };
+    }
+    return res.json(response);
+  } catch (error) {
+    console.error("DIRECT MENU ANALYTICS ERROR:", error);
+    return res.status(500).json({ success: false, message: "Failed to load direct menu analytics" });
+  }
+};
+
 module.exports = {
   track,
   getLive,
   getOverview,
   getCafeAnalytics,
+  getDirectMenuAnalytics,
   getDateRange,
   getIndiaDayStart,
   saveEvent,

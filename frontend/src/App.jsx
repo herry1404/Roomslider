@@ -108,6 +108,7 @@ const ManageBloodRequests = lazy(() => import("./pages/Admin/ManageBloodRequests
 const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateReports"));
 const AdminAnalytics = lazy(() => import("./pages/Admin/AnalyticsDashboard"));
 const CafeAnalytics = lazy(() => import("./pages/Admin/CafeAnalytics"));
+const MenuAnalytics = lazy(() => import("./pages/Admin/MenuAnalytics"));
 const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
 const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
 const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
@@ -265,6 +266,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/cafe-menus" element={<AdminRoute><CafeMenus /></AdminRoute>} />
+        <Route path="/admin/analytics/menus" element={<AdminRoute><MenuAnalytics /></AdminRoute>} />
         <Route path="/admin/analytics/cafe/:cafeId" element={<AdminRoute><CafeAnalytics /></AdminRoute>} />
         <Route path="/admin/reward-catalog" element={<AdminRoute><ManageRewardCatalog /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />

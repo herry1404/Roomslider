@@ -101,6 +101,7 @@ function Sidebar({ open, closeSidebar }) {
       label: "System",
       items: [
         { title: "Analytics", icon: <LineChart size={18} />, path: "/admin/analytics" },
+        { title: "Menu Analytics", icon: <UtensilsCrossed size={18} />, path: "/admin/analytics/menus" },
         { title: "Settings", icon: <Settings size={18} />, path: "/admin/settings" },
       ],
     },
@@ -147,6 +148,7 @@ function Sidebar({ open, closeSidebar }) {
                 <NavLink
                   key={item.title}
                   to={item.path}
+                  end={item.path === "/admin/analytics"}
                   onClick={closeSidebar}
                   className={({ isActive }) => {
                     const hashMatches = !item.activeHash || location.hash === item.activeHash;
