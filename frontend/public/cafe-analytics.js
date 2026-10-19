@@ -34,6 +34,45 @@
   }
   var querySource = [params.get("utm_source"), params.get("utm_campaign")].filter(Boolean).join(" / ");
   var source = (querySource || (referrer && referrer.indexOf("roomslider.in") === -1 ? referrer : "Direct")).slice(0, 100);
+  var sessionId;
+  try {
+    sessionId = localStorage.getItem("roomsliderAnalyticsSessionId");
+    if (!sessionId) {
+      sessionId = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+      localStorage.setItem("roomsliderAnalyticsSessionId", sessionId);
+    }
+  } catch {
+    sessionId = visitorId;
+  }
+
+  function trackAnalytics(type, itemName) {
+    var inferredSource = params.get("src") === "qr" ? "qr"
+      : /google/i.test(querySource + " " + referrer) ? "google"
+        : /instagram/i.test(querySource + " " + referrer) ? "instagram"
+          : /whatsapp|wa\.me/i.test(querySource + " " + referrer) ? "whatsapp"
+            : "direct";
+    var event = JSON.stringify({
+      type: type,
+      entityType: "cafe",
+      entityId: cafe,
+      sessionId: sessionId,
+      device: window.matchMedia("(max-width: 767px)").matches ? "mobile" : "desktop",
+      source: inferredSource,
+      area: location,
+      searchQuery: itemName || ""
+    });
+    var endpoint = "https://roomslider-api.onrender.com/api/analytics/track";
+    if (navigator.sendBeacon && navigator.sendBeacon(endpoint, new Blob([event], { type: "text/plain;charset=UTF-8" }))) return;
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      body: event,
+      keepalive: true,
+      credentials: "omit"
+    }).catch(function () {});
+  }
 
   function track(type, adId) {
     var event = { type: type, cafe: cafe, location: location, visitorId: visitorId, source: source, platform: platform };
@@ -65,6 +104,14 @@
   }).catch(function () {});
 
   track("menu_view");
+  trackAnalytics("menu_scan");
+  document.addEventListener("click", function (event) {
+    var target = event.target;
+    var item = target instanceof Element ? target.closest(".cafe-menu li, .it") : null;
+    if (!item) return;
+    var name = item.querySelector(".name, .n")?.textContent || item.dataset.n || item.textContent;
+    trackAnalytics("menu_item_view", String(name || "").trim().slice(0, 200));
+  });
   var impressionsSent = Object.create(null);
 
   var observedAds = new WeakSet();

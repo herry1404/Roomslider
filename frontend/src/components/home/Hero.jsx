@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Search, ShieldCheck, Camera, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { track } from "../../utils/track";
 
 const popularAreas = [
   "Vijay Nagar",
@@ -18,7 +17,6 @@ function Hero() {
 
   const goSearch = (value) => {
     const v = (value || "").trim();
-    track("search", { source: "home", meta: { query: v } });
     navigate(v ? `/rooms?search=${encodeURIComponent(v)}` : "/rooms");
   };
 

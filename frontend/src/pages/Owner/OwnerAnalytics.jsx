@@ -1,75 +1,104 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../../api/axios";
-import "../../styles/owner/analytics.css";
+import FilterBar from "../../components/analytics/FilterBar";
+import RankList from "../../components/analytics/RankList";
+import StatCard from "../../components/analytics/StatCard";
+import TrendChart from "../../components/analytics/TrendChart";
+import "../../styles/admin/theme.css";
+import "../../components/analytics/analytics.css";
 
-const ranges = ["7d", "30d", "90d"];
+const readFilters = (params) => ({
+  range: params.get("from") && params.get("to") ? "custom" : params.get("range") || "7d",
+  from: params.get("from") || "",
+  to: params.get("to") || "",
+  category: params.get("category") || "",
+  area: params.get("area") || "",
+  compare: params.get("compare") === "1",
+});
 
 function OwnerAnalytics() {
-  const [range, setRange] = useState("7d");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filters = useMemo(() => readFilters(searchParams), [searchParams]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const changeFilters = useCallback((changes) => {
+    const next = new URLSearchParams(searchParams);
+    for (const [key, value] of Object.entries(changes)) {
+      if (key === "range" && value) {
+        next.set(key, value);
+        next.delete("from");
+        next.delete("to");
+      } else if (key === "range") next.delete(key);
+      else if ((key === "from" || key === "to") && value) {
+        next.set(key, value);
+        next.delete("range");
+      } else if (key === "compare") {
+        if (value) next.set(key, "1");
+        else next.delete(key);
+      } else if (value) next.set(key, value);
+      else next.delete(key);
+    }
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError("");
-    api.get("/analytics/owner", { params: { range } })
+    const params = new URLSearchParams();
+    if (filters.from && filters.to) {
+      params.set("from", filters.from);
+      params.set("to", filters.to);
+    } else params.set("range", filters.range === "live" ? "today" : filters.range);
+    if (filters.category) params.set("category", filters.category);
+    if (filters.area) params.set("area", filters.area);
+    if (filters.compare) params.set("compare", "1");
+    api.get(`/analytics/owner/overview?${params}`)
       .then(({ data }) => { if (active) setAnalytics(data.analytics); })
       .catch((requestError) => { if (active) setError(requestError.response?.data?.message || "Analytics could not be loaded."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [range]);
+  }, [filters]);
 
   const totals = analytics?.totals || {};
-  return (
-    <main className="owner-analytics-page">
-      <header className="owner-analytics-header">
-        <div><Link to="/owner/dashboard">← Dashboard</Link><h1>Analytics</h1><p>Listing activity recorded by RoomSlider.</p></div>
-        <label>Range <select value={range} onChange={(event) => setRange(event.target.value)}>{ranges.map((item) => <option key={item}>{item}</option>)}</select></label>
-      </header>
-      {loading ? <div className="owner-analytics-loading" role="status"><span>Loading your analytics…</span><div className="owner-analytics-skeleton-grid">{Array.from({ length: 5 }, (_, index) => <i key={index} />)}</div><div className="owner-analytics-skeleton-chart" />
-      </div>
-        : error ? <p className="owner-analytics-error" role="alert">{error}</p>
-          : <>
-            <section className="owner-analytics-stats">
-              {[["Views", totals.views], ["Unique visitors", totals.uniqueVisitors], ["Calls", totals.calls], ["WhatsApp", totals.whatsapp], ["Contact requests", totals.contacts], ["Wishlist adds", totals.wishlistAdds], ["Conversion", `${Number(totals.conversion || 0).toFixed(1)}%`]].map(([label, value]) => <article key={label}><span>{label}</span><strong>{value ?? 0}</strong></article>)}
-            </section>
-            {!analytics?.totals?.views && <p className="owner-analytics-empty">No listing activity yet for this range.</p>}
-            <section className="owner-analytics-panel">
-              <h2>Daily views and contacts</h2>
-              <div className="owner-analytics-chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analytics?.daily || []} margin={{ top: 8, right: 10, left: -18, bottom: 0 }}>
-                    <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="views" stroke="#16a34a" strokeWidth={3} dot={false} />
-                    <Line type="monotone" dataKey="contacts" stroke="#0f766e" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </section>
-            <section className="owner-analytics-panel">
-              <h2>Per-room performance</h2>
-              <div className="owner-analytics-table-wrap"><table><thead><tr><th>Room</th><th>Views</th><th>Contacts</th><th>Conversion</th></tr></thead><tbody>
-                {(analytics?.rooms || []).map((room) => <tr key={room.id}><td>{room.title || "Listing"}</td><td>{room.views}</td><td>{room.contacts}</td><td>{Number(room.conversion || 0).toFixed(1)}%</td></tr>)}
-                {!analytics?.rooms?.length && <tr><td colSpan="4">No room activity for this range.</td></tr>}
-              </tbody></table></div>
-            </section>
-            <section className="owner-analytics-panel">
-              <h2>Recent contacts</h2>
-              <div className="owner-analytics-table-wrap"><table><thead><tr><th>Time</th><th>Room</th><th>Action</th><th>Visitor</th><th>Phone</th></tr></thead><tbody>
-                {(analytics?.contacts || []).map((contact) => <tr key={contact._id}><td>{new Date(contact.createdAt).toLocaleString()}</td><td>{contact.room || "Listing"}</td><td>{contact.actionType.replaceAll("_", " ")}</td><td>{contact.userName}</td><td>{contact.userPhone || "—"}</td></tr>)}
-                {!analytics?.contacts?.length && <tr><td colSpan="5">No contacts recorded yet.</td></tr>}
-              </tbody></table></div>
-            </section>
-          </>}
-    </main>
-  );
+  const daily = analytics?.daily || [];
+  return <main className="admin-page analytics-dashboard owner-analytics-dashboard">
+    <header className="admin-page-header">
+      <div><Link to="/owner/dashboard" className="analytics-back-link">← Dashboard</Link><span className="admin-analytics-eyebrow">YOUR LISTINGS</span><h1>Analytics</h1><p>Views and contacts for your rooms only.</p></div>
+    </header>
+    <FilterBar filters={filters} onChange={changeFilters} />
+    {error && <div className="analytics-error" role="alert">{error}</div>}
+    {loading ? <AnalyticsSkeleton /> : analytics && <>
+      <section className="admin-stats-grid analytics-stat-grid">
+        <StatCard label="Views" value={totals.views} growth={analytics.comparison?.growth?.views} sparkline={daily.map((row) => ({ value: row.views }))} />
+        <StatCard label="Calls" value={totals.calls} growth={analytics.comparison?.growth?.calls} sparkline={daily.map((row) => ({ value: row.calls }))} />
+        <StatCard label="WhatsApp" value={totals.whatsapp} growth={analytics.comparison?.growth?.whatsapp} sparkline={daily.map((row) => ({ value: row.whatsapp }))} />
+        <StatCard label="Wishlist" value={totals.wishlist} growth={analytics.comparison?.growth?.wishlist} sparkline={daily.map((row) => ({ value: row.wishlist }))} />
+        <StatCard label="Conversion" value={totals.conversion} suffix="%" />
+      </section>
+      <section className="analytics-dashboard-section">
+        <TrendChart data={daily} title="Daily listing activity" />
+      </section>
+      <section className="admin-analytics-grid analytics-main-grid">
+        <article className="admin-analytics-card analytics-room-table">
+          <header className="analytics-card-header"><h2>Per-room performance</h2></header>
+          {analytics.topListings?.length ? <div className="admin-analytics-table-wrap"><table className="admin-analytics-table">
+            <thead><tr><th>Room</th><th>Views</th><th>Calls</th><th>WhatsApp</th><th>Contacts</th><th>Conversion</th></tr></thead>
+            <tbody>{analytics.topListings.map((room) => <tr key={`${room.entityType}-${room.entityId}`}><td>{room.title}</td><td>{room.views}</td><td>{room.calls}</td><td>{room.whatsapp}</td><td>{room.contacts}</td><td>{Number(room.conversion || 0).toFixed(1)}%</td></tr>)}</tbody>
+          </table></div> : <div className="admin-empty"><h3>No room activity yet</h3><p>Your listing performance appears when visitors view your rooms.</p></div>}
+        </article>
+        <RankList title="Views hain par contact nahi" rows={analytics.noContactListings} valueKey="views" emptyMessage="Every viewed room received a call or WhatsApp contact." />
+      </section>
+    </>}
+  </main>;
+}
+
+function AnalyticsSkeleton() {
+  return <div className="analytics-skeleton" role="status" aria-label="Loading analytics">
+    <div className="admin-stats-grid analytics-stat-grid">{Array.from({ length: 5 }, (_, index) => <span className="skeleton shimmer analytics-skeleton-card" key={index} />)}</div>
+    <span className="skeleton shimmer analytics-skeleton-chart" />
+  </div>;
 }
 
 export default OwnerAnalytics;

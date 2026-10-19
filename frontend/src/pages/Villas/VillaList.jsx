@@ -24,14 +24,20 @@ function VillaList() {
   useEffect(() => {
     let active = true;
     const show = (items, nearbyItems = [], placeName = "", nearestFallback = false) => {
-      if (active) setResult({
-        search,
-        villas: items,
-        nearbyVillas: nearbyItems,
-        nearby: !items.length && nearbyItems.length > 0,
-        placeName,
-        nearestFallback,
-      });
+      if (active) {
+        if (search) track("search", {
+          source: "search",
+          meta: { query: search, resultCount: items.length, area: placeName },
+        });
+        setResult({
+          search,
+          villas: items,
+          nearbyVillas: nearbyItems,
+          nearby: !items.length && nearbyItems.length > 0,
+          placeName,
+          nearestFallback,
+        });
+      }
     };
     const load = async (coordinates = null, place = null, unmatchedSearch = "") => {
       try {
@@ -111,7 +117,6 @@ function VillaList() {
   const submitSearch = (event) => {
     event.preventDefault();
     const value = searchInput.trim();
-    track("search", { source: "search", meta: { query: value, listingType: "villa" } });
     setSearchParams(value ? { search: value } : {});
   };
 

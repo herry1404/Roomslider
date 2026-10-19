@@ -1,4 +1,5 @@
 import { ExternalLink, MapPin, Utensils } from "lucide-react";
+import { Link } from "react-router-dom";
 import cafes from "../../data/cafes";
 import "../../styles/admin/theme.css";
 import "../../styles/admin/cafe-menus.css";
@@ -23,6 +24,7 @@ export default function CafeMenus() {
                 <th scope="col">Location</th>
                 <th scope="col">Address</th>
                 <th scope="col">Menu</th>
+                <th scope="col">Analytics</th>
               </tr>
             </thead>
             <tbody>
@@ -36,6 +38,7 @@ export default function CafeMenus() {
                       Open menu <ExternalLink size={14} />
                     </a>
                   </td>
+                  <td data-label="Analytics"><Link to={`/admin/analytics/cafe/${encodeURIComponent(cafe.id)}`}>View analytics</Link></td>
                 </tr>
               ))}
             </tbody>

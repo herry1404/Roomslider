@@ -52,7 +52,6 @@ function Sidebar({ open, closeSidebar }) {
         { title: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
         { title: "Cafe Ads", icon: <Megaphone size={18} />, path: "/admin/ads" },
         { title: "Reward Catalog", icon: <Sparkles size={18} />, path: "/admin/reward-catalog" },
-        { title: "Analytics", icon: <LineChart size={18} />, path: "/admin/analytics" },
         { title: "Notifications", icon: <Megaphone size={18} />, path: "/admin/notifications" },
         { title: "Manage Rooms", icon: <Building2 size={18} />, path: "/admin/rooms" },
         { title: "Add Room", icon: <HousePlus size={18} />, path: "/admin/rooms/add" },
@@ -101,6 +100,7 @@ function Sidebar({ open, closeSidebar }) {
     {
       label: "System",
       items: [
+        { title: "Analytics", icon: <LineChart size={18} />, path: "/admin/analytics" },
         { title: "Settings", icon: <Settings size={18} />, path: "/admin/settings" },
       ],
     },

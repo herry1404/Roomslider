@@ -15,6 +15,7 @@ import { GoogleLogin } from "@react-oauth/google";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { track } from "../../utils/analytics";
 
 import heroRoom from "../../assets/images/hero-room.webp";
 
@@ -120,6 +121,7 @@ function Register() {
           password
         }
       );
+      track("signup");
 
 
       toast.success(

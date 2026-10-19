@@ -1,0 +1,363 @@
+.analytics-dashboard {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.analytics-dashboard .admin-page-header {
+  margin-bottom: 20px;
+}
+
+.analytics-back-link {
+  display: block;
+  width: fit-content;
+  margin-bottom: 8px;
+  color: var(--admin-info);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.analytics-filter-bar {
+  min-width: 0;
+  margin-bottom: 22px;
+  padding: 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: var(--admin-card);
+}
+
+.analytics-filter-scroll {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.analytics-range-options,
+.analytics-chart-period {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-bg);
+}
+
+.analytics-range-options button,
+.analytics-chart-period button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--admin-muted);
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.analytics-range-options button.selected,
+.analytics-chart-period button.selected {
+  background: var(--admin-hover);
+  color: var(--admin-text);
+}
+
+.analytics-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--admin-accent);
+  box-shadow: 0 0 0 3px var(--admin-accent-soft);
+}
+
+.analytics-filter-field {
+  display: grid;
+  flex: none;
+  gap: 5px;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.analytics-filter-field input,
+.analytics-filter-field select {
+  width: 130px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  color-scheme: dark;
+  font: inherit;
+  font-size: 12px;
+}
+
+.analytics-filter-field select {
+  width: 112px;
+}
+
+.analytics-filter-field.analytics-area-field input {
+  width: 125px;
+}
+
+.analytics-apply-button {
+  flex: none;
+  min-height: 36px;
+  padding: 7px 12px;
+}
+
+.analytics-compare-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.analytics-compare-toggle input {
+  accent-color: var(--admin-accent);
+}
+
+.analytics-filter-error,
+.analytics-error {
+  margin: 9px 0 0;
+  color: var(--admin-danger);
+  font-size: 12px;
+}
+
+.analytics-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.analytics-stat-card {
+  min-width: 0;
+  min-height: 120px;
+}
+
+.analytics-stat-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.analytics-stat-sparkline {
+  width: 68px;
+  height: 32px;
+  flex: none;
+}
+
+.analytics-growth {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 7px;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.analytics-growth.positive {
+  color: var(--admin-accent);
+}
+
+.analytics-growth.negative {
+  color: var(--admin-danger);
+}
+
+.analytics-growth.muted {
+  color: var(--admin-muted);
+}
+
+.analytics-dashboard-section {
+  display: grid;
+  gap: 16px;
+}
+
+.analytics-main-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.analytics-main-grid > * {
+  min-width: 0;
+}
+
+.analytics-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.analytics-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.analytics-trend-card {
+  min-width: 0;
+}
+
+.analytics-bar-chart {
+  width: 100%;
+  height: 280px;
+  min-width: 0;
+}
+
+.analytics-rank-list,
+.analytics-live-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.analytics-rank-list li {
+  min-width: 0;
+}
+
+.analytics-rank-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.analytics-rank-label span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-rank-label strong {
+  flex: none;
+  color: var(--admin-text);
+}
+
+.analytics-rank-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--admin-bg);
+}
+
+.analytics-rank-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--admin-accent);
+}
+
+.analytics-live-card {
+  min-width: 0;
+}
+
+.analytics-live-list li {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  font-size: 12px;
+}
+
+.analytics-live-list li > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-live-list time {
+  color: var(--admin-muted);
+}
+
+.analytics-room-table {
+  min-width: 0;
+}
+
+.analytics-room-table .admin-analytics-table {
+  min-width: 620px;
+}
+
+.analytics-skeleton {
+  display: grid;
+  gap: 16px;
+}
+
+.analytics-skeleton-card {
+  height: 120px;
+  border-radius: 14px;
+  background: var(--admin-hover);
+}
+
+.analytics-skeleton-chart {
+  width: 100%;
+  height: 290px;
+  border-radius: 14px;
+  background: var(--admin-hover);
+}
+
+.admin-analytics-note {
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+@media (max-width: 760px) {
+  .analytics-filter-scroll {
+    align-items: stretch;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .analytics-filter-bar {
+    padding: 9px;
+  }
+
+  .analytics-stat-grid,
+  .analytics-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analytics-stat-grid {
+    gap: 9px;
+  }
+
+  .analytics-stat-card {
+    min-height: 105px;
+  }
+
+  .analytics-bar-chart {
+    height: 240px;
+  }
+
+  .analytics-dashboard {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .analytics-live-list li {
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+
+  .analytics-live-list .admin-badge {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+}

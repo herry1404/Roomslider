@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 import api from "../api/axios";
+import { track } from "../utils/analytics";
 
 
 const AuthContext = createContext(null);
@@ -74,6 +75,7 @@ export function AuthProvider({ children }) {
       console.log("Login Data:", data);
 
       const res = await api.post("/auth/login", data);
+      track("login");
 
       console.log("Login Response:", res.data);
 
@@ -95,6 +97,7 @@ export function AuthProvider({ children }) {
     try {
 
       const res = await api.post("/auth/google", { credential });
+      track("login");
 
 
       if (res.data.token) {
@@ -127,6 +130,7 @@ export function AuthProvider({ children }) {
     try {
 
       const res = await api.post("/owners/login", data);
+      track("login");
 
       console.log("Owner Login Response:", res.data);
 
@@ -163,6 +167,7 @@ export function AuthProvider({ children }) {
   const messLogin = async (data) => {
     try {
       const res = await api.post("/mess/login", data);
+      track("login");
       saveSession(res.data.token, res.data.user);
       return {
         success: true,
@@ -180,6 +185,7 @@ export function AuthProvider({ children }) {
       console.log("Register Data:", data);
 
       const res = await api.post("/auth/register", data);
+      track("signup");
 
       console.log("Register Response:", res.data);
 

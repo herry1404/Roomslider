@@ -62,7 +62,7 @@ function VehicleList() {
       <main className="container vehicle-page">
         <header className="vehicle-heading"><div><h1>Rent a Vehicle</h1><p>Choose a vehicle and tell us how long you need it.</p></div></header>
         <div className="vehicle-controls">
-          <div className="vehicle-search"><Search size={18} aria-hidden="true" /><input type="search" placeholder="Search vehicles..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} onKeyDown={(event) => { if (event.key === "Enter") track("search", { source: "search", meta: { query: search.trim(), listingType: "vehicle" } }); }} aria-label="Search vehicles" /></div>
+          <div className="vehicle-search"><Search size={18} aria-hidden="true" /><input type="search" placeholder="Search vehicles..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} onKeyDown={(event) => { if (event.key === "Enter") track("search", { source: "search", meta: { query: search.trim(), resultCount: visibleVehicles.length, listingType: "vehicle" } }); }} aria-label="Search vehicles" /></div>
           <div className="vehicle-filter-row" aria-label="Filter by vehicle type">{FILTERS.map((filter) => <button type="button" key={filter.value} className={`vehicle-filter ${type === filter.value ? "active" : ""}`} onClick={() => { setType(filter.value); setPage(1); }}>{filter.label}</button>)}</div>
           <div className="vehicle-price-toggle" aria-label="Display price by period">{Object.keys(PRICE_KEYS).map((period) => <button type="button" key={period} className={pricePeriod === period ? "active" : ""} onClick={() => setPricePeriod(period)}>{period[0].toUpperCase() + period.slice(1)}</button>)}</div>
         </div>

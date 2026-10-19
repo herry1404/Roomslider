@@ -106,7 +106,8 @@ const BloodRequestForm = lazy(() => import("./pages/Blood/BloodRequestForm"));
 const BloodRequestDetail = lazy(() => import("./pages/Blood/BloodRequestDetail"));
 const ManageBloodRequests = lazy(() => import("./pages/Admin/ManageBloodRequests"));
 const ManageRoommateReports = lazy(() => import("./pages/Admin/ManageRoommateReports"));
-const AdminAnalytics = lazy(() => import("./pages/Admin/EventAnalytics"));
+const AdminAnalytics = lazy(() => import("./pages/Admin/AnalyticsDashboard"));
+const CafeAnalytics = lazy(() => import("./pages/Admin/CafeAnalytics"));
 const ManageListingReports = lazy(() => import("./pages/Admin/ManageListingReports"));
 const ManageReels = lazy(() => import("./pages/Admin/ManageReels"));
 const OwnerReels = lazy(() => import("./pages/Owner/OwnerReels"));
@@ -264,6 +265,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/cafe-menus" element={<AdminRoute><CafeMenus /></AdminRoute>} />
+        <Route path="/admin/analytics/cafe/:cafeId" element={<AdminRoute><CafeAnalytics /></AdminRoute>} />
         <Route path="/admin/reward-catalog" element={<AdminRoute><ManageRewardCatalog /></AdminRoute>} />
         <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
         <Route path="/admin/reels" element={<AdminRoute><ManageReels /></AdminRoute>} />

@@ -1,3 +1,5 @@
+import { track as trackAnalytics } from "./analytics";
+
 const API_URL = (
   import.meta.env.VITE_API_URL
   || (import.meta.env.DEV
@@ -21,6 +23,21 @@ export function getVisitorId() {
 
 export function track(type, payload = {}) {
   try {
+    const eventType = {
+      wishlist_add: "wishlist",
+    }[type] || type;
+    if (["listing_view", "call_click", "whatsapp_click", "wishlist", "share", "search"].includes(eventType)) {
+      const listingType = String(payload.listingType || "other").toLowerCase();
+      trackAnalytics(eventType, {
+        entityType: ["room", "pg", "hostel", "flat", "mess", "villa", "vehicle", "furniture", "cafe"].includes(listingType)
+          ? listingType
+          : "other",
+        entityId: payload.listingId || "",
+        area: payload.area || payload.meta?.area || "",
+        searchQuery: payload.meta?.query || "",
+        resultCount: payload.meta?.resultCount,
+      });
+    }
     const body = JSON.stringify({ ...payload, type, visitorId: getVisitorId() });
     const url = `${API_URL}/track`;
     let token = "";

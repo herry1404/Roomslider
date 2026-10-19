@@ -7,6 +7,7 @@ import SkeletonRoomCard from "../../components/ui/SkeletonRoomCard";
 import EmptyState from "../../components/ui/EmptyState";
 import { distanceKm, findIndorePlace, normalizePlaceName } from "../../utils/indoreLocation";
 import SEO, { PAGE_SEO } from "../../components/SEO";
+import { track } from "../../utils/track";
 
 const NEARBY_RADIUS_KM = 8;
 
@@ -62,7 +63,13 @@ function Rooms() {
           nearbyOnly = rooms.length > 0;
         }
 
-        if (active) setResult({ search, rooms, place, nearbyOnly, nearestFallback });
+        if (active) {
+          if (search) track("search", {
+            source: "search",
+            meta: { query: search, resultCount: rooms.length, area: place?.name || "" },
+          });
+          setResult({ search, rooms, place, nearbyOnly, nearestFallback });
+        }
       } catch (error) {
         if (!active) return;
         toast.error(error.response?.data?.message || "Rooms could not be loaded");
