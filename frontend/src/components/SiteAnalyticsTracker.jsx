@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../api/axios";
-import { track } from "../utils/analytics";
 
 const getVisitorId = () => {
   try {
@@ -45,7 +44,6 @@ function SiteAnalyticsTracker() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    track("page_view", { entityType: "other", entityId: pathname });
     if (/^\/(?:admin|owner|mess\/(?:login|dashboard)|hourly-manager)(?:\/|$)/i.test(pathname)) return;
     if (/^\/(?:cafe\/|htlcafe(?:\/|$))/.test(pathname)) return;
 

@@ -15,6 +15,8 @@ const analyticsEventSchema = new mongoose.Schema(
         "search",
         "ad_impression",
         "ad_click",
+        "page_view",
+        "menu_view",
       ],
       required: true,
     },
@@ -27,7 +29,12 @@ const analyticsEventSchema = new mongoose.Schema(
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "Owner", default: null },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     visitorId: { type: String, required: true },
-    adId: { type: mongoose.Schema.Types.ObjectId, default: null },
+    sessionId: { type: String, maxlength: 80 },
+    page: { type: String, trim: true, maxlength: 200 },
+    cafeSlug: { type: String, trim: true, lowercase: true, maxlength: 80 },
+    adId: { type: mongoose.Schema.Types.Mixed, default: null },
+    adName: { type: String, trim: true, maxlength: 120 },
+    referrer: { type: String, trim: true, maxlength: 200 },
     source: {
       type: String,
       enum: ["home", "search", "map", "listing", "profile", "ad"],
@@ -43,6 +50,7 @@ analyticsEventSchema.index({ owner: 1, type: 1, createdAt: -1 });
 analyticsEventSchema.index({ listingId: 1, type: 1, createdAt: -1 });
 analyticsEventSchema.index({ adId: 1, type: 1, createdAt: -1 });
 analyticsEventSchema.index({ visitorId: 1, listingId: 1, type: 1, createdAt: -1 });
+analyticsEventSchema.index({ type: 1, cafeSlug: 1, createdAt: -1 });
 
 module.exports = mongoose.models.AnalyticsEvent
   || mongoose.model("AnalyticsEvent", analyticsEventSchema);

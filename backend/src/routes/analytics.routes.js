@@ -3,8 +3,16 @@ const rateLimit = require("express-rate-limit");
 const { trackPageView, trackPageDuration } = require("../controllers/siteAnalytics.controller");
 const { getOwnerAnalytics, getAdminAnalytics } = require("../controllers/analyticsEvent.controller");
 const { track, getLive, getOverview, getCafeAnalytics, getDirectMenuAnalytics } = require("../controllers/analytics.controller");
+const {
+  trackAnalyticsEvent,
+  getAnalyticsSummary,
+  getAnalyticsCafes,
+  getAnalyticsAds,
+  getAnalyticsVisitors,
+} = require("../controllers/trackedAnalytics.controller");
 const { protect } = require("../middleware/auth.middleware");
 const { adminOnly } = require("../middleware/admin.middleware");
+const { requireAdminKey } = require("../middleware/adminKey.middleware");
 
 const router = express.Router();
 const pageViewLimiter = rateLimit({
@@ -22,7 +30,18 @@ const eventTrackerLimiter = rateLimit({
   message: { success: false, message: "Too many analytics events" },
 });
 
-router.post("/track", eventTrackerLimiter, express.text({ type: "text/plain", limit: "8kb" }), require("../middleware/auth.middleware").optionalAuth, track);
+router.post(
+  "/track",
+  eventTrackerLimiter,
+  express.text({ type: "text/plain", limit: "8kb" }),
+  require("../middleware/auth.middleware").optionalAuth,
+  trackAnalyticsEvent,
+  track
+);
+router.get("/summary", requireAdminKey, getAnalyticsSummary);
+router.get("/cafes", requireAdminKey, getAnalyticsCafes);
+router.get("/ads", requireAdminKey, getAnalyticsAds);
+router.get("/visitors", requireAdminKey, getAnalyticsVisitors);
 router.get("/live", protect, adminOnly, getLive);
 router.get("/admin/overview", protect, adminOnly, getOverview);
 router.get("/menus/overview", protect, adminOnly, getDirectMenuAnalytics);

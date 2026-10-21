@@ -65,6 +65,7 @@
     link.target = "_blank";
     link.rel = "noopener sponsored";
     link.dataset.adId = ad.id || ad._id || "";
+    link.dataset.adName = String(ad.text).slice(0, 120);
     link.hidden = true;
 
     var img = document.createElement("img");

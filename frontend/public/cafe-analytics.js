@@ -153,9 +153,4 @@
     }
   });
 
-  document.addEventListener("click", function (event) {
-    var target = event.target;
-    var anchor = target instanceof Element ? target.closest(".ad-card") : null;
-    if (anchor && anchor.dataset.adId) track("ad_click", anchor.dataset.adId);
-  });
 })();
