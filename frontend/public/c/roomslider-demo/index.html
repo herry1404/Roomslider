@@ -2,41 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#173b31">
   <title>RoomSlider Loyalty Trial Demo</title>
   <style>
     :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--theme-text,#18362e);background:var(--theme-background,#f2f7f2);font-synthesis:none;--theme-background:#f2f7f2;--theme-surface:#fff;--theme-text:#18362e;--theme-muted:#455b50;--theme-accent:#197450;--theme-accent-ink:#fff}
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 5%,color-mix(in srgb,var(--theme-accent) 16%,var(--theme-background)),transparent 28rem),var(--theme-background);color:var(--theme-text)}
-    .wrap{width:min(100% - 28px,760px);margin:auto;padding:22px 0 42px}
+    body{margin:0;min-height:100dvh;overflow-x:clip;background:radial-gradient(circle at 15% 5%,color-mix(in srgb,var(--theme-accent) 16%,var(--theme-background)),transparent 28rem),var(--theme-background);color:var(--theme-text)}
+    .wrap{position:relative;z-index:1;width:min(100% - 20px,760px);margin:auto;padding:calc(14px + env(safe-area-inset-top)) 0 calc(24px + env(safe-area-inset-bottom))}
     .trial{display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 14px;border:1px solid var(--theme-accent);border-radius:14px;background:var(--theme-surface);color:var(--theme-text);font-size:.77rem;font-weight:900;letter-spacing:.11em;text-align:center}
     .trial b{font-size:1rem}
-    header{position:relative;text-align:center;padding:25px 8px 20px;border-bottom:3px solid var(--theme-accent)}
-    header:after{content:var(--theme-motif,"");position:absolute;right:12px;top:12px;font-size:1.35rem}
-    :root[data-theme-id="diwali"] header:after{animation:diwali-twinkle 3.6s ease-in-out infinite alternate}
+    header{position:relative;text-align:center;padding:42px 8px 9px;border-bottom:3px solid var(--theme-accent);isolation:isolate}
+    header:after{content:var(--theme-motif,"");position:absolute;right:8px;top:8px;font-size:1.2rem}
+    .theme-decoration{position:absolute;z-index:2;left:10px;top:8px;width:34px;height:26px;pointer-events:none}
+    :root[data-theme-effects~="flag-wave"] .theme-decoration{left:auto;right:10px;width:38px;height:25px;border-radius:2px;background:linear-gradient(to bottom,#e87525 0 33%,#fff 33% 66%,#25834c 66%);transform-origin:left center}
+    :root[data-animations="on"][data-theme-effects~="flag-wave"] .theme-decoration{animation:flag-wave 3s ease-in-out infinite}
+    :root[data-theme-effects~="flag-wave"] .theme-decoration:after{content:"";position:absolute;left:16px;top:9px;width:6px;height:6px;border:1.5px solid #183b83;border-radius:50%}
+    @keyframes flag-wave{0%,100%{transform:perspective(80px) rotateY(-8deg) skewY(0)}50%{transform:perspective(80px) rotateY(8deg) skewY(-2deg)}}
+    :root[data-theme-effects~="diya"] .theme-decoration{top:12px;left:12px;width:26px;height:12px;border:2px solid var(--theme-accent);border-top:0;border-radius:0 0 14px 14px;background:#e9a62d}
+    :root[data-theme-effects~="diya"] .theme-decoration:before{content:"";position:absolute;left:8px;top:-13px;width:8px;height:13px;border-radius:80% 0 80% 0;background:#ef8f25;transform:rotate(45deg)}
+    :root[data-animations="on"][data-theme-effects~="diya"] .theme-decoration:before{animation:flame 1.8s ease-in-out infinite alternate}
+    @keyframes flame{to{opacity:.75;transform:rotate(48deg) scale(.94)}}
+    :root[data-theme-effects~="garba"] .theme-decoration{left:12px;top:8px;width:26px;height:26px;border:4px solid transparent;border-radius:50%;background:conic-gradient(#8c2850 0 40deg,#744019 40deg 80deg,#315f38 80deg 120deg,#823028 120deg 160deg,#71328b 160deg 200deg,#284f78 200deg 240deg,#8b4319 240deg 280deg,#31594c 280deg 320deg,#74374c 320deg) border-box}
+    :root[data-animations="on"][data-theme-effects~="garba"] .theme-decoration{animation:garba-spin 18s linear infinite}
+    @keyframes garba-spin{to{transform:rotate(360deg)}}
+    .theme-effect-canvas{position:fixed;inset:0;width:100vw;height:100dvh;z-index:0;pointer-events:none}
+    :root[data-animations="on"][data-theme-id="diwali"] header:after{animation:diwali-twinkle 3.6s ease-in-out infinite alternate}
     @keyframes diwali-twinkle{from{opacity:.82;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}
-    .brand{color:var(--theme-text);font-size:.85rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    .brand{color:var(--theme-text);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    header>.brand,header>h1,header>p{position:relative;z-index:2}
     h1{margin:6px 0;color:var(--theme-text);font-size:clamp(2rem,8vw,3.2rem);line-height:1.04}
-    header p{margin:8px auto 0;max-width:520px;color:var(--theme-muted);line-height:1.55}
-    .menu,.reward-banner{margin:14px 0;padding:19px;border:1px solid var(--theme-accent);border-radius:20px;background:var(--theme-surface);box-shadow:0 12px 30px #2149380d}
-    .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 13px;font-size:1.12rem}
+    header p{margin:5px auto 0;max-width:520px;color:var(--theme-muted);font-size:16px;line-height:1.35}
+    .menu,.reward-banner{margin:10px 0;padding:14px;border:1px solid var(--theme-accent);border-radius:17px;background:var(--theme-surface);box-shadow:0 12px 30px #2149380d}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;font-size:1.12rem}
     .demo-tag{padding:5px 8px;border-radius:99px;background:var(--theme-background);color:var(--theme-text);font-size:.68rem;font-weight:800}
     .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-    .menu-item{padding:12px;border:1px solid var(--theme-background);border-radius:13px;background:var(--theme-surface)}
-    .menu-item strong{display:block;font-size:.95rem}
-    .menu-item span{display:block;margin-top:4px;color:var(--theme-muted);font-size:.86rem}
+    .menu-item{min-width:0;padding:10px;border:1px solid var(--theme-background);border-radius:13px;background:var(--theme-surface)}
+    .menu-item strong{display:block;font-size:16px;overflow-wrap:anywhere}
+    .menu-item span{display:block;margin-top:4px;color:var(--theme-muted);font-size:16px}
     .reward-banner{display:flex;align-items:center;justify-content:space-between;gap:16px}
     .reward-banner h2{margin:0;color:var(--theme-text);font-size:1.05rem}
-    .reward-banner p{margin:5px 0 0;color:var(--theme-muted);font-size:.88rem;line-height:1.45}
-    .reward-link{flex:none;padding:11px 14px;border-radius:11px;background:var(--theme-accent);color:var(--theme-accent-ink);font-size:.88rem;font-weight:800;text-align:center;text-decoration:none}
+    .reward-banner p{margin:5px 0 0;color:var(--theme-muted);font-size:16px;line-height:1.45}
+    .reward-link{display:inline-flex;min-height:44px;align-items:center;justify-content:center;flex:none;padding:11px 14px;border-radius:11px;background:var(--theme-accent);color:var(--theme-accent-ink);font-size:16px;font-weight:800;text-align:center;text-decoration:none}
     .reward-link:focus-visible{outline:3px solid var(--theme-accent);outline-offset:2px}
     .theme-greeting{font-weight:750}
-    .theme-quote{font-size:.84rem}
-    .theme-chip{display:inline-block;margin-top:10px;padding:5px 9px;border:1px solid var(--theme-accent);border-radius:99px;background:var(--theme-surface);color:var(--theme-text);font-size:.72rem;font-weight:750}
+    .theme-quote{font-size:16px}
+    .theme-controls{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+    .theme-chip,.theme-animation-toggle{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:5px 9px;border:1px solid var(--theme-accent);border-radius:99px;background:var(--theme-surface);color:var(--theme-text);font-size:12px;font-weight:750}
+    .theme-animation-toggle{cursor:pointer}
+    :root[data-theme-effects~="steam"] .theme-decoration{left:12px;top:9px;width:27px;height:16px;border:2px solid var(--theme-accent);border-top:0;border-radius:0 0 7px 7px;background:linear-gradient(#d78231,#d78231) center 4px/2px 2px no-repeat}
+    :root[data-theme-effects~="steam"] .theme-decoration:before{content:"";position:absolute;left:7px;top:-11px;width:8px;height:9px;border-left:2px solid #aebbb6;border-radius:50%;transform:rotate(14deg)}
+    :root[data-theme-effects~="rain"] .theme-decoration:after{content:"";position:absolute;inset:3px;border-radius:50%;background:#d6e6ec;opacity:0}
+    :root[data-animations="on"][data-theme-effects~="rain"] .theme-decoration:after{animation:rain-glow 8s ease-in-out infinite}
+    @keyframes rain-glow{50%{opacity:.3}}
     @media(max-width:500px){.reward-banner{align-items:stretch;flex-direction:column;gap:12px}.reward-link{width:100%}}
-    @media(max-width:400px){.wrap{width:min(100% - 20px,760px)}.menu,.reward-banner{padding:15px}.menu-grid{gap:7px}}
+    @media(max-width:380px){.wrap{width:calc(100% - 16px)}.menu-grid{gap:6px}.menu-item{padding:8px}.menu,.reward-banner{padding:12px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -48,6 +69,9 @@
       <h1>RoomSlider Cafe</h1>
       <p>Browse the RoomSlider Cafe sample chai menu. This is a product demo—not a real cafe or a purchase offer.</p>
     </header>
+    <div class="theme-controls" aria-label="Theme controls">
+      <span class="theme-chip"></span><button class="theme-animation-toggle" type="button"></button>
+    </div>
     <section class="menu" aria-labelledby="menu-heading">
       <h2 class="section-title" id="menu-heading">Sample Menu <span class="demo-tag">DEMO PRICES</span></h2>
       <div class="menu-grid">

@@ -2,45 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#f2f6f2">
   <title>RoomSlider Cafe Theme Preview</title>
   <style>
     :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#17211b;background:#f2f6f2;font-synthesis:none;--theme-background:#f2f6f2;--theme-surface:#fff;--theme-text:#17211b;--theme-muted:#435047;--theme-accent:#245b32;--theme-accent-ink:#fff}
     *{box-sizing:border-box}
-    body{margin:0;background:var(--theme-background);color:var(--theme-text)}
-    main{width:min(100% - 24px,1000px);margin:auto;padding:22px 0 48px}
+    body{margin:0;min-height:100dvh;overflow-x:clip;background:var(--theme-background);color:var(--theme-text);font-size:16px}
+    main{width:min(100% - 20px,1000px);margin:auto;padding:calc(14px + env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom))}
     h1{margin:0;font-size:clamp(1.8rem,7vw,2.7rem);line-height:1.1}
-    .intro{max-width:680px;color:var(--theme-muted);line-height:1.55}
-    .tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;padding:14px;border:1px solid #9aa69c;border-radius:16px;background:var(--theme-surface)}
-    label{display:grid;gap:6px;font-size:.88rem;font-weight:750}
-    input{min-width:0;min-height:42px;padding:8px 10px;border:1px solid #66756b;border-radius:9px;background:var(--theme-surface);color:var(--theme-text);font:inherit}
-    .night-toggle{display:flex;grid-column:1/-1;align-items:center;gap:9px}
-    .night-toggle input{width:20px;min-height:20px;accent-color:var(--theme-accent)}
-    .picked{grid-column:1/-1;margin:0;padding:11px;border-left:4px solid var(--theme-accent);background:var(--theme-background);font-weight:800}
+    .intro{max-width:680px;color:var(--theme-muted);line-height:1.5}
+    .tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;padding:10px max(10px,env(safe-area-inset-left)) 10px max(10px,env(safe-area-inset-right));border:1px solid #9aa69c;border-radius:0 0 14px 14px;background:var(--theme-surface);box-shadow:0 4px 14px #16231a20}
+    label{display:grid;min-width:0;gap:4px;font-size:16px;font-weight:700}
+    input{width:100%;min-width:0;min-height:48px;padding:7px;border:1px solid #66756b;border-radius:9px;background:var(--theme-surface);color:var(--theme-text);font:inherit}
+    .switches{display:flex;grid-column:1/-1;gap:8px}
+    .switch{display:flex;min-height:48px;flex:1;align-items:center;gap:7px;padding:4px 8px;border:1px solid #66756b;border-radius:10px}
+    .switch input{width:24px;height:24px;min-height:24px;accent-color:var(--theme-accent)}
+    .picked{grid-column:1/-1;margin:0;padding:9px;border-left:4px solid var(--theme-accent);background:var(--theme-background);font-size:16px;font-weight:750}
     section{margin:28px 0}
     h2{font-size:1.25rem}
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:13px}
+    .cards{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
     .card{--theme-background:#f5f5f5;--theme-surface:#fff;--theme-text:#171717;--theme-muted:#444;--theme-accent:#345;--theme-accent-ink:#fff;background:var(--theme-background);color:var(--theme-text);border:1px solid var(--theme-accent);border-radius:15px;overflow:hidden}
     .card.is-selected{outline:3px solid var(--theme-accent);outline-offset:2px}
-    .sample-head{position:relative;padding:14px 15px 12px;border-bottom:3px solid var(--theme-accent);background:var(--theme-surface)}
-    .sample-head:after{content:var(--theme-motif);position:absolute;right:13px;top:12px;font-size:1.25rem}
-    [data-theme-card="diwali"] .sample-head:after{animation:diwali-twinkle 3.6s ease-in-out infinite alternate}
-    @keyframes diwali-twinkle{from{opacity:.82;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}
-    .sample-brand{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--theme-text)}
+    .sample-head{position:relative;isolation:isolate;min-height:120px;padding:38px 14px 10px;border-bottom:3px solid var(--theme-accent);background:var(--theme-surface)}
+    .sample-copy{position:relative;z-index:1;max-width:calc(100% - 38px)}
+    .sample-effect{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+    .sample-decoration{position:absolute;z-index:2;top:8px;left:10px;width:28px;height:26px;pointer-events:none}
+    .sample-head:after{content:var(--theme-motif);position:absolute;right:10px;top:8px;font-size:1.2rem}
+    [data-theme-effects~="flag-wave"] .sample-decoration{left:auto;right:9px;width:37px;height:24px;border-radius:2px;background:linear-gradient(to bottom,#e87525 0 33%,#fff 33% 66%,#25834c 66%);transform-origin:left center}
+    [data-theme-effects~="flag-wave"] .sample-decoration:after{content:"";position:absolute;left:16px;top:8px;width:6px;height:6px;border:1.5px solid #183b83;border-radius:50%}
+    [data-theme-effects~="diya"] .sample-decoration{top:11px;left:10px;width:26px;height:11px;border:2px solid var(--theme-accent);border-top:0;border-radius:0 0 14px 14px;background:#e9a62d}
+    [data-theme-effects~="diya"] .sample-decoration:before{content:"";position:absolute;left:8px;top:-12px;width:8px;height:12px;border-radius:80% 0 80% 0;background:#ef8f25;transform:rotate(45deg)}
+    [data-theme-effects~="garba"] .sample-decoration{left:10px;width:26px;height:26px;border:4px solid transparent;border-radius:50%;background:conic-gradient(#8c2850 0 40deg,#744019 40deg 80deg,#315f38 80deg 120deg,#823028 120deg 160deg,#71328b 160deg 200deg,#284f78 200deg 240deg,#8b4319 240deg 280deg,#31594c 280deg 320deg,#74374c 320deg) border-box}
+    [data-theme-effects~="steam"] .sample-decoration{left:10px;top:10px;width:26px;height:15px;border:2px solid var(--theme-accent);border-top:0;border-radius:0 0 7px 7px}
+    :root[data-animations="on"] [data-theme-effects~="flag-wave"] .sample-decoration{animation:flag-wave 3s ease-in-out infinite}
+    :root[data-animations="on"] [data-theme-effects~="diya"] .sample-decoration:before{animation:flame 1.8s ease-in-out infinite alternate}
+    :root[data-animations="on"] [data-theme-effects~="garba"] .sample-decoration{animation:garba-spin 18s linear infinite}
+    @keyframes flag-wave{0%,100%{transform:perspective(80px) rotateY(-8deg)}50%{transform:perspective(80px) rotateY(8deg) skewY(-2deg)}}
+    @keyframes flame{to{opacity:.75;transform:rotate(48deg) scale(.94)}}
+    @keyframes garba-spin{to{transform:rotate(360deg)}}
+    .sample-brand{font-size:16px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--theme-text)}
     .sample-head h3{max-width:calc(100% - 42px);margin:3px 0;font-size:1.1rem}
-    .greeting,.quote{margin:5px 0 0;color:var(--theme-muted);font-size:.84rem;line-height:1.4}
+    .greeting,.quote{margin:5px 0 0;color:var(--theme-muted);font-size:16px;line-height:1.3}
     .sample-items{display:grid;gap:0;padding:3px 14px;background:var(--theme-surface)}
-    .item{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--theme-background);font-size:.86rem}
+    .item{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--theme-background);font-size:16px}
     .item:last-child{border:0}
     .item span{color:var(--theme-muted)}
-    .card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:var(--theme-background);font-size:.78rem}
-    .open-link{padding:8px 10px;border-radius:8px;background:var(--theme-accent);color:var(--theme-accent-ink);font-weight:800;text-decoration:none}
-    :focus-visible{outline:3px solid #14532d;outline-offset:3px}
+    .card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;background:var(--theme-background);font-size:16px;overflow-wrap:anywhere}
+    .open-link{display:inline-flex;min-height:44px;max-width:66%;align-items:center;justify-content:center;padding:7px 9px;border-radius:8px;background:var(--theme-accent);color:var(--theme-accent-ink);font-size:16px;font-weight:800;text-align:center;text-decoration:none}
+    :focus-visible{outline:3px solid #14532d;outline-offset:2px}
     body.night{--theme-background:#171a1d;--theme-surface:#24292d;--theme-text:#f7f8f5;--theme-muted:#d0d5d8}
     body.night .card{--theme-background:#171a1d;--theme-surface:#24292d;--theme-text:#f7f8f5;--theme-muted:#d0d5d8}
-    @media(max-width:480px){main{width:min(100% - 18px,1000px);padding-top:17px}.tools{gap:10px;padding:12px}}
+    @media(min-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.tools{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}.switches{grid-column:span 2}.picked{grid-column:span 2}}
+    @media(max-width:380px){main{width:calc(100% - 16px)}.tools{gap:6px;padding:8px}.switch{font-size:14px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -50,8 +65,11 @@
     <p class="intro">A preview gallery for the demo menu. Festival dates marked to fill are intentionally unset; event examples are ignored by automatic selection.</p>
     <div class="tools" aria-label="Preview controls">
       <label for="preview-date">Date (IST) <input id="preview-date" type="date"></label>
-      <label for="preview-hour">Hour (IST) <input id="preview-hour" type="number" min="0" max="23" inputmode="numeric"></label>
-      <label class="night-toggle"><input id="night-mode" type="checkbox"> Night mode (all cards)</label>
+      <label for="preview-time">Time (IST) <input id="preview-time" type="time" step="3600"></label>
+      <div class="switches">
+        <label class="switch"><input id="night-mode" type="checkbox"> Night mode</label>
+        <label class="switch"><input id="animations-mode" type="checkbox"> Animations</label>
+      </div>
       <p class="picked" id="picked-theme" aria-live="polite">Loading calendar…</p>
     </div>
     <section aria-labelledby="festival-heading">
@@ -68,83 +86,6 @@
     </section>
   </main>
   <script src="/c/shared/theme-engine.js"></script>
-  <script>
-    (() => {
-      "use strict";
-      const engine = window.RoomsliderThemeEngine;
-      const festivalIds = new Set([
-        "makar-sankranti", "maha-shivaratri", "holi", "ram-navami", "raksha-bandhan",
-        "janmashtami", "ganesh-chaturthi", "navratri", "dussehra", "dhanteras",
-        "diwali", "bhai-dooj", "chhath", "gita-jayanti", "republic-day",
-        "independence-day", "gandhi-jayanti"
-      ]);
-      const dateInput = document.getElementById("preview-date");
-      const hourInput = document.getElementById("preview-hour");
-      const nightInput = document.getElementById("night-mode");
-      const result = document.getElementById("picked-theme");
-      const params = new URLSearchParams(location.search);
-      const forcedThemeId = params.get("theme");
-      const now = new Date();
-      dateInput.value = params.get("date") && engine.validDate(params.get("date")) ? params.get("date") : engine.istDate(now);
-      const requestedHour = params.get("hour");
-      hourInput.value = requestedHour !== null && /^(?:[0-9]|1[0-9]|2[0-3])$/.test(requestedHour)
-        ? requestedHour : String(engine.istHour(now));
-
-      function cardMarkup(selected) {
-        const c = selected.colors;
-        const style = `--theme-background:${c.background};--theme-surface:${c.surface};--theme-text:${c.text};--theme-muted:${c.muted};--theme-accent:${c.accent};--theme-accent-ink:#fff;--theme-motif:${JSON.stringify(selected.motif)}`;
-        return `<article class="card" data-theme-card="${selected.id}" style="${style}">
-          <div class="sample-head"><div class="sample-brand">RoomSlider Cafe</div><h3>${selected.name}</h3>
-            <p class="greeting">${selected.greeting}</p><p class="quote"></p></div>
-          <div class="sample-items">
-            <div class="item"><strong>Masala Chai</strong><span>₹20</span></div>
-            <div class="item"><strong>Ginger Chai</strong><span>₹25</span></div>
-            <div class="item"><strong>Filter Coffee</strong><span>₹35</span></div>
-          </div>
-          <div class="card-foot"><span>${selected.id}</span><a class="open-link" href="/cafe/demo/roomslider?theme=${encodeURIComponent(selected.id)}">Open on demo menu</a></div>
-        </article>`;
-      }
-
-      function renderCards() {
-        const festivals = engine.themes.filter((item) => festivalIds.has(item.id));
-        const events = engine.themes.filter((item) => item.id.startsWith("event-"));
-        const months = engine.themes.filter((item) => item.id.startsWith("month-"));
-        document.getElementById("festival-cards").innerHTML = festivals.map(cardMarkup).join("");
-        document.getElementById("event-cards").innerHTML = events.map(cardMarkup).join("");
-        document.getElementById("month-cards").innerHTML = months.map(cardMarkup).join("");
-      }
-
-      let calendar = null;
-      function updateSelection() {
-        const date = engine.validDate(dateInput.value) ? dateInput.value : engine.istDate(new Date());
-        const hour = Number(hourInput.value);
-        const automatic = engine.choose(date, calendar);
-        const selected = engine.themes.find((item) => item.id === forcedThemeId) || automatic;
-        const selectedHour = Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : engine.istHour(new Date());
-        const isNight = selectedHour >= 19 || selectedHour < 6;
-        nightInput.checked = isNight;
-        document.body.classList.toggle("night", isNight);
-        const nightText = isNight ? " · dark variant" : "";
-        result.textContent = forcedThemeId && selected.id === forcedThemeId
-          ? `Previewing: ${selected.name} · Automatic pick for ${date} at ${selectedHour}:00 IST: ${automatic.name}${nightText}`
-          : `For ${date} at ${selectedHour}:00 IST: ${automatic.name}${nightText}`;
-        document.querySelectorAll("[data-theme-card]").forEach((card) => {
-          const theme = engine.themes.find((item) => item.id === card.dataset.themeCard);
-          const quote = card.querySelector(".quote");
-          card.classList.toggle("is-selected", card.dataset.themeCard === selected.id);
-          if (theme && quote) quote.textContent = engine.quoteForDate(date);
-        });
-      }
-
-      nightInput.addEventListener("change", () => document.body.classList.toggle("night", nightInput.checked));
-      dateInput.addEventListener("input", updateSelection);
-      hourInput.addEventListener("input", updateSelection);
-      renderCards();
-      engine.loadCalendar().then((loadedCalendar) => {
-        calendar = loadedCalendar;
-        updateSelection();
-      });
-    })();
-  </script>
+  <script>(()=>{"use strict";const e=window.RoomsliderThemeEngine,t=new Set(["makar-sankranti","maha-shivaratri","holi","ram-navami","raksha-bandhan","janmashtami","ganesh-chaturthi","navratri","dussehra","dhanteras","diwali","bhai-dooj","chhath","gita-jayanti","republic-day","independence-day","gandhi-jayanti"]),a=document.getElementById("preview-date"),n=document.getElementById("preview-time"),s=document.getElementById("night-mode"),c=document.getElementById("animations-mode"),i=document.getElementById("picked-theme"),o=new URLSearchParams(location.search),d=o.get("theme"),r=new Date;a.value=o.get("date")&&e.validDate(o.get("date"))?o.get("date"):e.istDate(r);const m=o.get("hour");n.value=null!==m&&/^(?:[0-9]|1[0-9]|2[0-3])$/.test(m)?`${m.padStart(2,"0")}:00`:`${String(e.istHour(r)).padStart(2,"0")}:00`;let l=null;try{l=localStorage.getItem("roomslider-theme-animations")}catch(e){console.warn("Theme animation preference is unavailable.",e)}const h=matchMedia("(prefers-reduced-motion: reduce)").matches,u=Boolean(navigator.connection&&navigator.connection.saveData);c.disabled=h||u;let f=[],g=null;function v(e){const t=e.colors,a=`--theme-background:${t.background};--theme-surface:${t.surface};--theme-text:${t.text};--theme-muted:${t.muted};--theme-accent:${t.accent};--theme-accent-ink:#fff;--theme-motif:${JSON.stringify(e.motif)}`;return`<article class="card" data-theme-card="${e.id}" data-theme-effects="${e.effect.join(" ")}" style="${a}">\n          <div class="sample-head"><canvas class="sample-effect" aria-hidden="true"></canvas><span class="sample-decoration" aria-hidden="true"></span>\n            <div class="sample-copy"><div class="sample-brand">RoomSlider Cafe</div><h3>${e.name}</h3>\n            <p class="greeting">${e.greeting}</p><p class="quote"></p></div></div>\n          <div class="sample-items">\n            <div class="item"><strong>Masala Chai</strong><span>₹20</span></div>\n            <div class="item"><strong>Ginger Chai</strong><span>₹25</span></div>\n            <div class="item"><strong>Filter Coffee</strong><span>₹35</span></div>\n          </div>\n          <div class="card-foot"><span>${e.id}</span><a class="open-link" href="/cafe/demo/roomslider?theme=${encodeURIComponent(e.id)}">Open on demo menu</a></div>\n        </article>`}function p(t){f.forEach(e=>e()),f=[],!c.checked||h||u||document.querySelectorAll("[data-theme-card]").forEach(a=>{const n=a.dataset.themeEffects.split(" ").filter(e=>"none"!==e);if(t&&!n.includes("stars")&&n.push("stars"),n.length){const t=e.startEffects(a.querySelector("canvas"),n,a,!0);t&&f.push(t)}})}function y(){const t=e.validDate(a.value)?a.value:e.istDate(new Date),o=Number(n.value.slice(0,2)),r=e.choose(t,g),m=e.choose(t,g,d)||r,l=Number.isInteger(o)&&o>=0&&o<=23?o:e.istHour(new Date),f=l>=19||l<6;s.checked=f,document.body.classList.toggle("night",f),document.documentElement.dataset.animations=!c.checked||h||u?"off":"on";const v=f?" · dark variant":"";i.textContent=d&&m.id===d?`Previewing: ${m.name} · Automatic pick for ${t} at ${l}:00 IST: ${r.name}${v}`:`For ${t} at ${l}:00 IST: ${r.name}${v}`,document.querySelectorAll("[data-theme-card]").forEach(a=>{const n=e.themes.find(e=>e.id===a.dataset.themeCard),s=a.querySelector(".quote");a.classList.toggle("is-selected",a.dataset.themeCard===m.id),n&&s&&(s.textContent=e.quoteForDate(t));const c=e.choose(t,g,a.dataset.themeCard);c&&(a.style.setProperty("--theme-accent",c.colors.accent),a.dataset.themeEffects=c.effect.join(" "))}),p(f)}s.addEventListener("change",()=>{document.body.classList.toggle("night",s.checked),p(s.checked)}),c.checked=!h&&!u&&(null===l?t.has(e.choose(a.value,null).id):"on"===l),c.addEventListener("change",()=>{if(h||u)c.checked=!1;else{document.documentElement.dataset.animations=c.checked?"on":"off";try{localStorage.setItem("roomslider-theme-animations",c.checked?"on":"off")}catch(e){console.warn("Could not save theme animation preference.",e)}p(s.checked)}}),a.addEventListener("input",y),n.addEventListener("input",y),function(){const a=e.themes.filter(e=>t.has(e.id)),n=e.themes.filter(e=>e.id.startsWith("event-")),s=e.themes.filter(e=>e.id.startsWith("month-"));document.getElementById("festival-cards").innerHTML=a.map(v).join(""),document.getElementById("event-cards").innerHTML=n.map(v).join(""),document.getElementById("month-cards").innerHTML=s.map(v).join("")}(),e.loadCalendar().then(n=>{g=n,null===l&&(c.checked=!h&&!u&&t.has(e.choose(a.value,g).id)),y()})})();</script>
 </body>
 </html>
