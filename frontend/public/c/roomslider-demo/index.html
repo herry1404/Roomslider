@@ -7,28 +7,34 @@
   <meta name="theme-color" content="#173b31">
   <title>RoomSlider Loyalty Trial Demo</title>
   <style>
-    :root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#18362e;background:#f2f7f2;font-synthesis:none}
+    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--theme-text,#18362e);background:var(--theme-background,#f2f7f2);font-synthesis:none;--theme-background:#f2f7f2;--theme-surface:#fff;--theme-text:#18362e;--theme-muted:#455b50;--theme-accent:#197450;--theme-accent-ink:#fff}
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 5%,#d9f3e8,transparent 28rem),#f2f7f2}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 5%,color-mix(in srgb,var(--theme-accent) 16%,var(--theme-background)),transparent 28rem),var(--theme-background);color:var(--theme-text)}
     .wrap{width:min(100% - 28px,760px);margin:auto;padding:22px 0 42px}
-    .trial{display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 14px;border:1px solid #e9b74c;border-radius:14px;background:#fff5d8;color:#68450b;font-size:.77rem;font-weight:900;letter-spacing:.11em;text-align:center}
+    .trial{display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 14px;border:1px solid var(--theme-accent);border-radius:14px;background:var(--theme-surface);color:var(--theme-text);font-size:.77rem;font-weight:900;letter-spacing:.11em;text-align:center}
     .trial b{font-size:1rem}
-    header{text-align:center;padding:25px 8px 20px}
-    .brand{color:#237a5b;font-size:.85rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
-    h1{margin:6px 0;color:#173b31;font-size:clamp(2rem,8vw,3.2rem);line-height:1.04}
-    header p{margin:8px auto 0;max-width:520px;color:#587166;line-height:1.55}
-    .menu,.reward-banner{margin:14px 0;padding:19px;border:1px solid #d6e5da;border-radius:20px;background:#fff;box-shadow:0 12px 30px #2149380d}
+    header{position:relative;text-align:center;padding:25px 8px 20px;border-bottom:3px solid var(--theme-accent)}
+    header:after{content:var(--theme-motif,"");position:absolute;right:12px;top:12px;font-size:1.35rem}
+    :root[data-theme-id="diwali"] header:after{animation:diwali-twinkle 3.6s ease-in-out infinite alternate}
+    @keyframes diwali-twinkle{from{opacity:.82;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}
+    .brand{color:var(--theme-text);font-size:.85rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    h1{margin:6px 0;color:var(--theme-text);font-size:clamp(2rem,8vw,3.2rem);line-height:1.04}
+    header p{margin:8px auto 0;max-width:520px;color:var(--theme-muted);line-height:1.55}
+    .menu,.reward-banner{margin:14px 0;padding:19px;border:1px solid var(--theme-accent);border-radius:20px;background:var(--theme-surface);box-shadow:0 12px 30px #2149380d}
     .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 13px;font-size:1.12rem}
-    .demo-tag{padding:5px 8px;border-radius:99px;background:#e8f4ec;color:#286249;font-size:.68rem;font-weight:800}
+    .demo-tag{padding:5px 8px;border-radius:99px;background:var(--theme-background);color:var(--theme-text);font-size:.68rem;font-weight:800}
     .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-    .menu-item{padding:12px;border:1px solid #e5eee7;border-radius:13px;background:#fbfdfb}
+    .menu-item{padding:12px;border:1px solid var(--theme-background);border-radius:13px;background:var(--theme-surface)}
     .menu-item strong{display:block;font-size:.95rem}
-    .menu-item span{display:block;margin-top:4px;color:#61756a;font-size:.86rem}
+    .menu-item span{display:block;margin-top:4px;color:var(--theme-muted);font-size:.86rem}
     .reward-banner{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .reward-banner h2{margin:0;color:#173b31;font-size:1.05rem}
-    .reward-banner p{margin:5px 0 0;color:#587166;font-size:.88rem;line-height:1.45}
-    .reward-link{flex:none;padding:11px 14px;border-radius:11px;background:#197450;color:#fff;font-size:.88rem;font-weight:800;text-align:center;text-decoration:none}
-    .reward-link:focus-visible{outline:3px solid #83cda8;outline-offset:2px}
+    .reward-banner h2{margin:0;color:var(--theme-text);font-size:1.05rem}
+    .reward-banner p{margin:5px 0 0;color:var(--theme-muted);font-size:.88rem;line-height:1.45}
+    .reward-link{flex:none;padding:11px 14px;border-radius:11px;background:var(--theme-accent);color:var(--theme-accent-ink);font-size:.88rem;font-weight:800;text-align:center;text-decoration:none}
+    .reward-link:focus-visible{outline:3px solid var(--theme-accent);outline-offset:2px}
+    .theme-greeting{font-weight:750}
+    .theme-quote{font-size:.84rem}
+    .theme-chip{display:inline-block;margin-top:10px;padding:5px 9px;border:1px solid var(--theme-accent);border-radius:99px;background:var(--theme-surface);color:var(--theme-text);font-size:.72rem;font-weight:750}
     @media(max-width:500px){.reward-banner{align-items:stretch;flex-direction:column;gap:12px}.reward-link{width:100%}}
     @media(max-width:400px){.wrap{width:min(100% - 20px,760px)}.menu,.reward-banner{padding:15px}.menu-grid{gap:7px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
@@ -59,6 +65,7 @@
       <a class="reward-link" href="/rewards/roomslider-demo">Open Daily Reward</a>
     </section>
   </main>
+  <script src="/c/shared/theme-engine.js"></script>
   <script src="/c/shared/rewards-button.js" data-cafe="roomslider-demo"></script>
   <script src="/tracker.js" defer></script>
 </body>

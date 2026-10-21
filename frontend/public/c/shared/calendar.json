@@ -1,0 +1,28 @@
+{
+  "festivals": [
+    { "id": "makar-sankranti", "name": "Makar Sankranti", "date": "2027-01-14" },
+    { "id": "maha-shivaratri", "name": "Maha Shivaratri", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "holi", "name": "Holi", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "ram-navami", "name": "Ram Navami", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "raksha-bandhan", "name": "Raksha Bandhan", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "janmashtami", "name": "Janmashtami", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "ganesh-chaturthi", "name": "Ganesh Chaturthi", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "navratri", "name": "Navratri", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "dussehra", "name": "Dussehra", "date": null, "todo": "fill from trusted panchang" },
+    { "id": "dhanteras", "name": "Dhanteras", "date": "2026-11-06" },
+    { "id": "diwali", "name": "Diwali", "date": "2026-11-08" },
+    { "id": "bhai-dooj", "name": "Bhai Dooj", "date": "2026-11-11" },
+    { "id": "chhath", "name": "Chhath", "date": "2026-11-15" },
+    { "id": "gita-jayanti", "name": "Gita Jayanti", "date": "2026-12-20" }
+  ],
+  "nationalDays": [
+    { "id": "republic-day", "name": "Republic Day", "date": "2027-01-26", "repeat": "yearly", "monthDay": "01-26" },
+    { "id": "independence-day", "name": "Independence Day", "date": null, "repeat": "yearly", "monthDay": "08-15" },
+    { "id": "gandhi-jayanti", "name": "Gandhi Jayanti", "date": null, "repeat": "yearly", "monthDay": "10-02" }
+  ],
+  "eventDays": [],
+  "eventExamples": [
+    { "id": "cricket-match-example", "name": "Cricket match", "date": null, "example": true, "themeId": "event-cricket" },
+    { "id": "result-day-example", "name": "Result day", "date": null, "example": true, "themeId": "event-results" }
+  ]
+}
